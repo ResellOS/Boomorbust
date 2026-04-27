@@ -1,101 +1,88 @@
-import Image from "next/image";
+import Link from 'next/link';
 
-export default function Home() {
+const FEATURES = [
+  {
+    title: 'Multi-League Dashboard',
+    description: 'All your dynasty leagues in one place. Synced live from Sleeper with roster health at a glance.',
+    icon: (
+      <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+        <rect x="3" y="3" width="7" height="7" rx="1.5" />
+        <rect x="14" y="3" width="7" height="7" rx="1.5" />
+        <rect x="3" y="14" width="7" height="7" rx="1.5" />
+        <rect x="14" y="14" width="7" height="7" rx="1.5" />
+      </svg>
+    ),
+  },
+  {
+    title: 'Trade Analyzer',
+    description: 'KTC-powered trade analysis with future value weighting, positional need scoring, and age curve penalties.',
+    icon: (
+      <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+        <path d="M7 16l-4-4 4-4M17 8l4 4-4 4M14 4l-4 16" />
+      </svg>
+    ),
+  },
+  {
+    title: 'Sit/Start Optimizer',
+    description: 'Week-by-week lineup recommendations driven by projections, matchup DVOA, and real-time weather.',
+    icon: (
+      <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+        <circle cx="12" cy="12" r="9" />
+        <path d="M12 7v5l3 3" />
+      </svg>
+    ),
+  },
+];
+
+export default function LandingPage() {
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+    <div className="min-h-screen bg-[#0F172A] flex flex-col">
+      <main className="flex-1 flex flex-col items-center justify-center px-6 py-20 text-center">
+        {/* Hero */}
+        <div className="mb-16 max-w-3xl">
+          <div className="inline-flex items-center gap-2 bg-[#6366F1]/10 border border-[#6366F1]/20 rounded-full px-4 py-1.5 mb-8">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#6366F1] animate-pulse" />
+            <span className="text-[#6366F1] text-xs font-semibold tracking-wide uppercase">Dynasty Intelligence</span>
+          </div>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+          <h1 className="text-5xl sm:text-6xl font-bold text-white leading-tight mb-4">
+            Dynasty{' '}
+            <span className="text-[#6366F1]">Command Center</span>
+          </h1>
+          <p className="text-lg text-[#94A3B8] max-w-xl mx-auto">
+            The most powerful dynasty fantasy football tool ever built. Manage every league, analyze every trade, win every week.
+          </p>
+
+          <div className="flex items-center justify-center gap-4 mt-10">
+            <Link
+              href="/auth/signup"
+              className="bg-[#6366F1] hover:bg-[#6366F1]/90 text-white font-semibold px-8 py-3 rounded-xl transition text-sm"
+            >
+              Get started free
+            </Link>
+            <Link
+              href="/auth/login"
+              className="border border-white/15 hover:border-white/30 text-[#CBD5E1] hover:text-white font-medium px-8 py-3 rounded-xl transition text-sm"
+            >
+              Sign in
+            </Link>
+          </div>
+        </div>
+
+        {/* Feature cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 max-w-4xl w-full">
+          {FEATURES.map((f) => (
+            <div
+              key={f.title}
+              className="bg-[#1E293B] border border-white/5 hover:border-[#6366F1]/30 rounded-2xl p-6 text-left transition-colors"
+            >
+              <div className="text-[#6366F1] mb-4">{f.icon}</div>
+              <h3 className="text-white font-semibold mb-2">{f.title}</h3>
+              <p className="text-[#94A3B8] text-sm leading-relaxed">{f.description}</p>
+            </div>
+          ))}
         </div>
       </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
     </div>
   );
 }
