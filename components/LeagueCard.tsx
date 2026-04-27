@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Users, Calendar, ArrowRight } from 'lucide-react';
 import { clsx } from 'clsx';
 import { createClient } from '@/lib/supabase/client';
+import OpenInSleeper from '@/components/OpenInSleeper';
 
 interface League {
   id: string;
@@ -47,7 +48,7 @@ const INJURY_COLORS: Record<string, string> = {
   IR: 'bg-red-600/30 text-red-400',
 };
 
-export default function LeagueCard({ league }: { league: League }) {
+export default function LeagueCard({ league, hasAlert = false }: { league: League; hasAlert?: boolean }) {
   const [players, setPlayers] = useState<Record<string, PlayerSummary>>({});
   const [rosterIds, setRosterIds] = useState<string[]>([]);
   const supabase = createClient();
@@ -77,13 +78,21 @@ export default function LeagueCard({ league }: { league: League }) {
     ?? league.total_rosters;
 
   return (
-    <Link href={`/dashboard/league/${league.id}`}>
+    <Link href={`/dashboard/league/${league.id}`} className="relative block">
+      {hasAlert && (
+        <span
+          title="Roster action needed"
+          className="absolute -top-1.5 -right-1.5 z-10 w-3.5 h-3.5 rounded-full bg-red-500 border-2 border-[#0F172A]"
+        />
+      )}
       <div
         className={clsx(
           'bg-[#1E293B] rounded-2xl p-6 flex flex-col gap-4',
-          'border border-white/5 hover:border-indigo-500/40',
+          'border transition-all duration-200 cursor-pointer h-full',
+          hasAlert
+            ? 'border-red-500/30 hover:border-red-500/50'
+            : 'border-white/5 hover:border-indigo-500/40',
           'hover:shadow-lg hover:shadow-indigo-500/5',
-          'transition-all duration-200 cursor-pointer h-full'
         )}
       >
         {/* Row 1: name + scoring badge */}
@@ -147,10 +156,13 @@ export default function LeagueCard({ league }: { league: League }) {
           )}
         </div>
 
-        {/* Row 4: view link */}
+        {/* Row 4: view link + open in Sleeper */}
         <div className="flex items-center justify-between pt-2 border-t border-white/5">
-          <span className="text-[#6366F1] text-sm font-medium">View League</span>
-          <ArrowRight className="w-4 h-4 text-[#6366F1]" />
+          <div className="flex items-center gap-1.5 text-[#6366F1] text-sm font-medium">
+            View League
+            <ArrowRight className="w-4 h-4" />
+          </div>
+          <OpenInSleeper leagueId={league.id} variant="icon" />
         </div>
       </div>
     </Link>

@@ -31,6 +31,8 @@ export interface SleeperRoster {
   league_id: string;
   players: string[] | null;
   starters: string[] | null;
+  reserve: string[] | null;
+  taxi: string[] | null;
   settings: Record<string, number>;
 }
 

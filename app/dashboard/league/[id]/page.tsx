@@ -6,6 +6,7 @@ import { clsx } from 'clsx';
 import { RefreshCw } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { calculatePlayerDynastyScore } from '@/lib/values/engine';
+import OpenInSleeper from '@/components/OpenInSleeper';
 
 type TabId = 'roster' | 'transactions' | 'standings';
 
@@ -250,14 +251,17 @@ export default function LeaguePage() {
           </div>
           <p className="text-xs text-[#94A3B8]">Last synced {timeAgo(league.synced_at)}</p>
         </div>
-        <button
-          onClick={handleSync}
-          disabled={syncing}
-          className="flex items-center gap-2 text-sm text-[#94A3B8] hover:text-white border border-white/10 hover:border-white/30 px-3 py-1.5 rounded-lg transition disabled:opacity-50"
-        >
-          <RefreshCw className={clsx('w-4 h-4', syncing && 'animate-spin')} />
-          {syncing ? 'Syncing...' : 'Sync'}
-        </button>
+        <div className="flex items-center gap-2 shrink-0">
+          <OpenInSleeper leagueId={league.id} variant="button" />
+          <button
+            onClick={handleSync}
+            disabled={syncing}
+            className="flex items-center gap-2 text-sm text-[#94A3B8] hover:text-white border border-white/10 hover:border-white/30 px-3 py-1.5 rounded-lg transition disabled:opacity-50"
+          >
+            <RefreshCw className={clsx('w-4 h-4', syncing && 'animate-spin')} />
+            {syncing ? 'Syncing...' : 'Sync'}
+          </button>
+        </div>
       </div>
 
       {/* Tabs */}
