@@ -4,6 +4,7 @@ import { Redis } from '@upstash/redis';
 import { createClient } from '@/lib/supabase/server';
 import { getPlayersByIds } from '@/lib/sleeper/players';
 import { getKTCValues } from '@/lib/values/ktc';
+import { buildSystemPrompt } from '@/lib/coach/context';
 
 const anthropic = new Anthropic();
 const DAILY_LIMIT = 20;
@@ -97,9 +98,9 @@ export async function POST(request: NextRequest) {
   const { messages, includeContext } = await request.json();
   const systemContext = includeContext ? await buildCoachContext(user.id) : '';
 
-  const systemPrompt = `You are Dynasty Coach, an expert dynasty fantasy football analyst with access to this manager's complete roster data across all their Sleeper leagues. Be specific, direct, and reference their actual players and league situations. Always explain your reasoning. Be opinionated and give a clear recommendation.
-
-${systemContext ? `\n${systemContext}` : ''}`;
+  const systemPrompt = buildSystemPrompt(
+    `You are Dynasty Coach — an expert dynasty fantasy football analyst with complete access to this manager's rosters across all their Sleeper leagues. Be specific, direct, and reference actual players and league situations. Always explain your reasoning. Be opinionated and give a clear recommendation.${systemContext ? `\n\n${systemContext}` : ''}`
+  );
 
   const stream = anthropic.messages.stream({
     model: 'claude-sonnet-4-6',

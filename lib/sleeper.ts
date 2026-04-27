@@ -53,6 +53,14 @@ export async function fetchSleeperUserByUsername(
   return sleeperFetch(`/user/${username}`);
 }
 
+export interface SleeperDraftPick {
+  round: number;
+  season: string;
+  roster_id: number;
+  owner_id: number;
+  previous_owner_id: number;
+}
+
 export interface SleeperTransaction {
   transaction_id: string;
   type: 'trade' | 'free_agent' | 'waiver';
@@ -60,8 +68,15 @@ export interface SleeperTransaction {
   created: number;
   adds: Record<string, number> | null;
   drops: Record<string, number> | null;
-  draft_picks: unknown[];
+  draft_picks: SleeperDraftPick[];
   roster_ids: number[];
+}
+
+export interface SleeperUser {
+  user_id: string;
+  username: string;
+  display_name: string;
+  avatar: string | null;
 }
 
 export async function fetchTransactions(
@@ -81,4 +96,8 @@ export interface TradedPick {
 
 export async function fetchTradedPicks(leagueId: string): Promise<TradedPick[] | null> {
   return sleeperFetch<TradedPick[]>(`/league/${leagueId}/traded_picks`);
+}
+
+export async function fetchLeagueUsers(leagueId: string): Promise<SleeperUser[] | null> {
+  return sleeperFetch<SleeperUser[]>(`/league/${leagueId}/users`);
 }

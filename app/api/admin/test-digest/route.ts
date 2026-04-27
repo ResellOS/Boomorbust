@@ -15,7 +15,7 @@ export async function POST() {
   const adminUser = user!;
 
   try {
-    const digest = await generateWeeklyDigest(adminUser.id, 1, '2025');
+    const digest = await generateWeeklyDigest(adminUser.id, adminUser.email!, 1, '2025', supabase);
     if (!digest) return NextResponse.json({ message: '✗ No digest data — sync leagues first' }, { status: 400 });
 
     const html = buildDigestEmailHtml(digest);

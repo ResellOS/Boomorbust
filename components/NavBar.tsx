@@ -16,6 +16,7 @@ const NAV_LINKS: Array<{ href: string; label: string; badge?: string }> = [
   { href: '/dashboard/lineup', label: 'Lineup' },
   { href: '/dashboard/trade', label: 'Trade' },
   { href: '/dashboard/trade/finder', label: 'Finder' },
+  { href: '/dashboard/managers', label: 'Managers' },
   { href: '/dashboard/alerts', label: 'Alerts' },
   { href: '/dashboard/handcuffs', label: 'Handcuffs' },
   { href: '/dashboard/coach', label: 'Coach', badge: '✦' },

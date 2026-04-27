@@ -1,29 +1,29 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Resend } from 'resend';
-import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { generateWeeklyDigest, buildDigestEmailHtml } from '@/lib/digest/generator';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function POST(request: NextRequest) {
-  // Verify cron secret
   const auth = request.headers.get('authorization');
   if (auth !== `Bearer ${process.env.CRON_SECRET}`) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const supabase = createClient();
-  const { data: users } = await supabase.from('profiles').select('id');
+  const db = createAdminClient();
+  const { data: users } = await db.auth.admin.listUsers();
 
-  if (!users?.length) return NextResponse.json({ sent: 0 });
+  if (!users?.users?.length) return NextResponse.json({ sent: 0 });
 
   const now = new Date();
   const week = Math.ceil((now.getTime() - new Date('2025-09-04').getTime()) / (7 * 86400000));
   const season = '2025';
   let sent = 0;
 
-  for (const { id } of users) {
-    const digest = await generateWeeklyDigest(id, week, season);
+  for (const user of users.users) {
+    if (!user.email) continue;
+    const digest = await generateWeeklyDigest(user.id, user.email, week, season, db);
     if (!digest) continue;
 
     try {
@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
       });
       sent++;
     } catch (err) {
-      console.error(`Failed to send digest for ${id}:`, err);
+      console.error(`Failed to send digest for ${user.id}:`, err);
     }
   }
 

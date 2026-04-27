@@ -1,27 +1,29 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Anthropic from '@anthropic-ai/sdk';
 import type { PickInput, RosterPlayerInput, LeagueInput } from '@/lib/picks/advisor';
+import { buildSystemPrompt } from '@/lib/coach/context';
 
 const client = new Anthropic();
 
-// Static system prompt — eligible for prompt caching
-const SYSTEM_PROMPT = `You are a dynasty fantasy football expert with deep knowledge of pick values, roster construction, and long-term team building. Your analysis is direct, specific, and actionable.
+const PICK_INSTRUCTIONS = `You are a dynasty fantasy football expert with deep knowledge of pick values, roster construction, and long-term team building. Your analysis is direct, specific, and actionable.
 
 When analyzing a dynasty draft pick, structure your response with exactly these four sections:
 
 **Overview**
-What this pick slot typically produces: player caliber, historical examples, and floor vs. ceiling expectations. Reference KTC value context.
+What this pick slot typically produces: player caliber, historical examples, and floor vs. ceiling expectations. Reference KTC value tier (not vague language — use "~4,500 KTC mid-first range" style references).
 
 **Roster Fit**
-How this pick fits the team's specific age curve and positional needs. Be specific about the roster data provided — mention actual players if relevant.
+How this pick fits the team's specific age curve and positional needs. Be specific about the roster data provided — mention actual players if relevant. Factor in this manager's WR-first philosophy.
 
 **Trade Considerations**
-When to hold vs. trade this pick. What types of trade offers should trigger selling. What conditions make holding optimal.
+When to hold vs. trade this pick. Reference specific value thresholds that should trigger selling. Name the round/tier equivalent for any offers worth considering.
 
 **Bottom Line**
 One clear recommendation in 2-3 sentences. Be direct and opinionated.
 
-Keep the total response under 450 words. Use dynasty community terminology. Do not use filler phrases like "great question" or "certainly".`;
+Keep the total response under 450 words. Use dynasty community terminology.`;
+
+const SYSTEM_PROMPT = buildSystemPrompt(PICK_INSTRUCTIONS);
 
 export async function POST(request: NextRequest) {
   const apiKey = process.env.ANTHROPIC_API_KEY;

@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server';
+import type { SupabaseClient } from '@supabase/supabase-js';
 import { getPlayersByIds } from '@/lib/sleeper/players';
 import { getKTCValues } from '@/lib/values/ktc';
 import { scanAllRosterInjuries } from '@/lib/injuries/broadcaster';
@@ -27,14 +27,11 @@ export interface DigestData {
 
 export async function generateWeeklyDigest(
   user_id: string,
+  user_email: string,
   week: number,
-  season: string
+  season: string,
+  supabase: SupabaseClient
 ): Promise<DigestData | null> {
-  const supabase = createClient();
-
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return null;
-
   const [{ data: leagues }, { data: profile }] = await Promise.all([
     supabase.from('leagues').select('id, name, total_rosters, scoring_settings').eq('user_id', user_id),
     supabase.from('profiles').select('sleeper_user_id, preference_data').eq('id', user_id).single(),
@@ -103,7 +100,7 @@ export async function generateWeeklyDigest(
   ];
 
   return {
-    user_email: user.email ?? '',
+    user_email,
     week,
     season,
     injuries,
