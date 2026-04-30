@@ -1,0 +1,42 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx create-next-app@14 dynasty-command-center --typescript --tailwind --eslint --app --no-src-dir --import-alias \"@/*\" --use-npm --yes)",
+      "Bash(npm install *)",
+      "Bash(npx tsc *)",
+      "Bash(npm run *)",
+      "Bash(./node_modules/.bin/tsc --noEmit)",
+      "Bash(git remote *)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git push *)",
+      "Bash(python3 -c \" import sys, json lines = sys.stdin.read\\(\\).strip\\(\\).split\\('\\\\n'\\) for line in lines[-30:]: try: obj = json.loads\\(line\\) role = obj.get\\('role', ''\\) content = obj.get\\('content', ''\\) if isinstance\\(content, list\\): for c in content: if isinstance\\(c, dict\\) and c.get\\('type'\\) == 'text': print\\(f'[{role}]: {c[\\\\\"text\\\\\"][:500]}'\\) elif isinstance\\(content, str\\): print\\(f'[{role}]: {content[:500]}'\\) except: pass \")",
+      "Bash(powershell -Command 'Get-Content '\\\\''C:\\\\Users\\\\Kody\\\\.claude\\\\projects\\\\G--SaaSylum-FantasySmartass\\\\c55987de-cf46-4e7b-971a-8795f50663de.jsonl'\\\\'' -Tail 5 | ForEach-Object { $_ | ConvertFrom-Json | Select-Object -ExpandProperty content } 2>&1 | Select-Object -Last 20')",
+      "Bash(git -C \"G:/SaaSylum/FantasySmartass/dynasty-command-center\" log --oneline -10)",
+      "Bash(git -C \"G:/SaaSylum/FantasySmartass/dynasty-command-center\" diff HEAD)",
+      "Bash(echo \"EXIT:$?\")",
+      "Bash(echo \"TSC_EXIT:$?\")",
+      "WebFetch(domain:boomorbust.app)",
+      "Bash(git branch *)",
+      "Bash(git config *)",
+      "Bash(ls app/onboarding)",
+      "Bash(ls app/dashboard/onboarding)",
+      "Bash(rm -rf .next)",
+      "Bash(wmic logicaldisk *)",
+      "Bash(npm cache *)",
+      "PowerShell(Get-WmiObject *)",
+      "Bash(fsutil volume *)",
+      "Bash(node node_modules/.bin/next build)",
+      "Bash(npx next *)",
+      "Bash(git init *)",
+      "Bash(git status *)",
+      "Bash(git check-ignore *)",
+      "Bash(xargs grep *)",
+      "WebSearch",
+      "WebFetch(domain:docs.sleeper.com)",
+      "PowerShell(head *)",
+      "Bash(node -e \"const p = require\\('./package.json'\\); const deps = {...p.dependencies, ...p.devDependencies}; const keys = Object.keys\\(deps\\).filter\\(k => ['recharts','framer-motion','@radix-ui','react-spring'].some\\(x => k.includes\\(x\\)\\)\\); console.log\\(JSON.stringify\\(keys, null, 2\\)\\)\")",
+      "Bash(node -e \"const p = require\\('./package.json'\\); console.log\\(JSON.stringify\\({...p.dependencies}, null, 2\\)\\)\")"
+    ]
+  }
+}
