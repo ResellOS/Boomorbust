@@ -1,0 +1,170 @@
+'use client';
+
+import React from 'react';
+import { Check, X, ArrowRight, TrendingUp } from 'lucide-react';
+
+const BOOM_MINT = '#36E7A1';
+const BUST_PURPLE = '#733FF1';
+
+const comparisonData = [
+  { feature: 'Trade Analyzer', ktc: true, flock: true, boom: true },
+  { feature: 'Dynasty Rankings', ktc: true, flock: true, boom: true },
+  { feature: 'Start / Sit Decisions', ktc: false, flock: false, boom: true },
+  { feature: 'Portfolio Tracking', ktc: false, flock: false, boom: true },
+  { feature: 'Rookie Analytics', ktc: true, flock: true, boom: true },
+  { feature: 'Price', ktc: 'FREE', flock: '$24/mo', boom: '$10/mo' },
+];
+
+export default function ComparisonSection() {
+  return (
+    <section className="bg-[#0F1117] py-32 px-6 border-t border-white/5 relative overflow-hidden">
+      {/* Subtle Background Glows matching image_6c24a0.png */}
+      <div className="absolute top-0 left-1/4 w-96 h-96 bg-[#733FF1]/10 blur-[120px] pointer-events-none" />
+      
+      <div className="max-w-[1200px] mx-auto relative z-10">
+        
+        {/* ── TOP SECTION: COMPETITORS ── */}
+        <div className="grid lg:grid-cols-2 gap-20 items-center mb-48">
+          <div className="space-y-10">
+            <div>
+              <h2 className="text-5xl font-[900] text-white italic uppercase tracking-tighter leading-[0.8] mb-6">
+                Most Tools Give Rankings.<br />
+                <span className="bg-clip-text text-transparent bg-gradient-to-r from-[#36E7A1] to-[#2bd191]">We Give Decisions.</span>
+              </h2>
+              <p className="text-slate-400 text-lg font-medium max-w-md leading-relaxed border-l-2 border-[#36E7A1]/30 pl-6">
+                Don't pay for information you can get for free. Pay for the <span className="text-white">execution</span> that wins championships.
+              </p>
+            </div>
+
+            <ul className="space-y-5">
+              {['Start/Sit for every league', 'Full portfolio exposure', 'Real-time trade alerts', 'Integrated rookie film'].map((item) => (
+                <li key={item} className="flex items-center gap-4 text-xs font-black uppercase tracking-[0.2em] text-slate-200 italic">
+                  <div className="p-1 rounded-sm bg-[#36E7A1]/10">
+                    <Check size={14} style={{ color: BOOM_MINT }} strokeWidth={4} />
+                  </div> 
+                  {item}
+                </li>
+              ))}
+            </ul>
+
+            <button className="flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.3em] px-8 py-4 bg-white/5 border border-white/10 rounded-sm hover:bg-white/10 transition-all group">
+              Full Breakdown <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+            </button>
+          </div>
+
+          {/* TABLE (Referencing 3_5.png & image_6c24a0.png styles) */}
+          <div className="bg-[#12141C] border border-white/10 rounded-sm overflow-hidden shadow-[0_30px_60px_rgba(0,0,0,0.5)]">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="border-b border-white/5 bg-white/[0.02]">
+                  <th className="p-6 text-[10px] font-black uppercase tracking-[0.25em] text-slate-500 italic">Feature Set</th>
+                  <th className="p-6 text-[10px] font-black uppercase tracking-[0.25em] text-slate-500 italic text-center">KTC</th>
+                  <th className="p-6 text-[10px] font-black uppercase tracking-[0.25em] text-slate-500 italic text-center">Flock</th>
+                  <th className="p-6 text-[10px] font-black uppercase tracking-[0.25em] italic text-center text-[#36E7A1] bg-[#36E7A1]/5">BOOM</th>
+                </tr>
+              </thead>
+              <tbody>
+                {comparisonData.map((row, i) => {
+                  const isPrice = row.feature === 'Price';
+                  return (
+                    <tr key={i} className={`border-b border-white/[0.03] last:border-0 transition-colors ${isPrice ? 'bg-white/[0.04]' : ''}`}>
+                      <td className="p-6 text-[11px] font-black text-white uppercase italic tracking-wider">{row.feature}</td>
+                      <td className="p-6 text-center">
+                         {row.ktc === true ? <Check size={18} className="mx-auto text-slate-600" /> : row.ktc === false ? <X size={18} className="mx-auto text-red-500/20" /> : <span className="text-[10px] font-black text-slate-500">{row.ktc}</span>}
+                      </td>
+                      <td className="p-6 text-center">
+                         {row.flock === true ? <Check size={18} className="mx-auto text-slate-600" /> : row.flock === false ? <X size={18} className="mx-auto text-red-500/20" /> : <span className="text-[10px] font-black text-red-500/40">{row.flock}</span>}
+                      </td>
+                      <td className="p-6 text-center bg-[#36E7A1]/5">
+                         {row.boom === true ? (
+                           <Check size={20} className="mx-auto" style={{ color: BOOM_MINT }} strokeWidth={4} />
+                         ) : (
+                           <span className="text-[11px] font-black italic underline decoration-2 underline-offset-4" style={{ color: BOOM_MINT }}>{row.boom}</span>
+                         )}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* ── BOTTOM SECTION: PORTFOLIO (Referencing 3_5.png) ── */}
+        <div className="grid lg:grid-cols-2 gap-24 items-center">
+          {/* DASHBOARD MOCKUP inspired by image_6c24a0.png */}
+          <div className="bg-[#0D0F14] border border-white/10 p-10 rounded-sm shadow-[0_50px_100px_rgba(0,0,0,0.8)] relative overflow-hidden">
+             <div className="absolute top-0 right-0 w-32 h-32 bg-[#36E7A1]/5 blur-3xl" />
+             
+             <div className="flex justify-between items-end mb-12">
+                <div>
+                  <div className="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em] mb-1">Portfolio Power Index</div>
+                  <div className="text-5xl font-[900] text-white italic leading-none tracking-tighter">8,422 <span className="text-sm text-[#36E7A1] ml-2">+840 pts</span></div>
+                </div>
+                <div className="text-[9px] font-black text-slate-600 uppercase tracking-widest italic border border-white/10 px-3 py-1">v2.1 Stable</div>
+             </div>
+             
+             <div className="grid grid-cols-1 gap-8 mb-10">
+                <div className="bg-[#161922] p-8 rounded-sm border border-white/5 relative">
+                   <div className="flex justify-between items-center mb-6">
+                      <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest italic">Weekly Efficiency</span>
+                      <TrendingUp size={24} style={{ color: BOOM_MINT }} />
+                   </div>
+                   <div className="h-24 w-full flex items-end gap-1">
+                      {[40, 70, 45, 90, 65, 80, 95].map((h, i) => (
+                        <div key={i} className="flex-1 bg-gradient-to-t from-[#733FF1]/20 to-[#36E7A1]/40 rounded-t-sm" style={{ height: `${h}%` }} />
+                      ))}
+                   </div>
+                </div>
+             </div>
+
+             <div className="flex justify-between items-center">
+                <div className="flex -space-x-4">
+                  {[1, 2, 3, 4].map(i => (
+                    <div key={i} className="w-12 h-12 rounded-full bg-slate-800 border-4 border-[#0D0F14] z-[10-i]" />
+                  ))}
+                </div>
+                <button className="text-[10px] font-black text-white/40 uppercase tracking-[0.3em] hover:text-[#36E7A1] transition-colors italic">
+                  Explore Exposure Matrix ›
+                </button>
+             </div>
+          </div>
+
+          <div className="space-y-10">
+            <h2 className="text-5xl font-[900] text-white italic uppercase tracking-tighter leading-[0.85]">
+              Stop Managing Teams.<br />
+              Manage an Empire.
+            </h2>
+            <p className="text-slate-400 text-lg font-medium leading-relaxed max-w-md">
+              The high-stakes edge isn't found in one roster. It's found in the <span className="text-white">aggregate</span>. Track every share across every league instantly.
+            </p>
+            
+            <ul className="grid grid-cols-1 gap-4">
+              {[
+                'Dominate with Portfolio-wide Analytics',
+                'Identify "Bust" Exposure Early',
+                'Bulk Optimization for 50+ Leagues',
+                'The Industry Standard for Dynasty Pros'
+              ].map((item) => (
+                <li key={item} className="flex items-center gap-4 text-xs font-black uppercase tracking-[0.15em] text-slate-300 italic group">
+                  <div className="h-[2px] w-6 bg-[#733FF1] group-hover:w-10 group-hover:bg-[#36E7A1] transition-all" />
+                  {item}
+                </li>
+              ))}
+            </ul>
+
+            <div className="pt-6">
+              <button 
+                className="group relative inline-flex items-center justify-center px-14 py-6 bg-[#36E7A1] text-black font-[1000] text-sm uppercase tracking-[0.4em] transition-all hover:scale-[1.05] active:scale-[0.95]"
+              >
+                <div className="absolute inset-0 bg-black translate-x-2 translate-y-2 -z-10 group-hover:translate-x-0 group-hover:translate-y-0 transition-transform" />
+                START FOR FREE NOW!
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+  );
+}

@@ -1,0 +1,134 @@
+'use client';
+
+import React from 'react';
+import { 
+  CloudUpload,
+  Brain, 
+  Target, 
+  ChartPie, 
+  TrendingUp, 
+  ArrowLeftRight, 
+  Zap, 
+  ShieldCheck, 
+  Star,
+  MoveRight 
+} from 'lucide-react';
+
+const BOOM_MINT = '#36E7A1';
+const BUST_PURPLE = '#733FF1';
+
+const steps = [
+  {
+    id: '01',
+    title: 'Import Your Leagues',
+    desc: 'Connect your Sleeper account in seconds. We pull every roster automatically.',
+    icon: <CloudUpload size={18} />,
+  },
+  {
+    id: '02',
+    title: 'We Analyze Everything',
+    desc: 'Our engine processes historical data to find your hidden advantages.',
+    icon: <Brain size={18} />,
+  },
+  {
+    id: '03',
+    title: 'Get Weekly Dominance',
+    desc: 'Receive tailored lineup advice and trade alerts built for your rosters.',
+    icon: <Target size={18} />,
+  },
+];
+
+const features = [
+  { title: 'Impact Dashboard', desc: 'Birds-eye view of your entire portfolio.', icon: <ChartPie /> },
+  { title: 'Start/Sit Optimizer', desc: 'Mathematically backed weekly decisions.', icon: <TrendingUp /> },
+  { title: 'Trade Analyzer', desc: 'Instant dynasty value and future potential checks.', icon: <ArrowLeftRight /> },
+  { title: 'Waiver Wire Targets', desc: 'Find sleepers available in your specific leagues.', icon: <Zap /> },
+  { title: 'Dynasty Strategy', desc: 'Manage draft capital and long-term roster age.', icon: <ShieldCheck /> },
+  { title: 'Rookie Intelligence', desc: 'Deep-dive data and grades for every prospect.', icon: <Star /> },
+];
+
+export default function FeaturesSection() {
+  return (
+    <section className="bg-[#0F1117] py-16 px-6 relative border-t border-white/5">
+      <div className="max-w-[900px] mx-auto z-10 relative">
+        
+        {/* ── WORKFLOW SECTION ── */}
+        <div className="text-center mb-12">
+          <h2 className="text-xl font-[900] text-white mb-2 uppercase tracking-widest italic opacity-80">
+            From Sync to Dominance in 30 Seconds
+          </h2>
+          <div className="h-[1px] w-12 bg-[#733FF1] mx-auto opacity-60" />
+        </div>
+
+        <div className="flex flex-col md:flex-row items-center justify-between gap-2 mb-20">
+          {steps.map((step, index) => {
+            const color = index % 2 === 0 ? BUST_PURPLE : BOOM_MINT;
+            return (
+              <React.Fragment key={step.id}>
+                <div className="flex-1 flex flex-col items-center text-center max-w-[240px] group">
+                  <div className="mb-4 relative">
+                    <div 
+                      className="p-4 bg-[#161922] rounded-xl border border-white/[0.05] shadow-lg transition-all duration-300"
+                      style={{ color: color }}
+                    >
+                      {step.icon}
+                    </div>
+                    <span className="absolute -top-2 -right-2 text-[9px] font-black text-white/10 italic">
+                      {step.id}
+                    </span>
+                  </div>
+                  <h3 className="text-[11px] font-black text-white mb-2 uppercase italic tracking-wider">
+                    {step.title}
+                  </h3>
+                  <p className="text-slate-500 leading-relaxed text-[10px] px-2 font-medium opacity-80">
+                    {step.desc}
+                  </p>
+                </div>
+                
+                {index < 2 && (
+                  <div className="hidden md:block text-white/5 pb-12">
+                    <MoveRight size={14} strokeWidth={1} />
+                  </div>
+                )}
+              </React.Fragment>
+            );
+          })}
+        </div>
+
+        {/* ── GRID SECTION ── */}
+        <div className="text-center mb-12">
+          <h2 className="text-xl font-[900] text-white mb-2 uppercase tracking-widest italic opacity-80">
+            Everything You Need to Win
+          </h2>
+        </div>
+
+        <div className="grid md:grid-cols-3 gap-4">
+          {features.map((feature, index) => {
+            const color = index % 2 === 0 ? BUST_PURPLE : BOOM_MINT;
+            return (
+              <div 
+                key={feature.title} 
+                className="bg-[#161922]/30 border border-white/[0.02] p-6 rounded-xl flex flex-col items-center text-center transition-all hover:bg-[#161922]/50 hover:border-white/5 group"
+              >
+                <div 
+                  className="mb-4 p-3 rounded-lg bg-[#0F1117] border border-white/5 shadow-md"
+                  style={{ color: color }}
+                >
+                  {React.cloneElement(feature.icon as React.ReactElement, { size: 16, strokeWidth: 2 })}
+                </div>
+                
+                <h4 className="text-[11px] font-black text-white/90 uppercase italic tracking-widest mb-2">
+                  {feature.title}
+                </h4>
+                
+                <p className="text-slate-500 text-[9px] leading-relaxed font-medium px-1 opacity-80">
+                  {feature.desc}
+                </p>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  );
+}

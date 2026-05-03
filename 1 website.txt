@@ -1,0 +1,114 @@
+Photo 1 page.tsx 'use client';
+
+import React from 'react';
+import Link from 'next/link';
+import { Check, CreditCard, ShieldCheck } from 'lucide-react';
+import DashboardMockup from '@/components/landing/DashboardMockup';
+
+const BOOM_MINT = '#36E7A1';
+const BUST_PURPLE = '#733FF1';
+
+export default function HeroSection() {
+  return (
+    <div className="min-h-screen text-white font-sans antialiased bg-[#0F1117] overflow-x-hidden">
+      
+      {/* ── BROAD ATMOSPHERIC LIGHTING ── */}
+      <div className="fixed inset-0 pointer-events-none z-0">
+        <div className="absolute top-[-10%] left-[-10%] w-[100%] h-[100%] opacity-15 blur-[120px] bg-gradient-to-br from-indigo-900/40 via-transparent to-transparent" />
+      </div>
+
+      <div className="relative z-10">
+        {/* ── NAVIGATION ── */}
+        <nav className="max-w-[1700px] mx-auto px-10 py-6 flex items-center justify-between">
+          <div className="flex items-center gap-16">
+            <Link href="/" className="flex items-center transition-transform hover:scale-105">
+              <img 
+                src="/images/logo-full2.png" 
+                alt="Boom or Bust" 
+                className="h-32 w-auto object-contain" 
+              />
+            </Link>
+            
+            <div className="hidden lg:flex items-center gap-10">
+              {['Features', 'How it Works', 'Pricing', 'Resources'].map((link) => (
+                <Link key={link} href="#" className="text-[10px] font-black text-slate-400 hover:text-white uppercase tracking-[0.3em] transition">
+                  {link}
+                </Link>
+              ))}
+            </div>
+          </div>
+
+          <div className="flex items-center gap-10">
+            <Link href="#" className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em]">Sign In</Link>
+            <button className="px-8 py-3 bg-[#1e2230] border border-white/10 text-white font-black text-[10px] uppercase tracking-[0.2em] rounded-md hover:bg-[#2a2f42] transition">
+              Import My Leagues
+            </button>
+          </div>
+        </nav>
+
+        {/* ── HERO CONTENT ── */}
+        <section className="px-10 pt-4 pb-24 max-w-[1700px] mx-auto">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            
+            <div className="relative z-20 flex flex-col items-start">
+              <div className="mb-10 w-full max-w-fit">
+                {/* CENTERED LEAD-IN: "Stop Asking What If" now centered over the slogan width */}
+                <h2 className="text-[34px] xl:text-[42px] font-black italic tracking-[0.08em] uppercase leading-none text-white/90 mb-4 text-center w-full whitespace-nowrap">
+                  STOP ASKING WHAT IF.
+                </h2>
+                
+                {/* STACKED SLOGAN */}
+                <h1 className="text-[54px] xl:text-[68px] font-[900] leading-[0.85] tracking-tighter uppercase italic">
+                  DRAFT THE <span style={{ color: BOOM_MINT }}>BOOM.</span> <br />
+                  DODGE THE <span style={{ color: BUST_PURPLE }}>BUST.</span>
+                </h1>
+
+                {/* ALIGNED TAGLINE WITH DASHES */}
+                <div className="mt-8 flex items-center justify-between gap-4 w-full">
+                  <div className="h-[1px] flex-grow bg-[#36E7A1]/40" />
+                  <p className="text-[#36E7A1] font-black italic tracking-[0.4em] uppercase text-[11px] whitespace-nowrap">
+                    your dynasty edge. every single week.
+                  </p>
+                  <div className="h-[1px] flex-grow bg-[#36E7A1]/40" />
+                </div>
+              </div>
+              
+              <p className="text-lg text-slate-400 font-medium mb-12 leading-relaxed max-w-lg border-l-2 border-white/5 pl-8">
+                Sync your fantasy leagues and get personalized statistics, decisions, trade analysis, and quality edge score—built specifically for your teams.
+              </p>
+
+              {/* BUTTONS */}
+              <div className="flex flex-col sm:flex-row gap-5 mb-16">
+                <button 
+                  className="px-12 py-6 text-black font-black text-[11px] uppercase tracking-[0.3em] rounded-xl transition-all shadow-[0_15px_40px_rgba(54,231,161,0.25)] flex items-center gap-4 group"
+                  style={{ backgroundColor: BOOM_MINT }}
+                >
+                  Import My Leagues 
+                  <span className="text-xl transition-transform group-hover:translate-x-2">›</span>
+                </button>
+                <button className="px-12 py-6 border border-white/10 text-white font-black text-[11px] uppercase tracking-[0.3em] rounded-xl hover:bg-white/5 transition-all">
+                  See It In Action
+                </button>
+              </div>
+
+              {/* STATUS BAR */}
+              <div className="flex flex-wrap gap-10 text-[9px] text-slate-500 font-black uppercase tracking-[0.25em]">
+                <span className="flex items-center gap-2"><Check size={16} className="text-yellow-500"/> 100% Free to Start</span>
+                <span className="flex items-center gap-2"><CreditCard size={16}/> No Credit Card Required</span>
+                <span className="flex items-center gap-2"><ShieldCheck size={16} className="text-blue-500"/> Secure with Sleeper</span>
+              </div>
+            </div>
+
+            {/* ── DASHBOARD PREVIEW WITH MARGIN ── */}
+            <div className="relative w-full lg:scale-100 xl:scale-110 flex justify-end">
+               <div className="absolute -inset-10 bg-[#733FF1]/5 blur-[100px] rounded-full pointer-events-none" />
+               <div className="relative rounded-[2.5rem] border border-white/10 bg-[#0D0F14] shadow-[0_80px_160px_rgba(0,0,0,0.8)] overflow-hidden w-[92%]">
+                  <DashboardMockup />
+               </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+  );
+}
