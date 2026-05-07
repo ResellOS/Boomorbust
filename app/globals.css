@@ -1,0 +1,486 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+  scroll-behavior: smooth;
+}
+
+:root {
+  /* Base */
+  --bg-primary: #080b14;
+  --bg-dark: #06080D;
+  --bg-secondary: #0d1220;
+  --bg-card: #111827;
+  --bg-card-hover: #162032;
+  --bg-surface: #1a2540;
+
+  /* Brand palette — command-center neon (mock-aligned) */
+  --color-boom: #39ff14;
+  --color-boom-soft: rgba(57, 255, 20, 0.45);
+  --color-bust: #6366f1;
+
+  /* Accents */
+  --indigo: #6366f1;
+  --indigo-light: #818cf8;
+  --indigo-glow: rgba(99, 102, 241, 0.15);
+  --cyan: #22d3ee;
+  --gold: #f59e0b;
+  --green: #10b981;
+  --red: #ef4444;
+  --amber: #f97316;
+
+  /* Text */
+  --text-primary: #f1f5f9;
+  --text-secondary: #94a3b8;
+  --text-muted: #475569;
+
+  /* Borders */
+  --border: rgba(255, 255, 255, 0.06);
+  --border-hover: rgba(99, 102, 241, 0.3);
+
+  /* Team colors (defaults; can be overridden via inline style from JS) */
+  --team-primary: #6366f1;
+  --team-primary-rgb: 99, 102, 241;
+  --team-secondary: #22d3ee;
+
+  /* Fonts — set by next/font on <body> via variables */
+  --font-display: var(--font-bebas-neue), 'Bebas Neue', sans-serif;
+  --font-body: var(--font-inter), 'Inter', system-ui, sans-serif;
+
+  /* Shadows */
+  --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.4);
+  --shadow-glow: 0 0 40px rgba(99, 102, 241, 0.15);
+}
+
+body {
+  font-family: var(--font-body);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Typography scale */
+.display {
+  font-family: var(--font-display);
+  letter-spacing: 1px;
+}
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  letter-spacing: 1px;
+}
+h1 {
+  font-size: clamp(40px, 6vw, 72px);
+  line-height: 0.95;
+}
+h2 {
+  font-size: clamp(28px, 4vw, 48px);
+  line-height: 1;
+}
+h3 {
+  font-size: clamp(20px, 2.5vw, 28px);
+  line-height: 1.1;
+}
+
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  transition:
+    border-color 0.2s,
+    transform 0.2s,
+    box-shadow 0.2s;
+}
+.card:hover {
+  border-color: var(--border-hover);
+  box-shadow: var(--shadow-glow);
+}
+.card-sm {
+  border-radius: 12px;
+}
+.card-lg {
+  border-radius: 20px;
+}
+
+.terminal-card {
+  background-color: #080c11;
+  border: 1px solid #1f2937;
+  border-radius: 0.5rem;
+  box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.6);
+}
+
+.glow-cyan {
+  text-shadow: 0 0 10px #06b6d4;
+}
+
+.glow-amber {
+  box-shadow: 0 0 15px #f59e0b;
+}
+
+/* ── HUD glow + glass utilities (War Room theme) ─────────────────────────── */
+.glow-green {
+  color: #36e7a1;
+  text-shadow:
+    0 0 12px rgba(54, 231, 161, 0.65),
+    0 0 28px rgba(54, 231, 161, 0.35);
+}
+.glow-red {
+  color: #ef4444;
+  text-shadow:
+    0 0 12px rgba(239, 68, 68, 0.55),
+    0 0 26px rgba(239, 68, 68, 0.28);
+}
+.glow-cyan-strong {
+  color: #22d3ee;
+  text-shadow:
+    0 0 10px rgba(34, 211, 238, 0.55),
+    0 0 22px rgba(34, 211, 238, 0.18);
+}
+.glow-amber-text {
+  color: #fbbf24;
+  text-shadow: 0 0 10px rgba(251, 191, 36, 0.45);
+}
+
+/* War Room HUD: translucent glass — background must show through for blur depth */
+.glass-panel {
+  background: rgba(13, 17, 23, 0.52);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(28px) saturate(1.28);
+  -webkit-backdrop-filter: blur(28px) saturate(1.28);
+  border-radius: 0.75rem;
+  box-shadow:
+    inset 0 0 24px rgba(255, 255, 255, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.07),
+    0 0 0 1px rgba(0, 0, 0, 0.35),
+    0 12px 48px rgba(0, 0, 0, 0.55);
+}
+.glass-panel-elevated {
+  background: rgba(13, 17, 23, 0.58);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(28px) saturate(1.32);
+  -webkit-backdrop-filter: blur(28px) saturate(1.32);
+  border-radius: 0.75rem;
+  box-shadow:
+    inset 0 0 24px rgba(255, 255, 255, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 0 0 1px rgba(0, 0, 0, 0.38),
+    0 16px 56px rgba(0, 0, 0, 0.58);
+}
+
+/* Tactical grid background for radar / war-room instruments */
+.bg-targeting {
+  background-color: #0d1117;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    radial-gradient(circle at 50% 50%, rgba(34, 211, 238, 0.06), transparent 60%);
+  background-size: 14px 14px, 14px 14px, 100% 100%;
+}
+
+/* Live indicator: blinking red dot for streaming feeds */
+@keyframes live-pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(255, 87, 87, 0.7);
+    opacity: 1;
+  }
+  70% {
+    box-shadow: 0 0 0 6px rgba(255, 87, 87, 0);
+    opacity: 0.55;
+  }
+}
+.live-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 9999px;
+  background: #ff5757;
+  animation: live-pulse 1.6s ease-out infinite;
+}
+
+/* Mono numerals for tactical readouts */
+.font-mono-tactical {
+  font-family: var(--font-mono-tactical), 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-feature-settings: 'tnum' 1, 'zero' 1;
+  letter-spacing: 0.02em;
+}
+
+.gradient-text {
+  background: linear-gradient(135deg, var(--indigo), var(--cyan));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.gradient-text-gold {
+  background: linear-gradient(135deg, #f59e0b, #fcd34d);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+@keyframes pulse-dot {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.4;
+    transform: scale(0.8);
+  }
+}
+@keyframes ticker-scroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes blob-shift {
+  0% {
+    transform: translate(0, 0) scale(1);
+  }
+  100% {
+    transform: translate(40px, 30px) scale(1.1);
+  }
+}
+@keyframes count-up {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.mesh-blob-1 {
+  animation: blob-shift 18s ease-in-out infinite alternate;
+}
+.mesh-blob-2 {
+  animation: blob-shift 24s ease-in-out infinite alternate-reverse;
+}
+
+.animate-float {
+  animation: float 4s ease-in-out infinite;
+}
+.animate-fade-up {
+  animation: fade-up 0.6s ease forwards;
+}
+.animate-pulse-dot-custom {
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+
+.delay-1 {
+  animation-delay: 150ms;
+}
+.delay-2 {
+  animation-delay: 300ms;
+}
+.delay-3 {
+  animation-delay: 450ms;
+}
+.delay-4 {
+  animation-delay: 600ms;
+}
+.delay-5 {
+  animation-delay: 750ms;
+}
+
+.ticker-content {
+  animation: ticker-scroll 35s linear infinite;
+}
+.ticker-content:hover {
+  animation-play-state: paused;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--bg-card) 25%,
+    var(--bg-surface) 50%,
+    var(--bg-card) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 8px;
+}
+
+.shimmer {
+  background: linear-gradient(90deg, var(--bg-card) 0%, var(--bg-surface) 50%, var(--bg-card) 100%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
+  border-radius: 0.375rem;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-primary);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--bg-surface);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--indigo);
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in {
+  animation: fade-in 0.25s ease-out both;
+}
+
+/* ── Scanner glow sweep (top-property so % = card height, not bar height) ── */
+@keyframes scanner-sweep {
+  0%   { top: -2px; }
+  100% { top: calc(100% + 2px); }
+}
+
+/* All positioning lives here so JSX doesn't fight it */
+.animate-scanner {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 2px;
+  top: -2px;
+  pointer-events: none;
+  z-index: 20;
+  animation: scanner-sweep 3s linear infinite;
+  will-change: top;
+}
+
+/* ── Boot sequence: soft glow pulse ── */
+@keyframes boot-glow {
+  0%   { filter: drop-shadow(0 0 0px rgba(0,242,195,0));   opacity: 0.6; }
+  40%  { filter: drop-shadow(0 0 40px rgba(0,242,195,0.9)); opacity: 1;   }
+  70%  { filter: drop-shadow(0 0 14px rgba(0,242,195,0.4)); opacity: 0.9; }
+  100% { filter: drop-shadow(0 0 56px rgba(0,242,195,1));   opacity: 1;   }
+}
+
+/* ── Boot sequence: neon flicker ── */
+@keyframes neon-flicker {
+  0%   { opacity: 1;   }
+  10%  { opacity: 0.3; }
+  20%  { opacity: 1;   }
+  35%  { opacity: 0.2; }
+  50%  { opacity: 1;   }
+  62%  { opacity: 0.4; }
+  74%  { opacity: 1;   }
+  87%  { opacity: 0.15;}
+  100% { opacity: 1;   }
+}
+
+.animate-boot-glow {
+  animation: boot-glow 1.2s ease-in-out forwards;
+}
+.animate-neon-flicker {
+  animation: neon-flicker 0.55s linear forwards;
+  filter: drop-shadow(0 0 28px rgba(0,242,195,0.85));
+}
+
+/* ── Boom gradient text/border helpers ── */
+.text-boom {
+  color: var(--color-boom);
+}
+.text-bust {
+  color: var(--color-bust);
+}
+.gradient-boom {
+  background: linear-gradient(to right, var(--color-boom), var(--color-bust));
+}
+
+/* ── Bento grid background ── */
+.bg-grid {
+  background-color: var(--bg-dark);
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.032) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.032) 1px, transparent 1px);
+  background-size: 44px 44px;
+}
+
+/* ── Landing: pure black + faint grid + soft radial glows + grain ── */
+.bg-landing {
+  background-color: #000000;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.028) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.028) 1px, transparent 1px),
+    radial-gradient(ellipse 90% 55% at 15% 8%, rgba(0, 242, 195, 0.07), transparent 55%),
+    radial-gradient(ellipse 70% 50% at 92% 85%, rgba(99, 102, 241, 0.11), transparent 55%);
+  background-size: 44px 44px, 44px 44px, 100% 100%, 100% 100%;
+}
+
+.bg-landing::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+/* ── Glassmorphism card shell ── */
+.glass-card {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+/* ── Hero dashboard mockup: subtle 3D tilt ── */
+.hero-dashboard-tilt {
+  transform: rotateX(7deg) rotateY(-4deg) translateZ(0);
+  transform-style: preserve-3d;
+  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.hero-dashboard-tilt:hover {
+  transform: rotateX(5deg) rotateY(-2deg) scale(1.01) translateZ(0);
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}

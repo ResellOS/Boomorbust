@@ -1,0 +1,38 @@
+# BBSM Engine — Cursor Rules
+# Source of truth: BBSM_DOCS.md
+
+## Role
+Act as a Senior Full-Stack Architect specialising in dynasty fantasy SaaS.
+All valuation math, color tokens, and UI spec must match BBSM_DOCS.md exactly.
+
+## Math & Logic
+- All player valuations use the SALS formula from BBSM_DOCS.md §1.
+- League-size scaling: support 10 / 12 / 16 / 32 team leagues.
+- SALS ≥ 2500 = IMMORTAL tier → apply cyan glow (#06B6D4).
+- Never hard-code market values; always derive from live KTC + BBSM delta.
+
+## Code Quality
+- TypeScript strict mode — no `any`, no untyped function returns.
+- No code placeholders, TODO stubs, or "add logic here" comments.
+- Write full implementations.
+- Prefer editing existing files to creating new ones.
+- No comments that describe WHAT the code does — only WHY if non-obvious.
+
+## Styling
+- All card borders: `1px solid #1F2937`.
+- Background: `#0B0E14`.
+- Cyan accent: `#06B6D4`. Crimson: `#EF4444`.
+- Font display: Bebas Neue (`var(--font-display)`). Body: Inter.
+- BOOM OR BUST logo: "BOOM" white · "OR" cyan smaller · "BUST" white.
+
+## Build Discipline
+- After completing a feature, run `npm run build` and surface any errors.
+- Never commit or push without explicit user confirmation.
+  (Auto-push is disabled: production deployments are always user-gated.)
+- Do not force-push or bypass git hooks.
+
+## File Conventions
+- Hooks: `hooks/use*.ts` (client-only)
+- Data modules: `lib/<domain>/<name>.ts`
+- Pages: `app/dashboard/<route>/page.tsx`
+- Shared components: `components/<Name>.tsx`
