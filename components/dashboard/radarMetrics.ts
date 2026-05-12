@@ -27,6 +27,8 @@ export type RadarHubContext = {
   seasonAvgPpg?: number;
   current_points?: number;
   forecastDelta?: number;
+  /** Hub spotlight forecast — used when `getRadarMetrics` forecast arg omitted. */
+  forecast?: 'boom' | 'bust';
 };
 
 export type GetRadarMetricsOptions = {
@@ -36,18 +38,24 @@ export type GetRadarMetricsOptions = {
 
 export const POSITION_ACCENTS: Record<SkillPosition, { hex: string; soft: string }> = {
   QB: { hex: '#FBBF24', soft: 'rgba(251,191,36,0.30)' },
-  RB: { hex: '#39FF14', soft: 'rgba(57,255,20,0.30)' },
+  RB: { hex: '#36E7A1', soft: 'rgba(54,231,161,0.30)' },
   WR: { hex: '#22D3EE', soft: 'rgba(34,211,238,0.30)' },
   TE: { hex: '#A78BFA', soft: 'rgba(167,139,250,0.30)' },
   OTHER: { hex: '#94A3B8', soft: 'rgba(148,163,184,0.30)' },
 };
 
+/**
+ * Locked F-FIG pentagon copy — each label ≤6 chars (no runtime truncation).
+ * QB V1–V5: Passing Volume, Rushing Value, O-Line Quality, WR Quality, Scheme Fit
+ * RB: Rushing Value, Target Share, O-Line Quality, Explosive%, Red Zone Touches
+ * WR/TE: Target Share, Air Yards, Separation, YAC, Red Zone Targets
+ */
 const POSITION_AXES: Record<SkillPosition, string[]> = {
-  QB: ['Passing Vol', 'Rushing Val', 'O-Line Qual', 'WR Quality', 'Scheme'],
-  RB: ['Rushing Val', 'Target Shr', 'O-Line Qual', 'Explosive %', 'RedZone'],
-  WR: ['Air Yards', 'Target %', 'QB Qual', 'Separation', 'Red Zone'],
-  TE: ['Air Yards', 'Target %', 'QB Qual', 'Red Zone', 'O-Line Qual'],
-  OTHER: ['Volume', 'Efficiency', 'Matchup', 'Scheme', 'Health'],
+  QB: ['Pass V', 'Rush V', 'O-Line', 'WRQual', 'Scheme'],
+  RB: ['Rush V', 'Target', 'O-Line', 'Expl%', 'RZ Tch'],
+  WR: ['Target', 'AirYds', 'Separ', 'YAC', 'RZ Tgt'],
+  TE: ['Target', 'AirYds', 'Separ', 'YAC', 'RZ Tgt'],
+  OTHER: ['Volume', 'Effcy', 'Match', 'Scheme', 'Health'],
 };
 
 const BASELINES: Record<SkillPosition, number[]> = {
@@ -187,6 +195,13 @@ function wrAirYardsProxy(input: CalculateTFOScoreInput): number {
   return clamp(input.opportunityScore * 0.72 + input.redZoneShare * 0.28, 0, 100);
 }
 
+/** YAC proxy — route volume + after-catch opportunity from usage + RZ spike. */
+function wrTeYacProxy(input: CalculateTFOScoreInput): number {
+  const tgt = input.targetShare;
+  const tgtN = typeof tgt === 'number' ? clamp((tgt / 36) * 100, 0, 100) : input.opportunityScore * 0.75;
+  return clamp(tgtN * 0.42 + input.opportunityScore * 0.38 + input.redZoneShare * 0.2, 0, 100);
+}
+
 function rawAxesFromTFO(
   pos: SkillPosition,
   input: CalculateTFOScoreInput,
@@ -198,67 +213,52 @@ function rawAxesFromTFO(
   const rz = clamp(input.redZoneShare, 0, 100);
   const tgt = input.targetShare;
 
+  const targetNorm = typeof tgt === 'number' ? clamp((tgt / 36) * 100, 0, 100) : null;
+
   switch (pos) {
     case 'QB':
       return {
-        'Passing Vol': clamp(opp * 0.4 + schemePassingBoost(schemeScore), 0, 100),
-        'Rushing Val': qbRushingContribution(input),
-        'O-Line Qual': ol,
-        'WR Quality': cast,
+        'Pass V': clamp(opp * 0.4 + schemePassingBoost(schemeScore), 0, 100),
+        'Rush V': qbRushingContribution(input),
+        'O-Line': ol,
+        WRQual: cast,
         Scheme: schemeScore,
       };
     case 'RB':
       return {
-        'Rushing Val': clamp(opp * 0.45 + ol * 0.3 + schemeScore * 0.25, 0, 100),
-        'Target Shr': typeof tgt === 'number' ? clamp(tgt, 0, 100) : 50,
-        'O-Line Qual': ol,
-        'Explosive %': rbExplosivePct(input),
-        RedZone: rz,
+        'Rush V': clamp(opp * 0.45 + ol * 0.3 + schemeScore * 0.25, 0, 100),
+        Target: targetNorm ?? 50,
+        'O-Line': ol,
+        'Expl%': rbExplosivePct(input),
+        'RZ Tch': rz,
       };
     case 'WR':
-      return {
-        'Air Yards': wrAirYardsProxy(input),
-        'Target %': typeof tgt === 'number' ? clamp(tgt, 0, 100) : opp,
-        'QB Qual': cast,
-        Separation: clamp(schemeScore * 0.8, 0, 100),
-        'Red Zone': rz,
-      };
     case 'TE':
       return {
-        'Air Yards': clamp(opp * 0.6, 0, 100),
-        'Target %': typeof tgt === 'number' ? clamp(tgt, 0, 100) : clamp(opp * 0.7, 0, 100),
-        'QB Qual': cast,
-        'Red Zone': rz,
-        'O-Line Qual': ol,
+        Target: targetNorm ?? clamp(opp * 0.85, 0, 100),
+        AirYds: wrAirYardsProxy(input),
+        Separ: clamp(schemeScore * 0.55 + cast * 0.45, 0, 100),
+        YAC: wrTeYacProxy(input),
+        'RZ Tgt': rz,
       };
     default:
       return {};
   }
 }
 
-function scaleAxisToUnit(raw: number, tfoScore: number, verdict: TFOVerdict): number {
+/** Pentagon outer-ring scale by TFO verdict (locked product spec). */
+export const VERDICT_PENTAGON_SCALE: Record<TFOVerdict, number> = {
+  BOOM: 1.0,
+  LEAN_BOOM: 0.85,
+  NEUTRAL: 0.7,
+  LEAN_BUST: 0.55,
+  BUST: 0.4,
+};
+
+function scaleAxisToUnit(raw: number, tfoScore: number): number {
   const base = clamp(raw / 100, 0, 1);
   const structural = 0.32 + 0.68 * (tfoScore / 100);
-  let v = base * structural;
-  switch (verdict) {
-    case 'BOOM':
-      v *= 1.08;
-      break;
-    case 'LEAN_BOOM':
-      v *= 1.04;
-      break;
-    case 'NEUTRAL':
-      break;
-    case 'LEAN_BUST':
-      v *= 0.9;
-      break;
-    case 'BUST':
-      v *= 0.8;
-      break;
-    default:
-      break;
-  }
-  return clamp(v, 0.1, 1);
+  return clamp(base * structural, 0, 1);
 }
 
 function resolveTFOInput(
@@ -267,13 +267,15 @@ function resolveTFOInput(
   forecast: 'boom' | 'bust' | undefined,
   options: GetRadarMetricsOptions | undefined,
 ): CalculateTFOScoreInput | null {
+  const effForecast = forecast ?? options?.hub?.forecast;
+
   if (options?.tfoInput) {
     return { ...options.tfoInput, playerId: options.tfoInput.playerId || playerId };
   }
   if (options?.hub) {
     return inferTFOInputFromHub(
       { ...options.hub, player_id: options.hub.player_id || playerId, position: options.hub.position || position },
-      forecast,
+      effForecast,
     );
   }
   return null;
@@ -304,7 +306,8 @@ export function getRadarMetrics(
   const pos = normalizePosition(position);
   const axes = POSITION_AXES[pos];
   const base = BASELINES[pos];
-  const legacyBias = forecast === 'boom' ? 0.07 : forecast === 'bust' ? -0.07 : 0;
+  const effForecast = forecast ?? tfoOptions?.hub?.forecast;
+  const legacyBias = effForecast === 'boom' ? 0.07 : effForecast === 'bust' ? -0.07 : 0;
 
   const tfoInput = resolveTFOInput(position, playerId, forecast, tfoOptions);
 
@@ -313,26 +316,39 @@ export function getRadarMetrics(
     const tfoResult = calculateTFOScore(tfoInput);
     const rawMap = rawAxesFromTFO(pos, tfoInput, schemeScore);
 
+    const verdictScale = VERDICT_PENTAGON_SCALE[tfoResult.verdict] ?? 0.7;
+
     return axes.map((label) => {
       const override = metricsOverride?.[label];
       if (typeof override === 'number') {
-        return { label, value: clamp(override + legacyBias, 0.1, 1) };
+        const u = clamp(override + legacyBias, 0.05, 1);
+        return { label, value: clamp(u * verdictScale, 0.08, 1) };
       }
       const raw = rawMap[label] ?? 50;
-      const value = scaleAxisToUnit(raw, tfoResult.tfoScore, tfoResult.verdict);
-      return { label, value: clamp(value, 0.1, 1) };
+      const unit = scaleAxisToUnit(raw, tfoResult.tfoScore);
+      const value = clamp(unit * verdictScale, 0.08, 1);
+      return { label, value };
     });
   }
+
+  const legacyVerdictScale =
+    effForecast === 'boom'
+      ? VERDICT_PENTAGON_SCALE.BOOM
+      : effForecast === 'bust'
+        ? VERDICT_PENTAGON_SCALE.BUST
+        : VERDICT_PENTAGON_SCALE.NEUTRAL;
 
   return axes.map((label, i) => {
     const override = metricsOverride?.[label];
     if (typeof override === 'number') {
-      return { label, value: clamp(override + legacyBias, 0.1, 1) };
+      const u = clamp(override + legacyBias, 0.05, 1);
+      return { label, value: clamp(u * legacyVerdictScale, 0.08, 1) };
     }
     const jitter = (seededJitter(playerId, i) - 0.5) * 0.32;
+    const u = clamp((base[i] ?? 0.55) + jitter + legacyBias, 0.12, 0.99);
     return {
       label,
-      value: clamp((base[i] ?? 0.55) + jitter + legacyBias, 0.25, 0.99),
+      value: clamp(u * legacyVerdictScale, 0.08, 0.99),
     };
   });
 }

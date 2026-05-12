@@ -1,9 +1,12 @@
 'use client';
 
 import { Star, TrendingUp } from 'lucide-react';
+import PlayerAvatar from '@/components/PlayerAvatar';
+import PlayerBhsActions from './PlayerBhsActions';
 
 interface Props {
   player: {
+    player_id: string;
     name: string;
     position: string;
     team: string;
@@ -25,15 +28,11 @@ interface Props {
   winSharePct?: number;
   /** Last few KTC snapshots (oldest → newest) for sparkline. */
   sparklineValues?: number[];
+  /** `tfo_cache.verdict` for Buy/Hold/Sell strip. */
+  tfoVerdict?: string | null;
+  leagueId?: string | null;
   className?: string;
 }
-
-const POS_COLORS: Record<string, string> = {
-  WR: '#22D3EE',
-  RB: '#36E7A1',
-  QB: '#FEBC2E',
-  TE: '#A78BFA',
-};
 
 function PerformanceSparkline({ values }: { values: number[] }) {
   const v = values.filter((n) => Number.isFinite(n));
@@ -88,21 +87,16 @@ export default function StarTistCard({
   leagueLabel,
   winSharePct,
   sparklineValues,
+  tfoVerdict,
+  leagueId = null,
   className = '',
 }: Props) {
-  const posColor = POS_COLORS[player.position] ?? '#94A3B8';
-  const initials = player.name
-    .split(' ')
-    .map((w) => w[0])
-    .join('')
-    .slice(0, 2)
-    .toUpperCase();
 
   return (
     <div className={`glass-panel p-4 flex flex-col ${className}`}>
       <div className="flex items-center justify-between mb-3">
         <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-300 flex items-center gap-2">
-          <Star className="w-3 h-3 text-[#FEBC2E]" />
+          <Star className="w-3 h-3 text-[#FBBF24]" />
           Portfolio MVP
         </h3>
         {typeof winSharePct === 'number' && (
@@ -113,28 +107,21 @@ export default function StarTistCard({
       </div>
 
       <div className="flex items-center gap-3">
-        {player.photoUrl ? (
-          <img
-            src={player.photoUrl}
-            alt={player.name}
-            className="w-16 h-16 rounded-full object-cover border border-white/10"
-            style={{
-              filter:
-                'drop-shadow(0 0 12px rgba(54,231,161,0.45)) drop-shadow(0 0 24px rgba(54,231,161,0.2))',
-            }}
+        <div
+          className="shrink-0"
+          style={{
+            filter:
+              'drop-shadow(0 0 12px rgba(54,231,161,0.45)) drop-shadow(0 0 24px rgba(54,231,161,0.2))',
+          }}
+        >
+          <PlayerAvatar
+            playerId={player.player_id}
+            playerName={player.name}
+            position={player.position}
+            size={64}
+            className="border border-white/10"
           />
-        ) : (
-          <div
-            className="w-16 h-16 rounded-full flex items-center justify-center text-sm font-black font-mono-tactical shrink-0"
-            style={{
-              color: posColor,
-              border: `1.5px solid ${posColor}40`,
-              background: `${posColor}15`,
-            }}
-          >
-            {initials}
-          </div>
-        )}
+        </div>
         <div className="min-w-0 flex-1">
           <div className="text-sm font-black text-white truncate">{player.name}</div>
           <div className="text-[10px] text-slate-500 font-mono-tactical">
@@ -191,6 +178,17 @@ export default function StarTistCard({
           )}
         </div>
         <div className="text-[10px] text-slate-500 mt-1.5 font-mono-tactical">{subline}</div>
+        {player.player_id ? (
+          <div className="mt-2 border-t border-white/[0.06] pt-2">
+            <PlayerBhsActions
+              tfoVerdict={tfoVerdict}
+              playerId={player.player_id}
+              playerName={player.name}
+              leagueId={leagueId}
+              compact
+            />
+          </div>
+        ) : null}
       </div>
     </div>
   );

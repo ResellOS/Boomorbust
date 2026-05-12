@@ -271,6 +271,7 @@ create table if not exists public.bbv_values (
   team        text,
   age         numeric,
   bbv_score   numeric not null default 0,
+  bbsm_score  float,
   depth_order integer,
   ktc_value   numeric default 0,
   updated_at  timestamptz default now()

@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation';
 import { clsx } from 'clsx';
 import { createClient } from '@/lib/supabase/client';
 import AppBackground from '@/components/AppBackground';
+import LeagueNameSearch from '@/components/LeagueNameSearch';
+import { appendLeagueIdToDraft, parseLeagueIds } from '@/lib/leagueIds';
 
 type Step = 'connect' | 'leagues' | 'syncing' | 'done';
 
@@ -279,14 +281,19 @@ export default function OnboardingPage() {
               <div className="text-center mb-8">
                 <h1 className="text-white mb-2">Add your leagues</h1>
                 <p className="text-[var(--text-secondary)] text-sm leading-relaxed">
-                  Paste your Sleeper league IDs below. Leave empty to sync all leagues tied to your account.
+                  Search by name or paste Sleeper league IDs. Leave the ID box empty to sync every league on your account.
                 </p>
               </div>
 
               <div className="card p-7 space-y-5">
+                <LeagueNameSearch
+                  existingLeagueIds={parseLeagueIds(leagueInput)}
+                  onAppendLeagueId={(id) => setLeagueInput((prev) => appendLeagueIdToDraft(prev, id))}
+                />
+
                 <div>
                   <label className="text-xs uppercase tracking-widest text-[var(--text-muted)] block mb-2">
-                    League IDs <span className="normal-case text-[var(--text-muted)]">(one per line or comma-separated)</span>
+                    Enter league ID <span className="normal-case text-[var(--text-muted)]">(one per line or comma-separated)</span>
                   </label>
                   <textarea
                     value={leagueInput}
@@ -389,7 +396,7 @@ export default function OnboardingPage() {
                   {[
                     { icon: '📊', label: 'Trade Grades' },
                     { icon: '🏥', label: 'Injury Alerts' },
-                    { icon: '🤖', label: 'AI Coach' },
+                    { icon: '🤖', label: 'Dynasty Analyst' },
                   ].map(({ icon, label }) => (
                     <div
                       key={label}

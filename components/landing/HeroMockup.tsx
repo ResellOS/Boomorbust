@@ -172,7 +172,7 @@ function MockPortfolio() {
       </div>
       <div className="card-sm p-4 border border-[var(--border)]">
         <p className="text-xs font-bold text-[var(--indigo)] mb-2 flex items-center gap-1">
-          <span>✦</span> Dynasty Coach
+          <span>✦</span> Dynasty Analyst
         </p>
         <div className="space-y-2 text-[11px]">
           <div className="bg-[var(--indigo)] rounded-lg px-3 py-2 text-white rounded-tr-sm max-w-[92%] ml-auto">

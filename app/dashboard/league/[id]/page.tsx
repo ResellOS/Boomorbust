@@ -91,10 +91,10 @@ export default function LeaguePage() {
   const [syncing, setSyncing] = useState(false);
   const [loading, setLoading] = useState(true);
   const [expandedWhy, setExpandedWhy] = useState<string | null>(null);
-  const supabase = createClient();
 
   useEffect(() => {
     async function load() {
+      const supabase = createClient();
       setLoading(true);
 
       const [{ data: lg }, { data: rs }, ktcRes] = await Promise.all([

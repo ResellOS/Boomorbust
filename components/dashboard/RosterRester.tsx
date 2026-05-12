@@ -24,7 +24,7 @@ interface Props {
 
 const DOT_COLORS: Record<RosterStatusEntry['tone'], string> = {
   green: '#36E7A1',
-  red: '#FF5757',
+  red: '#EF4444',
   amber: '#FBBF24',
   gray: '#475569',
 };
@@ -45,19 +45,19 @@ export default function RosterRester({
   const circumference = 2 * Math.PI * RING_R;
   const stroke = (circumference * Math.max(0, Math.min(100, score))) / 100;
   const ringColor =
-    score >= 80 ? '#00E5FF' : score >= 60 ? '#FBBF24' : '#FF5757';
+    score >= 80 ? '#22D3EE' : score >= 60 ? '#FBBF24' : '#EF4444';
   const ringSoft =
     score >= 80
-      ? 'rgba(0,229,255,0.60)'
+      ? 'rgba(34,211,238,0.60)'
       : score >= 60
         ? 'rgba(251,191,36,0.60)'
-        : 'rgba(255,87,87,0.60)';
+        : 'rgba(239,68,68,0.60)';
 
   return (
     <div className={`glass-panel p-4 flex flex-col ${className}`}>
       <div className="flex items-center justify-between mb-3">
         <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-300 flex items-center gap-2">
-          <ShieldCheck className="w-3 h-3 text-[#00E5FF]" />
+          <ShieldCheck className="w-3 h-3 text-[#22D3EE]" />
           Roster Rester
         </h3>
         <span className="text-[8px] font-mono-tactical text-slate-600 uppercase">

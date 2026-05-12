@@ -1,12 +1,12 @@
 'use client';
 
 import { useState } from 'react';
-import { createClient } from '@/lib/supabase/client';
 import Link from 'next/link';
+
+const TWITTER_HREF = process.env.NEXT_PUBLIC_TWITTER_URL ?? 'https://x.com';
 
 export default function SignUpPage() {
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
@@ -15,73 +15,105 @@ export default function SignUpPage() {
     e.preventDefault();
     setLoading(true);
     setError(null);
-
-    const supabase = createClient();
-    const { error } = await supabase.auth.signUp({ email, password });
-    if (error) setError(error.message);
-    else setSuccess(true);
-    setLoading(false);
+    try {
+      const res = await fetch('/api/waitlist', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+      const data = (await res.json().catch(() => ({}))) as { error?: string };
+      if (!res.ok) {
+        setError(typeof data.error === 'string' ? data.error : 'Something went wrong');
+        return;
+      }
+      setSuccess(true);
+    } catch {
+      setError('Network error');
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-[#0F172A] px-4">
-      <div className="w-full max-w-md">
+    <div className="min-h-screen flex flex-col items-center justify-center px-4 py-12" style={{ background: '#060910' }}>
+      <div className="w-full max-w-lg flex flex-col items-center text-center">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/logo.png" alt="Boom or Bust" className="h-12 w-auto mx-auto mb-8" />
-        <p className="text-[#94A3B8] text-center mb-8">Manage your dynasty portfolio with Boom or Bust.</p>
+        <img
+          src="/images/logo-full2.png"
+          height={48}
+          alt="Boom or Bust"
+          className="mx-auto mb-10 h-12 w-auto"
+          style={{ width: 'auto' }}
+        />
+        <h1
+          className="text-white uppercase"
+          style={{
+            fontFamily: 'var(--font-display)',
+            fontSize: 52,
+            letterSpacing: '0.03em',
+            lineHeight: 1.05,
+          }}
+        >
+          WE&apos;RE ALMOST READY
+        </h1>
+        <p
+          className="mt-6 max-w-[480px] text-[14px] leading-relaxed text-[#94A3B8] mx-auto"
+          style={{ fontFamily: 'var(--font-body)' }}
+        >
+          Boom or Bust is putting the final touches on the most advanced dynasty intelligence platform ever built.
+        </p>
 
-        <div className="bg-[#1A2332] border border-white/5 rounded-xl p-8">
-          {success ? (
-            <div className="text-center">
-              <p className="text-sm mb-4" style={{ color: '#22D3EE' }}>
-                Account created! Check your email to confirm your address.
-              </p>
-              <Link href="/auth/login" className="text-[#6366F1] hover:underline text-sm">Back to sign in</Link>
-            </div>
-          ) : (
-            <form onSubmit={handleSubmit} className="space-y-5">
-              <div>
-                <label className="block text-sm text-[#CBD5E1] mb-1.5">Email</label>
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  className="w-full bg-[#1E293B] border border-white/10 rounded-lg px-4 py-2.5 text-white placeholder-[#94A3B8] focus:outline-none focus:border-[#6366F1] transition text-sm"
-                  placeholder="you@example.com"
-                />
-              </div>
-              <div>
-                <label className="block text-sm text-[#CBD5E1] mb-1.5">Password</label>
-                <input
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  minLength={6}
-                  className="w-full bg-[#1E293B] border border-white/10 rounded-lg px-4 py-2.5 text-white placeholder-[#94A3B8] focus:outline-none focus:border-[#6366F1] transition text-sm"
-                  placeholder="Min 6 characters"
-                />
-              </div>
-              {error && (
-                <p className="text-red-400 text-sm bg-red-400/10 border border-red-400/20 rounded-lg px-4 py-2.5">
-                  {error}
-                </p>
-              )}
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full bg-[#6366F1] hover:bg-[#6366F1]/90 disabled:opacity-50 text-white font-semibold py-2.5 rounded-lg transition"
-              >
-                {loading ? 'Creating account...' : 'Create Account'}
-              </button>
-              <p className="text-center text-sm text-[#94A3B8]">
-                Already have an account?{' '}
-                <Link href="/auth/login" className="text-[#6366F1] hover:underline font-medium">Sign in</Link>
-              </p>
-            </form>
-          )}
+        {success ? (
+          <p className="mt-10 text-[15px] text-[#36E7A1] font-mono-tactical">You&apos;re on the list. 🚀</p>
+        ) : (
+          <form onSubmit={handleSubmit} className="mt-10 w-full max-w-md flex flex-col gap-3 sm:flex-row sm:items-stretch">
+            <input
+              type="email"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="you@example.com"
+              className="min-h-[48px] flex-1 rounded-xl border border-white/[0.12] bg-white/[0.04] px-4 py-3 text-sm text-white placeholder:text-[#475569] outline-none focus:border-[#22D3EE] focus:ring-1 focus:ring-[#22D3EE] font-mono-tactical shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]"
+              autoComplete="email"
+            />
+            <button
+              type="submit"
+              disabled={loading}
+              className="min-h-[48px] shrink-0 rounded-xl bg-[#6366F1] px-5 py-3 text-[11px] font-bold uppercase tracking-[0.12em] text-white transition hover:bg-[#5254cc] disabled:opacity-50 font-mono-tactical whitespace-nowrap"
+            >
+              {loading ? '…' : 'NOTIFY ME ON LAUNCH'}
+            </button>
+          </form>
+        )}
+        {error ? <p className="mt-4 text-sm text-red-400">{error}</p> : null}
+
+        <div className="mt-12 w-full max-w-md text-center">
+          <p className="text-[9px] uppercase tracking-[0.08em] text-[#64748B] font-mono-tactical">
+            Follow for weekly player predictions:
+          </p>
+          <div className="mt-3 flex justify-center">
+            <a
+              href={TWITTER_HREF}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center rounded-[20px] px-[14px] py-[6px] text-[11px] font-mono-tactical transition hover:opacity-90"
+              style={{
+                color: '#22D3EE',
+                border: '1px solid rgba(34,211,238,0.2)',
+                fontFamily: "var(--font-mono-tactical), 'JetBrains Mono', ui-monospace, monospace",
+              }}
+            >
+              𝕏 @YourHandle
+            </a>
+          </div>
         </div>
+
+        <p className="mt-14 text-[13px] text-[#94A3B8]" style={{ fontFamily: 'var(--font-body)' }}>
+          Already have an account?{' '}
+          <Link href="/auth/login" className="font-semibold text-[#22D3EE] hover:underline">
+            Sign in
+          </Link>
+        </p>
       </div>
     </div>
   );

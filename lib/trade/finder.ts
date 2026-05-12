@@ -32,7 +32,7 @@ export interface PlayerInput {
 
 export type PlayerMap = Record<string, PlayerInput>;
 
-function scoreRoster(
+export function scoreRoster(
   playerIds: string[],
   players: PlayerMap,
   ktcMap: Record<string, number>

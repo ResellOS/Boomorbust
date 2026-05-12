@@ -420,8 +420,6 @@ function PlayerContextPanel({
 
 // ─── Main page ─────────────────────────────────────────────────────────────
 export default function RankingsPage() {
-  const supabase = createClient();
-
   const [loading, setLoading] = useState(true);
   const [merged, setMerged] = useState<Row[]>([]);
   const [leagues, setLeagues] = useState<Array<{ id: string; name: string }>>([]);
@@ -447,6 +445,7 @@ export default function RankingsPage() {
     let cancelled = false;
 
     async function boot() {
+      const supabase = createClient();
       setLoading(true);
       try {
         const [vRes, bbRes, lgRes] = await Promise.all([

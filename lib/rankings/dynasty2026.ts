@@ -1,6 +1,6 @@
 // 2026 Dynasty Rankings — Post-Free Agency snapshot
 // Market = KTC consensus. BBSM = internal Boom-or-Bust model value.
-// Delta >+5% → arbitrage buy. Delta < -5% → overvalued / sell candidate.
+// Trading signal = f(TFO verdict, delta). Never SELL on BOOM / LEAN_BOOM (formula bullish).
 
 import Fuse from 'fuse.js';
 import {
@@ -64,25 +64,81 @@ export function calculateDelta(marketValue: number, bbsmValue: number): number {
   return Math.round(((bbsmValue - marketValue) / marketValue) * 1000) / 10;
 }
 
+/** Hex accent per arbitrage signal tier (table + sidebar). */
+export function getArbitrageSignalColor(signal: SignalLabel): string {
+  switch (signal) {
+    case 'STRONG BUY':
+      return '#36E7A1';
+    case 'BUY':
+      return '#22D3EE';
+    case 'HOLD':
+      return '#94A3B8';
+    case 'SELL':
+      return '#FBBF24';
+    case 'STRONG SELL':
+      return '#EF4444';
+    default:
+      return '#94A3B8';
+  }
+}
+
 /**
- * Returns a hex color string for a delta value.
- * > +5%  → Cyan   #06B6D4  (arbitrage buy)
- * < -5%  → Crimson #EF4444  (overvalued / sell)
- * Otherwise → neutral #94A3B8
+ * Legacy delta-only tint (e.g. sparklines). Prefer {@link getArbitrageSignalColor} for trade signals.
  */
 export function getSignalColor(delta: number): string {
-  if (delta > 5) return '#06B6D4';
-  if (delta < -5) return '#EF4444';
+  if (delta > 5) return '#22D3EE';
+  if (delta < -5) return '#FBBF24';
   return '#94A3B8';
 }
 
-/** Derives a 5-tier trading signal from the raw delta percentage. */
-export function getSignalLabel(delta: number): SignalLabel {
-  if (delta >= 15) return 'STRONG BUY';
-  if (delta >= 5) return 'BUY';
-  if (delta <= -15) return 'STRONG SELL';
-  if (delta <= -5) return 'SELL';
+/**
+ * Combined signal from TFO verdict + BBSM vs market delta (%).
+ * Rule: never STRONG SELL/SELL when verdict is BOOM or LEAN_BOOM.
+ */
+export function computeArbitrageSignal(tfoVerdict: TFOVerdict, delta: number): SignalLabel {
+  if (tfoVerdict === 'BOOM' || tfoVerdict === 'LEAN_BOOM') {
+    if (delta > 15) return 'STRONG BUY';
+    if (delta > 5) return 'BUY';
+    return 'HOLD';
+  }
+
+  if (tfoVerdict === 'NEUTRAL') {
+    return 'HOLD';
+  }
+
+  if (tfoVerdict === 'BUST') {
+    if (delta < -15) return 'STRONG SELL';
+    if (delta < -10) return 'SELL';
+    return 'HOLD';
+  }
+
+  // LEAN_BUST
+  if (delta < -10) return 'SELL';
+  if (delta > -5) return 'HOLD';
   return 'HOLD';
+}
+
+/** Sidebar / copy: collapse tiers to BUY | HOLD | SELL. */
+export function arbitrageSignalToAction(signal: SignalLabel): 'BUY' | 'HOLD' | 'SELL' {
+  if (signal === 'STRONG BUY' || signal === 'BUY') return 'BUY';
+  if (signal === 'STRONG SELL' || signal === 'SELL') return 'SELL';
+  return 'HOLD';
+}
+
+/** One-line market vs model stance from delta (%). */
+export function getMarketCategory(delta: number): string {
+  if (delta > 10) return 'Trading below BBSM (discount)';
+  if (delta < -10) return 'Trading above BBSM (premium)';
+  return 'Near BBSM fair value';
+}
+
+/** First sentence of TFO reasoning for compact UI. */
+export function firstTfoReasonSentence(reasoning: string): string {
+  const t = reasoning.trim();
+  if (!t) return '—';
+  const m = t.match(/^.{1,220}?[.!?](?=\s|$)/);
+  if (m) return m[0]!.trim();
+  return t.length > 180 ? `${t.slice(0, 177)}…` : t;
 }
 
 function opportunityFromTier(tier: TfoOpportunityTier): number {
@@ -154,6 +210,7 @@ function player(
   const [firstName = '', ...rest] = name.split(' ');
   const tfoOpportunityScore = opportunityFromTier(oppTier);
   const tfoBlock = runTfoForRow(rank, name, team, position, age, marketValue, tfoOpportunityScore, extras);
+  const signal = computeArbitrageSignal(tfoBlock.tfoVerdict, delta);
 
   return {
     rank,
@@ -166,8 +223,8 @@ function player(
     marketValue,
     bbsmValue,
     delta,
-    signal: getSignalLabel(delta),
-    signalColor: getSignalColor(delta),
+    signal,
+    signalColor: getArbitrageSignalColor(signal),
     note,
     tfoOpportunityScore,
     tfoRbUsageStyle: extras?.rbUsageStyle,
@@ -236,14 +293,14 @@ export const dynastyRankings2026 = dynasty2026Players;
 /** All players sorted by rank (default). */
 export const byRank = [...dynasty2026Players].sort((a, b) => a.rank - b.rank);
 
-/** Arbitrage targets: BBSM sees ≥10% more value than market. */
+/** Arbitrage targets: signal BUY or STRONG BUY. */
 export const arbitrageTargets = dynasty2026Players
-  .filter((p) => p.delta >= 10)
+  .filter((p) => p.signal === 'BUY' || p.signal === 'STRONG BUY')
   .sort((a, b) => b.delta - a.delta);
 
-/** Sell candidates: BBSM sees ≥10% LESS value than market. */
+/** Sell candidates: signal SELL or STRONG SELL. */
 export const sellCandidates = dynasty2026Players
-  .filter((p) => p.delta <= -10)
+  .filter((p) => p.signal === 'SELL' || p.signal === 'STRONG SELL')
   .sort((a, b) => a.delta - b.delta);
 
 /** By position. */
@@ -271,12 +328,13 @@ function applyLiveMarketAndTfo(p: DynastyPlayer2026, marketValue: number): Dynas
       teamQbIsYoung: p.tfoTeamQbIsYoung,
     },
   );
+  const signal = computeArbitrageSignal(tfoBlock.tfoVerdict, delta);
   return {
     ...p,
     marketValue,
     delta,
-    signal: getSignalLabel(delta),
-    signalColor: getSignalColor(delta),
+    signal,
+    signalColor: getArbitrageSignalColor(signal),
     ...tfoBlock,
   };
 }

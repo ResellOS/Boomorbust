@@ -140,9 +140,34 @@ function gradeFromTfoScore(score: number): string {
 }
 
 function boomNeutralBustChip(verdict: string): { label: string; style: CSSProperties } {
-  if (verdict === 'START') return { label: 'BOOM', style: { color: '#36E7A1', borderColor: '#36E7A155', backgroundColor: '#36E7A114' } };
-  if (verdict === 'FLEX') return { label: 'NEUTRAL', style: { color: '#94A3B8', borderColor: '#94A3B855', backgroundColor: '#94A3B814' } };
-  return { label: 'BUST', style: { color: '#EF4444', borderColor: '#EF444455', backgroundColor: '#EF444414' } };
+  if (verdict === 'START')
+    return {
+      label: 'BOOM',
+      style: { color: '#36E7A1', borderColor: 'rgba(54,231,161,0.45)', backgroundColor: 'rgba(54,231,161,0.12)' },
+    };
+  if (verdict === 'FLEX')
+    return {
+      label: 'NEUTRAL',
+      style: { color: '#FBBF24', borderColor: 'rgba(251,191,36,0.45)', backgroundColor: 'rgba(251,191,36,0.12)' },
+    };
+  return {
+    label: 'BUST',
+    style: { color: '#EF4444', borderColor: 'rgba(239,68,68,0.45)', backgroundColor: 'rgba(239,68,68,0.12)' },
+  };
+}
+
+/** Glass row shell + START/FLEX/SIT neon left rail */
+function verdictRowAccent(verdict: string): CSSProperties {
+  if (verdict === 'START')
+    return {
+      borderLeft: '3px solid #36E7A1',
+      boxShadow: '0 0 12px rgba(54,231,161,0.15)',
+    };
+  if (verdict === 'FLEX') return { borderLeft: '3px solid #FBBF24' };
+  return {
+    borderLeft: '3px solid #EF4444',
+    boxShadow: '0 0 12px rgba(239,68,68,0.15)',
+  };
 }
 
 function OptimalGauge({ pct }: { pct: number }) {
@@ -151,6 +176,12 @@ function OptimalGauge({ pct }: { pct: number }) {
   const circ = 2 * Math.PI * r;
   const dash = (pct / 100) * circ;
   const gid = 'gauge-lineup-strength';
+  const glow =
+    c === '#36E7A1'
+      ? 'drop-shadow(0 0 8px rgba(54,231,161,0.65)) drop-shadow(0 0 18px rgba(54,231,161,0.35))'
+      : c === '#FBBF24'
+        ? 'drop-shadow(0 0 8px rgba(251,191,36,0.55)) drop-shadow(0 0 18px rgba(251,191,36,0.28))'
+        : 'drop-shadow(0 0 8px rgba(239,68,68,0.55)) drop-shadow(0 0 18px rgba(239,68,68,0.28))';
   return (
     <svg viewBox="0 0 120 120" className="w-32 h-32 sm:w-40 sm:h-40 shrink-0" aria-hidden>
       <defs>
@@ -170,6 +201,7 @@ function OptimalGauge({ pct }: { pct: number }) {
         strokeLinecap="round"
         strokeDasharray={`${dash} ${circ}`}
         transform="rotate(-90 60 60)"
+        style={{ filter: glow }}
       />
     </svg>
   );
@@ -238,8 +270,6 @@ function findClosePairs(recs: EnrichedRec[]): Array<{
 }
 
 export default function LineupPage() {
-  const supabase = createClient();
-
   const [leagues, setLeagues] = useState<LeagueOpt[]>([]);
   const [selectedLeague, setSelectedLeague] = useState('');
   const [week, setWeek] = useState(defaultNflWeek());
@@ -265,6 +295,7 @@ export default function LineupPage() {
   const FREE_CAP = 5;
 
   useEffect(() => {
+    const supabase = createClient();
     supabase.auth.getSession().then(({ data }) => data.session?.user?.id && setUserId(data.session.user.id));
     supabase
       .from('profiles')
@@ -379,6 +410,7 @@ export default function LineupPage() {
     setBenchLeft(null);
 
     try {
+      const supabase = createClient();
       const { data: u } = await supabase.auth.getUser();
       if (!u.user) {
         setLoading(false);
@@ -543,17 +575,14 @@ export default function LineupPage() {
 
   const starterSetMemo = starterIds;
 
-  const gaugeColor =
-    data && data.gaugePct >= 78
-      ? 'text-[#36E7A1]'
-      : data && data.gaugePct >= 58
-        ? 'text-[#FBBF24]'
-        : data
-          ? 'text-[#EF4444]'
-          : 'text-[var(--text-muted)]';
-
   const gaugeAccentHex =
     data && data.gaugePct >= 78 ? '#36E7A1' : data && data.gaugePct >= 58 ? '#FBBF24' : data ? '#EF4444' : '#94a3b8';
+
+  const lineupIntelCounts = useMemo(() => {
+    const total = recsFlat.length;
+    const starters = recsFlat.filter((r) => starterIds.has(r.player_id)).length;
+    return { starters, bench: Math.max(0, total - starters), total };
+  }, [recsFlat, starterIds]);
 
   let accuracyTrail: Array<{ week: number; pct: number; at: string }> = [];
   try {
@@ -631,10 +660,15 @@ export default function LineupPage() {
                 <div className="flex flex-col sm:flex-row items-center gap-6">
                   <div className="relative">
                     <OptimalGauge pct={data?.gaugePct ?? 0} />
-                    <span className={`absolute inset-0 flex flex-col items-center justify-center pointer-events-none ${gaugeColor}`}>
-                      <span className="display text-5xl">{data?.gaugePct ?? '—'}%</span>
-                      <span className="text-[11px] uppercase tracking-[0.2em] mt-2 text-[var(--text-muted)] text-center px-2 leading-tight">
+                    <span className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none gap-1 px-2 text-center">
+                      <span className="font-mono-tactical text-[9px] uppercase tracking-[0.15em] text-[#64748B]">
                         LINEUP STRENGTH
+                      </span>
+                      <span
+                        className="display text-[48px] leading-none font-bold tabular-nums"
+                        style={{ color: data ? gaugeAccentHex : '#64748b' }}
+                      >
+                        {data?.gaugePct ?? '—'}%
                       </span>
                     </span>
                   </div>
@@ -695,6 +729,17 @@ export default function LineupPage() {
               </div>
             ) : (
               <section className="space-y-8">
+                {data ? (
+                  <header className="border-b border-white/[0.06] pb-6">
+                    <h2 className="display text-[28px] text-white leading-tight tracking-wide">
+                      WEEK {data.meta?.week ?? week} LINEUP INTELLIGENCE
+                    </h2>
+                    <p className="font-mono-tactical mt-2 text-[11px] text-[#64748B] tabular-nums">
+                      {lineupIntelCounts.starters} starters · {lineupIntelCounts.bench} bench ·{' '}
+                      {data.projectedStarterPoints != null ? `${data.projectedStarterPoints.toFixed(1)}` : '—'} proj pts
+                    </p>
+                  </header>
+                ) : null}
                 {POSITION_ORDER.filter((slot) => (grouped[slot]?.length ?? 0) > 0).map((slot) => (
                   <div key={slot} className="space-y-3">
                     <div className="flex items-center justify-between gap-3">
@@ -718,9 +763,10 @@ export default function LineupPage() {
                           <div
                             key={r.player_id}
                             className={clsx(
-                              'rounded-2xl border p-5 transition-colors hover:border-[var(--border-hover)]',
-                              starterSetMemo.has(r.player_id) ? 'border-emerald-500/45 bg-emerald-500/[0.06]' : 'border-[var(--border)] bg-[var(--bg-secondary)]/60 opacity-92'
+                              'glass-panel !rounded-2xl p-5 transition-colors hover:border-white/20',
+                              starterSetMemo.has(r.player_id) ? 'opacity-100' : 'opacity-95',
                             )}
+                            style={verdictRowAccent(verdictForChip)}
                           >
                             <button
                               type="button"
@@ -759,14 +805,16 @@ export default function LineupPage() {
                                         })}
                                       </div>
                                     ) : null}
-                                    <p className="text-xs text-[var(--text-muted)] mt-2">
+                                    <p className="font-mono-tactical text-[11px] text-[var(--text-muted)] mt-2">
                                       {r.team ? `${r.position} · ${r.team}` : r.position}
                                     </p>
                                     {opt ? (
-                                      <p className="text-xs text-[var(--text-secondary)] mt-1 flex flex-wrap items-center gap-1.5">
-                                        <span aria-hidden>{lineupWeatherGlyph(opt.weather.condition, opt.weather.score)}</span>
+                                      <p className="font-mono-tactical text-[11px] text-[var(--text-secondary)] mt-1 flex flex-wrap items-center gap-1.5">
+                                        <span className="text-[20px] leading-none shrink-0" aria-hidden>
+                                          {lineupWeatherGlyph(opt.weather.condition, opt.weather.score)}
+                                        </span>
                                         <span>
-                                          vs <span className="text-white font-medium">{opt.opponent}</span>
+                                          vs <span className="text-white font-semibold">{opt.opponent}</span>
                                           <span className="text-[var(--text-muted)]">
                                             {' '}
                                             · {opt.weather.temp}° · {opt.weather.condition}
@@ -774,7 +822,7 @@ export default function LineupPage() {
                                         </span>
                                       </p>
                                     ) : typeof r.matchup_rank === 'number' ? (
-                                      <p className="text-xs text-[var(--text-muted)] mt-1">
+                                      <p className="font-mono-tactical text-[11px] text-[var(--text-muted)] mt-1">
                                         vs {r.opponent_abbr ?? '?'} ({r.matchup_grade} matchup · def rank {r.matchup_rank})
                                       </p>
                                     ) : null}
@@ -800,31 +848,37 @@ export default function LineupPage() {
                                       </button>
                                     ) : null}
                                     <span
-                                      className="inline-flex shrink-0 text-[10px] px-2.5 py-1 rounded-lg border font-bold uppercase tracking-wide"
-                                      style={bnb.style}
+                                      className="inline-flex shrink-0 items-center justify-center rounded-full border font-black uppercase tracking-wide font-mono-tactical"
+                                      style={{
+                                        fontSize: '14px',
+                                        padding: '6px 16px',
+                                        ...bnb.style,
+                                      }}
                                     >
                                       {bnb.label}
                                     </span>
                                   </div>
                                 </div>
-                                <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-3 text-[13px] text-[var(--text-secondary)]">
+                                <div className="flex flex-wrap items-end gap-x-4 gap-y-2 mt-3 text-[13px] text-[var(--text-secondary)]">
                                   {opt ? (
                                     <>
                                       <span>
-                                        Start <span className="text-white tabular-nums">{Math.round(opt.startScore)}</span>
+                                        Start <span className="text-white tabular-nums font-mono-tactical">{Math.round(opt.startScore)}</span>
                                       </span>
                                       <span>
-                                        TFO <span className="text-white tabular-nums">{Math.round(opt.tfoScore)}</span>
+                                        TFO <span className="text-white tabular-nums font-mono-tactical">{Math.round(opt.tfoScore)}</span>
                                       </span>
                                       <span>
-                                        Matchup <span className="text-white tabular-nums">{Math.round(opt.matchupGrade)}</span>
+                                        Matchup <span className="text-white tabular-nums font-mono-tactical">{Math.round(opt.matchupGrade)}</span>
                                       </span>
-                                      <span>
-                                        Proj{' '}
-                                        <span className="text-white tabular-nums">
-                                          {opt.projectedPoints.low.toFixed(1)}–{opt.projectedPoints.high.toFixed(1)}
+                                      <div className="flex flex-col gap-0.5">
+                                        <span className="font-mono-tactical text-[8px] uppercase tracking-[0.12em] text-[#64748B]">
+                                          PROJ
                                         </span>
-                                      </span>
+                                        <span className="font-mono-tactical text-sm font-bold text-white tabular-nums">
+                                          {opt.projectedPoints.low.toFixed(1)}–{opt.projectedPoints.high.toFixed(1)} pts
+                                        </span>
+                                      </div>
                                     </>
                                   ) : (
                                     <>
@@ -870,12 +924,19 @@ export default function LineupPage() {
 
             {/* Close calls */}
             {(borderlineLoading || borderlineStream) && (
-              <section className="rounded-2xl border border-purple-500/25 bg-purple-950/30 p-6">
-                <p className="display text-xl text-white mb-4">Close Calls</p>
+              <section
+                className="rounded-lg p-4 font-mono-tactical"
+                style={{
+                  background: 'rgba(0,0,0,0.4)',
+                  border: '1px solid rgba(255,255,255,0.06)',
+                  borderRadius: 8,
+                }}
+              >
+                <p className="text-[9px] uppercase tracking-[0.15em] text-[#22D3EE] mb-3">CLOSE CALLS · FORMULA ANALYSIS</p>
                 {borderlineLoading && !borderlineStream && (
-                  <Loader2 className="w-5 h-5 text-[var(--indigo-light)] animate-spin" />
+                  <Loader2 className="w-5 h-5 text-[#22D3EE] animate-spin mb-2" />
                 )}
-                <div className="text-sm leading-relaxed text-[var(--text-secondary)] whitespace-pre-wrap">{borderlineStream}</div>
+                <div className="text-[12px] leading-relaxed text-[#94A3B8] whitespace-pre-wrap">{borderlineStream}</div>
               </section>
             )}
 

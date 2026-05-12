@@ -1,55 +1,32 @@
 'use client';
 
-import { useState } from 'react';
 import type { TFOVerdict } from '@/lib/tfo/formula';
+import PlayerAvatar from '@/components/PlayerAvatar';
+import PlayerBhsActions from './PlayerBhsActions';
 
 export interface WaiverTarget {
+  /** Sleeper player id for CDN headshots. */
+  player_id: string;
   name: string;
   position: string;
   team: string;
-  /** Display value, e.g. "+85% AI Add Score". */
+  /** Display value, e.g. "+85% Add Score". */
   addValue: string;
   ownedPct?: number;
   trending?: boolean;
   photoUrl?: string;
-}
-
-function PlayerAvatar({
-  name,
-  photoUrl,
-  posColor,
-  initials,
-}: {
-  name: string;
-  photoUrl: string | undefined;
-  posColor: string;
-  initials: string;
-}) {
-  const [errored, setErrored] = useState(false);
-  if (photoUrl && !errored) {
-    return (
-      <img
-        src={photoUrl}
-        alt={name}
-        className="absolute inset-0 w-full h-full object-cover"
-        onError={() => setErrored(true)}
-      />
-    );
-  }
-  return (
-    <span
-      className="text-[14px] font-black font-mono-tactical"
-      style={{ color: posColor }}
-    >
-      {initials}
-    </span>
-  );
+  /** Optional TFO verdict from snapshot (e.g. LEAN_BOOM). */
+  verdict?: string;
 }
 
 interface Props {
   targets: WaiverTarget[];
   /** Optional league context label, e.g. "Lg 2". */
   leagueName?: string;
+  /** Sleeper league id for trade finder links. */
+  leagueContextId?: string | null;
+  /** `tfo_cache.verdict` keyed by Sleeper player id (from snapshot). */
+  verdictByPlayerId?: Record<string, string>;
   /** Lowercase player name → dynasty enriched verdict. */
   verdictByPlayerName?: Record<string, TFOVerdict>;
   /** Limit the count displayed (default 6 → 3x2 grid). */
@@ -69,7 +46,7 @@ function waiverTrendLabel(verdict: TFOVerdict | undefined): { text: string; clas
 const POS_COLORS: Record<string, string> = {
   WR: '#22D3EE',
   RB: '#36E7A1',
-  QB: '#FEBC2E',
+  QB: '#FBBF24',
   TE: '#A78BFA',
   K: '#94A3B8',
   DEF: '#94A3B8',
@@ -78,6 +55,8 @@ const POS_COLORS: Record<string, string> = {
 export default function WaiverWatchlist({
   targets,
   leagueName = 'Lg 2',
+  leagueContextId = null,
+  verdictByPlayerId,
   verdictByPlayerName,
   limit = 12,
   className = '',
@@ -102,33 +81,30 @@ export default function WaiverWatchlist({
 
   const renderCard = (target: WaiverTarget, i: number) => {
     const posColor = POS_COLORS[target.position] ?? '#94A3B8';
-    const initials = target.name
-      .split(' ')
-      .map((w) => w[0])
-      .join('')
-      .slice(0, 2)
-      .toUpperCase();
     const pctMatch = target.addValue.match(/(\d+)/);
     const pct = pctMatch ? pctMatch[1] : '—';
     const verdict = verdictByPlayerName?.[target.name.trim().toLowerCase()];
     const trend = waiverTrendLabel(verdict);
+    const cacheOrFormulaVerdict =
+      verdictByPlayerId?.[target.player_id] ?? target.verdict ?? null;
     return (
       <div
-        key={`${target.name}-${i}`}
-        className="flex items-stretch gap-3 min-w-[220px] max-w-[300px] flex-1 rounded-xl border border-white/[0.1] bg-white/[0.06] backdrop-blur-md px-3 py-2.5 transition-colors hover:bg-white/[0.08]"
+        key={`${target.player_id}-${i}`}
+        className="glass-panel flex min-w-[220px] max-w-[300px] flex-1 flex-col gap-2 !rounded-xl px-3 py-2.5 transition-colors hover:border-white/[0.14]"
         style={{
-          boxShadow: `inset 0 0 0 1px ${posColor}22, inset 0 1px 0 rgba(255,255,255,0.06), 0 8px 28px rgba(0,0,0,0.4)`,
+          boxShadow: `inset 0 0 0 1px ${posColor}33, inset 0 1px 0 rgba(255,255,255,0.06), 0 0 22px ${posColor}28`,
         }}
       >
+        <div className="flex items-stretch gap-3">
         <div
-          className="relative w-[4.75rem] shrink-0 self-stretch min-h-[5.25rem] rounded-lg overflow-hidden border"
+          className="relative w-[4.75rem] shrink-0 self-stretch min-h-[5.25rem] rounded-lg overflow-hidden border flex items-center justify-center bg-black/20"
           style={{ borderColor: `${posColor}50` }}
         >
           <PlayerAvatar
-            name={target.name}
-            photoUrl={target.photoUrl}
-            posColor={posColor}
-            initials={initials}
+            playerId={target.player_id}
+            playerName={target.name}
+            position={target.position}
+            size={72}
           />
           {target.trending && (
             <span
@@ -148,7 +124,7 @@ export default function WaiverWatchlist({
         <div className="shrink-0 flex flex-row items-center justify-end gap-2">
           <div className="text-right">
             <div className="text-[8px] font-black uppercase tracking-wider text-slate-500 font-mono-tactical">
-              AI Add
+              Add
             </div>
             <div
               className="text-[13px] font-black font-mono-tactical text-[#36E7A1] leading-none"
@@ -163,6 +139,16 @@ export default function WaiverWatchlist({
             {trend.text}
           </span>
         </div>
+        </div>
+        <PlayerBhsActions
+          tfoVerdict={cacheOrFormulaVerdict}
+          playerId={target.player_id}
+          playerName={target.name}
+          leagueId={leagueContextId}
+          allowSell={false}
+          compact
+          className="justify-center"
+        />
       </div>
     );
   };
@@ -198,30 +184,36 @@ export default function WaiverWatchlist({
         </div>
       )}
 
-      <div className="flex flex-wrap gap-2 items-stretch">
-        {order.map((pos) => {
-          const list = grouped[pos];
-          if (!list.length) return null;
-          const stripe = POS_COLORS[pos] ?? '#94A3B8';
-          return (
-            <div
-              key={pos}
-              className="flex flex-col gap-2 rounded-xl border border-white/[0.08] bg-white/[0.04] backdrop-blur-sm overflow-hidden p-2.5 w-full min-w-0"
-            >
-              <div className="flex items-center gap-2 px-0.5">
-                <span
-                  className="text-[9px] font-black text-black uppercase tracking-widest font-mono-tactical px-2 py-0.5 rounded"
-                  style={{ background: `linear-gradient(90deg, ${stripe}, ${stripe}cc)` }}
+      {visible.length > 0 ? (
+        <div className="slim-scroll max-h-[min(520px,58vh)] overflow-y-auto pr-1">
+          <div className="flex flex-wrap gap-2 items-stretch">
+            {order.map((pos) => {
+              const list = grouped[pos];
+              if (!list.length) return null;
+              const stripe = POS_COLORS[pos] ?? '#94A3B8';
+              return (
+                <div
+                  key={pos}
+                  className="flex flex-col gap-2 glass-panel !rounded-xl overflow-hidden p-2.5 w-full min-w-0"
                 >
-                  {pos === 'OTHER' ? 'OTHER' : pos}
-                </span>
-                <span className="text-[9px] text-slate-600 font-mono-tactical uppercase tracking-wider">Targets</span>
-              </div>
-              <div className="flex flex-wrap gap-2">{list.map((t, i) => renderCard(t, i))}</div>
-            </div>
-          );
-        })}
-      </div>
+                  <div className="flex items-center gap-2 px-0.5">
+                    <span
+                      className="text-[9px] font-black text-black uppercase tracking-widest font-mono-tactical px-2 py-0.5 rounded"
+                      style={{ background: `linear-gradient(90deg, ${stripe}, ${stripe}cc)` }}
+                    >
+                      {pos === 'OTHER' ? 'OTHER' : pos}
+                    </span>
+                    <span className="text-[9px] text-slate-600 font-mono-tactical uppercase tracking-wider">
+                      Targets
+                    </span>
+                  </div>
+                  <div className="flex flex-wrap gap-2">{list.map((t, i) => renderCard(t, i))}</div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }

@@ -153,8 +153,8 @@ h3 {
   box-shadow:
     inset 0 0 24px rgba(255, 255, 255, 0.06),
     inset 0 1px 0 rgba(255, 255, 255, 0.07),
-    0 0 0 1px rgba(0, 0, 0, 0.35),
-    0 12px 48px rgba(0, 0, 0, 0.55);
+    0 0 56px rgba(34, 211, 238, 0.06),
+    0 0 96px rgba(54, 231, 161, 0.04);
 }
 .glass-panel-elevated {
   background: rgba(13, 17, 23, 0.58);
@@ -165,8 +165,8 @@ h3 {
   box-shadow:
     inset 0 0 24px rgba(255, 255, 255, 0.06),
     inset 0 1px 0 rgba(255, 255, 255, 0.08),
-    0 0 0 1px rgba(0, 0, 0, 0.38),
-    0 16px 56px rgba(0, 0, 0, 0.58);
+    0 0 64px rgba(34, 211, 238, 0.07),
+    0 0 110px rgba(54, 231, 161, 0.05);
 }
 
 /* Tactical grid background for radar / war-room instruments */
@@ -182,11 +182,11 @@ h3 {
 /* Live indicator: blinking red dot for streaming feeds */
 @keyframes live-pulse {
   0%, 100% {
-    box-shadow: 0 0 0 0 rgba(255, 87, 87, 0.7);
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.75);
     opacity: 1;
   }
   70% {
-    box-shadow: 0 0 0 6px rgba(255, 87, 87, 0);
+    box-shadow: 0 0 0 6px rgba(239, 68, 68, 0);
     opacity: 0.55;
   }
 }
@@ -195,8 +195,76 @@ h3 {
   width: 6px;
   height: 6px;
   border-radius: 9999px;
-  background: #ff5757;
+  background: #ef4444;
   animation: live-pulse 1.6s ease-out infinite;
+}
+
+/* Landing — war-room hero orbs + headline stagger */
+@keyframes orbPulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+  50% {
+    transform: scale(1.15);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.landing-fade-slide-up {
+  opacity: 0;
+  animation: fadeSlideUp 0.65s ease-out forwards;
+}
+
+@keyframes marquee {
+  0% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
+.marquee-track {
+  display: flex;
+  white-space: nowrap;
+  animation: marquee 30s linear infinite;
+}
+
+/* Dashboard: Bloomberg-style seamless news wire (duplicate strip + translate -50%) */
+.dashboard-news-wire__track {
+  display: flex;
+  width: max-content;
+  animation: dashboard-news-wire-marquee 88s linear infinite;
+  will-change: transform;
+}
+.dashboard-news-wire:hover .dashboard-news-wire__track {
+  animation-play-state: paused;
+}
+@keyframes dashboard-news-wire-marquee {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .dashboard-news-wire__track {
+    animation: none;
+    transform: none;
+  }
 }
 
 /* Mono numerals for tactical readouts */
@@ -238,6 +306,20 @@ h3 {
     opacity: 0.4;
     transform: scale(0.8);
   }
+}
+
+@keyframes scouting-reticle-pulse {
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 0.95;
+  }
+}
+
+.scouting-reticle-bracket {
+  animation: scouting-reticle-pulse 3s ease-in-out infinite;
 }
 @keyframes ticker-scroll {
   0% {
@@ -314,6 +396,79 @@ h3 {
   animation-play-state: paused;
 }
 
+/* War Room: DEFCON 1 critical banner background pulse */
+@keyframes defcon-critical-bg {
+  0%,
+  100% {
+    background-color: rgba(127, 29, 29, 0.55);
+    box-shadow:
+      inset 0 0 48px rgba(239, 68, 68, 0.35),
+      0 0 32px rgba(239, 68, 68, 0.25);
+  }
+  50% {
+    background-color: rgba(185, 28, 28, 0.72);
+    box-shadow:
+      inset 0 0 72px rgba(239, 68, 68, 0.55),
+      0 0 48px rgba(239, 68, 68, 0.45);
+  }
+}
+.defcon-banner-critical {
+  animation: defcon-critical-bg 1s ease-in-out infinite;
+}
+
+@keyframes defcon-text-pulse {
+  0%,
+  100% {
+    opacity: 1;
+    filter: drop-shadow(0 0 8px rgba(239, 68, 68, 0.55));
+  }
+  50% {
+    opacity: 0.82;
+    filter: drop-shadow(0 0 14px rgba(239, 68, 68, 0.85));
+  }
+}
+.defcon-text-pulse {
+  animation: defcon-text-pulse 1s ease-in-out infinite;
+}
+
+/* Empire Ticker: cyan thumb, thin bar (Firefox + WebKit) */
+.scrollbar-ticker-cyan {
+  scrollbar-width: thin;
+  scrollbar-color: #22d3ee transparent;
+}
+.scrollbar-ticker-cyan::-webkit-scrollbar {
+  width: 6px;
+}
+.scrollbar-ticker-cyan::-webkit-scrollbar-track {
+  background: transparent;
+}
+.scrollbar-ticker-cyan::-webkit-scrollbar-thumb {
+  background: #22d3ee;
+  border-radius: 3px;
+}
+.scrollbar-ticker-cyan::-webkit-scrollbar-thumb:hover {
+  background: #67e8f9;
+}
+
+/* Thin cyan scrollbar for dashboard lists (waiver, leagues, command hub, etc.) */
+.slim-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: #22d3ee transparent;
+}
+.slim-scroll::-webkit-scrollbar {
+  width: 4px;
+}
+.slim-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+.slim-scroll::-webkit-scrollbar-thumb {
+  background: #22d3ee40;
+  border-radius: 2px;
+}
+.slim-scroll::-webkit-scrollbar-thumb:hover {
+  background: #22d3ee80;
+}
+
 @keyframes shimmer {
   0% {
     background-position: -200% 0;
@@ -322,16 +477,21 @@ h3 {
     background-position: 200% 0;
   }
 }
+
+@keyframes skeleton-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.45;
+  }
+}
+
 .skeleton {
-  background: linear-gradient(
-    90deg,
-    var(--bg-card) 25%,
-    var(--bg-surface) 50%,
-    var(--bg-card) 75%
-  );
-  background-size: 200% 100%;
-  animation: shimmer 1.5s infinite;
+  background: rgba(255, 255, 255, 0.04);
   border-radius: 8px;
+  animation: skeleton-pulse 1.5s ease-in-out infinite;
 }
 
 .shimmer {
@@ -477,6 +637,25 @@ h3 {
 }
 .hero-dashboard-tilt:hover {
   transform: rotateX(5deg) rotateY(-2deg) scale(1.01) translateZ(0);
+}
+
+/* Notification bell: unread count pulse (#EF4444) */
+@keyframes notif-badge-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.55);
+  }
+  50% {
+    box-shadow: 0 0 0 6px rgba(239, 68, 68, 0);
+  }
+}
+.notif-badge-count {
+  animation: notif-badge-pulse 1.45s ease-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .notif-badge-count {
+    animation: none;
+  }
 }
 
 @layer utilities {

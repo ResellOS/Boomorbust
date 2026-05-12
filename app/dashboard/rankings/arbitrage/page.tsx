@@ -1,5 +1,6 @@
 'use client';
 
+import type { CSSProperties } from 'react';
 import { useEffect, useMemo, useState } from 'react';
 import { clsx } from 'clsx';
 import { ArrowDownRight, ArrowUpRight, Loader2, X } from 'lucide-react';
@@ -7,7 +8,10 @@ import Link from 'next/link';
 import AppBackground from '@/components/AppBackground';
 import {
   dynasty2026Players,
-  getSignalColor,
+  arbitrageSignalToAction,
+  firstTfoReasonSentence,
+  getArbitrageSignalColor,
+  getMarketCategory,
   type DynastyPlayer2026,
   type SignalLabel,
 } from '@/lib/rankings/dynasty2026';
@@ -24,13 +28,14 @@ const POS_BADGE: Record<string, string> = {
   TE: 'bg-amber-500/20 text-amber-300',
 };
 
-const SIGNAL_BADGE: Record<SignalLabel, string> = {
-  'STRONG BUY':  'bg-emerald-500/25 text-emerald-300 border-emerald-500/40',
-  BUY:           'bg-emerald-500/15 text-emerald-200 border-emerald-500/25',
-  HOLD:          'bg-cyan-500/15 text-cyan-300 border-cyan-500/30',
-  SELL:          'bg-amber-500/18 text-amber-200 border-amber-500/35',
-  'STRONG SELL': 'bg-red-500/20 text-red-300 border-red-500/35',
-};
+function signalBadgeStyle(signal: SignalLabel): CSSProperties {
+  const c = getArbitrageSignalColor(signal);
+  return {
+    color: c,
+    borderColor: `${c}55`,
+    backgroundColor: `${c}14`,
+  };
+}
 
 /** TFO verdict colors — match dashboard accents */
 const TFO_VERDICT_HEX: Record<string, string> = {
@@ -43,8 +48,7 @@ const TFO_VERDICT_HEX: Record<string, string> = {
 
 // ── Sub-components ───────────────────────────────────────────────────────────
 
-function DeltaBadge({ delta }: { delta: number }) {
-  const color = getSignalColor(delta);
+function DeltaBadge({ delta, color }: { delta: number; color: string }) {
   const isPos = delta > 0;
   const Icon = isPos ? ArrowUpRight : ArrowDownRight;
   return (
@@ -144,52 +148,51 @@ function PlayerContext({
           </div>
         </div>
 
-        {/* Signal */}
-        <div className="space-y-2">
-          <p className="text-[10px] uppercase tracking-[0.2em] text-[var(--text-muted)]">Signal</p>
-          <span className={clsx('inline-flex px-3 py-1.5 rounded-lg border display text-lg tracking-wide', SIGNAL_BADGE[player.signal])}>
-            {player.signal}
-          </span>
-        </div>
-
-        <div className="space-y-2 rounded-xl border border-[var(--border)] bg-black/20 p-4">
-          <p className="text-[10px] uppercase tracking-[0.2em] text-[var(--text-muted)]">TFO model</p>
-          <div className="flex flex-wrap gap-3 items-baseline">
-            <span className="display text-2xl text-white tabular-nums">{player.tfoScore.toFixed(1)}</span>
-            <span className="text-[11px] font-bold px-2 py-0.5 rounded border border-white/15 text-[var(--cyan)]">
-              {player.tfoGrade.replace(/_/g, ' ')}
+        {/* Ratings, verdict, why */}
+        <div className="space-y-3 rounded-xl border border-[var(--border)] bg-black/20 p-4">
+          <div className="space-y-1">
+            <p className="text-[10px] uppercase tracking-[0.2em] text-[var(--text-muted)]">OUR RATING</p>
+            <p className="text-sm font-semibold text-white">{player.tfoGrade.replace(/_/g, ' ')}</p>
+          </div>
+          <div className="space-y-1 pt-2 border-t border-[var(--border)]">
+            <p className="text-[10px] uppercase tracking-[0.2em] text-[var(--text-muted)]">MARKET RATING</p>
+            <p className="text-sm text-[var(--text-secondary)]" style={{ fontFamily: 'var(--font-body)' }}>
+              {getMarketCategory(player.delta)}
+            </p>
+          </div>
+          <div className="space-y-1 pt-2 border-t border-[var(--border)]">
+            <p className="text-[10px] uppercase tracking-[0.2em] text-[var(--text-muted)]">OUR VERDICT</p>
+            <p
+              className="display text-xl tracking-wide font-bold"
+              style={{ color: getArbitrageSignalColor(player.signal) }}
+            >
+              {arbitrageSignalToAction(player.signal)}
+            </p>
+            <p className="text-[10px] text-[var(--text-muted)]">Signal tier: {player.signal}</p>
+          </div>
+          <div className="space-y-1 pt-2 border-t border-[var(--border)]">
+            <p className="text-[10px] uppercase tracking-[0.2em] text-[var(--text-muted)]">WHY</p>
+            <p className="text-xs text-[var(--text-secondary)] leading-snug" style={{ fontFamily: 'var(--font-body)' }}>
+              {firstTfoReasonSentence(player.tfoReasoning)}
+            </p>
+          </div>
+          <div className="pt-2 border-t border-[var(--border)] flex flex-wrap gap-3 items-baseline">
+            <span className="text-[10px] text-[var(--text-muted)]">TFO score</span>
+            <span className="display text-lg text-white tabular-nums">{player.tfoScore.toFixed(1)}</span>
+            <span
+              className="text-[10px] font-bold px-2 py-0.5 rounded border border-white/15 uppercase tracking-wide display"
+              style={{
+                color: TFO_VERDICT_HEX[player.tfoVerdict] ?? '#94A3B8',
+                borderColor: `${TFO_VERDICT_HEX[player.tfoVerdict] ?? '#94A3B8'}44`,
+                backgroundColor: `${TFO_VERDICT_HEX[player.tfoVerdict] ?? '#94A3B8'}12`,
+              }}
+            >
+              {player.tfoVerdict.replace(/_/g, ' ')}
             </span>
           </div>
-          <p
-            className="display text-sm tracking-wide mt-1"
-            style={{ color: TFO_VERDICT_HEX[player.tfoVerdict] ?? '#94A3B8' }}
-          >
-            {player.tfoVerdict.replace(/_/g, ' ')}
-          </p>
-          <p className="text-xs text-[var(--text-secondary)] mt-2 leading-snug" style={{ fontFamily: 'var(--font-body)' }}>
-            {player.tfoReasoning}
-          </p>
           {player.tfoFlags.length > 0 && (
-            <p className="text-[10px] text-[var(--text-muted)] mt-2">
-              Flags: {player.tfoFlags.join(', ')}
-            </p>
+            <p className="text-[10px] text-[var(--text-muted)]">Flags: {player.tfoFlags.join(', ')}</p>
           )}
-        </div>
-
-        {/* Boomer / Buster tags */}
-        <div className="grid grid-cols-2 gap-3">
-          <div className="rounded-xl border border-[var(--cyan)]/25 bg-[var(--cyan)]/[0.05] p-3">
-            <p className="display text-[11px] tracking-wider text-[var(--cyan)] mb-1">🦅 BOOMER</p>
-            <p className="text-xs text-[var(--text-secondary)]" style={{ fontFamily: 'var(--font-body)' }}>
-              {isPos ? `BBSM premium: +${player.delta.toFixed(1)}% gap. ${player.note}.` : 'Age curve stable. Monitor closely.'}
-            </p>
-          </div>
-          <div className="rounded-xl border border-red-500/20 bg-red-500/[0.04] p-3">
-            <p className="display text-[11px] tracking-wider text-red-400 mb-1">😈 BUSTER</p>
-            <p className="text-xs text-[var(--text-secondary)]" style={{ fontFamily: 'var(--font-body)' }}>
-              {!isPos ? `Market premium: ${Math.abs(player.delta).toFixed(1)}% overvalued. ${player.note}.` : 'Injury risk is universal. Depth contingency needed.'}
-            </p>
-          </div>
         </div>
 
         {/* CTA */}
@@ -243,11 +246,11 @@ export default function ArbitragePage() {
   const byRankSorted = useMemo(() => [...players].sort((a, b) => a.rank - b.rank), [players]);
 
   const arbitrageTargetsLive = useMemo(
-    () => players.filter((p) => p.delta >= 10).sort((a, b) => b.delta - a.delta),
+    () => players.filter((p) => p.signal === 'STRONG BUY' || p.signal === 'BUY').sort((a, b) => b.delta - a.delta),
     [players],
   );
   const sellCandidatesLive = useMemo(
-    () => players.filter((p) => p.delta <= -10).sort((a, b) => a.delta - b.delta),
+    () => players.filter((p) => p.signal === 'SELL' || p.signal === 'STRONG SELL').sort((a, b) => a.delta - b.delta),
     [players],
   );
 
@@ -282,7 +285,8 @@ export default function ArbitragePage() {
             MARKET ARBITRAGE — FIND THE GAP
           </p>
           <p className="mt-3 text-sm text-[var(--text-secondary)]" style={{ fontFamily: 'var(--font-body)' }}>
-            BBSM model vs KTC market consensus · Δ &gt; +5% = undervalued · Δ &lt; −5% = overvalued · TFO scores refresh with live KTC
+            TFO verdict plus BBSM vs KTC delta sets the signal — bullish TFO (BOOM / LEAN BOOM) never produces SELL;
+            sells require bearish TFO and market premium (delta below thresholds).
           </p>
           {rankingsHint && (
             <p className="mt-2 text-xs text-amber-400/90" style={{ fontFamily: 'var(--font-body)' }}>
@@ -427,7 +431,7 @@ export default function ArbitragePage() {
 
                       {/* Delta */}
                       <td className="px-4 py-3">
-                        <DeltaBadge delta={p.delta} />
+                        <DeltaBadge delta={p.delta} color={p.signalColor} />
                       </td>
 
                       {/* TFO score */}
@@ -458,7 +462,10 @@ export default function ArbitragePage() {
 
                       {/* Signal */}
                       <td className="px-4 py-3">
-                        <span className={clsx('inline-flex px-2 py-0.5 rounded border text-[10px] font-bold uppercase tracking-wide display', SIGNAL_BADGE[p.signal])}>
+                        <span
+                          className="inline-flex px-2 py-0.5 rounded border text-[10px] font-bold uppercase tracking-wide display whitespace-nowrap"
+                          style={signalBadgeStyle(p.signal)}
+                        >
                           {p.signal}
                         </span>
                       </td>
@@ -503,7 +510,7 @@ export default function ArbitragePage() {
                       <span className="text-white text-sm font-medium">{p.name}</span>
                       <span className="text-[var(--text-muted)] text-[11px]">{p.team} · {p.age}y</span>
                     </div>
-                    <DeltaBadge delta={p.delta} />
+                    <DeltaBadge delta={p.delta} color={p.signalColor} />
                   </li>
                 ))}
               </ul>

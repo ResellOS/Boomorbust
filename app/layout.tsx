@@ -3,6 +3,7 @@ import { Bebas_Neue, Inter, JetBrains_Mono } from 'next/font/google';
 import { Toaster } from 'sonner';
 import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/next';
+import Script from 'next/script';
 import './globals.css';
 
 const bebasNeue = Bebas_Neue({
@@ -31,12 +32,14 @@ export const metadata: Metadata = {
   },
   description:
     'Manage your dynasty leagues like a portfolio. Sit/start decisions, trade analysis, and dynasty scouting powered by the TFO formula.',
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? 'https://thefrontoffice.app'),
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_SITE_URL ?? 'https://boomorbust.app'
+  ),
   openGraph: {
     title: 'Boom or Bust',
     description: 'Dynasty fantasy football intelligence platform',
     type: 'website',
-    url: 'https://thefrontoffice.app',
+    url: 'https://boomorbust.app',
     siteName: 'Boom or Bust',
   },
   twitter: {
@@ -60,9 +63,23 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const adsenseId = process.env.NEXT_PUBLIC_ADSENSE_PUBLISHER_ID;
+
   return (
     <html lang="en">
-      <body className={`${bebasNeue.variable} ${inter.variable} ${jetbrainsMono.variable} antialiased`}>
+      <head>
+        {adsenseId && (
+          <Script
+            async
+            src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adsenseId}`}
+            crossOrigin="anonymous"
+            strategy="afterInteractive"
+          />
+        )}
+      </head>
+      <body
+        className={`${bebasNeue.variable} ${inter.variable} ${jetbrainsMono.variable} antialiased`}
+      >
         {children}
         <Toaster
           theme="dark"

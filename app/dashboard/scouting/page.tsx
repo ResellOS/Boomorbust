@@ -1,991 +1,951 @@
 'use client';
 
-import Image from 'next/image';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { clsx } from 'clsx';
-import { Crosshair, Filter, Loader2, TrendingDown, TrendingUp } from 'lucide-react';
-import AppBackground from '@/components/AppBackground';
-import { createClient } from '@/lib/supabase/client';
-import type { DynastyPlayer2026 } from '@/lib/rankings/dynasty2026';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import Link from 'next/link';
 import {
-  ageCurveMultiplier,
-  normalizeKtcTo100,
-  type CalculateTFOScoreInput,
-  type TFOPosition,
-  type TFOVerdict,
-} from '@/lib/tfo/formula';
-import { schemeForTeam } from '@/lib/lineup/teamSchemeMap';
-import { getRadarMetrics } from '@/components/dashboard/radarMetrics';
-import SparklineGraph from '@/components/SparklineGraph';
-import type { RadarMetric } from '@/components/dashboard/PlayerHubCard';
-import { getPlayerPhotoUrl } from '@/lib/sleeper/playerPhotos';
+  ChevronLeft,
+  TrendingUp,
+  TrendingDown,
+  Minus,
+  RefreshCw,
+  Zap,
+  Target,
+  Eye,
+} from 'lucide-react';
+import AppBackground from '@/components/AppBackground';
+import { useDashboardLeagueStore } from '@/store/dashboardLeagueStore';
+import type {
+  ScoutingData,
+  WaiverRadarPlayer,
+  ProcessResultsPlayer,
+  HiddenGem,
+  WREfficiencyPlayer,
+} from '@/app/api/dashboard/scouting/route';
 
-type ScoutingPlayer = DynastyPlayer2026 & { playerId: string; sleeperId?: string };
+// ─── Design tokens ────────────────────────────────────────────────────────────
 
-interface RostRow {
-  roster_id: number;
-  owner_id: string | null;
-  players: string[] | null;
+const MONO = { fontFamily: 'var(--font-mono-tactical, "JetBrains Mono", monospace)' } as const;
+
+const POS_COLOR: Record<string, string> = {
+  QB: '#FBBF24',
+  RB: '#36E7A1',
+  WR: '#22D3EE',
+  TE: '#A78BFA',
+};
+function posColor(pos: string) { return POS_COLOR[pos?.toUpperCase()] ?? '#94A3B8'; }
+
+const VERDICT_META: Record<string, { color: string; label: string }> = {
+  BOOM:      { color: '#36E7A1', label: 'BOOM' },
+  LEAN_BOOM: { color: '#86EFAC', label: 'LEAN BOOM' },
+  NEUTRAL:   { color: '#94A3B8', label: 'NEUTRAL' },
+  LEAN_BUST: { color: '#C084FC', label: 'LEAN BUST' },
+  BUST:      { color: '#F87171', label: 'BUST' },
+};
+function verdictMeta(v: string | null | undefined) {
+  return VERDICT_META[String(v ?? '').toUpperCase()] ?? { color: '#64748B', label: 'N/A' };
 }
 
-const F_MONO = { fontFamily: 'var(--font-mono-tactical), ui-monospace, monospace' } as const;
+const GLASS = {
+  background: 'rgba(10,13,20,0.65)',
+  backdropFilter: 'blur(24px)',
+  border: '1px solid rgba(255,255,255,0.08)',
+} as const;
 
-function stablePlayerId(p: DynastyPlayer2026): string {
-  return `dynasty2026-${p.rank}-${p.name.replace(/\s+/g, '-').slice(0, 24)}`;
-}
+// ─── Sleeper headshot ─────────────────────────────────────────────────────────
 
-/** Same stable PRNG as lineup optimize `seededUnit`. */
-function seededUnit(id: string, salt: number): number {
-  let h = 0x811c9dc5;
-  const input = `${id}:${salt}`;
-  for (let i = 0; i < input.length; i++) {
-    h ^= input.charCodeAt(i);
-    h = Math.imul(h, 0x01000193);
+function PlayerThumb({ playerId, name, size = 36 }: { playerId: string; name: string; size?: number }) {
+  const [errored, setErrored] = useState(false);
+  const initials = name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
+  if (errored) {
+    return (
+      <div
+        className="shrink-0 rounded-full flex items-center justify-center text-[10px] font-bold"
+        style={{ width: size, height: size, background: 'rgba(255,255,255,0.08)', color: '#94A3B8', ...MONO }}
+      >
+        {initials}
+      </div>
+    );
   }
-  return ((h >>> 0) % 10001) / 10000;
+  return (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src={`https://sleepercdn.com/content/nfl/players/thumb/${playerId}.jpg`}
+      alt={name}
+      width={size}
+      height={size}
+      className="shrink-0 rounded-full object-cover"
+      style={{ width: size, height: size }}
+      onError={() => setErrored(true)}
+    />
+  );
 }
 
-function clamp(n: number, lo: number, hi: number): number {
-  return Math.max(lo, Math.min(hi, n));
+// ─── Skeleton ─────────────────────────────────────────────────────────────────
+
+function PanelSkeleton({ rows = 5 }: { rows?: number }) {
+  return (
+    <div className="space-y-2 p-3">
+      {Array.from({ length: rows }).map((_, i) => (
+        <div key={i} className="flex items-center gap-2 animate-pulse">
+          <div className="skeleton shrink-0 rounded-full h-8 w-8" />
+          <div className="flex-1 space-y-1">
+            <div className="skeleton h-2 w-3/4" />
+            <div className="skeleton h-1.5 w-1/2" />
+          </div>
+          <div className="skeleton h-5 w-10 rounded" />
+        </div>
+      ))}
+    </div>
+  );
 }
 
-function buildTfoInput(p: ScoutingPlayer): CalculateTFOScoreInput {
-  return {
-    playerId: p.playerId,
-    position: p.position as TFOPosition,
-    age: p.age,
-    team: p.team.toUpperCase(),
-    ocScheme: schemeForTeam(p.team),
-    opportunityScore: p.tfoOpportunityScore,
-    olGrade: 70,
-    wrCastGrade: 70,
-    redZoneShare: 60,
-    ktcValue: p.marketValue,
-    ocYear: 3,
-    rbUsageStyle: p.tfoRbUsageStyle ?? 'POWER',
-    wrDeployment: p.tfoWrDeployment ?? 'SLOT',
-    teamQbIsYoung: p.tfoTeamQbIsYoung,
-  };
+// ─── SVG Sparkline ────────────────────────────────────────────────────────────
+
+function Sparkline({
+  data,
+  color,
+  width = 60,
+  height = 24,
+}: {
+  data: number[];
+  color: string;
+  width?: number;
+  height?: number;
+}) {
+  if (data.length < 2) return null;
+  const min = Math.min(...data);
+  const max = Math.max(...data);
+  const range = Math.max(max - min, 1);
+  const pts = data.map((v, i) => {
+    const x = (i / (data.length - 1)) * width;
+    const y = height - ((v - min) / range) * (height - 2) - 1;
+    return `${x},${y}`;
+  });
+  return (
+    <svg width={width} height={height} className="shrink-0">
+      <polyline points={pts.join(' ')} fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
 }
 
-function marketValuePercentile(marketValue: number, sortedAsc: number[]): number {
-  if (!sortedAsc.length) return 50;
-  let idx = sortedAsc.findIndex((v) => v >= marketValue);
-  if (idx === -1) idx = sortedAsc.length - 1;
-  return (idx / Math.max(sortedAsc.length - 1, 1)) * 100;
+// ─── Divergence Area Chart ────────────────────────────────────────────────────
+
+function DivergenceChart({
+  processHistory,
+  resultsHistory,
+}: {
+  processHistory: number[];
+  resultsHistory: number[];
+}) {
+  const W = 100;
+  const H = 32;
+
+  const allVals = [...processHistory, ...resultsHistory];
+  const min = Math.min(...allVals) - 2;
+  const max = Math.max(...allVals) + 2;
+  const range = Math.max(max - min, 1);
+  const n = Math.max(processHistory.length, resultsHistory.length);
+
+  const toX = (i: number) => (i / (n - 1)) * W;
+  const toY = (v: number) => H - ((v - min) / range) * (H - 4) - 2;
+
+  const procPts = processHistory.map((v, i) => `${toX(i)},${toY(v)}`).join(' ');
+  const resPts  = resultsHistory.map((v, i) => `${toX(i)},${toY(v)}`).join(' ');
+
+  // Shaded area polygon between the two lines
+  const fwd  = processHistory.map((v, i) => `${toX(i)},${toY(v)}`).join(' ');
+  const back  = resultsHistory.map((v, i) => `${toX(resultsHistory.length - 1 - i)},${toY(resultsHistory[resultsHistory.length - 1 - i] ?? v)}`).join(' ');
+  const areaPath = `${fwd} ${back}`;
+
+  return (
+    <svg width={W} height={H} className="shrink-0">
+      <defs>
+        <linearGradient id="div-fill" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#A78BFA" stopOpacity="0.25" />
+          <stop offset="100%" stopColor="#36E7A1" stopOpacity="0.10" />
+        </linearGradient>
+      </defs>
+      <polygon points={areaPath} fill="url(#div-fill)" />
+      <polyline points={procPts} fill="none" stroke="#A78BFA" strokeWidth="1.5" strokeLinecap="round" />
+      <polyline points={resPts}  fill="none" stroke="#36E7A1" strokeWidth="1.5" strokeLinecap="round" />
+    </svg>
+  );
 }
 
-function computeHiddenGems(list: ScoutingPlayer[]): ScoutingPlayer[] {
-  if (!list.length) return [];
-  const sortedAsc = Array.from(new Set(list.map((p) => p.marketValue))).sort((a, b) => a - b);
-  const ranked = list
-    .map((p) => {
-      const norm = normalizeKtcTo100(p.marketValue);
-      const gap = p.tfoScore - norm;
-      const pct = marketValuePercentile(p.marketValue, sortedAsc);
-      return { p, gap, pct };
-    })
-    .filter(({ p, gap: g0, pct }) => g0 > 0 && p.tfoScore > pct)
-    .sort((a, b) => b.gap - a.gap)
-    .slice(0, 5)
-    .map((x) => x.p);
-  if (ranked.length) return ranked;
-  return [...list]
-    .map((p) => ({ p, gap: p.tfoScore - normalizeKtcTo100(p.marketValue) }))
-    .filter((x) => x.gap > 0)
-    .sort((a, b) => b.gap - a.gap)
-    .slice(0, 5)
-    .map((x) => x.p);
+// ─── Hex (6-point) Radar ─────────────────────────────────────────────────────
+
+const HEX_AXES = [
+  'Separation',
+  'Routes Run',
+  'TPRR',
+  'Matchup',
+  'Depth Chart',
+  'Low Risk',
+] as const;
+
+function hexPoint(cx: number, cy: number, r: number, axisIdx: number) {
+  const angle = ((axisIdx * 60) - 90) * (Math.PI / 180);
+  return { x: cx + r * Math.cos(angle), y: cy + r * Math.sin(angle) };
 }
 
-function routePreset(
-  position: string,
-  scheme: string,
-  wrDeployment: string | undefined,
-): { go: number; slant: number; out: number; cross: number } {
-  const sch = scheme.toLowerCase();
-  const dep = (wrDeployment ?? 'SLOT').toUpperCase();
-
-  if (position === 'WR' && sch.includes('mcvay') && dep === 'SLOT') {
-    return { slant: 45, cross: 30, out: 15, go: 10 };
-  }
-  if (position === 'WR' && sch.includes('norv')) {
-    return { go: 40, out: 30, slant: 20, cross: 10 };
-  }
-  if (position === 'RB' && sch.includes('reid')) {
-    return { cross: 50, slant: 30, out: 15, go: 5 };
-  }
-  if (position === 'TE' && sch.includes('reid')) {
-    return { cross: 45, slant: 25, out: 20, go: 10 };
-  }
-  return { go: 35, out: 25, slant: 25, cross: 15 };
-}
-
-function verdictEffMult(v: TFOVerdict): number {
-  if (v === 'BOOM' || v === 'LEAN_BOOM') return 1.15;
-  if (v === 'NEUTRAL') return 1.02;
-  return 0.88;
-}
-
-function boomTrendLabel(v: TFOVerdict, tfoScore: number): 'boom' | 'bust' {
-  if (v === 'BOOM' || v === 'LEAN_BOOM') return 'boom';
-  if (v === 'BUST' || v === 'LEAN_BUST') return 'bust';
-  return tfoScore >= 55 ? 'boom' : 'bust';
-}
-
-function radarPolygon(values: number[], cx: number, cy: number, r: number): string {
-  const n = values.length;
+function hexPoly(values: number[], cx: number, cy: number, maxR: number): string {
   return values
     .map((v, i) => {
-      const angle = (2 * Math.PI * i) / n - Math.PI / 2;
-      const x = cx + v * r * Math.cos(angle);
-      const y = cy + v * r * Math.sin(angle);
-      return `${x.toFixed(1)},${y.toFixed(1)}`;
+      const { x, y } = hexPoint(cx, cy, (v / 100) * maxR, i);
+      return `${x},${y}`;
     })
     .join(' ');
 }
 
-function axisAngle(i: number, n: number): number {
-  return (2 * Math.PI * i) / n - Math.PI / 2;
-}
+const WR_COLORS = ['#22D3EE', '#A78BFA', '#36E7A1'] as const;
 
-function SeparationBars({ playerId, tfoScore }: { playerId: string; tfoScore: number }) {
-  const labels = ['0 yd Cushion', '15 yd Cushion', '25 yd Cushion', '45 yd Cushion', 'Pass Block %'];
-  const values = labels.map((_, i) =>
-    clamp(Math.round(tfoScore * 0.55 + seededUnit(playerId, 90 + i) * 45), 8, 98),
-  );
-  const barColor = (v: number) =>
-    v > 65 ? '#36E7A1' : v >= 45 ? '#22D3EE' : '#475569';
-
-  return (
-    <div className="mt-4">
-      <p className="text-[10px] font-mono-tactical uppercase tracking-[0.14em] text-[#94A3B8] mb-2">
-        Separation score (vs. man/zone)
-      </p>
-      <div className="flex items-end justify-center gap-2">
-        {values.map((v, i) => (
-          <div key={labels[i]} className="flex flex-col items-center gap-1">
-            <div
-              className="w-8 rounded-t-sm transition-all"
-              style={{
-                height: `${(v / 100) * 80}px`,
-                backgroundColor: barColor(v),
-                minHeight: 6,
-              }}
-            />
-            <span
-              className="text-[9px] text-center leading-tight text-[#64748B] max-w-[72px]"
-              style={F_MONO}
-            >
-              {labels[i]}
-            </span>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function TrajectoryChart({ p, normalizedMarket }: { p: ScoutingPlayer; normalizedMarket: number }) {
-  const W = 560;
-  const H = 160;
-  const pad = { l: 36, r: 12, t: 14, b: 28 };
-  const innerW = W - pad.l - pad.r;
-  const innerH = H - pad.t - pad.b;
-  const years = [2024, 2025, 2026, 2027, 2028];
-  const pos = p.position as TFOPosition;
-  const rb = p.tfoRbUsageStyle ?? 'POWER';
-
-  const collegeSeries = years.map((_, i) => {
-    if (i === 0) return p.tfoScore * 0.65;
-    if (i === 1) return p.tfoScore;
-    const ageOff = i - 1;
-    return p.tfoScore * ageCurveMultiplier(pos, p.age + ageOff, rb);
-  });
-
-  const n0 = normalizedMarket;
-  const v2024 = clamp(n0 * 0.92, 30, 100);
-  const v2025 = clamp(normalizedMarket * (1 + p.delta / 100), 30, 100);
-  const m = verdictEffMult(p.tfoVerdict);
-  const v2026 = clamp(v2025 * m, 30, 100);
-  const v2027 = clamp(v2026 * (m >= 1 ? 1.04 : 0.96), 30, 100);
-  const v2028 = clamp(v2027 * (m >= 1 ? 1.03 : 0.97), 30, 100);
-  const greenSeries = [v2024, v2025, v2026, v2027, v2028];
-
-  const yMin = 30;
-  const yMax = 100;
-  const xScale = (i: number) => pad.l + (i / (years.length - 1)) * innerW;
-  const yScale = (v: number) => pad.t + innerH - ((clamp(v, yMin, yMax) - yMin) / (yMax - yMin)) * innerH;
-
-  const linePath = (series: number[]) =>
-    series
-      .map((v, i) => `${i === 0 ? 'M' : 'L'} ${xScale(i).toFixed(1)} ${yScale(v).toFixed(1)}`)
-      .join(' ');
-
-  const areaPath = `${linePath(greenSeries)} L ${xScale(years.length - 1)} ${pad.t + innerH} L ${pad.l} ${pad.t + innerH} Z`;
-
-  const delta = Math.round(p.tfoScore - normalizedMarket);
-  const deltaPositive = delta >= 0;
-
-  return (
-    <div className="w-full overflow-x-auto">
-      <svg
-        viewBox={`0 0 ${W} ${H}`}
-        className="w-full h-[160px] min-w-[320px]"
-        preserveAspectRatio="xMidYMid meet"
-      >
-        {[30, 50, 70, 90].map((tick) => {
-          const y = yScale(tick);
-          return (
-            <g key={tick}>
-              <line x1={pad.l} y1={y} x2={W - pad.r} y2={y} stroke="rgba(255,255,255,0.06)" strokeWidth={1} />
-              <text x={4} y={y + 4} fill="#64748B" fontSize={9} style={F_MONO}>
-                {tick}%
-              </text>
-            </g>
-          );
-        })}
-        {years.map((yr, i) => (
-          <text
-            key={yr}
-            x={xScale(i)}
-            y={H - 6}
-            fill="#64748B"
-            fontSize={10}
-            textAnchor="middle"
-            style={F_MONO}
-          >
-            {yr}
-          </text>
-        ))}
-        <path d={areaPath} fill="rgba(54,231,161,0.08)" />
-        <path
-          d={linePath(collegeSeries)}
-          fill="none"
-          stroke="#A78BFA"
-          strokeWidth={2}
-          strokeLinecap="square"
-          strokeLinejoin="miter"
-        />
-        <path
-          d={linePath(greenSeries)}
-          fill="none"
-          stroke="#36E7A1"
-          strokeWidth={2}
-          strokeLinecap="square"
-          strokeLinejoin="miter"
-        />
-        <text
-          x={W - pad.r}
-          y={H - pad.b + 4}
-          fill={deltaPositive ? '#22D3EE' : '#EF4444'}
-          fontSize={24}
-          textAnchor="end"
-          style={{ fontFamily: 'var(--font-display), Bebas Neue, Impact, sans-serif' }}
-        >
-          {deltaPositive ? '+' : ''}
-          {delta}% WIN PROBABILITY
-        </text>
-        <g>
-          <circle cx={pad.l} cy={H - 10} r={4} fill="#A78BFA" />
-          <text x={pad.l + 10} y={H - 6} fill="#94A3B8" fontSize={10} style={F_MONO}>
-            College Scouting Model
-          </text>
-        </g>
-        <g>
-          <circle cx={pad.l + 148} cy={H - 10} r={4} fill="#36E7A1" />
-          <text x={pad.l + 158} y={H - 6} fill="#94A3B8" fontSize={10} style={F_MONO}>
-            Live NFL Efficiency
-          </text>
-        </g>
-      </svg>
-    </div>
-  );
-}
-
-function RouteHeatmap({
-  position,
-  team,
-  wrDeployment,
+function HexRadar({
+  players,
+  selectedIds,
 }: {
-  position: string;
-  team: string;
-  wrDeployment: string | undefined;
+  players: WREfficiencyPlayer[];
+  selectedIds: string[];
 }) {
-  const scheme = schemeForTeam(team);
-  const { go, slant, out, cross } = routePreset(position, scheme, wrDeployment);
-  const rows = [
-    { label: 'Go', pct: go, heat: 'hot' as const },
-    { label: 'Slant', pct: slant, heat: 'warm' as const },
-    { label: 'Out', pct: out, heat: 'mid' as const },
-    { label: 'Cross', pct: cross, heat: cross >= 30 ? 'warm' : 'cold' as const },
-  ];
+  const W = 220;
+  const H = 200;
+  const cx = W / 2;
+  const cy = H / 2 + 4;
+  const maxR = 72;
+  const RINGS = [25, 50, 75, 100];
 
-  const heatBg = (h: (typeof rows)[0]['heat']) => {
-    if (h === 'hot') return 'rgba(54,231,161,0.45)';
-    if (h === 'warm') return 'rgba(34,211,238,0.28)';
-    if (h === 'mid') return 'rgba(99,102,241,0.22)';
-    return 'rgba(59,130,246,0.12)';
-  };
+  const selected = selectedIds
+    .map(id => players.find(p => p.player_id === id))
+    .filter(Boolean) as WREfficiencyPlayer[];
+
+  const benchmarkValues = [65, 62, 58, 61, 64, 70]; // avg reference
 
   return (
-    <div
-      className="relative rounded-lg overflow-hidden border border-white/[0.08]"
-      style={{ width: 200, height: 160, background: '#0a0f18' }}
-    >
-      {Array.from({ length: 9 }).map((_, i) => (
-        <div
-          key={i}
-          className="absolute left-0 right-0 pointer-events-none"
-          style={{
-            top: 16 + i * 16,
-            height: 1,
-            background: 'rgba(255,255,255,0.06)',
-          }}
+    <svg viewBox={`0 0 ${W} ${H}`} width="100%" height={H} style={{ maxWidth: W }}>
+      {/* Grid rings */}
+      {RINGS.map(pct => (
+        <polygon
+          key={pct}
+          points={hexPoly([pct, pct, pct, pct, pct, pct], cx, cy, maxR)}
+          fill="none"
+          stroke="rgba(255,255,255,0.08)"
+          strokeWidth="1"
         />
       ))}
-      <div
-        className="absolute inset-0 opacity-10 pointer-events-none"
-        style={{
-          backgroundImage:
-            'linear-gradient(90deg, rgba(255,255,255,0.15) 1px, transparent 1px)',
-          backgroundSize: '24px 100%',
-        }}
+
+      {/* Axis lines */}
+      {HEX_AXES.map((_, i) => {
+        const { x, y } = hexPoint(cx, cy, maxR, i);
+        return <line key={i} x1={cx} y1={cy} x2={x} y2={y} stroke="rgba(255,255,255,0.08)" strokeWidth="1" />;
+      })}
+
+      {/* Benchmark polygon */}
+      <polygon
+        points={hexPoly(benchmarkValues, cx, cy, maxR)}
+        fill="rgba(34,211,238,0.06)"
+        stroke="rgba(34,211,238,0.25)"
+        strokeWidth="1"
+        strokeDasharray="3,2"
       />
-      <div className="absolute top-2 left-2 right-2 flex flex-col gap-2 z-10">
-        {rows.map((r) => (
-          <div
-            key={r.label}
-            className="rounded px-2 py-1 text-[10px] font-mono-tactical border border-white/10"
+
+      {/* Player polygons */}
+      {selected.map((player, pi) => {
+        const vals = [
+          player.separation_grade,
+          player.routes_run_pct,
+          player.tprr,
+          player.matchup_multiplier,
+          player.depth_chart_priority,
+          player.boom_bust_risk,
+        ];
+        const col = WR_COLORS[pi % WR_COLORS.length]!;
+        return (
+          <polygon
+            key={player.player_id}
+            points={hexPoly(vals, cx, cy, maxR)}
+            fill={`${col}22`}
+            stroke={col}
+            strokeWidth="1.5"
+          />
+        );
+      })}
+
+      {/* Axis labels */}
+      {HEX_AXES.map((label, i) => {
+        const r = maxR + 14;
+        const { x, y } = hexPoint(cx, cy, r, i);
+        return (
+          <text
+            key={i}
+            x={x}
+            y={y}
+            textAnchor="middle"
+            dominantBaseline="middle"
+            fill="#22D3EE"
+            fontSize="7"
+            fontFamily="JetBrains Mono, monospace"
+            opacity={0.75}
+          >
+            {label.slice(0, 8)}
+          </text>
+        );
+      })}
+    </svg>
+  );
+}
+
+// ─── Waiver Radar Panel ───────────────────────────────────────────────────────
+
+type PosFilter = 'ALL' | 'QB' | 'RB' | 'WR' | 'TE';
+
+function WaiverRadarPanel({ players, gapPositions }: { players: WaiverRadarPlayer[]; gapPositions: string[] }) {
+  const [filter, setFilter] = useState<PosFilter>('ALL');
+
+  const filtered = filter === 'ALL' ? players : players.filter(p => p.position === filter);
+
+  const FILTERS: PosFilter[] = ['ALL', 'QB', 'RB', 'WR', 'TE'];
+
+  return (
+    <section
+      className="flex flex-col rounded-2xl overflow-hidden"
+      style={{ ...GLASS, border: '1px solid rgba(34,211,238,0.15)' }}
+    >
+      {/* Header */}
+      <div className="flex items-center justify-between gap-2 px-4 py-3 border-b border-white/[0.07]">
+        <div className="flex items-center gap-2">
+          <Zap size={13} className="text-[#22D3EE]" />
+          <span className="text-[11px] font-bold uppercase tracking-widest text-white/70" style={MONO}>
+            Waiver Radar
+          </span>
+        </div>
+        {gapPositions.length > 0 && (
+          <span className="text-[9px] text-[#22D3EE]/70 uppercase tracking-wide" style={MONO}>
+            Needs: {gapPositions.join(', ')}
+          </span>
+        )}
+      </div>
+
+      {/* Filter pills */}
+      <div className="flex items-center gap-1.5 px-3 py-2 border-b border-white/[0.05]">
+        {FILTERS.map(f => (
+          <button
+            key={f}
+            onClick={() => setFilter(f)}
+            className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide transition-all"
             style={{
-              backgroundColor: heatBg(r.heat),
-              color: '#e2e8f0',
+              ...MONO,
+              background: filter === f ? (f === 'ALL' ? 'rgba(34,211,238,0.18)' : `${posColor(f)}22`) : 'rgba(255,255,255,0.05)',
+              color: filter === f ? (f === 'ALL' ? '#22D3EE' : posColor(f)) : '#64748B',
+              border: `1px solid ${filter === f ? (f === 'ALL' ? 'rgba(34,211,238,0.40)' : posColor(f) + '55') : 'rgba(255,255,255,0.08)'}`,
             }}
           >
-            {r.label} {r.pct}%
-          </div>
+            {f}
+          </button>
         ))}
       </div>
-    </div>
-  );
-}
 
-function ReticleIdle() {
-  return (
-    <div className="relative flex flex-col items-center justify-center py-24 text-[var(--text-muted)]">
-      <div className="relative w-40 h-40 flex items-center justify-center">
-        <span
-          className="absolute inset-6 border border-dashed border-[#22D3EE]/25 rounded-full animate-pulse"
-          aria-hidden
-        />
-        <span
-          className="absolute inset-10 border border-[#22D3EE]/15 rounded-full animate-pulse"
-          style={{ animationDelay: '0.4s' }}
-          aria-hidden
-        />
-        <Crosshair className="w-14 h-14 text-[#22D3EE]/40 animate-pulse" strokeWidth={1.25} />
-      </div>
-      <p className="mt-6 text-sm text-[var(--text-secondary)] text-center max-w-xs">
-        Select a player from the waiver radar to begin analysis
-      </p>
-    </div>
-  );
-}
-
-function Toggle({
-  active,
-  label,
-  onClick,
-}: {
-  active: boolean;
-  label: string;
-  onClick: () => void;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={clsx(
-        'w-full text-left px-2 py-1.5 rounded-md border text-[10px] font-mono-tactical uppercase tracking-wide transition',
-        active
-          ? 'border-[var(--cyan)]/50 bg-[var(--cyan)]/10 text-[var(--cyan)]'
-          : 'border-[var(--border)] bg-white/[0.03] text-[var(--text-muted)] hover:border-white/20',
-      )}
-    >
-      {label}
-    </button>
-  );
-}
-
-export default function ScoutingPage() {
-  const supabase = createClient();
-  const [players, setPlayers] = useState<ScoutingPlayer[]>([]);
-  const [selectedPlayer, setSelectedPlayer] = useState<ScoutingPlayer | null>(null);
-  const [ownedIds, setOwnedIds] = useState<Set<string>>(new Set());
-  const [idToName, setIdToName] = useState<Record<string, string>>({});
-  const [rosterByLeague, setRosterByLeague] = useState<Record<string, string[]>>({});
-  const [leagueNames, setLeagueNames] = useState<{ id: string; name: string }[]>([]);
-  const [rookiesOnly, setRookiesOnly] = useState(false);
-  const [availableOnly, setAvailableOnly] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [loading, setLoading] = useState(true);
-  const [filtersOpen, setFiltersOpen] = useState(true);
-  const initPick = useRef(false);
-
-  useEffect(() => {
-    let cancelled = false;
-
-    async function load() {
-      setLoading(true);
-      try {
-        const [rankRes, { data: leagueData }, profileRes] = await Promise.all([
-          fetch('/api/rankings/dynasty-enriched'),
-          supabase.from('leagues').select('id, name').order('season', { ascending: false }),
-          supabase.from('profiles').select('sleeper_user_id').single(),
-        ]);
-
-        if (cancelled) return;
-
-        const raw = rankRes.ok ? ((await rankRes.json()) as DynastyPlayer2026[]) : [];
-        const base: ScoutingPlayer[] = raw.map((r) => ({
-          ...r,
-          playerId: stablePlayerId(r),
-        }));
-
-        const leagueList = (leagueData ?? []) as { id: string; name: string }[];
-        const ownerSid = profileRes.data?.sleeper_user_id ? String(profileRes.data.sleeper_user_id) : null;
-
-        const rosterMap: Record<string, string[]> = {};
-        await Promise.all(
-          leagueList.map(async (lg) => {
-            const { data: rows } = ownerSid
-              ? await supabase.from('rosters').select('*').eq('league_id', lg.id).eq('owner_id', ownerSid)
-              : await supabase.from('rosters').select('*').eq('league_id', lg.id).limit(1);
-            const arr = (rows ?? []) as RostRow[];
-            const yours = ownerSid
-              ? arr.find((row) => String(row.owner_id) === ownerSid) ?? arr[0]
-              : arr[0];
-            if (yours?.players?.length) rosterMap[lg.id] = yours.players;
-            else rosterMap[lg.id] = [];
-          }),
-        );
-
-        const allIds = Array.from(new Set(Object.values(rosterMap).flat())).filter(Boolean).slice(0, 400);
-        let pmap: Record<string, { full_name?: string }> = {};
-        if (allIds.length) {
-          const pr = await fetch(`/api/players?ids=${allIds.join(',')}`);
-          if (pr.ok) pmap = await pr.json();
-        }
-
-        const namesForMap = base.map((p) => p.name).slice(0, 400);
-        let nameToSleeper: Record<string, string> = {};
-        try {
-          const mr = await fetch('/api/players/map-names', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ names: namesForMap }),
-          });
-          if (mr.ok) {
-            const j = (await mr.json()) as { mapping?: Record<string, string> };
-            nameToSleeper = j.mapping ?? {};
-          }
-        } catch {
-          /* ignore */
-        }
-
-        const merged = base.map((p) => ({
-          ...p,
-          sleeperId: nameToSleeper[p.name],
-        }));
-
-        const owned = new Set<string>();
-        const i2n: Record<string, string> = {};
-        for (const id of allIds) {
-          const fn = pmap[id]?.full_name?.trim();
-          if (fn) i2n[id] = fn;
-        }
-        for (const id of allIds) {
-          if (id) owned.add(id);
-        }
-
-        if (cancelled) return;
-        setPlayers(merged);
-        setOwnedIds(owned);
-        setIdToName(i2n);
-        setRosterByLeague(rosterMap);
-        setLeagueNames(leagueList);
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    }
-
-    load();
-    return () => {
-      cancelled = true;
-    };
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps -- mount bootstrap only
-
-  const leagueIds = useMemo(() => leagueNames.map((l) => l.id), [leagueNames]);
-
-  const playerOwned = useCallback(
-    (p: ScoutingPlayer): boolean => {
-      if (p.sleeperId && ownedIds.has(p.sleeperId)) return true;
-      const ln = p.name.toLowerCase();
-      for (const id of Array.from(ownedIds)) {
-        if ((idToName[id]?.toLowerCase() ?? '') === ln) return true;
-      }
-      return false;
-    },
-    [ownedIds, idToName],
-  );
-
-  const onRosterInLeague = useCallback(
-    (leagueId: string, p: ScoutingPlayer): boolean => {
-      const ids = rosterByLeague[leagueId] ?? [];
-      if (p.sleeperId && ids.includes(p.sleeperId)) return true;
-      const ln = p.name.toLowerCase();
-      for (const rid of ids) {
-        if ((idToName[rid]?.toLowerCase() ?? '') === ln) return true;
-      }
-      return false;
-    },
-    [rosterByLeague, idToName],
-  );
-
-  const faMeta = useCallback(
-    (p: ScoutingPlayer) => {
-      const y = leagueIds.length;
-      if (!y) return { fa: 0, label: '—', allOwned: false };
-      let fa = 0;
-      for (const lid of leagueIds) {
-        if (!onRosterInLeague(lid, p)) fa++;
-      }
-      const allOwned = fa === 0;
-      return {
-        fa,
-        label: allOwned ? 'Owned' : `FA in ${fa}/${y} Lgs`,
-        allOwned,
-      };
-    },
-    [leagueIds, onRosterInLeague],
-  );
-
-  const filteredPlayers = useMemo(() => {
-    const q = searchQuery.trim().toLowerCase();
-    const leagueHit =
-      q.length > 0 && leagueNames.some((l) => l.name.toLowerCase().includes(q));
-
-    return players.filter((p) => {
-      if (rookiesOnly && p.age > 23) return false;
-      if (availableOnly && playerOwned(p)) return false;
-      if (!q) return true;
-      if (leagueHit) return true;
-      return p.name.toLowerCase().includes(q);
-    });
-  }, [players, rookiesOnly, availableOnly, searchQuery, leagueNames, playerOwned]);
-
-  const hiddenGems = useMemo(() => computeHiddenGems(filteredPlayers), [filteredPlayers]);
-
-  useEffect(() => {
-    if (loading || initPick.current) return;
-    const first = hiddenGems[0];
-    if (first) {
-      setSelectedPlayer(first);
-      initPick.current = true;
-    }
-  }, [loading, hiddenGems]);
-
-  const gemSparklineData = (p: ScoutingPlayer): number[] => {
-    const norm = normalizeKtcTo100(p.marketValue);
-    const prior = clamp(norm * 0.88, 5, 95);
-    const cur = norm;
-    const proj = clamp(norm + (p.tfoScore - norm) * 0.35, 5, 98);
-    return [prior, cur, proj];
-  };
-
-  const radarForSelected = useMemo((): RadarMetric[] => {
-    if (!selectedPlayer) return [];
-    const input = buildTfoInput(selectedPlayer);
-    const fid = selectedPlayer.sleeperId ?? selectedPlayer.playerId;
-    const boom = boomTrendLabel(selectedPlayer.tfoVerdict, selectedPlayer.tfoScore) === 'boom' ? 'boom' : 'bust';
-    return getRadarMetrics(selectedPlayer.position, fid, undefined, boom, { tfoInput: input });
-  }, [selectedPlayer]);
-
-  const RADAR_SZ = 180;
-  const RADAR_CX = RADAR_SZ / 2;
-  const RADAR_CY = RADAR_SZ / 2 - 4;
-  const RADAR_R = 62;
-  const rings = [0.33, 0.66, 1];
-
-  const normMarketSel = selectedPlayer ? normalizeKtcTo100(selectedPlayer.marketValue) : 0;
-  const deltaRating = selectedPlayer ? selectedPlayer.tfoScore - normMarketSel : 0;
-
-  return (
-    <AppBackground>
-      <div className="min-h-screen text-[var(--text-primary)] pb-24 lg:pb-8" style={{ background: '#060910' }}>
-        <div className="max-w-[1920px] mx-auto px-4 sm:px-6 py-6">
-          <header className="mb-8">
-            <h1
-              className="uppercase tracking-[0.05em] font-black leading-tight"
-              style={{
-                fontFamily: 'var(--font-display), Bebas Neue, Impact, sans-serif',
-                fontSize: 'clamp(28px, 4vw, 48px)',
-                background: 'linear-gradient(180deg, #ffffff 0%, #22D3EE 100%)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                backgroundClip: 'text',
-              }}
+      {/* Player list */}
+      <div className="flex-1 overflow-y-auto divide-y divide-white/[0.04]" style={{ maxHeight: 440 }}>
+        {filtered.length === 0 && (
+          <div className="px-4 py-8 text-center text-[11px] text-white/30" style={MONO}>
+            No waiver targets found
+          </div>
+        )}
+        {filtered.map((p, i) => {
+          const vm = verdictMeta(p.verdict);
+          const isNeed = gapPositions.includes(p.position);
+          return (
+            <div
+              key={p.player_id}
+              className="flex items-center gap-2.5 px-3 py-2.5 hover:bg-white/[0.03] transition-colors"
             >
-              NFL Scouting Terminal
-            </h1>
-            <p
-              className="mt-2 text-[13px] text-[#22D3EE] tracking-[0.2em] uppercase font-mono-tactical"
-              style={F_MONO}
-            >
-              Process intelligence
-            </p>
-          </header>
+              {/* Rank */}
+              <span className="text-[10px] w-4 text-white/25 shrink-0 text-right" style={MONO}>{i + 1}</span>
 
-          {loading ? (
-            <div className="flex items-center justify-center py-32 gap-3 text-[var(--text-muted)]">
-              <Loader2 className="w-6 h-6 animate-spin" />
-              <span className="text-sm font-mono-tactical">Loading scouting intel…</span>
-            </div>
-          ) : (
-            <div className="flex flex-col xl:flex-row gap-4 items-stretch">
-              {/* Left — Waiver Radar */}
-              <aside className="glass-panel shrink-0 p-4 flex flex-col gap-4 overflow-hidden w-full xl:w-[280px] xl:max-w-[280px]">
-                <div className="flex items-center justify-between gap-2">
-                  <h2 className="text-xs font-mono-tactical uppercase tracking-[0.18em] text-white">
-                    Waiver Radar
-                  </h2>
-                  <button
-                    type="button"
-                    onClick={() => setFiltersOpen((o) => !o)}
-                    className="p-1.5 rounded-md border border-white/10 text-[#94A3B8] hover:text-white hover:bg-white/5"
-                    aria-label="Toggle filters"
-                  >
-                    <Filter className="w-4 h-4" />
-                  </button>
-                </div>
+              {/* Avatar */}
+              <PlayerThumb playerId={p.player_id} name={p.name} size={32} />
 
-                {filtersOpen && (
-                  <div className="flex flex-col gap-2">
-                    <Toggle
-                      active={availableOnly}
-                      onClick={() => setAvailableOnly((x) => !x)}
-                      label="Available in my leagues"
-                    />
-                    <Toggle active={rookiesOnly} onClick={() => setRookiesOnly((x) => !x)} label="Rookies only" />
-                  </div>
-                )}
-
-                <input
-                  type="search"
-                  placeholder="SEARCH PLAYER OR LEAGUE..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2 text-[11px] text-[#94A3B8] placeholder:text-[#94A3B8]/70 outline-none focus:border-[var(--cyan)]/40 backdrop-blur-md"
-                  style={F_MONO}
-                />
-
-                <div>
-                  <p className="text-[10px] font-mono-tactical uppercase tracking-[0.16em] text-[#64748B] mb-3">
-                    Top hidden gems
-                  </p>
-                  <div className="flex flex-col gap-2 max-h-[calc(100vh-280px)] overflow-y-auto pr-1">
-                    {hiddenGems.length === 0 ? (
-                      <p className="text-xs text-[var(--text-muted)]">No gems match filters.</p>
-                    ) : (
-                      hiddenGems.map((g) => {
-                        const { label, allOwned } = faMeta(g);
-                        const spark = gemSparklineData(g);
-                        const boom = boomTrendLabel(g.tfoVerdict, g.tfoScore) === 'boom';
-                        return (
-                          <button
-                            key={g.playerId}
-                            type="button"
-                            onClick={() => setSelectedPlayer(g)}
-                            className={clsx(
-                              'text-left rounded-lg border p-2.5 transition hover:border-[var(--cyan)]/35',
-                              selectedPlayer?.playerId === g.playerId
-                                ? 'border-[var(--cyan)]/50 bg-[var(--cyan)]/8'
-                                : 'border-white/10 bg-white/[0.02]',
-                            )}
-                          >
-                            <div className="flex justify-between gap-2">
-                              <div className="min-w-0">
-                                <p className="font-bold text-white truncate text-sm">{g.name}</p>
-                                <p className="text-[11px] text-[#22D3EE] truncate" style={F_MONO}>
-                                  {g.position} · {g.team}
-                                </p>
-                              </div>
-                              <SparklineGraph data={spark} width={40} height={20} />
-                            </div>
-                            <div className="mt-2 flex items-center justify-between gap-2">
-                              <span
-                                className={clsx(
-                                  'text-[10px] font-mono-tactical px-1.5 py-0.5 rounded border',
-                                  allOwned
-                                    ? 'border-white/15 text-[#64748B]'
-                                    : 'border-emerald-500/40 text-emerald-400 bg-emerald-500/10',
-                                )}
-                              >
-                                {label}
-                              </span>
-                              <span
-                                className={clsx(
-                                  'flex items-center gap-0.5 text-[10px] font-mono-tactical font-bold',
-                                  boom ? 'text-emerald-400' : 'text-red-400',
-                                )}
-                              >
-                                {boom ? (
-                                  <>
-                                    BOOM <TrendingUp className="w-3 h-3" />
-                                  </>
-                                ) : (
-                                  <>
-                                    BUST <TrendingDown className="w-3 h-3" />
-                                  </>
-                                )}
-                              </span>
-                            </div>
-                          </button>
-                        );
-                      })
-                    )}
-                  </div>
-                </div>
-              </aside>
-
-              {/* Center — Deep Dive */}
-              <main className="glass-panel flex-1 min-w-0 p-5 flex flex-col">
-                <h2 className="text-xs font-mono-tactical uppercase tracking-[0.18em] text-[var(--text-muted)] mb-4">
-                  Player Deep Dive
-                  {selectedPlayer && (
-                    <span className="text-white ml-2">(Selected: {selectedPlayer.name})</span>
+              {/* Info */}
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-1.5">
+                  <span className="text-[12px] font-semibold text-white/90 truncate">{p.name}</span>
+                  {isNeed && (
+                    <span className="text-[8px] px-1 py-0.5 rounded font-bold uppercase"
+                      style={{ background: 'rgba(34,211,238,0.15)', color: '#22D3EE', ...MONO }}>
+                      NEED
+                    </span>
                   )}
-                </h2>
+                </div>
+                <div className="flex items-center gap-1.5 mt-0.5">
+                  <span className="text-[10px] font-bold" style={{ color: posColor(p.position), ...MONO }}>
+                    {p.position}
+                  </span>
+                  <span className="text-[10px] text-white/30" style={MONO}>{p.team}</span>
+                </div>
+              </div>
 
-                {!selectedPlayer ? (
-                  <ReticleIdle />
-                ) : (
-                  <>
-                    <section className="border-b border-white/10 pb-6 mb-6">
-                      <div className="flex flex-wrap items-center gap-4 mb-4">
-                        {selectedPlayer.sleeperId ? (
-                          <Image
-                            src={getPlayerPhotoUrl(selectedPlayer.sleeperId)}
-                            alt=""
-                            width={48}
-                            height={48}
-                            className="rounded-full border border-white/15 object-cover bg-black/40"
-                            unoptimized
-                          />
-                        ) : (
-                          <div
-                            className="w-12 h-12 rounded-full border border-white/15 flex items-center justify-center text-sm font-bold text-white/70"
-                            style={{ background: 'rgba(34,211,238,0.12)' }}
-                          >
-                            {selectedPlayer.firstName?.[0]}
-                            {selectedPlayer.lastName?.[0]}
-                          </div>
-                        )}
-                        <div className="min-w-0 flex-1">
-                          <p className="text-lg font-bold text-white truncate">{selectedPlayer.name}</p>
-                          <p className="text-[12px] text-[var(--text-muted)]" style={F_MONO}>
-                            {selectedPlayer.team} · {selectedPlayer.position}
-                          </p>
-                        </div>
-                        {(() => {
-                          const { label, allOwned } = faMeta(selectedPlayer);
-                          return (
-                            <span
-                              className={clsx(
-                                'text-[11px] font-mono-tactical px-2 py-1 rounded-full border shrink-0',
-                                allOwned
-                                  ? 'border-white/15 text-[#64748B]'
-                                  : 'border-emerald-500/35 text-emerald-400 bg-emerald-500/10',
-                              )}
-                            >
-                              {label}
-                            </span>
-                          );
-                        })()}
-                      </div>
+              {/* Trend */}
+              <div className="shrink-0">
+                {p.trend === 'up'   && <TrendingUp  size={13} className="text-[#36E7A1]" />}
+                {p.trend === 'down' && <TrendingDown size={13} className="text-[#EF4444]" />}
+                {p.trend === 'flat' && <Minus        size={13} className="text-[#64748B]" />}
+              </div>
 
-                      <p
-                        className="text-[10px] font-mono-tactical uppercase tracking-[0.14em] text-[#94A3B8] mb-2"
-                        style={{ fontFamily: 'var(--font-display)' }}
-                      >
-                        Predictive trajectory
-                      </p>
-                      <TrajectoryChart p={selectedPlayer} normalizedMarket={normMarketSel} />
-                    </section>
-
-                    <section>
-                      <h3 className="text-sm uppercase tracking-[0.12em] text-white" style={{ fontFamily: 'var(--font-display)' }}>
-                        Heatmap &amp; scheme fit
-                      </h3>
-                      <p className="text-[11px] text-[#64748B] font-mono-tactical mt-1 mb-4 uppercase tracking-wide">
-                        Separator hotspots
-                      </p>
-                      <div className="flex flex-col lg:flex-row gap-6">
-                        <RouteHeatmap
-                          position={selectedPlayer.position}
-                          team={selectedPlayer.team}
-                          wrDeployment={selectedPlayer.tfoWrDeployment}
-                        />
-                        <div className="flex-1 rounded-lg border border-white/10 bg-black/25 p-4 min-h-[160px]">
-                          <p className="text-[10px] font-mono-tactical text-[#22D3EE] mb-2">AI-SUMMARY:</p>
-                          <p className="text-[11px] font-bold text-white uppercase tracking-wide mb-2">
-                            True talent delta:
-                          </p>
-                          <p className="text-sm text-[var(--text-secondary)] leading-relaxed mb-4">
-                            {selectedPlayer.tfoReasoning?.slice(0, 280)}
-                            {(selectedPlayer.tfoReasoning?.length ?? 0) > 280 ? '…' : ''}
-                          </p>
-                          <p className="text-[12px] font-mono-tactical">
-                            Value is{' '}
-                            <span
-                              className={clsx(
-                                'font-bold',
-                                deltaRating > 10
-                                  ? 'text-emerald-400'
-                                  : deltaRating < -10
-                                    ? 'text-red-400'
-                                    : 'text-slate-400',
-                              )}
-                            >
-                              {deltaRating > 10 ? 'UNDERRATED' : deltaRating < -10 ? 'OVERRATED' : 'FAIRLY RATED'}
-                            </span>
-                          </p>
-                        </div>
-                      </div>
-                    </section>
-                  </>
-                )}
-              </main>
-
-              {/* Right — Efficiency */}
-              <aside className="glass-panel shrink-0 p-4 flex flex-col w-full xl:w-[320px] xl:max-w-[320px]">
-                <h2 className="text-xs font-mono-tactical uppercase tracking-[0.18em] text-[#94A3B8] mb-4">
-                  WR Efficiency Matrix
-                </h2>
-
-                {!selectedPlayer ? (
-                  <p className="text-xs text-[var(--text-muted)]">Select a player.</p>
-                ) : (
-                  <>
-                    <div className="flex justify-center">
-                      <svg width={RADAR_SZ} height={RADAR_SZ} viewBox={`0 0 ${RADAR_SZ} ${RADAR_SZ}`}>
-                        {rings.map((t) => (
-                          <polygon
-                            key={t}
-                            points={radarPolygon(
-                              radarForSelected.map(() => t),
-                              RADAR_CX,
-                              RADAR_CY,
-                              RADAR_R,
-                            )}
-                            fill="none"
-                            stroke="rgba(148,163,184,0.18)"
-                            strokeWidth={1}
-                          />
-                        ))}
-                        {radarForSelected.map((_, i) => {
-                          const angle = axisAngle(i, radarForSelected.length);
-                          const x2 = RADAR_CX + RADAR_R * Math.cos(angle);
-                          const y2 = RADAR_CY + RADAR_R * Math.sin(angle);
-                          return (
-                            <line
-                              key={i}
-                              x1={RADAR_CX}
-                              y1={RADAR_CY}
-                              x2={x2}
-                              y2={y2}
-                              stroke="rgba(148,163,184,0.25)"
-                              strokeWidth={1}
-                            />
-                          );
-                        })}
-                        <polygon
-                          points={radarPolygon(
-                            radarForSelected.map((m) => m.value),
-                            RADAR_CX,
-                            RADAR_CY,
-                            RADAR_R,
-                          )}
-                          fill="rgba(34,211,238,0.14)"
-                          stroke="#22D3EE"
-                          strokeWidth={1.5}
-                        />
-                        {radarForSelected.map((m, i) => {
-                          const angle = axisAngle(i, radarForSelected.length);
-                          const lx = RADAR_CX + (RADAR_R + 18) * Math.cos(angle);
-                          const ly = RADAR_CY + (RADAR_R + 18) * Math.sin(angle);
-                          return (
-                            <text
-                              key={m.label}
-                              x={lx}
-                              y={ly}
-                              fill="#94A3B8"
-                              fontSize={10}
-                              textAnchor="middle"
-                              dominantBaseline="middle"
-                              style={F_MONO}
-                            >
-                              {m.label}
-                            </text>
-                          );
-                        })}
-                      </svg>
-                    </div>
-
-                    <SeparationBars
-                      playerId={selectedPlayer.sleeperId ?? selectedPlayer.playerId}
-                      tfoScore={selectedPlayer.tfoScore}
-                    />
-
-                    <div className="mt-6 grid grid-cols-2 gap-3">
-                      {(() => {
-                        const rz = Math.round(38 + seededUnit(selectedPlayer.playerId, 77) * 52);
-                        const rzColor =
-                          rz > 60 ? 'text-emerald-400 border-emerald-500/30' : rz > 40 ? 'text-amber-400 border-amber-500/30' : 'text-red-400 border-red-500/30';
-                        const vs = Math.round(selectedPlayer.tfoScore - 50);
-                        const vsColor = vs >= 0 ? 'text-emerald-400 border-emerald-500/30' : 'text-red-400 border-red-500/30';
-                        return (
-                          <>
-                            <div className={clsx('rounded-lg border p-3 bg-white/[0.02]', rzColor)}>
-                              <p className="text-[9px] font-mono-tactical uppercase text-[#64748B] mb-1">
-                                Usage delta
-                              </p>
-                              <p className="text-xl font-black" style={{ fontFamily: 'var(--font-display)' }}>
-                                {rz}%
-                              </p>
-                              <p className="text-[10px] text-[#64748B] font-mono-tactical mt-1">Red Zone Targets</p>
-                            </div>
-                            <div className={clsx('rounded-lg border p-3 bg-white/[0.02]', vsColor)}>
-                              <p className="text-[9px] font-mono-tactical uppercase text-[#64748B] mb-1">
-                                Usage delta
-                              </p>
-                              <p className="text-xl font-black" style={{ fontFamily: 'var(--font-display)' }}>
-                                {vs >= 0 ? '+' : ''}
-                                {vs}%
-                              </p>
-                              <p className="text-[10px] text-[#64748B] font-mono-tactical mt-1">vs Position Avg</p>
-                            </div>
-                          </>
-                        );
-                      })()}
-                    </div>
-                  </>
-                )}
-              </aside>
+              {/* Verdict badge */}
+              <div className="shrink-0 flex flex-col items-end gap-0.5">
+                <span
+                  className="text-[9px] font-bold px-1.5 py-0.5 rounded uppercase"
+                  style={{ ...MONO, background: `${vm.color}18`, color: vm.color, border: `1px solid ${vm.color}40` }}
+                >
+                  {vm.label}
+                </span>
+                <span className="text-[10px] font-bold" style={{ color: '#22D3EE', ...MONO }}>
+                  {p.bbsm_score.toFixed(1)}
+                </span>
+              </div>
             </div>
-          )}
+          );
+        })}
+      </div>
+
+      {/* BBSM legend */}
+      <div className="px-3 py-2 border-t border-white/[0.05] flex items-center gap-1.5 flex-wrap">
+        <span className="text-[9px] text-white/25 uppercase tracking-wide" style={MONO}>BBSM =</span>
+        {[
+          { label: 'P3W', weight: '45%' },
+          { label: 'Trend', weight: '30%' },
+          { label: 'Need', weight: '25%' },
+        ].map(({ label, weight }) => (
+          <span key={label} className="text-[9px] text-white/35" style={MONO}>
+            {label} <span className="text-white/20">{weight}</span>
+          </span>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+// ─── Process vs Results Panel ─────────────────────────────────────────────────
+
+function buildHistory(processScore: number, resultsScore: number, trend: string, n = 5): { proc: number[]; res: number[] } {
+  const dir = trend === 'rising' ? 1 : trend === 'falling' ? -1 : 0;
+  const proc: number[] = [];
+  const res: number[] = [];
+  for (let i = 0; i < n; i++) {
+    const t = i / (n - 1);
+    proc.push(Math.round(processScore - dir * (1 - t) * 6 + (Math.random() * 2 - 1)));
+    res.push(Math.round(resultsScore - dir * (1 - t) * 4 + (Math.random() * 2 - 1)));
+  }
+  return { proc, res };
+}
+
+function ProcessResultsPanel({ players }: { players: ProcessResultsPlayer[] }) {
+  const gems  = players.filter(p => p.divergence_type === 'hidden_gem').slice(0, 6);
+  const regs  = players.filter(p => p.divergence_type === 'regression_risk').slice(0, 4);
+  const aligned = players.filter(p => p.divergence_type === 'aligned').slice(0, 4);
+
+  function PlayerProcessRow({ p }: { p: ProcessResultsPlayer }) {
+    const { proc, res } = buildHistory(p.process_score, p.results_score, p.tfo_trend);
+    const isGem = p.divergence_type === 'hidden_gem';
+    const isReg = p.divergence_type === 'regression_risk';
+    return (
+      <div className="flex items-center gap-2 px-3 py-2.5 hover:bg-white/[0.03] transition-colors">
+        <PlayerThumb playerId={p.player_id} name={p.name} size={28} />
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-1.5">
+            <span className="text-[11px] font-semibold text-white/90 truncate">{p.name}</span>
+            <span className="text-[9px] font-bold" style={{ color: posColor(p.position), ...MONO }}>{p.position}</span>
+          </div>
+          <div className="flex items-center gap-2 mt-0.5">
+            <span className="text-[9px] text-[#A78BFA]" style={MONO}>
+              PROC {p.process_score.toFixed(0)}
+            </span>
+            <span className="text-[9px] text-white/20">|</span>
+            <span className="text-[9px] text-[#36E7A1]" style={MONO}>
+              RES {p.results_score.toFixed(0)}
+            </span>
+          </div>
+        </div>
+        <DivergenceChart processHistory={proc} resultsHistory={res} />
+        <div className="shrink-0 text-right min-w-[36px]">
+          <span
+            className="text-[10px] font-bold"
+            style={{ ...MONO, color: isGem ? '#36E7A1' : isReg ? '#EF4444' : '#94A3B8' }}
+          >
+            {p.divergence > 0 ? '+' : ''}{p.divergence.toFixed(0)}
+          </span>
         </div>
       </div>
+    );
+  }
+
+  return (
+    <section
+      className="flex flex-col rounded-2xl overflow-hidden"
+      style={{ ...GLASS, border: '1px solid rgba(167,139,250,0.15)' }}
+    >
+      <div className="flex items-center gap-2 px-4 py-3 border-b border-white/[0.07]">
+        <Eye size={13} className="text-[#A78BFA]" />
+        <span className="text-[11px] font-bold uppercase tracking-widest text-white/70" style={MONO}>
+          Process vs Results
+        </span>
+        <div className="ml-auto flex items-center gap-3">
+          <div className="flex items-center gap-1">
+            <div className="w-2 h-0.5 rounded" style={{ background: '#A78BFA' }} />
+            <span className="text-[9px] text-white/30" style={MONO}>Process</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <div className="w-2 h-0.5 rounded" style={{ background: '#36E7A1' }} />
+            <span className="text-[9px] text-white/30" style={MONO}>Results</span>
+          </div>
+        </div>
+      </div>
+
+      <div className="flex-1 overflow-y-auto" style={{ maxHeight: 460 }}>
+        {gems.length > 0 && (
+          <div>
+            <div className="px-3 pt-2.5 pb-1 flex items-center gap-1.5">
+              <div className="h-px flex-1 bg-[#36E7A1]/20" />
+              <span className="text-[9px] font-bold uppercase text-[#36E7A1]/70" style={MONO}>Hidden Gems — Process &gt; Results</span>
+              <div className="h-px flex-1 bg-[#36E7A1]/20" />
+            </div>
+            <div className="divide-y divide-white/[0.04]">
+              {gems.map(p => <PlayerProcessRow key={p.player_id} p={p} />)}
+            </div>
+          </div>
+        )}
+        {regs.length > 0 && (
+          <div>
+            <div className="px-3 pt-2.5 pb-1 flex items-center gap-1.5">
+              <div className="h-px flex-1 bg-[#EF4444]/20" />
+              <span className="text-[9px] font-bold uppercase text-[#EF4444]/70" style={MONO}>Regression Risk — Results &gt; Process</span>
+              <div className="h-px flex-1 bg-[#EF4444]/20" />
+            </div>
+            <div className="divide-y divide-white/[0.04]">
+              {regs.map(p => <PlayerProcessRow key={p.player_id} p={p} />)}
+            </div>
+          </div>
+        )}
+        {aligned.length > 0 && (
+          <div>
+            <div className="px-3 pt-2.5 pb-1 flex items-center gap-1.5">
+              <div className="h-px flex-1 bg-white/[0.06]" />
+              <span className="text-[9px] font-bold uppercase text-white/25" style={MONO}>Aligned</span>
+              <div className="h-px flex-1 bg-white/[0.06]" />
+            </div>
+            <div className="divide-y divide-white/[0.04]">
+              {aligned.map(p => <PlayerProcessRow key={p.player_id} p={p} />)}
+            </div>
+          </div>
+        )}
+        {players.length === 0 && (
+          <div className="px-4 py-10 text-center text-[11px] text-white/30" style={MONO}>
+            No data — sync your leagues to populate
+          </div>
+        )}
+      </div>
+    </section>
+  );
+}
+
+// ─── Hidden Gems Panel ────────────────────────────────────────────────────────
+
+function HiddenGemsPanel({ gems }: { gems: HiddenGem[] }) {
+  return (
+    <section
+      className="flex flex-col rounded-2xl overflow-hidden"
+      style={{ ...GLASS, border: '1px solid rgba(54,231,161,0.15)' }}
+    >
+      <div className="flex items-center gap-2 px-4 py-3 border-b border-white/[0.07]">
+        <Target size={13} className="text-[#36E7A1]" />
+        <span className="text-[11px] font-bold uppercase tracking-widest text-white/70" style={MONO}>
+          Hidden Gems
+        </span>
+        <span className="text-[9px] text-white/30 ml-auto" style={MONO}>BVI &gt; KTC + Process &gt; Results</span>
+      </div>
+
+      <div className="flex-1 divide-y divide-white/[0.05]" style={{ maxHeight: 460, overflowY: 'auto' }}>
+        {gems.length === 0 && (
+          <div className="px-4 py-10 text-center text-[11px] text-white/30" style={MONO}>
+            No hidden gems detected — BVI data populates nightly
+          </div>
+        )}
+        {gems.map(gem => {
+          const vm = verdictMeta(gem.verdict);
+          const isBoom = gem.verdict === 'BOOM' || gem.verdict === 'LEAN_BOOM';
+          const posC = posColor(gem.position);
+          const sparkData = [gem.results_score, (gem.results_score + gem.process_score) / 2, gem.process_score];
+
+          return (
+            <Link
+              key={gem.player_id}
+              href={`/dashboard/trade/finder?targetPlayerId=${gem.player_id}&intent=buy`}
+              className="block px-3 py-3.5 hover:bg-white/[0.03] transition-colors group"
+            >
+              <div className="flex items-start gap-3">
+                <PlayerThumb playerId={gem.player_id} name={gem.name} size={40} />
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <span className="text-[13px] font-semibold text-white/90">{gem.name}</span>
+                    <span className="text-[9px] font-bold px-1 py-0.5 rounded" style={{ background: `${posC}18`, color: posC, ...MONO }}>
+                      {gem.position}
+                    </span>
+                    {isBoom && (
+                      <span className="text-[8px] font-bold px-1.5 py-0.5 rounded uppercase"
+                        style={{ background: 'rgba(54,231,161,0.18)', color: '#36E7A1', border: '1px solid rgba(54,231,161,0.40)', ...MONO }}>
+                        BOOM
+                      </span>
+                    )}
+                    <span className="text-[8px] font-bold px-1.5 py-0.5 rounded uppercase ml-auto"
+                      style={{ background: `${vm.color}18`, color: vm.color, border: `1px solid ${vm.color}40`, ...MONO }}>
+                      {vm.label}
+                    </span>
+                  </div>
+
+                  {/* BVI delta badge */}
+                  <div className="flex items-center gap-2 mt-1">
+                    <span className="text-[9px]" style={{ color: '#22D3EE', ...MONO }}>
+                      BVI {gem.bvi_score.toLocaleString()} | KTC {gem.ktc_value.toLocaleString()} |{' '}
+                      <span style={{ color: '#36E7A1' }}>△+{gem.delta.toLocaleString()} UNDERVALUED</span>
+                    </span>
+                  </div>
+
+                  {/* Reasoning */}
+                  <p className="text-[10px] text-white/45 leading-snug mt-1.5 line-clamp-2"
+                    style={MONO}>
+                    {gem.reasoning}
+                  </p>
+                </div>
+
+                {/* Sparkline */}
+                <div className="shrink-0 flex flex-col items-end gap-1">
+                  <Sparkline data={sparkData} color="#36E7A1" width={48} height={20} />
+                  <span className="text-[9px] text-white/25 group-hover:text-[#22D3EE]/60 transition-colors" style={MONO}>
+                    View →
+                  </span>
+                </div>
+              </div>
+            </Link>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
+
+// ─── WR Efficiency Matrix ─────────────────────────────────────────────────────
+
+function WREfficiencyMatrix({ players }: { players: WREfficiencyPlayer[] }) {
+  const [selected, setSelected] = useState<string[]>([]);
+
+  const toggle = (id: string) => {
+    setSelected(prev => {
+      if (prev.includes(id)) return prev.filter(x => x !== id);
+      if (prev.length >= 3) return [...prev.slice(1), id];
+      return [...prev, id];
+    });
+  };
+
+  // Auto-select top 2 on data load
+  useEffect(() => {
+    if (players.length >= 1 && selected.length === 0) {
+      setSelected(players.slice(0, 2).map(p => p.player_id));
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [players.length]);
+
+  return (
+    <section
+      className="rounded-2xl overflow-hidden"
+      style={{ ...GLASS, border: '1px solid rgba(34,211,238,0.12)' }}
+    >
+      {/* Header */}
+      <div className="flex items-center gap-2 px-4 py-3 border-b border-white/[0.07]">
+        <div className="flex items-center gap-2">
+          <div className="w-2 h-2 rounded-full" style={{ background: '#22D3EE', boxShadow: '0 0 6px #22D3EE' }} />
+          <span className="text-[11px] font-bold uppercase tracking-widest text-white/70" style={MONO}>
+            WR Efficiency Matrix
+          </span>
+        </div>
+        <span className="ml-auto text-[9px] text-white/30" style={MONO}>Compare up to 3 WRs</span>
+      </div>
+
+      <div className="flex flex-col sm:flex-row gap-0">
+        {/* Radar */}
+        <div className="flex items-center justify-center p-4 sm:w-[240px] shrink-0">
+          <HexRadar players={players} selectedIds={selected} />
+        </div>
+
+        {/* Legend + WR picker */}
+        <div className="flex-1 border-t sm:border-t-0 sm:border-l border-white/[0.07]">
+          {/* Legend */}
+          {selected.length > 0 && (
+            <div className="flex items-center gap-3 px-3 py-2 border-b border-white/[0.05] flex-wrap">
+              {selected.map((id, i) => {
+                const p = players.find(p => p.player_id === id);
+                if (!p) return null;
+                return (
+                  <div key={id} className="flex items-center gap-1.5">
+                    <div className="w-2 h-2 rounded-full shrink-0" style={{ background: WR_COLORS[i % WR_COLORS.length] }} />
+                    <span className="text-[10px] text-white/70" style={MONO}>{p.name}</span>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
+          {/* Axis breakdown for selected player */}
+          {selected[0] && (() => {
+            const p = players.find(pl => pl.player_id === selected[0]);
+            if (!p) return null;
+            const axes = [
+              { label: 'Separation Grade', val: p.separation_grade },
+              { label: 'Routes Run %',     val: p.routes_run_pct },
+              { label: 'TPRR',             val: p.tprr },
+              { label: 'Matchup Mult.',    val: p.matchup_multiplier },
+              { label: 'Depth Chart',      val: p.depth_chart_priority },
+              { label: 'Low Risk',         val: p.boom_bust_risk },
+            ];
+            return (
+              <div className="px-3 py-2 space-y-1 border-b border-white/[0.05]">
+                {axes.map(({ label, val }) => (
+                  <div key={label} className="flex items-center gap-2">
+                    <span className="text-[9px] text-white/40 w-28 shrink-0 truncate" style={MONO}>{label}</span>
+                    <div className="flex-1 h-1 rounded-full bg-white/[0.06] overflow-hidden">
+                      <div
+                        className="h-full rounded-full transition-all duration-500"
+                        style={{ width: `${val}%`, background: '#22D3EE' }}
+                      />
+                    </div>
+                    <span className="text-[9px] w-6 text-right" style={{ color: '#22D3EE', ...MONO }}>{Math.round(val)}</span>
+                  </div>
+                ))}
+              </div>
+            );
+          })()}
+
+          {/* Player picker */}
+          <div className="overflow-y-auto divide-y divide-white/[0.04]" style={{ maxHeight: 200 }}>
+            {players.map((p) => {
+              const isSelected = selected.includes(p.player_id);
+              const selIdx = selected.indexOf(p.player_id);
+              return (
+                <button
+                  key={p.player_id}
+                  onClick={() => toggle(p.player_id)}
+                  className="w-full flex items-center gap-2 px-3 py-2 text-left hover:bg-white/[0.04] transition-colors"
+                >
+                  <div
+                    className="w-2 h-2 rounded-full shrink-0 transition-all"
+                    style={{
+                      background: isSelected ? WR_COLORS[selIdx % WR_COLORS.length] : 'rgba(255,255,255,0.12)',
+                      boxShadow: isSelected ? `0 0 6px ${WR_COLORS[selIdx % WR_COLORS.length]}` : 'none',
+                    }}
+                  />
+                  <span className="text-[10px] font-medium truncate" style={{ color: isSelected ? '#fff' : '#94A3B8' }}>
+                    {p.name}
+                  </span>
+                  <span className="ml-auto text-[9px] shrink-0" style={{ color: '#22D3EE', ...MONO }}>
+                    {Math.round(p.depth_chart_priority)}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ─── Main page ────────────────────────────────────────────────────────────────
+
+export default function ScoutingPage() {
+  const activeLeagueId = useDashboardLeagueStore(s => s.activeLeagueId);
+  const [data, setData] = useState<ScoutingData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [refreshing, setRefreshing] = useState(false);
+  const hasFetched = useRef(false);
+
+  const load = useCallback(async (showRefresh = false) => {
+    if (showRefresh) setRefreshing(true);
+    else setLoading(true);
+    setError(null);
+    try {
+      const params = activeLeagueId ? `?leagueId=${activeLeagueId}` : '';
+      const res = await fetch(`/api/dashboard/scouting${params}`);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const json = await res.json() as ScoutingData;
+      setData(json);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Failed to load');
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  }, [activeLeagueId]);
+
+  useEffect(() => {
+    if (!hasFetched.current) {
+      hasFetched.current = true;
+      void load();
+    }
+  }, [load]);
+
+  // Reload when league changes
+  useEffect(() => {
+    if (hasFetched.current) {
+      hasFetched.current = false;
+      void load();
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeLeagueId]);
+
+  return (
+    <AppBackground intensity="subtle">
+      {/* Nav */}
+      <nav
+        className="fixed top-0 left-0 right-0 z-50 flex items-center gap-3 px-4 sm:px-6 h-14"
+        style={{
+          background: 'rgba(10,13,20,0.90)',
+          backdropFilter: 'blur(20px)',
+          borderBottom: '1px solid rgba(255,255,255,0.07)',
+        }}
+      >
+        <Link
+          href="/dashboard"
+          className="flex items-center gap-1.5 text-white/40 hover:text-white/80 transition-colors"
+          style={{ ...MONO, fontSize: 11 }}
+        >
+          <ChevronLeft size={14} />
+          Dashboard
+        </Link>
+        <span className="text-white/20 text-xs">/</span>
+        <span className="text-white/60 text-[11px] uppercase tracking-widest" style={MONO}>
+          Scouting Terminal
+        </span>
+        {data && (
+          <span className="text-white/30 text-[10px] ml-1" style={MONO}>
+            — {data.activeLeagueName}
+          </span>
+        )}
+        <button
+          onClick={() => void load(true)}
+          disabled={refreshing}
+          className="ml-auto flex items-center gap-1.5 text-white/30 hover:text-white/70 transition-colors disabled:opacity-40"
+        >
+          <RefreshCw size={12} className={refreshing ? 'animate-spin' : ''} />
+          <span className="text-[10px]" style={MONO}>Refresh</span>
+        </button>
+      </nav>
+
+      <main className="min-h-screen pt-16 pb-20 px-3 sm:px-5">
+
+        {/* Page header */}
+        <div className="mb-4">
+          <h1 className="text-[18px] font-bold tracking-tight text-white/90">Scouting Terminal</h1>
+          <p className="text-[11px] text-white/35 mt-0.5" style={MONO}>
+            Waiver radar · Process vs results · Hidden gems · WR efficiency
+          </p>
+        </div>
+
+        {error && (
+          <div className="mb-4 rounded-xl border border-[#EF4444]/30 bg-[#EF4444]/10 px-4 py-3 text-[11px] text-[#EF4444]" style={MONO}>
+            {error}
+          </div>
+        )}
+
+        {/* ── THREE COLUMN GRID ─────────────────────────────────────────────── */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 mb-3">
+
+          {/* LEFT — Waiver Radar */}
+          <div>
+            {loading
+              ? (
+                <div className="rounded-2xl overflow-hidden" style={GLASS}>
+                  <div className="px-4 py-3 border-b border-white/[0.07]">
+                    <div className="skeleton h-2.5 w-24" />
+                  </div>
+                  <PanelSkeleton rows={8} />
+                </div>
+              )
+              : (
+                <WaiverRadarPanel
+                  players={data?.waiverRadar ?? []}
+                  gapPositions={data?.gapPositions ?? []}
+                />
+              )}
+          </div>
+
+          {/* CENTER — Process vs Results */}
+          <div>
+            {loading
+              ? (
+                <div className="rounded-2xl overflow-hidden" style={GLASS}>
+                  <div className="px-4 py-3 border-b border-white/[0.07]">
+                    <div className="skeleton h-2.5 w-32" />
+                  </div>
+                  <PanelSkeleton rows={8} />
+                </div>
+              )
+              : (
+                <ProcessResultsPanel players={data?.processResults ?? []} />
+              )}
+          </div>
+
+          {/* RIGHT — Hidden Gems */}
+          <div>
+            {loading
+              ? (
+                <div className="rounded-2xl overflow-hidden" style={GLASS}>
+                  <div className="px-4 py-3 border-b border-white/[0.07]">
+                    <div className="skeleton h-2.5 w-20" />
+                  </div>
+                  <PanelSkeleton rows={4} />
+                </div>
+              )
+              : (
+                <HiddenGemsPanel gems={data?.hiddenGems ?? []} />
+              )}
+          </div>
+        </div>
+
+        {/* ── BOTTOM — WR Efficiency Matrix ────────────────────────────────── */}
+        {loading
+          ? (
+            <div className="rounded-2xl overflow-hidden" style={GLASS}>
+              <div className="px-4 py-3 border-b border-white/[0.07]">
+                <div className="skeleton h-2.5 w-40" />
+              </div>
+              <div className="h-52 flex items-center justify-center">
+                <div className="skeleton h-32 w-32 rounded-full" />
+              </div>
+            </div>
+          )
+          : (
+            <WREfficiencyMatrix players={data?.wrEfficiency ?? []} />
+          )}
+
+        {/* Empty state guidance */}
+        {!loading && !error && data && data.waiverRadar.length === 0 && data.processResults.length === 0 && (
+          <div
+            className="mt-6 rounded-2xl px-6 py-8 text-center"
+            style={{ ...GLASS, border: '1px solid rgba(255,255,255,0.07)' }}
+          >
+            <p className="text-[14px] font-semibold text-white/60 mb-1">No scouting data yet</p>
+            <p className="text-[11px] text-white/35" style={MONO}>
+              The nightly engine populates tfo_cache at 2 AM. Sync your leagues first.
+            </p>
+            <Link
+              href="/dashboard"
+              className="mt-4 inline-flex items-center gap-1.5 text-[11px] text-[#22D3EE] hover:underline"
+              style={MONO}
+            >
+              Go to Dashboard →
+            </Link>
+          </div>
+        )}
+      </main>
     </AppBackground>
   );
 }

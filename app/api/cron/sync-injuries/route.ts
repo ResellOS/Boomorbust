@@ -64,6 +64,12 @@ export async function GET(request: Request) {
   if (redis) {
     try {
       await redis.set('metrics:pipeline:injuries', new Date().toISOString(), { ex: 172800 });
+
+      // Bust per-user alert and handcuff caches so next fetch is fresh
+      const alertKeys = await redis.keys('alerts:*');
+      const handcuffKeys = await redis.keys('handcuffs:*');
+      const bustKeys = [...alertKeys, ...handcuffKeys];
+      if (bustKeys.length) await redis.del(...bustKeys);
     } catch {}
   }
 

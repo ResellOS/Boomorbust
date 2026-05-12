@@ -1,4 +1,5 @@
 import type { FFigInput } from './engine';
+import { ROOKIE_2025_FFIG_SEEDS } from '@/lib/rookies/rookie2025Board';
 
 // [name, pos, year, round, pick, college, team, age, dom, ras, breakoutAge|null, targetShare,
 //  smallSchool, committee, p2sBust, vacVolMod, qbCoeffMod, schemeMod, hit|null, ppg|null]
@@ -189,14 +190,8 @@ const RAW: Row[] = [
   ['Brian Thomas Jr',  'WR', 2024, 1,  23, 'LSU',            'JAC', 21.5, 82, 9.4, 21,  36, false, false, false, 0.1, -0.1,  0,    true,  18.4],
   ['Brock Bowers',     'TE', 2024, 1,  13, 'Georgia',        'LV',  21.0, 86, 9.0, 20,  40, false, false, false, 0.1, -0.1,  0,    true,  22.8],
 
-  // ── 2025 (current class — dynasty_hit & career_ppg TBD) ─────────────────
-  ['Cam Ward',         'QB', 2025, 1,   1, 'Miami FL',       'TEN', 22.0, 88, 7.2, 21,   0, false, false, false, 0,    0,    0.05, null,   null],
-  ['Travis Hunter',    'WR', 2025, 1,   2, 'Colorado',       'CLE', 21.5, 88, 9.7, 21,  44, false, false, false, 0.1,  0,    0,    null,   null],
-  ['Ashton Jeanty',    'RB', 2025, 1,   6, 'Boise State',    'LV',  21.0, 96, 8.8, 20,  68, true,  false, false, 0.1, -0.1,  0,    null,   null],
-  ['Tetairoa McMillan','WR', 2025, 1,   8, 'Arizona',        'CAR', 21.0, 92, 9.2, 20,  48, false, false, false, 0.1,  0,    0.05, null,   null],
-  ['Omarion Hampton',  'RB', 2025, 1,  22, 'UNC',            'LAC', 21.0, 88, 9.0, 20,  58, false, false, false, 0.1,  0,    0.05, null,   null],
-  ['Shedeur Sanders',  'QB', 2025, 1,   5, 'Colorado',       'NYG', 22.5, 84, 6.8, 22,   0, false, false, false, 0,   -0.1,  0,    null,   null],
-  ['Luther Burden III','WR', 2025, 1,  11, 'Missouri',       'ARI', 21.5, 86, 9.1, 21,  40, false, false, false, 0.1,  0,    0.05, null,   null],
+  // ── 2025 NFL draft class (canonical rows in lib/rookies/rookie2025Board.ts) ──
+  ...(ROOKIE_2025_FFIG_SEEDS as Row[]),
 ];
 
 export const HISTORICAL_PROSPECTS: FFigInput[] = RAW.map(

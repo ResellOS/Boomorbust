@@ -1,0 +1,78 @@
+'use client';
+
+import { useState } from 'react';
+
+export default function LandingFooterWaitlist() {
+  const [email, setEmail] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await fetch('/api/waitlist', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, source: 'landing-footer-cta' }),
+      });
+      const data = (await res.json().catch(() => ({}))) as { error?: string };
+      if (!res.ok) {
+        setError(typeof data.error === 'string' ? data.error : 'Something went wrong');
+        return;
+      }
+      setSuccess(true);
+    } catch {
+      setError('Network error');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <section className="border-t border-white/[0.06] px-6 py-[72px] lg:px-12" style={{ background: '#060910' }}>
+      <div className="mx-auto max-w-[720px] text-center">
+        <h2
+          className="text-[52px] leading-[0.95] text-white uppercase"
+          style={{ fontFamily: 'var(--font-display)', letterSpacing: '0.03em' }}
+        >
+          STOP GUESSING. START WINNING.
+        </h2>
+        <p className="mt-4 text-[52px] leading-none uppercase" style={{ fontFamily: 'var(--font-display)' }}>
+          <span style={{ color: '#36E7A1' }}>BOOM</span>
+          <span style={{ color: '#EF4444' }}> OR BUST</span>
+        </p>
+
+        {success ? (
+          <p className="mt-10 text-[15px] text-[#36E7A1] font-mono-tactical">You&apos;re on the list. 🚀</p>
+        ) : (
+          <form onSubmit={handleSubmit} className="mx-auto mt-10 flex w-full max-w-[480px] flex-col gap-3 sm:flex-row sm:items-stretch">
+            <input
+              type="email"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="you@example.com"
+              className="min-h-[48px] flex-1 rounded-xl border border-white/[0.12] bg-white/[0.04] px-4 py-3 text-sm text-white placeholder:text-[#475569] outline-none focus:border-[#22D3EE] focus:ring-1 focus:ring-[#22D3EE] font-mono-tactical shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]"
+              autoComplete="email"
+            />
+            <button
+              type="submit"
+              disabled={loading}
+              className="min-h-[48px] shrink-0 rounded-xl px-6 py-3 text-[13px] font-bold text-[#060910] transition-opacity hover:opacity-95 disabled:opacity-50 font-mono-tactical whitespace-nowrap uppercase tracking-wide"
+              style={{
+                fontFamily: 'var(--font-body)',
+                background: 'linear-gradient(135deg, #36E7A1, #22D3EE)',
+              }}
+            >
+              {loading ? '…' : 'GET EARLY ACCESS →'}
+            </button>
+          </form>
+        )}
+        {error ? <p className="mt-4 text-sm text-red-400">{error}</p> : null}
+      </div>
+    </section>
+  );
+}

@@ -1,9 +1,13 @@
 'use client';
 
+import PlayerAvatar from '@/components/PlayerAvatar';
+import PlayerBhsActions from '@/components/dashboard/PlayerBhsActions';
 import type { OvervaluedPlayer } from '@/app/api/dashboard/snapshot/route';
 
 interface Props {
   players: OvervaluedPlayer[];
+  /** League context for trade finder links. */
+  contextLeagueId?: string | null;
   className?: string;
 }
 
@@ -12,7 +16,7 @@ function formatKtc(n: number): string {
   return String(Math.round(n));
 }
 
-export default function OvervaluedAssets({ players, className = '' }: Props) {
+export default function OvervaluedAssets({ players, contextLeagueId = null, className = '' }: Props) {
   return (
     <div className={`glass-panel p-4 flex flex-col ${className}`}>
       <div className="flex items-center justify-between mb-3">
@@ -27,16 +31,19 @@ export default function OvervaluedAssets({ players, className = '' }: Props) {
           No sell signals — market aligned with production.
         </p>
       ) : (
-        <ul className="space-y-2">
+        <ul className="slim-scroll space-y-2 max-h-[min(280px,40vh)] overflow-y-auto pr-1">
           {players.map((p) => (
             <li
               key={p.player_id}
-              className="flex items-center gap-2.5 rounded-lg border border-white/[0.1] bg-white/[0.05] backdrop-blur-md px-2.5 py-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]"
+              className="glass-panel flex flex-col gap-2 px-2.5 py-2 !rounded-lg"
             >
-              <img
-                src={p.photoUrl}
-                alt=""
-                className="w-9 h-9 rounded-full object-cover border border-white/15 shrink-0"
+              <div className="flex items-center gap-2.5">
+              <PlayerAvatar
+                playerId={p.player_id}
+                playerName={p.name}
+                position={p.position}
+                size={36}
+                className="border border-white/15"
               />
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2 flex-wrap">
@@ -47,7 +54,7 @@ export default function OvervaluedAssets({ players, className = '' }: Props) {
                       color: '#0b0e14',
                       background: 'linear-gradient(180deg, #FF6B6B 0%, #EF4444 100%)',
                       border: '1px solid rgba(255,255,255,0.35)',
-                      textShadow: '0 1px 0 rgba(0,0,0,0.25)',
+                      textShadow: '0 0 8px rgba(239,68,68,0.35)',
                       boxShadow:
                         '0 0 12px rgba(239,68,68,0.65), 0 0 24px rgba(239,68,68,0.35), inset 0 1px 0 rgba(255,255,255,0.2)',
                     }}
@@ -64,12 +71,21 @@ export default function OvervaluedAssets({ players, className = '' }: Props) {
                 <div className="text-[10px] font-mono-tactical font-black text-[#36E7A1]">
                   {formatKtc(p.ktcValue)}
                 </div>
-                <div className="text-[8px] text-[#FF5757] font-mono-tactical font-bold">
+                <div className="text-[8px] text-[#EF4444] font-mono-tactical font-bold">
                   MO {p.moPts >= 0 ? '+' : ''}
                   {p.moPts?.toFixed(1) ?? '—'}
                 </div>
                 <div className="text-[8px] text-slate-600">KTC</div>
               </div>
+              </div>
+              <PlayerBhsActions
+                tfoVerdict={p.tfoVerdict ?? null}
+                playerId={p.player_id}
+                playerName={p.name}
+                leagueId={contextLeagueId}
+                compact
+                className="justify-center"
+              />
             </li>
           ))}
         </ul>

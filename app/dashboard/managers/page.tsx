@@ -221,7 +221,6 @@ function ManagerCard({ row }: { row: MgrProfileRow }) {
 }
 
 export default function ManagersPage() {
-  const supabase = createClient();
   const [leagues, setLeagues] = useState<League[]>([]);
   const [selectedLeague, setSelectedLeague] = useState<string>('');
   const [profiles, setProfiles] = useState<MgrProfileRow[]>([]);
@@ -230,6 +229,7 @@ export default function ManagersPage() {
   const [error, setError] = useState('');
 
   useEffect(() => {
+    const supabase = createClient();
     supabase.from('leagues').select('id, name').then(({ data }) => {
       setLeagues(data ?? []);
       if (data?.length) setSelectedLeague(data[0].id);
@@ -244,6 +244,7 @@ export default function ManagersPage() {
   }, [selectedLeague]);
 
   async function loadProfiles(leagueId: string) {
+    const supabase = createClient();
     setLoading(true);
     setError('');
     const { data } = await supabase

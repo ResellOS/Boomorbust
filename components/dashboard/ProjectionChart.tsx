@@ -1,5 +1,6 @@
 'use client';
 
+import type { ReactNode } from 'react';
 import { useId, useMemo } from 'react';
 import { Settings } from 'lucide-react';
 import Link from 'next/link';
@@ -13,10 +14,49 @@ export interface ProjectionAnnotation {
   note?: string;
 }
 
+/** Per-position KTC series when a league filter is active (QB/RB/WR/TE totals over time). */
+export interface PositionLineSeries {
+  position: 'QB' | 'RB' | 'WR' | 'TE';
+  color: string;
+  values: number[];
+}
+
+/** QB/RB/WR/TE KTC totals per portfolio history tick (same length as `labels`). */
+export interface PositionBreakdown {
+  QB: number[];
+  RB: number[];
+  WR: number[];
+  TE: number[];
+}
+
+const POSITION_PALETTE: Record<PositionLineSeries['position'], string> = {
+  QB: '#FEBC2E',
+  RB: '#36E7A1',
+  WR: '#22D3EE',
+  TE: '#A78BFA',
+};
+
+function breakdownToPositionLines(b: PositionBreakdown): PositionLineSeries[] | null {
+  const { QB, RB, WR, TE } = b;
+  const n = QB.length;
+  if (n < 2 || RB.length !== n || WR.length !== n || TE.length !== n) return null;
+  return (['QB', 'RB', 'WR', 'TE'] as const).map((position) => ({
+    position,
+    color: POSITION_PALETTE[position],
+    values: b[position],
+  }));
+}
+
 interface Props {
-  /** Empire / lineup projected pts per week, oldest → newest. */
+  /** When true, chart SVG is omitted and a skeleton block fills the plot area (same footprint). */
+  chartBodySkeleton?: boolean;
+  /** Empire / lineup projected pts per week, oldest → newest (aggregate mode). */
   data: number[];
   labels: string[];
+  /** When set (same length as labels), draws multi-line position chart instead of single emerald series. */
+  positionLines?: PositionLineSeries[] | null;
+  /** Preferred over `positionLines`: QB/RB/WR/TE KTC series for the selected league. */
+  positionBreakdown?: PositionBreakdown | null;
   /** Inline player annotations rendered under the X-axis. */
   annotations?: ProjectionAnnotation[];
   title?: string;
@@ -38,7 +78,7 @@ interface Props {
   benchmarkValue?: number | null;
   benchmarkLabel?: string;
   /** Optional secondary controls rendered next to the title. */
-  controls?: React.ReactNode;
+  controls?: ReactNode;
   className?: string;
 }
 
@@ -48,6 +88,7 @@ const PAD_X = 36;
 const PAD_Y = 26;
 
 const EMERALD = '#36E7A1';
+const BENCH_GRAY = 'rgba(148,163,184,0.52)';
 
 /** Sharp segment path (HUD “zig” read) — reads as tactical peaks, not spline mush. */
 function buildLinearOpenPath(pts: { x: number; y: number }[]): string {
@@ -104,9 +145,28 @@ function buildPath(
   return { line, area, pts };
 }
 
+function buildPtsOnly(
+  data: number[],
+  minV: number,
+  maxV: number,
+): { line: string; pts: { x: number; y: number; v: number }[] } {
+  const n = data.length;
+  const innerW = W - PAD_X * 2;
+  const innerH = H - PAD_Y * 2;
+  const range = maxV - minV || 1;
+  const pts = data.map((v, i) => ({
+    x: PAD_X + (i / (n - 1)) * innerW,
+    y: PAD_Y + innerH - ((v - minV) / range) * innerH,
+    v,
+  }));
+  return { line: buildLinearOpenPath(pts), pts };
+}
+
 export default function ProjectionChart({
   data,
   labels,
+  positionLines = null,
+  positionBreakdown = null,
   annotations = [],
   title = 'Week Projected Pts',
   subtitle,
@@ -121,6 +181,7 @@ export default function ProjectionChart({
   benchmarkLabel = 'League Average Benchmark',
   controls,
   className = '',
+  chartBodySkeleton = false,
 }: Props) {
   const id = useId();
 
@@ -128,6 +189,32 @@ export default function ProjectionChart({
   const safeLabels = labels.length === safeData.length ? labels : safeData.map((_, i) => `T-${i}`);
 
   const fmt = (n: number) => (valueFormatter ? valueFormatter(n) : n.toFixed(1));
+
+  const resolvedPositionLines = useMemo((): PositionLineSeries[] | null => {
+    if (positionBreakdown) {
+      return breakdownToPositionLines(positionBreakdown);
+    }
+    return positionLines;
+  }, [positionBreakdown, positionLines]);
+
+  const positionMode = useMemo(() => {
+    if (!resolvedPositionLines?.length) return false;
+    const n = resolvedPositionLines[0]?.values.length ?? 0;
+    if (n < 2) return false;
+    return resolvedPositionLines.every((s) => s.values.length === n && n === safeLabels.length);
+  }, [resolvedPositionLines, safeLabels.length]);
+
+  const multiPrepared = useMemo(() => {
+    if (!positionMode || !resolvedPositionLines?.length) return null;
+    const embellished = resolvedPositionLines.map((s) => ({
+      position: s.position,
+      color: s.color,
+      display: embellishDisplayValues(s.values),
+      raw: s.values,
+    }));
+    const flat = embellished.flatMap((s) => s.display);
+    return embellished.length ? { series: embellished, flat } : null;
+  }, [positionMode, resolvedPositionLines]);
 
   const displayData = useMemo(() => embellishDisplayValues(safeData), [safeData]);
 
@@ -138,34 +225,64 @@ export default function ProjectionChart({
       ? benchmarkValue
       : null;
 
-  const minV =
-    Math.min(...displayData, ...(bench !== null ? [bench] : [])) -
-    Math.max(8, Math.abs(Math.min(...displayData)) * 0.05);
-  const maxV =
-    Math.max(...displayData, ...(bench !== null ? [bench] : [])) +
-    Math.max(8, Math.abs(Math.max(...displayData)) * 0.05);
+  const minV = useMemo(() => {
+    if (multiPrepared) {
+      const flat = [...multiPrepared.flat, ...(bench !== null ? [bench] : [])];
+      return Math.min(...flat) - Math.max(8, Math.abs(Math.min(...multiPrepared.flat)) * 0.05);
+    }
+    return (
+      Math.min(...displayData, ...(bench !== null ? [bench] : [])) -
+      Math.max(8, Math.abs(Math.min(...displayData)) * 0.05)
+    );
+  }, [multiPrepared, displayData, bench]);
 
-  const { line, area, pts } = useMemo(
+  const maxV = useMemo(() => {
+    if (multiPrepared) {
+      const flat = [...multiPrepared.flat, ...(bench !== null ? [bench] : [])];
+      return Math.max(...flat) + Math.max(8, Math.abs(Math.max(...multiPrepared.flat)) * 0.05);
+    }
+    return (
+      Math.max(...displayData, ...(bench !== null ? [bench] : [])) +
+      Math.max(8, Math.abs(Math.max(...displayData)) * 0.05)
+    );
+  }, [multiPrepared, displayData, bench]);
+
+  const singlePath = useMemo(
     () => buildPath(displayData, minV, maxV),
     [displayData, minV, maxV],
   );
 
+  const multiPaths = useMemo(() => {
+    if (!multiPrepared) return [];
+    return multiPrepared.series.map((s) => ({
+      ...s,
+      ...buildPtsOnly(s.display, minV, maxV),
+    }));
+  }, [multiPrepared, minV, maxV]);
+
   const benchPts = useMemo(() => {
-    if (bench === null || displayData.length < 2) return '';
-    const n = displayData.length;
+    const n =
+      positionMode && multiPrepared
+        ? multiPrepared.series[0]!.display.length
+        : displayData.length;
+    if (bench === null || n < 2) return '';
     const innerW = W - PAD_X * 2;
     const innerH = H - PAD_Y * 2;
     const range = maxV - minV || 1;
-    const benchPtsOnly = displayData.map((_, i) => ({
+    const benchPtsOnly = Array.from({ length: n }, (_, i) => ({
       x: PAD_X + (i / (n - 1)) * innerW,
       y: PAD_Y + innerH - ((bench - minV) / range) * innerH,
     }));
     return buildLinearOpenPath(benchPtsOnly);
-  }, [bench, displayData, minV, maxV]);
+  }, [bench, positionMode, multiPrepared, displayData.length, minV, maxV]);
+
+  const { line, area, pts } = singlePath;
 
   const grad = `${id}-grad`;
   const innerH = H - PAD_Y * 2;
   const gridYs = [0.25, 0.5, 0.75].map((r) => PAD_Y + innerH * (1 - r));
+
+  const labelYOffset: Record<string, number> = { QB: -12, RB: -4, WR: 4, TE: 12 };
 
   return (
     <div className={`glass-panel p-5 ${className}`}>
@@ -175,8 +292,10 @@ export default function ProjectionChart({
             <span
               className="w-1 h-3 inline-block"
               style={{
-                background: EMERALD,
-                boxShadow: `0 0 10px ${EMERALD}, 0 0 18px rgba(54,231,161,0.45)`,
+                background: positionMode ? '#22D3EE' : EMERALD,
+                boxShadow: positionMode
+                  ? '0 0 10px #22D3EE, 0 0 18px rgba(34,211,238,0.45)'
+                  : `0 0 10px ${EMERALD}, 0 0 18px rgba(54,231,161,0.45)`,
               }}
             />
             {title}
@@ -194,11 +313,12 @@ export default function ProjectionChart({
                   </p>
                   <p className="flex items-baseline gap-1.5 leading-none">
                     <span
-                      className="text-2xl sm:text-3xl lg:text-[2.65rem] font-black font-mono-tactical tracking-tight"
+                      className="text-2xl sm:text-3xl lg:text-[2.65rem] font-black font-mono-tactical tracking-tight tabular-nums"
                       style={{
-                        color: EMERALD,
-                        textShadow:
-                          '0 0 18px rgba(54,231,161,0.55), 0 0 42px rgba(54,231,161,0.22), 0 0 2px rgba(255,255,255,0.15)',
+                        color: positionMode ? '#22D3EE' : EMERALD,
+                        textShadow: positionMode
+                          ? '0 0 18px rgba(34,211,238,0.45), 0 0 42px rgba(34,211,238,0.18)'
+                          : '0 0 18px rgba(54,231,161,0.55), 0 0 42px rgba(54,231,161,0.22)',
                       }}
                     >
                       {scoreHighlightNumeric}
@@ -214,11 +334,11 @@ export default function ProjectionChart({
                     {scoreHighlightLabel}
                   </p>
                   <p
-                    className="text-2xl sm:text-3xl lg:text-4xl font-black font-mono-tactical leading-none tracking-tight"
+                    className="text-2xl sm:text-3xl lg:text-4xl font-black font-mono-tactical leading-none tracking-tight tabular-nums"
                     style={{
                       color: EMERALD,
                       textShadow:
-                        '0 0 18px rgba(54,231,161,0.55), 0 0 42px rgba(54,231,161,0.22), 0 0 2px rgba(255,255,255,0.15)',
+                        '0 0 18px rgba(54,231,161,0.55), 0 0 42px rgba(54,231,161,0.22)',
                     }}
                   >
                     {scoreHighlightValue}
@@ -255,20 +375,28 @@ export default function ProjectionChart({
       </div>
 
       <div className="relative w-full" style={{ height: `${H}px` }}>
-        <svg
-          width="100%"
-          height={H}
-          viewBox={`0 0 ${W} ${H}`}
-          preserveAspectRatio="none"
-        >
+        {chartBodySkeleton ? (
+          <>
+            <div className="absolute inset-x-0 top-0 rounded-lg skeleton" style={{ height: H }} aria-hidden />
+            <div className="flex flex-col gap-1 mt-1 px-1">
+              <div className="h-[14px] max-w-[220px] skeleton rounded-md" aria-hidden />
+            </div>
+          </>
+        ) : (
+          <>
+          <svg
+            width="100%"
+            height={H}
+            viewBox={`0 0 ${W} ${H}`}
+            preserveAspectRatio="none"
+            style={{ willChange: 'transform' }}
+          >
           <defs>
-            {/* Area fill: 20% opacity green → transparent */}
             <linearGradient id={grad} x1="0" y1="0" x2="0" y2="1">
               <stop offset="0%" stopColor={EMERALD} stopOpacity={0.22} />
               <stop offset="85%" stopColor={EMERALD} stopOpacity={0.04} />
               <stop offset="100%" stopColor={EMERALD} stopOpacity={0} />
             </linearGradient>
-            {/* Neon glow filter for the line */}
             <filter id={`${id}-glow`} x="-25%" y="-55%" width="150%" height="210%">
               <feGaussianBlur stdDeviation="5" result="blur" />
               <feMerge>
@@ -279,7 +407,6 @@ export default function ProjectionChart({
             </filter>
           </defs>
 
-          {/* Grid */}
           {gridYs.map((y, i) => (
             <line
               key={i}
@@ -292,70 +419,115 @@ export default function ProjectionChart({
             />
           ))}
 
-          {/* Area fill */}
-          <path d={area} fill={`url(#${grad})`} />
-          {/* League Average Benchmark — dashed gray secondary line */}
-          {benchPts && (
+          {benchPts ? (
             <path
               d={benchPts}
               fill="none"
-              stroke="rgba(255,255,255,0.28)"
+              stroke={BENCH_GRAY}
               strokeWidth={1.5}
               strokeDasharray="6 5"
               strokeLinecap="round"
             />
-          )}
-          {/* Jagged emerald portfolio line with bloom glow */}
-          <path
-            d={line}
-            fill="none"
-            stroke={EMERALD}
-            strokeWidth={2.75}
-            strokeLinecap="square"
-            strokeLinejoin="miter"
-            filter={`url(#${id}-glow)`}
-            style={{
-              filter: `url(#${id}-glow) drop-shadow(0 0 8px rgba(54,231,161,0.95)) drop-shadow(0 0 20px rgba(54,231,161,0.55)) drop-shadow(0 0 36px rgba(54,231,161,0.25))`,
-            }}
-          />
+          ) : null}
 
-          {/* Data dots */}
-          {pts.map((p, i) => {
-            const isLast = i === pts.length - 1;
-            const labelV = safeData[i] ?? p.v;
-            return (
-              <g key={i}>
-                <circle
-                  cx={p.x}
-                  cy={p.y}
-                  r={isLast ? 5 : 3}
-                  fill={EMERALD}
-                  stroke="#0D1117"
-                  strokeWidth={isLast ? 2 : 1.5}
-                  filter={`url(#${id}-glow)`}
-                />
-                {isLast && (
-                  <text
-                    x={p.x - 8}
-                    y={p.y - 12}
-                    fill={EMERALD}
-                    fontSize="11"
-                    fontWeight="800"
-                    fontFamily="var(--font-mono-tactical), ui-monospace, monospace"
-                    textAnchor="end"
+          {positionMode && multiPaths.length ? (
+            <>
+              {multiPaths.map((s) => (
+                <g key={s.position}>
+                  <path
+                    d={s.line}
+                    fill="none"
+                    stroke={s.color}
+                    strokeWidth={1.5}
+                    strokeLinecap="square"
+                    strokeLinejoin="miter"
                     style={{
-                      filter:
-                        'drop-shadow(0 0 10px rgba(54,231,161,0.75)) drop-shadow(0 0 20px rgba(54,231,161,0.35))',
+                      filter: `drop-shadow(0 0 4px ${s.color}66) drop-shadow(0 0 10px ${s.color}33)`,
                     }}
-                  >
-                    {fmt(labelV)}
-                  </text>
-                )}
-              </g>
-            );
-          })}
+                  />
+                  {s.pts.map((p, i) => {
+                    const isLast = i === s.pts.length - 1;
+                    return (
+                      <g key={`${s.position}-${i}`}>
+                        <circle
+                          cx={p.x}
+                          cy={p.y}
+                          r={isLast ? 4 : 2.5}
+                          fill={s.color}
+                          stroke="#0D1117"
+                          strokeWidth={isLast ? 1.5 : 1}
+                        />
+                        {isLast ? (
+                          <text
+                            x={p.x + 4}
+                            y={p.y + (labelYOffset[s.position] ?? 0)}
+                            fill={s.color}
+                            fontSize="8"
+                            fontWeight="700"
+                            fontFamily="var(--font-mono-tactical), ui-monospace, monospace"
+                            textAnchor="start"
+                          >
+                            {s.position}
+                          </text>
+                        ) : null}
+                      </g>
+                    );
+                  })}
+                </g>
+              ))}
+            </>
+          ) : (
+            <>
+              <path d={area} fill={`url(#${grad})`} />
+              <path
+                d={line}
+                fill="none"
+                stroke={EMERALD}
+                strokeWidth={2.75}
+                strokeLinecap="square"
+                strokeLinejoin="miter"
+                filter={`url(#${id}-glow)`}
+                style={{
+                  filter: `url(#${id}-glow) drop-shadow(0 0 8px rgba(54,231,161,0.95)) drop-shadow(0 0 20px rgba(54,231,161,0.55)) drop-shadow(0 0 36px rgba(54,231,161,0.25))`,
+                }}
+              />
+              {pts.map((p, i) => {
+                const isLast = i === pts.length - 1;
+                const labelV = safeData[i] ?? p.v;
+                return (
+                  <g key={i}>
+                    <circle
+                      cx={p.x}
+                      cy={p.y}
+                      r={isLast ? 5 : 3}
+                      fill={EMERALD}
+                      stroke="#0D1117"
+                      strokeWidth={isLast ? 2 : 1.5}
+                      filter={`url(#${id}-glow)`}
+                    />
+                    {isLast ? (
+                      <text
+                        x={p.x - 8}
+                        y={p.y - 12}
+                        fill={EMERALD}
+                        fontSize="11"
+                        fontWeight="800"
+                        fontFamily="var(--font-mono-tactical), ui-monospace, monospace"
+                        textAnchor="end"
+                        style={{
+                          filter:
+                            'drop-shadow(0 0 10px rgba(54,231,161,0.75)) drop-shadow(0 0 20px rgba(54,231,161,0.35))',
+                        }}
+                      >
+                        {fmt(labelV)}
+                      </text>
+                    ) : null}
+                  </g>
+                );
+              })}
+            </>
+          )}
 
-          {/* X-axis labels */}
           {safeLabels.map((label, i) => {
             const innerW = W - PAD_X * 2;
             const x = PAD_X + (i / Math.max(1, safeLabels.length - 1)) * innerW;
@@ -376,14 +548,30 @@ export default function ProjectionChart({
           })}
         </svg>
 
-        <div className="flex items-center justify-between mt-1 px-1">
+        <div className="flex flex-col gap-1 mt-1 px-1">
           <span className="text-[9px] font-mono-tactical text-slate-600 uppercase tracking-wider">
             {bench !== null ? `${benchmarkLabel}: ${fmt(bench)}` : '\u00a0'}
           </span>
+          {positionMode && multiPaths.length ? (
+            <div className="flex flex-wrap items-center gap-x-[12px] gap-y-1 font-mono-tactical text-[8px] text-[#94A3B8]">
+              {multiPaths.map((s) => (
+                <span key={s.position} className="inline-flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full shrink-0" style={{ background: s.color }} aria-hidden />
+                  {s.position}
+                </span>
+              ))}
+            </div>
+          ) : !positionMode ? (
+            <div className="flex flex-wrap items-center gap-x-[12px] gap-y-1 font-mono-tactical text-[8px] text-[#94A3B8]">
+              <span className="inline-flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full shrink-0 bg-[#36E7A1]" aria-hidden />
+                AGGREGATE
+              </span>
+            </div>
+          ) : null}
         </div>
 
-        {/* Player annotations beneath the line */}
-        {annotations.length > 0 && (
+        {annotations.length > 0 && !positionMode ? (
           <div className="absolute inset-x-0 top-[58%] pointer-events-none">
             {annotations.map((a, i) => {
               const innerW = 100 - (PAD_X * 2 * 100) / W;
@@ -395,16 +583,19 @@ export default function ProjectionChart({
                   className="absolute -translate-x-1/2 text-center"
                   style={{ left: `${left}%`, maxWidth: 110 }}
                 >
-                  <div className="text-[9px] font-mono-tactical font-bold leading-tight" style={{ color: EMERALD, textShadow: '0 0 10px rgba(54,231,161,0.45)' }}>
+                  <div
+                    className="text-[9px] font-mono-tactical font-bold leading-tight"
+                    style={{ color: EMERALD, textShadow: '0 0 10px rgba(54,231,161,0.45)' }}
+                  >
                     {a.player}
                   </div>
-                  {a.note && (
-                    <div className="text-[8px] text-slate-500 leading-tight">{a.note}</div>
-                  )}
+                  {a.note ? <div className="text-[8px] text-slate-500 leading-tight">{a.note}</div> : null}
                 </div>
               );
             })}
           </div>
+        ) : null}
+          </>
         )}
       </div>
     </div>

@@ -162,7 +162,7 @@ const PRICING = [
     price: '$9',
     sub: '/mo',
     featured: true,
-    features: ['Dynasty Coach ✦', 'Trade Finder + AI pitches', 'Pick advisor & exposure', 'Handcuffs · digests · Wrapped'],
+    features: ['Dynasty Analyst ✦', 'Trade Finder + Smart pitches', 'Pick advisor & exposure', 'Handcuffs · digests · Wrapped'],
     cta: 'Start Pro Trial',
     href: '/auth/signup',
   },
@@ -329,7 +329,7 @@ export default function LandingPage({ buildSha = 'local' }: { buildSha?: string 
         <section id="pricing" className="py-24 px-4 sm:px-6 max-w-[1100px] mx-auto">
           <div className="text-center mb-14">
             <h2 className="text-white">Simple pricing. No tricks.</h2>
-            <p className="text-[var(--text-secondary)] mt-3">Upgrade when you’re ready for AI and advanced edge tools.</p>
+            <p className="text-[var(--text-secondary)] mt-3">Upgrade when you’re ready for Empire Insights and advanced edge tools.</p>
           </div>
           <div className="grid md:grid-cols-3 gap-6">
             {PRICING.map((p) => (

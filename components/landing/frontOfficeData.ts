@@ -398,7 +398,7 @@ export const pricingTiers = [
     features: [
       'Everything in Free',
       'Start/Sit optimizer',
-      'Dynasty Coach AI chat',
+      'Dynasty Analyst chat',
       'Weekly digest email',
     ],
     highlight: true,

@@ -122,7 +122,7 @@ export default function AlertsPage() {
   async function fetchAlerts() {
     setLoading(true);
     try {
-      const res = await fetch('/api/injuries/scan');
+      const res = await fetch('/api/alerts');
       if (res.ok) {
         setAlerts(await res.json());
         setLastUpdated(new Date());

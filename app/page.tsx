@@ -1,5 +1,10 @@
 import type { CSSProperties } from 'react';
 import Link from 'next/link';
+import WaitlistStatRow from '@/components/landing/WaitlistStatRow';
+import ProjectionCard, { type ProjectionCardProps } from '@/components/landing/ProjectionCard';
+import LandingWaitlistUrgency from '@/components/landing/LandingWaitlistUrgency';
+import LandingFooterWaitlist from '@/components/landing/LandingFooterWaitlist';
+import { TWITTER_AT_DISPLAY, TWITTER_PROFILE_HREF } from '@/lib/twitter-public';
 
 const BG = '#060910';
 
@@ -10,6 +15,73 @@ const NAV_LINKS = [
   { label: 'Resources', href: '#resources' },
 ] as const;
 
+const SECTION_HEADING_STYLE = {
+  fontFamily: 'var(--font-display)',
+  fontSize: 'clamp(32px, 5vw, 64px)',
+  letterSpacing: '0.03em',
+} as const;
+
+/** Headline tokens preserve BOOM/BUST coloring; each word staggers on load. */
+function tokenizeHeadlineLine(line: string): Array<{ text: string; color: string }> {
+  const parts = line.split(/(BOOM|BUST)/gi);
+  const tokens: Array<{ text: string; color: string }> = [];
+  for (const part of parts) {
+    if (!part) continue;
+    const u = part.toUpperCase();
+    if (u === 'BOOM') {
+      tokens.push({ text: part, color: '#36E7A1' });
+      continue;
+    }
+    if (u === 'BUST') {
+      tokens.push({ text: part, color: '#EF4444' });
+      continue;
+    }
+    for (const w of part.trim().split(/\s+/).filter(Boolean)) {
+      tokens.push({ text: w, color: '#ffffff' });
+    }
+  }
+  return tokens;
+}
+
+function StaggeredHeroHeadline({ lines }: { lines: string[] }) {
+  let wordIndex = 0;
+  return (
+    <h1
+      style={{
+        fontFamily: 'var(--font-display)',
+        fontSize: 'clamp(48px, 7vw, 88px)',
+        lineHeight: 0.92,
+        letterSpacing: '0.02em',
+      }}
+    >
+      {lines.map((line) => {
+        const tokens = tokenizeHeadlineLine(line);
+        return (
+          <span key={line} className="block">
+            {tokens.map((t, i) => {
+              const delayIndex = wordIndex++;
+              return (
+                <span key={`${line}-${i}-${t.text}`}>
+                  <span
+                    className="landing-fade-slide-up inline-block"
+                    style={{
+                      color: t.color,
+                      animationDelay: `${delayIndex * 0.1}s`,
+                    }}
+                  >
+                    {t.text}
+                  </span>
+                  {i < tokens.length - 1 ? ' ' : null}
+                </span>
+              );
+            })}
+          </span>
+        );
+      })}
+    </h1>
+  );
+}
+
 export default function LandingPage() {
   return (
     <div className="min-h-screen antialiased" style={{ background: BG, color: '#f8fafc' }}>
@@ -17,12 +89,15 @@ export default function LandingPage() {
 
       <main>
         <HeroSection />
+        <WeeklyPlayerPredictionsSection />
         <SocialProofBar />
         <HowItWorksSection />
         <FeatureGridSection />
         <ComparisonSection />
         <PricingSection />
+        <LandingWaitlistUrgency />
         <StatsBannerSection />
+        <LandingFooterWaitlist />
       </main>
 
       <SiteFooter />
@@ -33,16 +108,18 @@ export default function LandingPage() {
 function LandingNav() {
   return (
     <header
-      className="fixed top-0 left-0 right-0 z-[100] flex h-16 items-center border-b border-white/[0.06] px-6 lg:px-12"
+      className="fixed top-0 left-0 right-0 z-[100] flex h-16 items-center px-6 lg:px-12"
       style={{
         background: 'rgba(6,9,16,0.92)',
         backdropFilter: 'blur(20px)',
         WebkitBackdropFilter: 'blur(20px)',
+        borderBottom: '1px solid rgba(255,255,255,0.06)',
       }}
     >
       <div className="mx-auto flex h-full w-full max-w-[1400px] items-center justify-between gap-4">
         <Link href="/" className="shrink-0" aria-label="Boom or Bust home">
-          <img src="/images/logo-full2.png" height={32} width={180} className="h-8 w-auto object-contain" alt="Boom or Bust" />
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/images/logo-full2.png" height={32} alt="Boom or Bust" className="h-8 w-auto object-contain" />
         </Link>
 
         <nav className="hidden items-center gap-8 md:flex" aria-label="Primary" style={{ fontFamily: 'var(--font-body)' }}>
@@ -60,8 +137,8 @@ function LandingNav() {
         <div className="flex shrink-0 items-center gap-3">
           <Link
             href="/auth/login"
-            className="hidden rounded-lg border border-white/[0.15] px-5 py-2 text-[13px] text-white transition-colors hover:bg-white/[0.06] sm:inline-flex"
-            style={{ fontFamily: 'var(--font-body)' }}
+            className="glass-panel hidden rounded-lg px-5 py-2 text-[13px] text-white transition-all duration-200 ease-in-out hover:border-white/25 sm:inline-flex"
+            style={{ fontFamily: 'var(--font-body)', border: '1px solid rgba(255,255,255,0.15)' }}
           >
             Sign In
           </Link>
@@ -70,10 +147,11 @@ function LandingNav() {
             className="inline-flex items-center gap-1 rounded-lg px-5 py-[9px] text-[13px] font-bold text-[#060910] transition-opacity hover:opacity-95"
             style={{
               fontFamily: 'var(--font-body)',
+              fontWeight: 700,
               background: 'linear-gradient(135deg, #36E7A1, #22D3EE)',
             }}
           >
-            Import My Leagues →
+            JOIN THE WAITLIST →
           </Link>
         </div>
       </div>
@@ -84,16 +162,32 @@ function LandingNav() {
 function HeroSection() {
   return (
     <section className="relative min-h-[calc(100vh-4rem)] overflow-hidden pt-16">
-      {/* Radial orbs */}
+      {/* War-room pulse orbs + tactical grid */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
         <div
-          className="absolute -left-[15%] -top-[20%] h-[600px] w-[600px] rounded-full blur-3xl"
-          style={{ background: 'rgba(0,212,255,0.06)' }}
+          className="absolute rounded-full"
+          style={{
+            width: 600,
+            height: 600,
+            top: -100,
+            left: -100,
+            background: 'radial-gradient(circle, rgba(0,212,255,0.08) 0%, transparent 70%)',
+            animation: 'orbPulse 8s ease-in-out infinite',
+          }}
         />
         <div
-          className="absolute -bottom-[25%] -right-[15%] h-[500px] w-[500px] rounded-full blur-3xl"
-          style={{ background: 'rgba(54,231,161,0.04)' }}
+          className="absolute rounded-full"
+          style={{
+            width: 500,
+            height: 500,
+            bottom: -50,
+            right: -50,
+            background: 'radial-gradient(circle, rgba(54,231,161,0.06) 0%, transparent 70%)',
+            animation: 'orbPulse 8s ease-in-out infinite',
+            animationDelay: '2s',
+          }}
         />
+        <div className="absolute inset-0 bg-targeting opacity-[0.22]" aria-hidden />
       </div>
 
       <div className="relative mx-auto grid max-w-[1200px] grid-cols-1 items-center gap-12 px-6 py-[72px] lg:grid-cols-[55%_45%] lg:gap-10 lg:px-12 lg:py-[120px]">
@@ -108,28 +202,9 @@ function HeroSection() {
             ⚡ Built for dynasty players
           </div>
 
-          <h1
-            className="text-white"
-            style={{
-              fontFamily: 'var(--font-display)',
-              fontSize: 'clamp(48px, 6vw, 80px)',
-              lineHeight: 0.95,
-              letterSpacing: '0.02em',
-            }}
-          >
-            <span className="block">Manage All Your</span>
-            <span className="block">Fantasy Leagues</span>
-            <span
-              className="block bg-clip-text text-transparent"
-              style={{
-                backgroundImage: 'linear-gradient(135deg, #36E7A1, #22D3EE)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-              }}
-            >
-              Like a Portfolio.
-            </span>
-          </h1>
+          <StaggeredHeroHeadline
+            lines={['Manage All Your', 'Fantasy Leagues', 'Like a Portfolio.']}
+          />
 
           <p
             className="mt-5 max-w-[480px] text-base leading-relaxed text-[#94A3B8]"
@@ -145,17 +220,18 @@ function HeroSection() {
               className="inline-flex items-center gap-1 rounded-[10px] px-7 py-[14px] text-[15px] font-bold text-[#060910] transition-opacity hover:opacity-95"
               style={{
                 fontFamily: 'var(--font-body)',
+                fontWeight: 700,
                 background: 'linear-gradient(135deg, #36E7A1, #22D3EE)',
               }}
             >
-              Import My Leagues →
+              JOIN THE WAITLIST →
             </Link>
             <Link
               href="#demo"
-              className="inline-flex items-center rounded-[10px] border border-white/[0.15] bg-white/[0.04] px-7 py-[14px] text-[15px] text-white transition-colors hover:bg-white/[0.08]"
-              style={{ fontFamily: 'var(--font-body)' }}
+              className="glass-panel inline-flex items-center rounded-[10px] px-7 py-[14px] text-[15px] text-white transition-all duration-200 ease-in-out hover:border-white/25"
+              style={{ fontFamily: 'var(--font-body)', border: '1px solid rgba(255,255,255,0.15)' }}
             >
-              See It In Action
+              SEE IT IN ACTION
             </Link>
           </div>
 
@@ -168,6 +244,128 @@ function HeroSection() {
 
         <div id="demo" className="relative w-full scroll-mt-24">
           <HeroDashboardMock />
+        </div>
+      </div>
+    </section>
+  );
+}
+
+const WEEKLY_PREDICTION_SAMPLES: ProjectionCardProps[] = [
+  {
+    playerName: "Ja'Marr Chase",
+    position: 'WR',
+    team: 'CIN',
+    week: 1,
+    tfoScore: 91,
+    grade: 'ELITE',
+    verdict: 'START',
+    startScore: 94,
+    projLow: 18,
+    projHigh: 28,
+    opponent: 'PIT',
+    matchupGrade: 82,
+    weatherCondition: 'Dome',
+    weatherTemp: 72,
+    flags: ['ELITE_OPPORTUNITY'],
+    reasoning: 'Elite separation in scheme built for his profile',
+    verdictColor: '#36E7A1',
+    gradeColor: '#36E7A1',
+    matchupLabel: 'vs PIT',
+    weatherIcon: '🏟️',
+  },
+  {
+    playerName: 'Derrick Henry',
+    position: 'RB',
+    team: 'BAL',
+    week: 1,
+    tfoScore: 62,
+    grade: 'VIABLE',
+    verdict: 'SIT',
+    startScore: 48,
+    projLow: 6,
+    projHigh: 14,
+    opponent: 'KC',
+    matchupGrade: 38,
+    weatherCondition: 'Clear',
+    weatherTemp: 45,
+    flags: ['AGE_CLIFF', 'SCHEME_MISMATCH'],
+    reasoning: 'Age curve + elite KC run defense creates floor risk',
+    verdictColor: '#EF4444',
+    gradeColor: '#FBBF24',
+    matchupLabel: 'vs KC',
+    weatherIcon: '☀️',
+  },
+  {
+    playerName: 'Jayden Reed',
+    position: 'WR',
+    team: 'GB',
+    week: 1,
+    tfoScore: 76,
+    grade: 'HIGH_VALUE',
+    verdict: 'START',
+    startScore: 78,
+    projLow: 11,
+    projHigh: 19,
+    opponent: 'CHI',
+    matchupGrade: 74,
+    weatherCondition: 'Clear',
+    weatherTemp: 55,
+    flags: ['ELITE_OPPORTUNITY'],
+    reasoning: 'LaFleur slot system + favorable coverage matchup',
+    verdictColor: '#36E7A1',
+    gradeColor: '#22D3EE',
+    matchupLabel: 'vs CHI',
+    weatherIcon: '☀️',
+  },
+];
+
+function WeeklyPlayerPredictionsSection() {
+  return (
+    <section
+      className="scroll-mt-24 border-y border-white/[0.06] px-6 py-[80px] lg:px-12"
+      style={{ background: 'rgba(0,0,0,0.25)' }}
+    >
+      <div className="mx-auto max-w-[1200px]">
+        <h2
+          className="text-center text-white uppercase tracking-[0.03em]"
+          style={{ fontFamily: 'var(--font-display)', fontSize: 40 }}
+        >
+          WEEKLY PLAYER PREDICTIONS
+        </h2>
+        <p className="mt-3 text-center text-[12px] text-[#94A3B8] font-mono-tactical">
+          Follow {TWITTER_AT_DISPLAY} for daily dynasty intelligence
+        </p>
+
+        <div className="mt-12 flex flex-col items-stretch justify-center gap-10 lg:flex-row lg:items-start lg:justify-center lg:gap-8">
+          <div className="mx-auto w-full max-w-[340px] shrink-0 lg:mx-0" style={{ transform: 'rotate(-2deg)' }}>
+            <ProjectionCard {...WEEKLY_PREDICTION_SAMPLES[0]} />
+          </div>
+          <div
+            className="mx-auto w-full max-w-[340px] shrink-0 lg:mx-0 lg:mt-4"
+            style={{ transform: 'rotate(0deg) scale(1.05)', zIndex: 10 }}
+          >
+            <ProjectionCard {...WEEKLY_PREDICTION_SAMPLES[1]} />
+          </div>
+          <div className="mx-auto w-full max-w-[340px] shrink-0 lg:mx-0" style={{ transform: 'rotate(2deg)' }}>
+            <ProjectionCard {...WEEKLY_PREDICTION_SAMPLES[2]} />
+          </div>
+        </div>
+
+        <p className="mt-14 text-center text-[12px] text-[#64748B] font-mono-tactical font-bold uppercase tracking-[0.08em]">
+          GET THESE PREDICTIONS EVERY WEEK
+        </p>
+        <div className="mt-6 flex justify-center">
+          <Link
+            href="/auth/signup"
+            className="inline-flex items-center gap-1 rounded-[10px] px-7 py-[14px] text-[15px] font-bold text-[#060910] transition-opacity hover:opacity-95"
+            style={{
+              fontFamily: 'var(--font-body)',
+              fontWeight: 700,
+              background: 'linear-gradient(135deg, #36E7A1, #22D3EE)',
+            }}
+          >
+            JOIN WAITLIST →
+          </Link>
         </div>
       </div>
     </section>
@@ -261,36 +459,73 @@ function MiniSignalCard({
   );
 }
 
+function TwitterDailyIntelCallout() {
+  return (
+    <div className="glass-panel mx-auto w-full max-w-[400px] rounded-xl text-center lg:text-left" style={{ padding: 20, borderRadius: 12 }}>
+      <h3 className="text-[20px] text-white uppercase tracking-[0.02em]" style={{ fontFamily: 'var(--font-display)' }}>
+        𝕏 DAILY DYNASTY INTEL
+      </h3>
+      <p className="mt-3 text-[13px] leading-[1.5] text-[#94A3B8]" style={{ fontFamily: 'var(--font-body)' }}>
+        Get 6 player predictions posted every day during the season. Free. No signup required.
+      </p>
+      <a
+        href={TWITTER_PROFILE_HREF}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="mt-4 inline-block rounded-lg text-[12px] font-bold text-white transition hover:opacity-90 font-mono-tactical uppercase tracking-wide"
+        style={{
+          background: '#000',
+          border: '1px solid rgba(255,255,255,0.2)',
+          padding: '10px 20px',
+          borderRadius: 8,
+          fontFamily: "var(--font-mono-tactical), 'JetBrains Mono', ui-monospace, monospace",
+        }}
+      >
+        FOLLOW {TWITTER_AT_DISPLAY.toUpperCase()}
+      </a>
+    </div>
+  );
+}
+
 function SocialProofBar() {
   return (
     <section
       className="border-y border-white/[0.06] py-5"
       style={{ background: 'rgba(255,255,255,0.02)' }}
     >
-      <div className="mx-auto flex max-w-[1200px] flex-col gap-8 px-6 lg:flex-row lg:items-center lg:justify-between lg:gap-6 lg:px-12">
+      <div className="mx-auto flex max-w-[1200px] flex-col gap-8 px-6 lg:px-12">
         <div className="flex flex-wrap gap-10 lg:gap-14">
-          <StatPair num="100+" label="Teams Optimized Daily" />
-          <StatPair num="8,000+" label="Trades Analyzed" />
-          <StatPair num="82.5%" label="Sit/Start Accuracy" />
+          <StatPair num="100+" label="Teams Optimized Daily" numColor="#36E7A1" />
+          <StatPair num="8,000+" label="Trades Analyzed" numColor="#22D3EE" />
+          <StatPair num="82.5%" label="Sit/Start Accuracy" numColor="#36E7A1" />
+          <WaitlistStatRow />
         </div>
-        <div className="flex flex-col gap-1 lg:max-w-[280px] lg:text-right">
-          <div className="text-xl tracking-widest text-[#36E7A1]">★★★★★</div>
-          <p className="text-[12px] leading-snug text-[#64748B] font-mono-tactical">
-            Trusted by dynasty players in 100+ Sleeper leagues
-          </p>
-        </div>
-        <div className="text-[13px] text-[#64748B] font-mono-tactical">
-          Built for <span className="font-bold text-[#22D3EE]">SLEEPER</span>
+
+        <TwitterDailyIntelCallout />
+
+        <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between lg:gap-6">
+          <div className="flex flex-col gap-1 lg:max-w-[280px] lg:text-right lg:ml-auto">
+            <div className="text-xl tracking-widest text-[#36E7A1]">★★★★★</div>
+            <p className="text-[12px] leading-snug text-[#64748B] font-mono-tactical">
+              Trusted by dynasty players in 100+ Sleeper leagues
+            </p>
+          </div>
+          <div className="text-[13px] text-[#64748B] font-mono-tactical text-center lg:text-right">
+            Built for <span className="font-bold text-[#22D3EE]">SLEEPER</span>
+          </div>
         </div>
       </div>
     </section>
   );
 }
 
-function StatPair({ num, label }: { num: string; label: string }) {
+function StatPair({ num, label, numColor }: { num: string; label: string; numColor: string }) {
   return (
     <div>
-      <div className="text-xl font-bold text-white" style={{ fontFamily: 'var(--font-body)' }}>
+      <div
+        className="text-[52px] font-bold leading-none"
+        style={{ fontFamily: 'var(--font-display)', color: numColor }}
+      >
         {num}
       </div>
       <div className="mt-0.5 text-[12px] text-[#64748B] font-mono-tactical">{label}</div>
@@ -323,10 +558,7 @@ function HowItWorksSection() {
   return (
     <section id="how-it-works" className="scroll-mt-24 px-6 py-[100px] lg:px-12">
       <div className="mx-auto max-w-[1200px]">
-        <h2
-          className="text-center text-[52px] text-white leading-[1.05]"
-          style={{ fontFamily: 'var(--font-display)' }}
-        >
+        <h2 className="text-center text-white leading-[1.05]" style={SECTION_HEADING_STYLE}>
           From Sync to Dominance
           <br />
           In 30 Seconds
@@ -396,7 +628,7 @@ const FEATURE_CARDS = [
     color: '#22D3EE',
     body: 'See your entire dynasty empire at a glance. Portfolio value, boom/bust signals, and roster health.',
     href: '/auth/signup',
-    link: 'See all leagues →',
+    link: 'JOIN THE WAITLIST →',
   },
   {
     emoji: '⚡',
@@ -404,7 +636,7 @@ const FEATURE_CARDS = [
     color: '#36E7A1',
     body: 'Get sharp start/sit calls with matchup grades, weather, and TFO formula reasoning — not just rankings.',
     href: '/auth/signup',
-    link: 'Optimize my lineup →',
+    link: 'JOIN THE WAITLIST →',
   },
   {
     emoji: '🔄',
@@ -412,7 +644,7 @@ const FEATURE_CARDS = [
     color: '#A78BFA',
     body: 'Dynasty-aware trade analysis that factors in scheme fit, age curve, and 3-year value windows.',
     href: '/auth/signup',
-    link: 'Analyze a trade →',
+    link: 'JOIN THE WAITLIST →',
   },
   {
     emoji: '🎯',
@@ -420,7 +652,7 @@ const FEATURE_CARDS = [
     color: '#FBBF24',
     body: 'Find undervalued players before your league catches up. Powered by TFO formula + market gap detection.',
     href: '/auth/signup',
-    link: 'View top targets →',
+    link: 'JOIN THE WAITLIST →',
   },
   {
     emoji: '🧭',
@@ -428,7 +660,7 @@ const FEATURE_CARDS = [
     color: '#36E7A1',
     body: 'Evaluate players on scheme fit, coaching tree tendencies, and 3-year dynasty windows.',
     href: '/auth/signup',
-    link: 'Get my strategy →',
+    link: 'JOIN THE WAITLIST →',
   },
   {
     emoji: '🌟',
@@ -436,7 +668,7 @@ const FEATURE_CARDS = [
     color: '#22D3EE',
     body: 'Evaluate rookies on landing spot quality, scheme fit, and age curve before your draft.',
     href: '/auth/signup',
-    link: 'View rookies board →',
+    link: 'JOIN THE WAITLIST →',
   },
 ] as const;
 
@@ -444,14 +676,22 @@ function FeatureGridSection() {
   return (
     <section id="features" className="scroll-mt-24 px-6 pb-[100px] lg:px-12">
       <div className="mx-auto max-w-[1200px]">
-        <h2 className="text-center text-[52px] text-white" style={{ fontFamily: 'var(--font-display)' }}>
+        <h2 className="text-center text-white" style={SECTION_HEADING_STYLE}>
           Everything You Need to Win — In One Place
         </h2>
         <div className="mt-14 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {FEATURE_CARDS.map((f) => (
             <article
               key={f.title}
-              className="glass-panel group rounded-2xl p-7 transition-colors hover:border-white/20"
+              className="glass-panel group rounded-2xl p-7 transition-all duration-200 ease-in-out hover:[border-color:var(--landing-feat-accent)]"
+              style={
+                {
+                  ['--landing-feat-accent' as string]: f.color,
+                  borderWidth: 1,
+                  borderStyle: 'solid',
+                  borderColor: 'rgba(255,255,255,0.1)',
+                } as CSSProperties
+              }
             >
               <div className="text-[32px] leading-none">{f.emoji}</div>
               <h3 className="mt-4 text-base font-semibold text-white" style={{ fontFamily: 'var(--font-body)' }}>
@@ -488,7 +728,7 @@ function ComparisonSection() {
   return (
     <section className="px-6 pb-[100px] lg:px-12">
       <div className="mx-auto max-w-[1200px]">
-        <h2 className="text-center text-[52px] text-white leading-tight" style={{ fontFamily: 'var(--font-display)' }}>
+        <h2 className="text-center text-white leading-tight" style={SECTION_HEADING_STYLE}>
           Most Tools Give Rankings.
           <br />
           We Give Decisions.
@@ -549,7 +789,7 @@ function PricingSection() {
   return (
     <section id="pricing" className="scroll-mt-24 px-6 pb-[100px] lg:px-12">
       <div className="mx-auto max-w-[1100px]">
-        <h2 className="text-center text-[52px] text-white" style={{ fontFamily: 'var(--font-display)' }}>
+        <h2 className="text-center text-white" style={SECTION_HEADING_STYLE}>
           Start Free. Level Up When You&apos;re Ready.
         </h2>
 
@@ -565,7 +805,7 @@ function PricingSection() {
               'Weekly boom/bust signals',
               'Waiver wire targets',
             ]}
-            cta={{ label: 'Start Free', variant: 'ghost', href: '/auth/signup' }}
+            cta={{ label: 'JOIN THE WAITLIST →', variant: 'ghost', href: '/auth/signup' }}
           />
           <PricingCard
             name="Rookie"
@@ -579,7 +819,7 @@ function PricingSection() {
               'Trade analyzer (10/week)',
               'Rookie rankings',
             ]}
-            cta={{ label: 'Start Rookie', variant: 'cyan', href: '/auth/signup?plan=rookie' }}
+            cta={{ label: 'JOIN THE WAITLIST →', variant: 'cyan', href: '/auth/signup' }}
           />
           <PricingCard
             name="Veteran"
@@ -594,7 +834,7 @@ function PricingSection() {
               'Arbitrage alerts',
               'Twitter card generator',
             ]}
-            cta={{ label: 'Go Veteran', variant: 'green', href: '/auth/signup?plan=veteran' }}
+            cta={{ label: 'JOIN THE WAITLIST →', variant: 'green', href: '/auth/signup' }}
           />
           <PricingCard
             name="All-Pro Terminal"
@@ -605,12 +845,12 @@ function PricingSection() {
             features={[
               'Everything in Veteran',
               'Full TFO Factor access',
-              'AI Dynasty Coach (unlimited)',
+              'Dynasty Analyst (unlimited)',
               'Dynasty Wrapped',
               'Behavioral trade engine',
               'Prominent trade engine',
             ]}
-            cta={{ label: 'Go All-Pro', variant: 'purple', href: '/auth/signup?plan=allpro' }}
+            cta={{ label: 'JOIN THE WAITLIST →', variant: 'purple', href: '/auth/signup' }}
           />
         </div>
         <p className="mt-4 text-center text-[12px] text-[#64748B] font-mono-tactical">Cancel anytime. No contracts.</p>
@@ -643,30 +883,34 @@ function PricingCard({
       background: 'transparent',
     },
     cyan: {
-      background: '#22D3EE',
+      background: 'linear-gradient(135deg, #36E7A1, #22D3EE)',
       color: '#060910',
       fontWeight: 700,
+      border: 'none',
     },
     green: {
-      background: '#36E7A1',
+      background: 'linear-gradient(135deg, #36E7A1, #22D3EE)',
       color: '#060910',
       fontWeight: 700,
+      border: 'none',
     },
     purple: {
-      background: '#A78BFA',
+      background: 'linear-gradient(135deg, #36E7A1, #22D3EE)',
       color: '#060910',
       fontWeight: 700,
+      border: 'none',
     },
   };
 
   return (
     <div
-      className="glass-panel relative flex h-full flex-col rounded-2xl p-7"
-      style={
-        featured
-          ? { border: '2px solid #A78BFA', borderRadius: '16px' }
-          : undefined
-      }
+      className="glass-panel relative flex h-full flex-col rounded-2xl p-7 transition-all duration-200 ease-in-out"
+      style={{
+        borderWidth: featured ? 2 : 1,
+        borderStyle: 'solid',
+        borderColor: featured ? '#A78BFA' : name === 'Free' ? 'rgba(255,255,255,0.12)' : name === 'Rookie' ? '#22D3EE' : name === 'Veteran' ? '#36E7A1' : 'rgba(255,255,255,0.12)',
+        borderRadius: '16px',
+      }}
     >
       {featured && (
         <div
@@ -697,10 +941,15 @@ function PricingCard({
       </ul>
       <Link
         href={cta.href}
-        className="mt-8 block w-full rounded-lg py-3 text-center text-[13px] transition-opacity hover:opacity-90"
+        className={
+          cta.variant === 'ghost'
+            ? 'glass-panel mt-8 block w-full rounded-lg py-3 text-center text-[13px] transition-all duration-200 ease-in-out hover:border-white/25'
+            : 'mt-8 block w-full rounded-lg py-3 text-center text-[13px] transition-opacity hover:opacity-90'
+        }
         style={{
           ...btnStyles[cta.variant],
           fontFamily: 'var(--font-body)',
+          fontWeight: cta.variant === 'ghost' ? undefined : 700,
         }}
       >
         {cta.label}
@@ -757,8 +1006,8 @@ function SiteFooter() {
   return (
     <footer
       id="resources"
-      className="scroll-mt-24 border-t border-white/[0.06] px-6 py-12"
-      style={{ background: 'rgba(0,0,0,0.3)' }}
+      className="scroll-mt-24 border-t px-6 py-12"
+      style={{ background: 'rgba(0,0,0,0.4)', borderTop: '1px solid rgba(255,255,255,0.06)' }}
     >
       <div className="mx-auto flex max-w-[1200px] flex-col items-center justify-between gap-8 md:flex-row md:items-start">
         <div className="flex flex-col items-center gap-2 md:items-start">

@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import Fuse from 'fuse.js';
+import { clsx } from 'clsx';
 import { X } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import AppBackground from '@/components/AppBackground';
@@ -60,11 +61,43 @@ interface LeagueAnalysis {
   empirePulse: string;
 }
 
+type TickerKind = 'TRADE' | 'ALERT' | 'MOCK' | 'BOOM';
+
 interface TickerEntry {
   league: string;
-  type: 'warning' | 'success' | 'info';
+  kind: TickerKind;
   text: string;
 }
+
+const TICKER_KIND_STYLES: Record<
+  TickerKind,
+  { border: string; pillBg: string; pillText: string; pillBorder: string }
+> = {
+  TRADE: {
+    border: '#A78BFA',
+    pillBg: 'rgba(167,139,250,0.12)',
+    pillText: '#A78BFA',
+    pillBorder: 'rgba(167,139,250,0.35)',
+  },
+  ALERT: {
+    border: '#EF4444',
+    pillBg: 'rgba(239,68,68,0.12)',
+    pillText: '#EF4444',
+    pillBorder: 'rgba(239,68,68,0.35)',
+  },
+  MOCK: {
+    border: '#22D3EE',
+    pillBg: 'rgba(34,211,238,0.1)',
+    pillText: '#22D3EE',
+    pillBorder: 'rgba(34,211,238,0.35)',
+  },
+  BOOM: {
+    border: '#36E7A1',
+    pillBg: 'rgba(54,231,161,0.1)',
+    pillText: '#36E7A1',
+    pillBorder: 'rgba(54,231,161,0.35)',
+  },
+};
 
 /** Per-player TFO snapshot for Tactical Map + DEFCON */
 interface PlayerTfoSnapshot {
@@ -217,29 +250,39 @@ function buildRankedPlayers(
 function generateTicker(leagues: LeagueAnalysis[]): TickerEntry[] {
   return leagues.flatMap((lg, i) => {
     const entries: TickerEntry[] = [];
+    const leagueLabel = `L${i + 1}`;
+    const nuke = lg.rankedPlayers.find((p) => classifyAsset(p) === 'nuke');
+
     if (lg.signal === 'BUST') {
-      const nuke = lg.rankedPlayers.find((p) => classifyAsset(p) === 'nuke');
-      if (nuke)
+      if (nuke) {
         entries.push({
-          league: `L${i + 1}`,
-          type: 'warning',
-          text: `ALERT: Nuke risk — ${nuke.name} blocking roster spot`,
+          league: leagueLabel,
+          kind: 'ALERT',
+          text: `Nuke risk — ${nuke.name} blocking roster spot`,
         });
+      } else {
+        entries.push({
+          league: leagueLabel,
+          kind: 'TRADE',
+          text: `Rebuild lane — target pick swaps in ${lg.name}`,
+        });
+      }
     }
     if (lg.signal === 'BOOM') {
       entries.push({
-        league: `L${i + 1}`,
-        type: 'success',
-        text: `RISING: ${lg.name} is BOOM territory — contend now`,
+        league: leagueLabel,
+        kind: 'BOOM',
+        text: `${lg.name} is BOOM territory — contend now`,
       });
     }
     const diamond = lg.rankedPlayers.find((p) => classifyAsset(p) === 'diamond');
-    if (diamond)
+    if (diamond) {
       entries.push({
-        league: `L${i + 1}`,
-        type: 'info',
-        text: `ASSET: ${diamond.name} elite-tier anchor`,
+        league: leagueLabel,
+        kind: 'MOCK',
+        text: `${diamond.name} elite-tier anchor — mock-friendly chip`,
       });
+    }
     return entries;
   });
 }
@@ -270,37 +313,35 @@ function getDefcon(
   leagues: LeagueAnalysis[],
   tfoAgg: { bustCount: number; leanBustCount: number },
 ): {
-  level: 1 | 2 | 3;
+  level: 1 | 2 | 3 | 4 | 5;
   nukeCount: number;
   boomCount: number;
-  busterCaption: 'screaming' | 'shouting' | 'alert' | 'watching';
 } {
   const nukeCount = leagues.reduce((sum, lg) => {
     return sum + lg.rankedPlayers.filter((p) => classifyAsset(p) === 'nuke').length;
   }, 0);
   const boomCount = leagues.filter((lg) => lg.signal === 'BOOM').length;
+  const bustLeagueCount = leagues.filter((lg) => lg.signal === 'BUST').length;
 
-  let level: 1 | 2 | 3;
-  if (nukeCount >= 5 || boomCount > 0) level = 1;
-  else if (nukeCount >= 2) level = 2;
-  else level = 3;
+  let level: 1 | 2 | 3 | 4 | 5 = 5;
 
-  if (level !== 1 && tfoAgg.bustCount >= 1) {
+  if (nukeCount >= 5 || boomCount > 0) {
+    level = 1;
+  } else if (nukeCount >= 2 || tfoAgg.bustCount >= 2) {
+    level = 2;
+  } else if (nukeCount >= 1 || tfoAgg.bustCount >= 1 || tfoAgg.leanBustCount > 2) {
+    level = 3;
+  } else if (bustLeagueCount > 0 || tfoAgg.leanBustCount > 0) {
+    level = 4;
+  } else {
+    level = 5;
+  }
+
+  if (level !== 1 && tfoAgg.bustCount >= 1 && level > 2) {
     level = 2;
   }
 
-  let busterCaption: 'screaming' | 'shouting' | 'alert' | 'watching';
-  if (level === 1) {
-    busterCaption = 'screaming';
-  } else if (level === 2) {
-    busterCaption = 'shouting';
-  } else if (tfoAgg.leanBustCount > 2) {
-    busterCaption = 'alert';
-  } else {
-    busterCaption = 'watching';
-  }
-
-  return { level, nukeCount, boomCount, busterCaption };
+  return { level, nukeCount, boomCount };
 }
 
 function normalize(value: number, min: number, max: number, outMin: number, outMax: number): number {
@@ -634,8 +675,6 @@ function TacticalMap({
 // ── Main Page ─────────────────────────────────────────────────────────────────
 
 export default function WarRoomPage() {
-  const supabase = createClient();
-
   const [loading, setLoading] = useState(true);
   const [leagueAnalyses, setLeagueAnalyses] = useState<LeagueAnalysis[]>([]);
   const [selectedLeague, setSelectedLeague] = useState<LeagueAnalysis | null>(null);
@@ -650,6 +689,7 @@ export default function WarRoomPage() {
     let cancelled = false;
 
     async function load() {
+      const supabase = createClient();
       setLoading(true);
 
       // Best-effort sync
@@ -758,7 +798,7 @@ export default function WarRoomPage() {
     return () => {
       cancelled = true;
     };
-  }, [supabase]);
+  }, []);
 
   const playerDots = useMemo((): TacticalPlayerDot[] => {
     const dots: TacticalPlayerDot[] = [];
@@ -793,24 +833,47 @@ export default function WarRoomPage() {
     return { bustCount, leanBustCount };
   }, [tfoByPlayer]);
 
-  // ── DEFCON ────────────────────────────────────────────────────────────────
-  const defcon = leagueAnalyses.length > 0 ? getDefcon(leagueAnalyses, tfoAgg) : null;
+  const defcon = useMemo(() => {
+    if (leagueAnalyses.length === 0) {
+      return { level: 5 as const, nukeCount: 0, boomCount: 0 };
+    }
+    return getDefcon(leagueAnalyses, tfoAgg);
+  }, [leagueAnalyses, tfoAgg]);
 
-  const defconStyles = {
-    1: { bg: 'bg-red-600/90', text: 'text-white', border: 'border-red-500/60' },
-    2: { bg: 'bg-amber-500/90', text: 'text-black', border: 'border-amber-400/60' },
-    3: { bg: 'bg-yellow-400/80', text: 'text-black', border: 'border-yellow-300/60' },
-  };
-
-  const defconLabel = defcon
-    ? defcon.level === 1
-      ? `DEFCON 1: CRITICAL ALERT (${defcon.nukeCount} NUKES). (Buster is SCREAMING).`
-      : defcon.level === 2
-        ? `DEFCON 2: MULTIPLE NUKE ALERTS (${defcon.nukeCount}). (Buster is Shouting).`
-        : defcon.busterCaption === 'alert'
-          ? `DEFCON 3: EMPIRE STABLE (${defcon.nukeCount} nukes). (Buster Alert).`
-          : `DEFCON 3: EMPIRE STABLE (${defcon.nukeCount} nukes). (Buster is Watching).`
-    : null;
+  const defconUi = useMemo(() => {
+    const { level } = defcon;
+    if (level === 1) {
+      return {
+        label: '⚠ DEFCON 1 — CRITICAL ALERT',
+        textClass: 'text-[#EF4444]',
+        textAnimate: true,
+        wrapClass:
+          'defcon-banner-critical rounded-xl border px-5 py-4 text-center border-red-500/70',
+      };
+    }
+    if (level === 2) {
+      return {
+        label: '⚡ DEFCON 2 — MULTIPLE ALERTS',
+        textClass: 'text-[#FBBF24]',
+        textAnimate: false,
+        wrapClass: 'rounded-xl border px-5 py-4 text-center border-amber-400/40 bg-amber-500/[0.07]',
+      };
+    }
+    if (level === 3) {
+      return {
+        label: '● DEFCON 3 — ELEVATED',
+        textClass: 'text-[#22D3EE]',
+        textAnimate: false,
+        wrapClass: 'rounded-xl border px-5 py-4 text-center border-cyan-400/35 bg-cyan-500/[0.06]',
+      };
+    }
+    return {
+      label: `✓ DEFCON ${level} — OPERATIONAL`,
+      textClass: 'text-[#36E7A1]',
+      textAnimate: false,
+      wrapClass: 'rounded-xl border px-5 py-4 text-center border-emerald-500/35 bg-emerald-500/[0.06]',
+    };
+  }, [defcon]);
 
   // ── Exploits ─────────────────────────────────────────────────────────────
   const exploits = selectedLeague ? generateExploits(selectedLeague) : [];
@@ -842,6 +905,18 @@ export default function WarRoomPage() {
   return (
     <AppBackground intensity="subtle">
       <main className="max-w-[1600px] mx-auto px-4 sm:px-6 pb-24 pt-6 space-y-6">
+        {/* ── DEFCON BANNER ───────────────────────────────────────────── */}
+        <div className={defconUi.wrapClass}>
+          <p
+            className={clsx(
+              'display text-[24px] leading-tight tracking-wide font-semibold',
+              defconUi.textClass,
+              defconUi.textAnimate && 'defcon-text-pulse'
+            )}
+          >
+            {defconUi.label}
+          </p>
+        </div>
 
         {/* ── TOP BAR ──────────────────────────────────────────────────── */}
         <div className="flex flex-wrap items-center gap-4 rounded-xl border border-[var(--border)] bg-[var(--bg-card)]/80 px-5 py-4 backdrop-blur-sm">
@@ -859,14 +934,6 @@ export default function WarRoomPage() {
               THE WAR ROOM (MISSION CONTROL)
             </h1>
           </div>
-
-          {defcon && (
-            <div
-              className={`shrink-0 rounded-lg border px-4 py-2 text-xs font-bold font-mono uppercase tracking-wide ${defconStyles[defcon.level].bg} ${defconStyles[defcon.level].text} ${defconStyles[defcon.level].border}`}
-            >
-              {defconLabel}
-            </div>
-          )}
         </div>
 
         {/* ── THREE-COLUMN LAYOUT ──────────────────────────────────────── */}
@@ -885,38 +952,62 @@ export default function WarRoomPage() {
             </div>
 
             {/* Feed */}
-            <div className="overflow-y-auto max-h-[500px] p-3 space-y-1 font-mono scrollbar-thin">
+            <div className="overflow-y-auto max-h-[500px] p-3 space-y-2 scrollbar-ticker-cyan">
               {tickerEntries.length === 0 ? (
                 <p className="text-xs text-[var(--text-muted)] p-4">No active signals. Empire is quiet.</p>
               ) : (
-                tickerEntries.map((entry, idx) => (
-                  <div
-                    key={idx}
-                    className={`flex gap-2 text-xs py-1 border-b border-white/[0.04] last:border-none ${
-                      entry.type === 'warning'
-                        ? 'text-red-400'
-                        : entry.type === 'success'
-                          ? 'text-green-400'
-                          : 'text-amber-400'
-                    }`}
-                  >
-                    <span className="text-[var(--text-muted)] shrink-0 tabular-nums">{tickerTime(idx)}</span>
-                    <span className="shrink-0 font-bold">[{entry.league}]</span>
-                    <span className="leading-relaxed">{entry.text}</span>
-                  </div>
-                ))
+                tickerEntries.map((entry, idx) => {
+                  const st = TICKER_KIND_STYLES[entry.kind];
+                  return (
+                    <div
+                      key={`${entry.kind}-${entry.league}-${idx}-${entry.text.slice(0, 24)}`}
+                      className="glass-panel overflow-hidden border border-white/[0.08] bg-black/20 pl-0 pr-3 py-2.5"
+                      style={{ borderLeftWidth: 4, borderLeftColor: st.border }}
+                    >
+                      <div className="flex flex-wrap items-start gap-x-3 gap-y-1 pl-3">
+                        <span className="font-mono-tactical text-[9px] text-[#475569] shrink-0 tabular-nums w-[3.25rem]">
+                          {tickerTime(idx)}
+                        </span>
+                        <div className="flex flex-wrap items-center gap-1.5 shrink-0">
+                          <span
+                            className="font-mono-tactical text-[9px] font-black uppercase tracking-wide px-2 py-0.5 rounded-full"
+                            style={{
+                              backgroundColor: st.pillBg,
+                              color: st.pillText,
+                              border: `1px solid ${st.pillBorder}`,
+                            }}
+                          >
+                            {entry.kind}
+                          </span>
+                          <span
+                            className="font-mono-tactical text-[9px] font-bold uppercase px-2 py-0.5 rounded-full"
+                            style={{
+                              backgroundColor: st.pillBg,
+                              color: st.pillText,
+                              border: `1px solid ${st.pillBorder}`,
+                            }}
+                          >
+                            {entry.league}
+                          </span>
+                        </div>
+                        <p className="text-[11px] leading-snug text-[#94A3B8] flex-1 min-w-[min(100%,12rem)]">{entry.text}</p>
+                      </div>
+                    </div>
+                  );
+                })
               )}
               {/* Blinking cursor */}
-              <div className="flex gap-2 text-xs text-green-400 py-1 mt-1">
-                <span className="text-[var(--text-muted)]">NOW</span>
-                <span className="animate-pulse">█</span>
+              <div className="flex gap-2 items-center text-xs text-[#36E7A1] py-2 px-1 opacity-80">
+                <span className="font-mono-tactical text-[9px] text-[#475569]">NOW</span>
+                <span className="animate-pulse font-mono">█</span>
               </div>
             </div>
           </div>
 
           {/* ── CENTER: Tactical Map ─────────────────────────────────────── */}
-          <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)]/90 overflow-hidden">
-            <div className="px-5 py-4 border-b border-[var(--border)]">
+          <div className="rounded-2xl border border-[var(--border)] bg-targeting overflow-hidden relative shadow-[0_0_40px_rgba(34,211,238,0.06)]">
+            <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#22D3EE]/45 to-transparent z-10" />
+            <div className="px-5 py-4 border-b border-[var(--border)] bg-black/20">
               <h2 className="display text-white text-xl leading-none tracking-wide">
                 TACTICAL MAP (ASSET DENSITY MATRIX)
               </h2>
@@ -927,11 +1018,13 @@ export default function WarRoomPage() {
 
             <div className="p-4 pl-10">
               {leagueAnalyses.length === 0 ? (
-                <div className="flex items-center justify-center h-[500px] text-[var(--text-muted)] text-sm font-mono">
+                <div className="flex items-center justify-center h-[500px] text-[var(--text-muted)] text-sm font-mono glass-panel border border-white/[0.06] rounded-xl">
                   No league data. Sync your leagues first.
                 </div>
               ) : (
-                <TacticalMap leagues={leagueAnalyses} playerDots={playerDots} onSelectLeague={handleSelectLeague} />
+                <div className="glass-panel border border-white/[0.08] rounded-xl p-3 shadow-inner">
+                  <TacticalMap leagues={leagueAnalyses} playerDots={playerDots} onSelectLeague={handleSelectLeague} />
+                </div>
               )}
             </div>
 

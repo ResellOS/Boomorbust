@@ -9,33 +9,21 @@ export default function LoginPage() {
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [isSignUp, setIsSignUp] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
     setError(null);
-    setSuccess(null);
     const supabase = createClient();
 
-    if (isSignUp) {
-      const { error } = await supabase.auth.signUp({ email, password });
-      if (error) {
-        setError(error.message);
-      } else {
-        setSuccess('Account created! Check your email to confirm your address.');
-      }
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) {
+      setError(error.message);
     } else {
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error) {
-        setError(error.message);
-      } else {
-        router.push('/dashboard');
-        router.refresh();
-      }
+      router.push('/dashboard');
+      router.refresh();
     }
 
     setLoading(false);
@@ -46,9 +34,7 @@ export default function LoginPage() {
       <div className="w-full max-w-md">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/logo.png" alt="Boom or Bust" className="h-12 w-auto mx-auto mb-8" />
-        <p className="text-text-muted text-center mb-8">
-          {isSignUp ? 'Manage your dynasty portfolio with Boom or Bust.' : 'Sign in to your Boom or Bust account'}
-        </p>
+        <p className="text-text-muted text-center mb-8">Sign in to your Boom or Bust account</p>
 
         <div className="bg-background-card border border-white/5 rounded-xl p-8">
           <form onSubmit={handleSubmit} className="space-y-5">
@@ -87,29 +73,17 @@ export default function LoginPage() {
               </p>
             )}
 
-            {success && (
-              <p className="text-sm bg-accent-cyan/10 border border-accent-cyan/20 rounded-lg px-4 py-2.5" style={{ color: '#22D3EE' }}>
-                {success}
-              </p>
-            )}
-
             <button
               type="submit"
               disabled={loading}
               className="w-full bg-accent hover:bg-accent/90 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold py-2.5 rounded-lg transition"
             >
-              {loading ? 'Loading...' : isSignUp ? 'Create Account' : 'Sign In'}
+              {loading ? 'Loading...' : 'Sign In'}
             </button>
           </form>
 
-          <p className="mt-6 text-center text-sm text-text-muted">
-            {isSignUp ? 'Already have an account?' : "Don't have an account?"}{' '}
-            <button
-              onClick={() => { setIsSignUp(!isSignUp); setError(null); setSuccess(null); }}
-              className="text-accent hover:underline font-medium"
-            >
-              {isSignUp ? 'Sign in' : 'Sign up'}
-            </button>
+          <p className="mt-6 text-center text-[10px] text-[#475569] font-mono-tactical">
+            New accounts opening soon.
           </p>
         </div>
       </div>

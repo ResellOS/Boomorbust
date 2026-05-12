@@ -1,23 +1,21 @@
 'use client';
 
 import Image from 'next/image';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useId, useMemo, useState } from 'react';
 import { clsx } from 'clsx';
 import { ChevronDown, ChevronUp, Loader2, Search, Sparkles } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import AppBackground from '@/components/AppBackground';
 import type { FFigGrade, FFigPosition } from '@/lib/ffig/engine';
-import { espnNflLogoUrl, nflTeamDisplayName } from '@/lib/nfl/espnTeam';
+import { calculateTFOScore } from '@/lib/tfo/formula';
+import { espnNflLogoUrl } from '@/lib/nfl/espnTeam';
+import { nflTeamPrimaryHex } from '@/lib/nfl/teamPrimaryHex';
+import { getRadarMetrics, inferTFOInputFromHub } from '@/components/dashboard/radarMetrics';
+import type { RadarMetric } from '@/components/dashboard/PlayerHubCard';
+import { build2025RookieProspectRecords, roundPickSlotLabel } from '@/lib/rookies/rookie2025Board';
 
 type Tier = 'free' | 'pro' | 'elite';
-type UiTier =
-  | 'ALL'
-  | 'DIAMOND'
-  | 'GEM'
-  | 'STARTER'
-  | 'DEPTH'
-  | 'FADE'
-  | 'HARD_FADE';
+type UiTier = 'ALL' | 'ELITE' | 'HIGH_VALUE' | 'VIABLE' | 'AVOID';
 type YearKey = 2026 | 2025 | 2024 | 2023 | 'historic';
 type AccuracyTab = 'year' | 'pos' | 'round';
 
@@ -48,6 +46,8 @@ interface Prospect {
   ffig_grade: FFigGrade;
   dynasty_hit: boolean | null;
   career_ppg: number | null;
+  /** Precomputed TFO from rookie board builder (2025 class). */
+  tfo_snapshot?: number | null;
 }
 
 interface AccuracyRow {
@@ -60,48 +60,192 @@ interface AccuracyRow {
 
 const WATCH_LS = 'bb_ffig_watch';
 const POSITIONS: (FFigPosition | 'ALL')[] = ['ALL', 'QB', 'RB', 'WR', 'TE'];
-const UI_GRADES: UiTier[] = [
-  'ALL',
-  'DIAMOND',
-  'GEM',
-  'STARTER',
-  'DEPTH',
-  'FADE',
-  'HARD_FADE',
-];
+const UI_GRADES: UiTier[] = ['ALL', 'ELITE', 'HIGH_VALUE', 'VIABLE', 'AVOID'];
 
-const TIER_META: Record<Exclude<UiTier, 'ALL'>, { label: string; className: string }> = {
-  DIAMOND: { label: 'DIAMOND', className: 'text-[var(--gold)] bg-[var(--gold)]/15 border-[var(--gold)]/40' },
-  GEM: { label: 'GEM', className: 'text-[var(--indigo-light)] bg-[var(--indigo)]/18 border-[var(--indigo)]/40' },
-  STARTER: { label: 'STARTER', className: 'text-[var(--cyan)] bg-[var(--cyan)]/12 border-[var(--cyan)]/35' },
-  DEPTH: { label: 'DEPTH', className: 'text-[var(--text-secondary)] bg-white/[0.06] border-[var(--border)]' },
-  FADE: { label: 'FADE', className: 'text-[var(--amber)] bg-[var(--amber)]/14 border-[var(--amber)]/35' },
-  HARD_FADE: { label: 'HARD FADE', className: 'text-red-400 bg-red-500/15 border-red-500/35' },
-};
-
-const TIER_LETTERS: Record<Exclude<UiTier, 'ALL'>, FFigGrade[]> = {
-  DIAMOND: ['A+'],
-  GEM: ['A'],
-  STARTER: ['B+', 'B'],
-  DEPTH: ['C+', 'C'],
-  FADE: ['D'],
-  HARD_FADE: ['F'],
+const TIER_FILTER_META: Record<Exclude<UiTier, 'ALL'>, { label: string; activeClass: string }> = {
+  ELITE: {
+    label: 'ELITE',
+    activeClass: 'bg-[#36E7A1]/20 border-[#36E7A1]/55 text-[#36E7A1] shadow-[0_0_20px_rgba(54,231,161,0.25)]',
+  },
+  HIGH_VALUE: {
+    label: 'HIGH VALUE',
+    activeClass: 'bg-[#22D3EE]/18 border-[#22D3EE]/50 text-[#22D3EE] shadow-[0_0_18px_rgba(34,211,238,0.22)]',
+  },
+  VIABLE: {
+    label: 'VIABLE',
+    activeClass: 'bg-[#FBBF24]/16 border-[#FBBF24]/45 text-[#FBBF24] shadow-[0_0_16px_rgba(251,191,36,0.2)]',
+  },
+  AVOID: {
+    label: 'AVOID',
+    activeClass: 'bg-[#EF4444]/15 border-[#EF4444]/45 text-[#EF4444] shadow-[0_0_18px_rgba(239,68,68,0.2)]',
+  },
 };
 
 function letterTier(g: FFigGrade): Exclude<UiTier, 'ALL'> {
-  if (g === 'A+') return 'DIAMOND';
-  if (g === 'A') return 'GEM';
-  if (g === 'B+' || g === 'B') return 'STARTER';
-  if (g === 'C+' || g === 'C') return 'DEPTH';
-  if (g === 'D') return 'FADE';
-  return 'HARD_FADE';
+  const s = String(g);
+  if (s.startsWith('A')) return 'ELITE';
+  if (s.startsWith('B')) return 'HIGH_VALUE';
+  if (s.startsWith('C')) return 'VIABLE';
+  return 'AVOID';
 }
 
 function tierHit(g: Exclude<UiTier, 'ALL'>): boolean {
-  return g === 'DIAMOND' || g === 'GEM';
+  return g === 'ELITE';
 }
 function tierBustSignal(g: Exclude<UiTier, 'ALL'>): boolean {
-  return g === 'FADE' || g === 'HARD_FADE';
+  return g === 'AVOID';
+}
+
+/** Synthetic OC tree label — DB has no scheme column; blend PROE heuristic + stable hash. */
+function schemeFamilyKey(p: Prospect): keyof typeof SCHEME_BADGES {
+  const proe = Number(p.scheme_proe_mod);
+  if (proe >= 0.035) return 'air_raid';
+  if (proe <= -0.025) return 'run_first';
+  const seed = p.player_id || p.id;
+  const schemes = ['reid_tree', 'mcvay_tree', 'shanahan_tree', 'air_raid', 'run_first', 'default'] as const;
+  let h = 0x811c9dc5;
+  for (let i = 0; i < seed.length; i++) {
+    h ^= seed.charCodeAt(i);
+    h = Math.imul(h, 0x01000193);
+  }
+  return schemes[(h >>> 0) % schemes.length]!;
+}
+
+const SCHEME_BADGES = {
+  reid_tree: { label: 'REID TREE', bg: 'rgba(34,211,238,0.14)', color: '#22D3EE', border: 'rgba(34,211,238,0.35)' },
+  mcvay_tree: { label: 'McVAY TREE', bg: 'rgba(34,211,238,0.14)', color: '#22D3EE', border: 'rgba(34,211,238,0.35)' },
+  shanahan_tree: { label: 'SHANAHAN', bg: 'rgba(54,231,161,0.14)', color: '#36E7A1', border: 'rgba(54,231,161,0.35)' },
+  air_raid: { label: 'AIR RAID', bg: 'rgba(251,191,36,0.14)', color: '#FBBF24', border: 'rgba(251,191,36,0.35)' },
+  run_first: { label: 'RUN FIRST', bg: 'rgba(251,191,36,0.14)', color: '#FBBF24', border: 'rgba(251,191,36,0.35)' },
+  default: { label: 'BALANCED', bg: 'rgba(148,163,184,0.1)', color: '#94A3B8', border: 'rgba(148,163,184,0.25)' },
+} as const;
+
+function prospectHubKtc(p: Prospect): number {
+  return Math.max(320, Math.round(420 + Number(p.ffig_score) * 88));
+}
+
+function prospectTfoScore(p: Prospect): number {
+  if (p.tfo_snapshot != null && Number.isFinite(Number(p.tfo_snapshot))) return Number(p.tfo_snapshot);
+  const input = inferTFOInputFromHub(
+    {
+      player_id: p.player_id || p.id,
+      position: p.position,
+      team: p.nfl_team || '—',
+      ktc_value: prospectHubKtc(p),
+    },
+    'boom',
+  );
+  return calculateTFOScore(input).tfoScore;
+}
+
+function landingQuality(tfo: number): { label: string; tone: 'elite' | 'good' | 'neutral' | 'poor' } {
+  if (tfo >= 85) return { label: 'ELITE LANDING', tone: 'elite' };
+  if (tfo >= 70) return { label: 'GOOD LANDING', tone: 'good' };
+  if (tfo >= 55) return { label: 'NEUTRAL', tone: 'neutral' };
+  return { label: 'POOR LANDING', tone: 'poor' };
+}
+
+function gradeLetterStyle(g: FFigGrade): { color: string; band: string } {
+  const s = String(g);
+  if (s.startsWith('A')) return { color: '#36E7A1', band: 'ELITE' };
+  if (s.startsWith('B')) return { color: '#22D3EE', band: 'HIGH VALUE' };
+  if (s.startsWith('C')) return { color: '#FBBF24', band: 'VIABLE' };
+  return { color: '#EF4444', band: 'AVOID' };
+}
+
+const RADAR_CX = 110;
+const RADAR_CY = 100;
+const RADAR_R = 94;
+const BOOM_EMERALD = '#36E7A1';
+
+function axisAngle(i: number, n: number): number {
+  return (2 * Math.PI * i) / n - Math.PI / 2;
+}
+
+function polarPointMini(value: number, i: number, n: number, radius = RADAR_R) {
+  const angle = axisAngle(i, n);
+  return {
+    x: RADAR_CX + value * radius * Math.cos(angle),
+    y: RADAR_CY + value * radius * Math.sin(angle),
+  };
+}
+
+function polygonPointsMini(values: number[], n: number): string {
+  return values
+    .map((v, i) => {
+      const pt = polarPointMini(v, i, n);
+      return `${pt.x.toFixed(1)},${pt.y.toFixed(1)}`;
+    })
+    .join(' ');
+}
+
+function RookieMiniRadar({ prospect }: { prospect: Prospect }) {
+  const reactId = useId().replace(/:/g, '');
+  const pid = prospect.player_id || prospect.id;
+  const hub = {
+    player_id: pid,
+    position: prospect.position,
+    team: prospect.nfl_team || 'FA',
+    ktc_value: prospectHubKtc(prospect),
+  };
+  const radar = getRadarMetrics(prospect.position, pid, undefined, 'boom', { hub });
+  const n = radar.length;
+  const rings = [0.33, 0.66, 1];
+  const fillId = `rr-fill-${reactId}`;
+
+  return (
+    <div
+      className="relative shrink-0 rounded-lg border border-white/[0.08] bg-black/25"
+      style={{ width: 80, height: 80 }}
+      aria-hidden
+    >
+      <svg width={80} height={80} viewBox={`0 0 ${RADAR_CX * 2} ${RADAR_CY * 2 + 20}`} className="block">
+        <defs>
+          <radialGradient id={fillId} cx="50%" cy="50%" r="60%">
+            <stop offset="0%" stopColor={BOOM_EMERALD} stopOpacity={0.42} />
+            <stop offset="100%" stopColor={BOOM_EMERALD} stopOpacity={0.12} />
+          </radialGradient>
+        </defs>
+        {rings.map((ratio) => (
+          <polygon
+            key={ratio}
+            points={polygonPointsMini(Array(n).fill(ratio), n)}
+            fill="none"
+            stroke="rgba(255,255,255,0.07)"
+            strokeWidth="1"
+          />
+        ))}
+        {radar.map((_, i) => {
+          const outer = polarPointMini(1, i, n);
+          return (
+            <line
+              key={i}
+              x1={RADAR_CX}
+              y1={RADAR_CY}
+              x2={outer.x.toFixed(1)}
+              y2={outer.y.toFixed(1)}
+              stroke="rgba(255,255,255,0.05)"
+              strokeWidth="1"
+            />
+          );
+        })}
+        <polygon
+          points={polygonPointsMini(
+            radar.map((m: RadarMetric) => m.value),
+            n,
+          )}
+          fill={`url(#${fillId})`}
+          stroke={BOOM_EMERALD}
+          strokeWidth={2}
+          style={{ filter: 'drop-shadow(0 0 8px rgba(54,231,161,0.45))' }}
+        />
+        {radar.map((m: RadarMetric, i: number) => {
+          const pt = polarPointMini(m.value, i, n);
+          return <circle key={i} cx={pt.x.toFixed(1)} cy={pt.y.toFixed(1)} r={2} fill={BOOM_EMERALD} />;
+        })}
+      </svg>
+    </div>
+  );
 }
 
 function scoreTo120(s: number): number {
@@ -151,12 +295,12 @@ function allowedYearKeys(t: Tier): YearKey[] {
   return [2026, 2025, 2024, 2023, 'historic'];
 }
 
-function defaultYearKey(t: Tier): YearKey {
-  return t === 'elite' ? 2026 : 2025;
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+function defaultYearKey(_t: Tier): YearKey {
+  return 2025;
 }
 
 export default function RookiesPage() {
-  const supabase = createClient();
   const [tier, setTier] = useState<Tier>('free');
   const [loading, setLoading] = useState(true);
   const [rows, setRows] = useState<Prospect[]>([]);
@@ -188,6 +332,7 @@ export default function RookiesPage() {
 
   useEffect(() => {
     async function boot() {
+      const supabase = createClient();
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
       const { data } = await supabase
@@ -211,6 +356,7 @@ export default function RookiesPage() {
   useEffect(() => {
     let cancelled = false;
     async function loadAcc() {
+      const supabase = createClient();
       const { data } = await supabase
         .from('ffig_prospects')
         .select('draft_year,draft_round,position,dynasty_hit,ffig_grade')
@@ -222,17 +368,25 @@ export default function RookiesPage() {
     return () => {
       cancelled = true;
     };
-  }, [supabase]);
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
     async function loadProspects() {
+      const supabase = createClient();
       const allowed = allowedYearKeys(tier);
       if (!allowed.includes(yearKey)) {
         setLoading(false);
         return;
       }
       setLoading(true);
+      if (yearKey === 2025) {
+        const built = build2025RookieProspectRecords();
+        if (!cancelled) setRows(built as Prospect[]);
+        if (!cancelled) setLoading(false);
+        return;
+      }
+
       let q = supabase.from('ffig_prospects').select('*');
       if (yearKey === 'historic') q = q.lt('draft_year', 2023);
       else q = q.eq('draft_year', yearKey as number);
@@ -247,7 +401,7 @@ export default function RookiesPage() {
     return () => {
       cancelled = true;
     };
-  }, [supabase, yearKey, tier]);
+  }, [yearKey, tier]);
 
   const toggleWatch = useCallback((id: string) => {
     setWatchIds((prev) => {
@@ -263,8 +417,7 @@ export default function RookiesPage() {
     let list = rows;
     if (pos !== 'ALL') list = list.filter((p) => p.position === pos);
     if (gradeTier !== 'ALL') {
-      const letters = TIER_LETTERS[gradeTier];
-      list = list.filter((p) => letters.includes(p.ffig_grade));
+      list = list.filter((p) => letterTier(p.ffig_grade) === gradeTier);
     }
     if (debounced) {
       const d = debounced.toLowerCase();
@@ -335,14 +488,19 @@ export default function RookiesPage() {
     return out;
   }
 
+  const displayYear = yearKey === 'historic' ? 'HISTORIC' : String(yearKey);
+
   return (
     <AppBackground intensity="minimal">
       <div className="max-w-[1500px] mx-auto px-4 sm:px-6 lg:px-10 pb-16 space-y-8">
         <header className="pt-10">
-          <h1 className="display text-[48px] leading-none text-[var(--text-primary)] uppercase tracking-[0.04em]">
-            F-FIG Rookie Grades
+          <h1 className="display text-[48px] leading-none uppercase tracking-[0.04em] bg-gradient-to-b from-white to-[#22D3EE] bg-clip-text text-transparent">
+            ROOKIE DRAFT INTELLIGENCE
           </h1>
-          <p className="mt-3 text-[var(--text-secondary)] text-sm md:text-base max-w-2xl">
+          <p className="font-mono-tactical mt-3 text-[11px] tracking-[0.2em] text-[#22D3EE]">
+            F-FIG SCOUTING GRADES · {displayYear} CLASS
+          </p>
+          <p className="mt-4 text-[var(--text-secondary)] text-sm md:text-base max-w-2xl">
             Final Fantasy Impact Grade — 82.5% accuracy vs 52% consensus
           </p>
         </header>
@@ -389,53 +547,96 @@ export default function RookiesPage() {
           </div>
 
           <div className="flex flex-wrap gap-2 items-center">
-            <span className="text-[10px] uppercase tracking-[0.2em] text-[var(--text-muted)] mr-2 w-full sm:w-auto">Year</span>
-            {(([2026, 2025, 2024, 2023, 'historic'] as const)).map((y) => {
+            <span className="text-[10px] uppercase tracking-[0.2em] text-[var(--text-muted)] mr-2 w-full sm:w-auto">
+              Draft class
+            </span>
+            {([2025, 2024, 2023] as const).map((y) => {
               const disabled = !allowedYearKeys(tier).includes(y);
+              const label = y === 2025 ? '2025 ROOKIES' : y === 2024 ? '2024 ROOKIES' : '2023 ROOKIES';
               return (
                 <button
-                  key={String(y)}
+                  key={y}
                   type="button"
-                  title={
-                    disabled
-                      ? y === 2026 || y === 'historic'
-                        ? 'Elite tier required'
-                        : 'Pro tier required'
-                      : undefined
-                  }
+                  title={disabled ? 'Pro tier required for 2024–2023 classes' : undefined}
                   disabled={disabled}
                   onClick={() => !disabled && setYearKey(y)}
                   className={clsx(
-                    'text-xs font-bold px-3 py-2 rounded-full border transition capitalize',
+                    'text-xs font-bold px-3 py-2 rounded-full border transition',
                     yearKey === y
                       ? 'bg-[var(--indigo)] text-white border-[var(--indigo)]'
                       : 'bg-[var(--bg-secondary)] text-[var(--text-secondary)] border-[var(--border)] hover:border-[var(--indigo)]/35',
                     disabled && 'opacity-40 cursor-not-allowed'
                   )}
                 >
-                  {y === 'historic' ? 'Historical' : y}
+                  {label}
                 </button>
               );
             })}
+            {tier === 'elite' ? (
+              <>
+                <span className="hidden sm:block h-6 w-px bg-[var(--border)] mx-1 shrink-0" aria-hidden />
+                {([2026, 'historic'] as const).map((y) => (
+                  <button
+                    key={String(y)}
+                    type="button"
+                    onClick={() => setYearKey(y)}
+                    className={clsx(
+                      'text-xs font-bold px-3 py-2 rounded-full border transition capitalize',
+                      yearKey === y
+                        ? 'bg-[var(--indigo)] text-white border-[var(--indigo)]'
+                        : 'bg-[var(--bg-secondary)] text-[var(--text-secondary)] border-[var(--border)] hover:border-[var(--indigo)]/35'
+                    )}
+                  >
+                    {y === 'historic' ? 'Historical' : `${y} (proj.)`}
+                  </button>
+                ))}
+              </>
+            ) : null}
           </div>
 
           <div className="flex flex-wrap gap-2 items-center">
             <span className="text-[10px] uppercase tracking-[0.2em] text-[var(--text-muted)] mr-2 w-full sm:w-auto">Grade</span>
-            {UI_GRADES.map((g) => (
-              <button
-                key={g}
-                type="button"
-                onClick={() => setGradeTier(g)}
-                className={clsx(
-                  'text-[10px] font-bold uppercase px-2 py-2 rounded-full border transition',
-                  gradeTier === g
-                    ? 'bg-[var(--indigo)] text-white border-[var(--indigo)]'
-                    : 'bg-[var(--bg-secondary)] text-[var(--text-muted)] border-[var(--border)] hover:border-[var(--indigo)]/35'
-                )}
-              >
-                {g.replace('_', ' ')}
-              </button>
-            ))}
+            {UI_GRADES.map((g) => {
+              const active = gradeTier === g;
+              const ghost = clsx(
+                'glass-panel text-[10px] font-bold uppercase px-3 py-2 rounded-full border border-white/[0.08] bg-white/[0.03]',
+                'text-[var(--text-muted)] hover:border-white/15 hover:text-[var(--text-secondary)] transition'
+              );
+              if (g === 'ALL') {
+                return (
+                  <button
+                    key={g}
+                    type="button"
+                    onClick={() => setGradeTier(g)}
+                    className={
+                      active
+                        ? clsx(
+                            'text-[10px] font-bold uppercase px-3 py-2 rounded-full border transition',
+                            'bg-[#22D3EE]/14 border-[#22D3EE]/45 text-white shadow-[0_0_18px_rgba(34,211,238,0.22)]'
+                          )
+                        : ghost
+                    }
+                  >
+                    ALL
+                  </button>
+                );
+              }
+              const meta = TIER_FILTER_META[g];
+              return (
+                <button
+                  key={g}
+                  type="button"
+                  onClick={() => setGradeTier(g)}
+                  className={
+                    active
+                      ? clsx('text-[10px] font-bold uppercase px-3 py-2 rounded-full border transition', meta.activeClass)
+                      : ghost
+                  }
+                >
+                  {meta.label}
+                </button>
+              );
+            })}
           </div>
 
           <div className="relative max-w-md">
@@ -475,48 +676,27 @@ export default function RookiesPage() {
               No prospects match. Seed data via admin or adjust filters.
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full min-w-[960px] text-sm">
-                <thead className="sticky top-0 z-10 bg-[var(--bg-card)] border-b border-[var(--border)]">
-                  <tr className="text-left text-[10px] uppercase tracking-[0.15em] text-[var(--text-muted)]">
-                    <th className="py-4 pl-6 pr-2">Pick</th>
-                    <th className="py-4 pr-2">Player</th>
-                    <th className="py-4 pr-2">Pos</th>
-                    <th className="py-4 pr-2">Grade</th>
-                    <th className="py-4 pr-2">Score</th>
-                    <th className="py-4 pr-2">Landing</th>
-                    <th className="py-4 pr-2">Opp</th>
-                    <th className="py-4 pr-4 text-right"></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {processed.map((p) => {
-                    const ui = letterTier(p.ffig_grade);
-                    const meta = TIER_META[ui];
-                    const photo = p.player_id ? `https://sleepercdn.com/content/nfl/players/${p.player_id}.jpg` : null;
-                    const logoUrl = espnNflLogoUrl(p.nfl_team);
-                    return (
-                      <FragmentRow
-                        key={p.id}
-                        p={p}
-                        meta={meta}
-                        photoUrl={photo}
-                        logoUrl={logoUrl}
-                        expanded={expanded === p.id}
-                        onExpand={() =>
-                          setExpanded((x) => (x === p.id ? null : p.id))
-                        }
-                        opp={opportunityLetter(p)}
-                        pickDisplay={formatDynastyPick(p.draft_round, p.draft_pick)}
-                        scoreDisp={scoreTo120(Number(p.ffig_score))}
-                        comparable={similarNames(p, rows)}
-                        onWatch={() => toggleWatch(p.id)}
-                        watched={watchIds.has(p.id)}
-                      />
-                    );
-                  })}
-                </tbody>
-              </table>
+            <div className="divide-y divide-[var(--border)]/80">
+              {processed.map((p) => {
+                const photo = p.player_id ? `https://sleepercdn.com/content/nfl/players/${p.player_id}.jpg` : null;
+                const logoUrl = espnNflLogoUrl(p.nfl_team);
+                return (
+                  <ProspectRow
+                    key={p.id}
+                    p={p}
+                    photoUrl={photo}
+                    logoUrl={logoUrl}
+                    expanded={expanded === p.id}
+                    onExpand={() => setExpanded((x) => (x === p.id ? null : p.id))}
+                    opp={opportunityLetter(p)}
+                    pickDisplay={formatDynastyPick(p.draft_round, p.draft_pick)}
+                    scoreDisp={scoreTo120(Number(p.ffig_score))}
+                    comparable={similarNames(p, rows)}
+                    onWatch={() => toggleWatch(p.id)}
+                    watched={watchIds.has(p.id)}
+                  />
+                );
+              })}
             </div>
           )}
         </section>
@@ -531,9 +711,8 @@ export default function RookiesPage() {
   );
 }
 
-function FragmentRow(props: {
+function ProspectRow(props: {
   p: Prospect;
-  meta: { label: string; className: string };
   photoUrl: string | null;
   logoUrl: string | null;
   expanded: boolean;
@@ -547,7 +726,6 @@ function FragmentRow(props: {
 }) {
   const {
     p,
-    meta,
     photoUrl,
     logoUrl,
     expanded,
@@ -570,73 +748,141 @@ function FragmentRow(props: {
           : 'bg-amber-500/18 text-amber-300'
   );
 
+  const schemeKey = schemeFamilyKey(p);
+  const schemeBadge = SCHEME_BADGES[schemeKey];
+  const tfo = prospectTfoScore(p);
+  const landing = landingQuality(tfo);
+  const teamPrimary = p.nfl_team ? nflTeamPrimaryHex(p.nfl_team) : '#94a3b8';
+  const gradeStyle = gradeLetterStyle(p.ffig_grade);
+
+  const landingWrap = clsx(
+    'flex flex-col gap-0.5 rounded-lg px-2 py-1.5 border min-w-[7.5rem]',
+    landing.tone === 'elite' &&
+      'border-emerald-400/35 shadow-[0_0_14px_rgba(54,231,161,0.38)] bg-emerald-500/[0.06]',
+    landing.tone === 'good' &&
+      'border-cyan-400/35 shadow-[0_0_12px_rgba(34,211,238,0.28)] bg-cyan-500/[0.05]',
+    landing.tone === 'neutral' && 'border-slate-500/25 bg-slate-500/[0.04]',
+    landing.tone === 'poor' && 'border-red-400/35 shadow-[0_0_14px_rgba(239,68,68,0.35)] bg-red-500/[0.06]'
+  );
+
   return (
-    <>
-      <tr
+    <div className="group">
+      <div
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            onExpand();
+          }
+        }}
         className={clsx(
-          'border-b border-[var(--border)]/80 hover:bg-[var(--indigo)]/[0.06] cursor-pointer transition group',
-          expanded && 'bg-[var(--indigo)]/[0.06]'
+          'glass-panel flex flex-wrap items-center gap-3 md:gap-4 px-4 py-4 md:px-6 cursor-pointer transition border border-white/[0.06] hover:border-[var(--indigo)]/25 hover:bg-[var(--indigo)]/[0.05]',
+          expanded && 'border-[var(--indigo)]/30 bg-[var(--indigo)]/[0.06]'
         )}
         onClick={onExpand}
       >
-        <td className="py-4 pl-6 align-top">
-          <span className="display text-[var(--gold)] text-lg">{pickDisplay}</span>
-        </td>
-        <td className="py-4 align-top min-w-[200px]">
-          <div className="flex gap-3 items-start">
-            <div className="relative w-11 h-11 rounded-xl overflow-hidden border border-white/10 shrink-0 bg-white/5">
-              {photoUrl ? (
-                <Image src={photoUrl} alt="" width={44} height={44} className="object-cover" unoptimized />
-              ) : (
-                <span className="flex h-full w-full items-center justify-center text-xs font-bold text-white/70">
-                  {p.player_name
-                    .split(' ')
-                    .map((s) => s[0])
-                    .join('')
-                    .slice(0, 2)}
-                </span>
-              )}
-            </div>
-            <div className="min-w-0">
-              <p className="font-semibold text-white truncate">{p.player_name}</p>
-              {p.college && (
-                <span className="inline-block mt-1 text-[10px] px-2 py-0.5 rounded bg-white/[0.06] border border-[var(--border)] text-[var(--text-muted)] truncate max-w-[14rem]">
-                  {p.college}
-                </span>
-              )}
-            </div>
-          </div>
-        </td>
-        <td className="py-4 align-middle">
-          <span className={posBadge}>{p.position}</span>
-        </td>
-        <td className="py-4 align-middle">
-          <span className={clsx('inline-flex items-center gap-1 px-2 py-1 rounded-lg border text-[10px] font-black', meta.className)}>
-            {meta.label}
-          </span>
-        </td>
-        <td className="py-4 align-middle text-[var(--text-primary)] tabular-nums">{scoreDisp}</td>
-        <td className="py-4 align-middle">
-          <div className="flex items-center gap-2">
-            {logoUrl && (
-              <Image src={logoUrl} alt="" width={26} height={26} className="shrink-0" unoptimized />
+        <RookieMiniRadar prospect={p} />
+
+        <div className="flex flex-col justify-center shrink-0 w-[3.25rem]">
+          <span className="display text-[var(--gold)] text-lg leading-none">{pickDisplay}</span>
+        </div>
+
+        <div className="flex gap-3 items-start flex-1 min-w-[200px]">
+          <div className="relative w-11 h-11 rounded-xl overflow-hidden border border-white/10 shrink-0 bg-white/5">
+            {photoUrl ? (
+              <Image src={photoUrl} alt="" width={44} height={44} className="object-cover" unoptimized />
+            ) : (
+              <span className="flex h-full w-full items-center justify-center text-xs font-bold text-white/70">
+                {p.player_name
+                  .split(' ')
+                  .map((s) => s[0])
+                  .join('')
+                  .slice(0, 2)}
+              </span>
             )}
-            <span className="text-[var(--text-secondary)] text-xs truncate max-w-[8rem]">
-              {p.nfl_team ? nflTeamDisplayName(p.nfl_team) : '—'}
+          </div>
+          <div className="min-w-0 flex-1">
+            <div className="flex flex-wrap items-center gap-2">
+              <p className="font-semibold text-white truncate">{p.player_name}</p>
+              <span className={posBadge}>{p.position}</span>
+            </div>
+            <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 mt-1">
+              <span
+                className="font-mono-tactical font-black uppercase tracking-[0.12em]"
+                style={{ fontSize: '8px', color: '#FBBF24' }}
+              >
+                {p.draft_year} NFL DRAFT
+              </span>
+              {roundPickSlotLabel(p.draft_round, p.draft_pick) ? (
+                <span className="font-mono-tactical text-[9px] text-[#64748B]">
+                  {roundPickSlotLabel(p.draft_round, p.draft_pick)}
+                </span>
+              ) : null}
+            </div>
+            {p.college && (
+              <span className="inline-block mt-1 text-[10px] px-2 py-0.5 rounded bg-white/[0.06] border border-[var(--border)] text-[var(--text-muted)] truncate max-w-[14rem]">
+                {p.college}
+              </span>
+            )}
+            <p className="mt-1 text-xs text-[var(--text-secondary)] tabular-nums">
+              Score <span className="text-white font-semibold">{scoreDisp}</span>
+            </p>
+          </div>
+        </div>
+
+        <span
+          className="font-mono-tactical font-bold whitespace-nowrap shrink-0"
+          style={{
+            fontSize: '9px',
+            padding: '3px 8px',
+            borderRadius: 20,
+            backgroundColor: schemeBadge.bg,
+            color: schemeBadge.color,
+            border: `1px solid ${schemeBadge.border}`,
+          }}
+        >
+          {schemeBadge.label}
+        </span>
+
+        <div className={landingWrap}>
+          <div className="flex items-center gap-2">
+            {logoUrl ? <Image src={logoUrl} alt="" width={22} height={22} className="shrink-0" unoptimized /> : null}
+            <span className="font-mono-tactical text-[11px] font-black tracking-tight" style={{ color: teamPrimary }}>
+              {p.nfl_team ?? '—'}
             </span>
           </div>
-        </td>
-        <td className="py-4 align-middle">
+          <span className="font-mono-tactical text-[9px] font-bold tracking-[0.08em] text-[var(--text-muted)]">
+            {landing.label} · {Math.round(tfo)} TFO
+          </span>
+        </div>
+
+        <div className="flex items-center gap-2 shrink-0">
+          <span className="text-[10px] uppercase tracking-wider text-[var(--text-muted)]">Opp</span>
           <span className="tabular-nums font-semibold text-white">{opp}</span>
-        </td>
-        <td className="py-4 pr-6 align-middle text-right text-[var(--text-muted)]">
-          {expanded ? <ChevronUp className="w-4 h-4 inline-block" /> : <ChevronDown className="w-4 h-4 inline-block" />}
-        </td>
-      </tr>
+        </div>
+
+        <div className="flex items-center gap-3 ml-auto shrink-0">
+          <div className="text-right">
+            <p
+              className="display text-[32px] leading-none font-bold tracking-tight"
+              style={{ fontFamily: 'var(--font-display)', color: gradeStyle.color }}
+            >
+              {p.ffig_grade}
+            </p>
+            <p className="font-mono-tactical text-[9px] font-bold tracking-[0.12em] mt-0.5" style={{ color: gradeStyle.color }}>
+              {gradeStyle.band}
+            </p>
+          </div>
+          <span className="text-[var(--text-muted)]">
+            {expanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+          </span>
+        </div>
+      </div>
+
       {expanded && (
-        <tr key={`${p.id}-more`} className="border-b border-[var(--border)] bg-[var(--bg-secondary)]/40">
-          <td colSpan={8} className="px-6 py-6">
-            <div className="grid md:grid-cols-2 gap-6">
+        <div className="border-b border-[var(--border)] bg-[var(--bg-secondary)]/40 px-4 md:px-6 py-6">
+          <div className="grid md:grid-cols-2 gap-6">
               <div className="space-y-4">
                 <h4 className="text-[11px] uppercase tracking-[0.2em] text-[var(--text-muted)]">F-FIG breakdown</h4>
                 <dl className="grid grid-cols-2 gap-3 text-sm">
@@ -701,11 +947,10 @@ function FragmentRow(props: {
                   {watched ? '★ On watch list' : 'Add to Watch List'}
                 </button>
               </div>
-            </div>
-          </td>
-        </tr>
+          </div>
+        </div>
       )}
-    </>
+    </div>
   );
 }
 
@@ -754,8 +999,8 @@ function HistoricalAccuracy({
             <tr className="text-left text-[10px] uppercase text-[var(--text-muted)] tracking-[0.12em]">
               <th className="pb-3 pr-4">{tab === 'year' ? 'Year' : tab === 'pos' ? 'Position' : 'Round'}</th>
               <th className="pb-3 pr-4">Graded</th>
-              <th className="pb-3 pr-4">Diamond/Gem Hits</th>
-              <th className="pb-3 pr-4">Fade busts</th>
+              <th className="pb-3 pr-4">Elite tier hits</th>
+              <th className="pb-3 pr-4">Avoid-tier busts</th>
               <th className="pb-3 pr-4">Model %</th>
               <th className="pb-3">vs Consensus %</th>
             </tr>

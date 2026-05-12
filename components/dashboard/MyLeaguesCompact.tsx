@@ -30,7 +30,7 @@ const DOT_COLORS: Record<CompactLeague['tone'], string> = {
   green: '#36E7A1',
   amber: '#FBBF24',
   gray: '#475569',
-  red: '#FF5757',
+  red: '#EF4444',
 };
 
 const ICONS = [Trophy, Medal, Flag] as const;
@@ -77,7 +77,7 @@ export default function MyLeaguesCompact({
       )}
       <div className="flex items-center justify-between mb-3">
         <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-300 flex items-center gap-2">
-          <Trophy className="w-3 h-3 text-[#FEBC2E]" />
+          <Trophy className="w-3 h-3 text-[#FBBF24]" />
           My Leagues
           <span className="text-[10px] font-mono-tactical text-slate-600">({count})</span>
         </h3>
@@ -100,7 +100,8 @@ export default function MyLeaguesCompact({
         </div>
       </div>
 
-      <ul className="space-y-1.5">
+      <div className="slim-scroll max-h-[min(320px,45vh)] overflow-y-auto pr-1">
+        <ul className="space-y-1.5">
         {leagues.slice(0, 5).map((lg, i) => {
           const Icon = ICONS[i % ICONS.length] ?? Trophy;
           const active = selectedId === lg.id;
@@ -110,15 +111,15 @@ export default function MyLeaguesCompact({
               <span
                 className="w-6 h-6 rounded-md flex items-center justify-center shrink-0"
                 style={{
-                  background: active ? 'rgba(54,231,161,0.18)' : 'rgba(99,102,241,0.12)',
+                  background: active ? 'rgba(54,231,161,0.18)' : 'rgba(34,211,238,0.10)',
                   border: active
                     ? '1px solid rgba(54,231,161,0.4)'
-                    : '1px solid rgba(99,102,241,0.25)',
+                    : '1px solid rgba(34,211,238,0.28)',
                 }}
               >
                 <Icon
                   className="w-3 h-3"
-                  style={{ color: active ? '#36E7A1' : '#818CF8' }}
+                  style={{ color: active ? '#36E7A1' : '#22D3EE' }}
                 />
               </span>
               <div className="flex-1 min-w-0">
@@ -172,7 +173,8 @@ export default function MyLeaguesCompact({
             </li>
           );
         })}
-      </ul>
+        </ul>
+      </div>
     </div>
   );
 }

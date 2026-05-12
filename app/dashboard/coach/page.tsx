@@ -171,7 +171,6 @@ async function fetchKtcByName(): Promise<Map<string, number>> {
 }
 
 export default function CoachPage() {
-  const supabase = createClient();
   const [userId, setUserId] = useState<string | null>(null);
   const [tier, setTier] = useState<'free' | 'pro' | 'elite'>('free');
   const [sessions, setSessions] = useState<CoachSession[]>([]);
@@ -211,6 +210,7 @@ export default function CoachPage() {
 
   useEffect(() => {
     async function bootstrap() {
+      const supabase = createClient();
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
       setUserId(user.id);
@@ -330,6 +330,7 @@ export default function CoachPage() {
   );
 
   async function refreshProUsage(uid: string) {
+    const supabase = createClient();
     const today = new Date().toISOString().slice(0, 10);
     const { data: usage } = await supabase
       .from('coach_usage')
@@ -516,10 +517,10 @@ export default function CoachPage() {
         <div className="px-4 sm:px-6 lg:px-8 pt-8 pb-4 shrink-0 flex flex-wrap items-end justify-between gap-4 border-b border-[var(--border)]">
           <div>
             <h1 className="display text-[48px] leading-none text-[var(--text-primary)] uppercase tracking-[0.04em]">
-              Dynasty Coach
+              DYNASTY ANALYST
             </h1>
             <p className="mt-2 text-[var(--text-secondary)] text-sm md:text-base max-w-xl">
-              AI-powered dynasty advice. Plain English, no fluff.
+              Formula-powered dynasty advice. Plain English, no fluff.
             </p>
           </div>
           <button
@@ -548,7 +549,7 @@ export default function CoachPage() {
               {tier === 'free' ? (
                 <div className="rounded-xl border border-amber-500/25 bg-amber-500/5 px-3 py-2.5">
                   <p className="text-xs text-[var(--text-secondary)] leading-relaxed mb-2">
-                    Upgrade to Pro to unlock Coach.
+                    Upgrade to Pro to unlock the Analyst.
                   </p>
                   <Link
                     href="/dashboard/settings?tab=billing"
@@ -597,7 +598,7 @@ export default function CoachPage() {
             {tier === 'free' && (
               <div className="shrink-0 px-4 sm:px-6 py-3 border-b border-[var(--border)] bg-amber-500/10 flex flex-wrap items-center justify-between gap-3">
                 <p className="text-sm text-[var(--text-primary)]">
-                  Dynasty Coach is a Pro feature. Upgrade to get 10 AI messages/day.
+                  Dynasty Analyst is a Pro feature. Upgrade to get 10 messages/day.
                 </p>
                 <Link
                   href="/dashboard/settings?tab=billing"
@@ -611,7 +612,7 @@ export default function CoachPage() {
             <div className="shrink-0 px-4 sm:px-6 lg:px-10 py-4 border-b border-[var(--border)] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div className="flex items-center gap-3 min-w-0">
                 <Crown className="w-6 h-6 text-[var(--gold)] shrink-0" />
-                <span className="font-semibold text-white truncate display text-xl tracking-wide">Dynasty Coach</span>
+                <span className="font-semibold text-white truncate display text-xl tracking-wide">Dynasty Analyst</span>
               </div>
               <div className="flex flex-wrap items-center gap-3">
                 <div className="flex items-center gap-2">
@@ -631,7 +632,7 @@ export default function CoachPage() {
               </div>
             </div>
             <p className="shrink-0 px-4 sm:px-6 lg:px-10 pb-4 text-[11px] text-[var(--text-muted)]">
-              Coach has context on:{' '}
+              Analyst has context on:{' '}
               <span className="text-[var(--text-secondary)]">
                 {leagueLabel}, your roster, KTC values, recent trades where synced.
               </span>
@@ -677,7 +678,7 @@ export default function CoachPage() {
               )}
               {showEmptyState && tier === 'free' && (
                 <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)]/40 p-8 max-w-xl mx-auto text-center text-[var(--text-muted)]">
-                  Preview Coach — subscribe to send messages.
+                  Preview Analyst — subscribe to send messages.
                 </div>
               )}
 
@@ -752,10 +753,10 @@ export default function CoachPage() {
                   onKeyDown={handleKeyDown}
                   placeholder={
                     tier === 'free'
-                      ? 'Upgrade to Pro to message Coach…'
+                      ? 'Upgrade to Pro to message the Analyst…'
                       : rateLimited
                         ? 'Daily message limit reached…'
-                        : 'Ask about trades, rebuilds, values…'
+                        : 'Ask the Analyst about trades, rebuilds, values…'
                   }
                   rows={1}
                   disabled={streaming || tier === 'free' || rateLimited}
@@ -801,7 +802,7 @@ export default function CoachPage() {
             </button>
             {tier === 'free' ? (
               <p className="text-xs text-[var(--text-muted)] mb-4">
-                Upgrade to Pro to unlock Coach.{' '}
+                Upgrade to Pro to unlock the Analyst.{' '}
                 <Link href="/dashboard/settings?tab=billing" className="text-[var(--indigo-light)] underline">
                   Billing →
                 </Link>
@@ -840,7 +841,7 @@ export default function CoachPage() {
           <button type="button" className="absolute inset-0 bg-black/70" onClick={() => setTradeOpen(false)} />
           <div className="relative w-full max-w-lg rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-6 shadow-2xl">
             <h3 className="text-lg font-semibold text-white mb-2">Trade check</h3>
-            <p className="text-xs text-[var(--text-muted)] mb-4">Describe what you give and get — Coach will evaluate.</p>
+            <p className="text-xs text-[var(--text-muted)] mb-4">Describe what you give and get — the Analyst will evaluate.</p>
             <label className="block text-xs text-[var(--text-muted)] mb-1">You give</label>
             <textarea
               value={tradeGive}
@@ -869,7 +870,7 @@ export default function CoachPage() {
                 }}
                 className="px-4 py-2 rounded-lg text-sm bg-[var(--indigo)] text-white font-semibold"
               >
-                Ask Coach
+                Ask the Analyst
               </button>
             </div>
           </div>
@@ -952,7 +953,7 @@ function SparklesBanner() {
   return (
     <div className="flex flex-col items-center gap-2">
       <span className="text-[var(--gold)] text-2xl">✦</span>
-      <p className="text-[var(--text-secondary)] text-sm">Pick a prompt or type your own.</p>
+      <p className="text-[var(--text-secondary)] text-sm">Ask the Analyst — pick a prompt or type your own.</p>
     </div>
   );
 }

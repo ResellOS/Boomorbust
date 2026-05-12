@@ -192,3 +192,57 @@ export async function fetchTrendingPlayers(
     `/players/nfl/trending/${type}?lookback_hours=${lookbackHours}&limit=${limit}`,
   );
 }
+
+/** Sleeper may not expose GET /leagues/search — returns null when unavailable or non-OK. */
+export async function tryGlobalLeagueSearch(query: string): Promise<SleeperLeague[] | null> {
+  const trimmed = query.trim();
+  if (!trimmed) return [];
+  try {
+    const res = await fetch(
+      `${SLEEPER_BASE}/leagues/search?query=${encodeURIComponent(trimmed)}&sport=nfl`,
+      { cache: 'no-store' },
+    );
+    if (!res.ok) return null;
+    const data: unknown = await res.json();
+    const raw = normalizeGlobalSearchPayload(data);
+    return raw.filter(isSleeperLeagueShape);
+  } catch {
+    return null;
+  }
+}
+
+function normalizeGlobalSearchPayload(data: unknown): SleeperLeague[] {
+  if (Array.isArray(data)) return data as SleeperLeague[];
+  if (data && typeof data === 'object' && Array.isArray((data as { leagues?: unknown }).leagues)) {
+    return (data as { leagues: SleeperLeague[] }).leagues;
+  }
+  return [];
+}
+
+function isSleeperLeagueShape(x: unknown): x is SleeperLeague {
+  if (!x || typeof x !== 'object') return false;
+  const o = x as Record<string, unknown>;
+  return typeof o.league_id === 'string' && typeof o.name === 'string';
+}
+
+export function formatLeagueScoringLabel(settings: Record<string, number> | undefined): string {
+  if (!settings || typeof settings !== 'object') return 'Unknown';
+  const rec = settings.rec ?? 0;
+  if (rec >= 0.9) return 'PPR';
+  if (rec >= 0.4 && rec <= 0.6) return 'Half PPR';
+  if (rec <= 0.05) return 'Standard';
+  if (rec > 0.05 && rec < 0.4) return `Custom (${rec} rec)`;
+  return `Custom (${rec} rec)`;
+}
+
+export async function filterUserLeaguesByName(
+  sleeperUserId: string,
+  season: string,
+  nameQuery: string,
+): Promise<SleeperLeague[]> {
+  const all = await fetchUserLeagues(sleeperUserId, season);
+  if (!all?.length) return [];
+  const q = nameQuery.trim().toLowerCase();
+  if (!q) return all;
+  return all.filter((l) => (l.name ?? '').toLowerCase().includes(q));
+}

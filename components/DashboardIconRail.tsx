@@ -20,7 +20,7 @@ export const DASHBOARD_RAIL_LINKS: Array<{ href: string; label: string; Icon: ty
   { href: '/dashboard/trade', label: 'Trade Lab', Icon: ArrowLeftRight },
   { href: '/dashboard/lineup', label: 'Lineup', Icon: LayoutGrid },
   { href: '/dashboard/rankings', label: 'Rankings', Icon: BarChart3 },
-  { href: '/dashboard/coach', label: 'Coach', Icon: Sparkles },
+  { href: '/dashboard/coach', label: 'Analyst', Icon: Sparkles },
   { href: '/dashboard/mission-control', label: 'Mission Control', Icon: Globe },
   { href: '/dashboard/settings', label: 'More', Icon: MoreHorizontal },
 ];

@@ -916,8 +916,6 @@ function LeagueDrawer({
 
 // ─── Main page ──────────────────────────────────────────────────────────────
 export default function OptimizerPage() {
-  const supabase = createClient();
-
   const [leagues, setLeagues] = useState<LeagueRow[]>([]);
   const [rosterByLeague, setRosterByLeague] = useState<Record<string, RosterRow>>({});
   const [players, setPlayers] = useState<Record<string, PlayerRow>>({});
@@ -934,6 +932,7 @@ export default function OptimizerPage() {
     let cancelled = false;
 
     async function load() {
+      const supabase = createClient();
       setLoading(true);
 
       const [{ data: leagueData }, profileRes] = await Promise.all([

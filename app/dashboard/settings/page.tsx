@@ -8,6 +8,8 @@ import { toast } from 'sonner';
 import { createClient } from '@/lib/supabase/client';
 import { type RiskTolerance, usePreferences } from '@/store/preferences';
 import AppBackground from '@/components/AppBackground';
+import LeagueNameSearch from '@/components/LeagueNameSearch';
+import { appendLeagueIdToDraft, parseLeagueIds } from '@/lib/leagueIds';
 import {
   inferPositionPriorityFromRanking,
   mergePreferenceData,
@@ -148,7 +150,7 @@ const LANDING_PRICE_TIERS = [
     features: [
       'Unlimited trade breakdowns',
       'Sit/start optimizer',
-      'Coach AI (10 messages / day)',
+      'Dynasty Analyst (10 messages / day)',
       'Weekly digest & proactive alerts',
       'No ads',
     ],
@@ -161,7 +163,7 @@ const LANDING_PRICE_TIERS = [
     annual: '$99.99',
     subFn: (annual: boolean) => (annual ? '/yr' : '/mo'),
     features: [
-      'Unlimited Coach conversations',
+      'Unlimited Analyst conversations',
       'Win-window & timeline tools',
       'F-FIG rookie grades',
       'College BBB scouting layer',
@@ -174,7 +176,6 @@ const LANDING_PRICE_TIERS = [
 export default function SettingsPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const supabase = createClient();
 
   const { loadFromData, hiddenLeagues } = usePreferences();
 
@@ -215,6 +216,7 @@ export default function SettingsPage() {
 
   const [lastSynced, setLastSynced] = useState<string | null>(null);
   const [syncing, setSyncing] = useState(false);
+  const [leagueIdsDraft, setLeagueIdsDraft] = useState('');
 
   const [savingPrefs, setSavingPrefs] = useState(false);
   const [savingNotifications, setSavingNotifications] = useState(false);
@@ -254,6 +256,7 @@ export default function SettingsPage() {
 
   useEffect(() => {
     async function load() {
+      const supabase = createClient();
       const {
         data: { user },
       } = await supabase.auth.getUser();
@@ -374,6 +377,7 @@ export default function SettingsPage() {
         toast.error('Invalid Sleeper response');
         return;
       }
+      const supabase = createClient();
       await supabase.from('profiles').upsert({
         id: userId,
         sleeper_user_id: data.user_id,
@@ -390,9 +394,29 @@ export default function SettingsPage() {
   }
 
   async function syncLeagues() {
+    const supabase = createClient();
     setSyncing(true);
     try {
-      const res = await fetch('/api/sync', { method: 'POST' });
+      const ids = parseLeagueIds(leagueIdsDraft);
+      for (const id of ids) {
+        try {
+          const res = await fetch(`https://api.sleeper.app/v1/league/${encodeURIComponent(id)}`);
+          const league = res.ok ? ((await res.json()) as { league_id?: string } | null) : null;
+          if (!league?.league_id) {
+            toast.error(`Invalid league ID: "${id}". Check your IDs and try again.`);
+            return;
+          }
+        } catch {
+          toast.error(`Could not validate league ID "${id}". Check your connection and try again.`);
+          return;
+        }
+      }
+
+      const res = await fetch('/api/sync', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(ids.length > 0 ? { league_ids: ids } : {}),
+      });
       const data = (await res.json()) as { success?: boolean; leagues_synced?: number; error?: string };
       if (!res.ok || !data.success) {
         toast.error(data.error ?? 'Sync failed');
@@ -417,6 +441,7 @@ export default function SettingsPage() {
   }
 
   async function savePreferencesFooter() {
+    const supabase = createClient();
     if (!userId) return;
     setSavingPrefs(true);
     try {
@@ -461,6 +486,7 @@ export default function SettingsPage() {
   }
 
   async function saveNotificationsFooter() {
+    const supabase = createClient();
     if (!userId) return;
     setSavingNotifications(true);
     try {
@@ -548,6 +574,7 @@ export default function SettingsPage() {
       }
       toast.success('Your account has been deleted');
       setDeleteOpen(false);
+      const supabase = createClient();
       await supabase.auth.signOut();
       router.push('/');
     } catch {
@@ -722,6 +749,32 @@ export default function SettingsPage() {
                     Connected as <span className="text-[var(--text-primary)] font-medium">@{sleeperSaved.replace(/^@/, '')}</span>
                   </p>
                 ) : null}
+              </div>
+
+              <div className="border-t border-[var(--border)] pt-5 space-y-5">
+                <p className="text-xs uppercase tracking-wide text-[var(--text-muted)]">Leagues</p>
+                <p className="text-sm text-[var(--text-secondary)]">
+                  Search by name or paste Sleeper league IDs. Leave the ID box empty to sync every league on your account.
+                </p>
+                <LeagueNameSearch
+                  existingLeagueIds={parseLeagueIds(leagueIdsDraft)}
+                  onAppendLeagueId={(id) => setLeagueIdsDraft((prev) => appendLeagueIdToDraft(prev, id))}
+                />
+                <div>
+                  <label className="text-xs uppercase tracking-widest text-[var(--text-muted)] block mb-2 font-mono-tactical">
+                    Enter league ID{' '}
+                    <span className="normal-case text-[var(--text-muted)] font-[family-name:var(--font-body)] tracking-normal">
+                      (one per line or comma-separated)
+                    </span>
+                  </label>
+                  <textarea
+                    value={leagueIdsDraft}
+                    onChange={(e) => setLeagueIdsDraft(e.target.value)}
+                    placeholder={'1048374694683095040\n998765432109876543'}
+                    rows={4}
+                    className="w-full rounded-xl border border-white/10 bg-[var(--bg-secondary)] px-4 py-3 text-sm font-mono text-white placeholder-[var(--text-muted)] outline-none transition focus:border-[var(--indigo)] focus:ring-1 focus:ring-[var(--indigo)] resize-none"
+                  />
+                </div>
               </div>
 
               <div className="flex flex-wrap items-center gap-3">

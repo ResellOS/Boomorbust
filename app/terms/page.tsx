@@ -52,7 +52,7 @@ export default function TermsPage() {
                 3. No Guarantees
               </h2>
               <p className="text-[var(--text-secondary)] text-sm leading-relaxed">
-                Dynasty analysis, trade grades, and AI recommendations are provided for
+                Dynasty analysis, trade grades, and recommendations are provided for
                 informational purposes only. The Front Office makes no guarantees about the
                 accuracy of valuations or fantasy outcomes.
               </p>

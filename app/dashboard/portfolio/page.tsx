@@ -156,8 +156,6 @@ function escapeCsv(s: string) {
 }
 
 export default function PortfolioPage() {
-  const supabase = createClient();
-
   const [loading, setLoading] = useState(true);
   const [leagues, setLeagues] = useState<LeagueRow[]>([]);
   const [rosterByLeague, setRosterByLeague] = useState<Record<string, RostRow>>({});
@@ -180,6 +178,7 @@ export default function PortfolioPage() {
     let cancelled = false;
 
     async function load() {
+      const supabase = createClient();
       setLoading(true);
       try {
         await fetch('/api/sync', { method: 'POST' });
@@ -267,7 +266,7 @@ export default function PortfolioPage() {
     return () => {
       cancelled = true;
     };
-  }, [supabase, nflWeek]);
+  }, [nflWeek]);
 
   const aggregates = useMemo(() => {
     let totalPortfolioKtc = 0;

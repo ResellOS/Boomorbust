@@ -1,6 +1,7 @@
 'use client';
 
 import { Sparkles, ArrowLeftRight } from 'lucide-react';
+import PlayerAvatar from '@/components/PlayerAvatar';
 import type { TradeScenario } from '@/app/api/dashboard/snapshot/route';
 
 interface Props {
@@ -16,7 +17,7 @@ interface Props {
 
 const VERDICT_COLORS: Record<NonNullable<Props['verdictTone']>, string> = {
   green: '#36E7A1',
-  red: '#FF5757',
+  red: '#EF4444',
   amber: '#FBBF24',
 };
 
@@ -54,15 +55,21 @@ export default function TradeAnalyzerNote({
 
         <div className="flex items-center justify-center gap-2 py-2">
           <div className="flex flex-col items-center gap-1 min-w-0 flex-1">
-            <img
-              src={sell.photoUrl}
-              alt=""
-              className="w-16 h-16 rounded-full object-cover border-2 border-[#FF5757]/50"
+            <div
+              className="rounded-full"
               style={{
-                boxShadow: '0 0 16px rgba(255,87,87,0.45), 0 0 32px rgba(239,68,68,0.2)',
+                boxShadow: '0 0 16px rgba(239,68,68,0.45), 0 0 32px rgba(239,68,68,0.22)',
               }}
-            />
-            <span className="text-[8px] font-black uppercase text-[#FF5757] px-2 py-0.5 rounded border border-[#FF5757]/30 bg-[#FF5757]/10">
+            >
+              <PlayerAvatar
+                playerId={sell.player_id}
+                playerName={sell.name}
+                position={sell.position}
+                size={64}
+                className="border-2 border-[#EF4444]/50"
+              />
+            </div>
+            <span className="text-[8px] font-black uppercase text-[#EF4444] px-2 py-0.5 rounded border border-[#EF4444]/30 bg-[#EF4444]/10">
               Selling
             </span>
             <span className="text-[10px] font-bold text-white truncate w-full text-center">
@@ -73,14 +80,20 @@ export default function TradeAnalyzerNote({
           <ArrowLeftRight className="w-5 h-5 text-slate-600 shrink-0" aria-hidden />
 
           <div className="flex flex-col items-center gap-1 min-w-0 flex-1">
-            <img
-              src={buy.photoUrl}
-              alt=""
-              className="w-16 h-16 rounded-full object-cover border-2 border-[#36E7A1]/55"
+            <div
+              className="rounded-full"
               style={{
                 boxShadow: '0 0 16px rgba(54,231,161,0.45), 0 0 32px rgba(54,231,161,0.22)',
               }}
-            />
+            >
+              <PlayerAvatar
+                playerId={buy.player_id}
+                playerName={buy.name}
+                position={buy.position}
+                size={64}
+                className="border-2 border-[#36E7A1]/55"
+              />
+            </div>
             <span className="text-[8px] font-black uppercase text-[#36E7A1] px-2 py-0.5 rounded border border-[#36E7A1]/30 bg-[#36E7A1]/10">
               Buying
             </span>

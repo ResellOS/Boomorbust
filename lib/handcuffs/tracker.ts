@@ -31,7 +31,7 @@ for (const [starter, backups] of Object.entries(KNOWN_HANDCUFFS)) {
   }
 }
 
-export type HandcuffStatus = 'YOU_OWN' | 'AVAILABLE' | 'OPPONENT_OWNS';
+export type HandcuffStatus = 'YOU_OWN' | 'AVAILABLE' | 'OPPONENT_OWNS' | 'NOT_FOUND';
 export type HandcuffPriority = 'critical' | 'important' | 'monitor';
 
 export interface HandcuffResult {
@@ -132,20 +132,20 @@ export function getHandcuffStatus(
 
         for (const leagueRoster of leaguesWithStarter) {
           const ownership = leagueOwnership[leagueRoster.league_id] ?? {};
-          let status: HandcuffStatus = 'AVAILABLE';
+          let status: HandcuffStatus;
           let owner_roster_id: number | null = null;
 
-          if (backupId) {
-            if (leagueRoster.players.includes(backupId)) {
-              status = 'YOU_OWN';
-              userOwnsAny = true;
-            } else if (ownership[backupId]) {
-              status = 'OPPONENT_OWNS';
-              owner_roster_id = ownership[backupId];
-            } else {
-              status = 'AVAILABLE';
-              available++;
-            }
+          if (!backupId) {
+            status = 'NOT_FOUND';
+          } else if (leagueRoster.players.includes(backupId)) {
+            status = 'YOU_OWN';
+            userOwnsAny = true;
+          } else if (ownership[backupId]) {
+            status = 'OPPONENT_OWNS';
+            owner_roster_id = ownership[backupId];
+          } else {
+            status = 'AVAILABLE';
+            available++;
           }
 
           handcuffEntries.push({

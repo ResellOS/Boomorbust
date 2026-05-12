@@ -1,50 +1,48 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { getUpstashRedis } from '@/lib/upstash';
 
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+export const dynamic = 'force-dynamic';
 
-export async function POST(req: NextRequest) {
+const COUNT_CACHE_KEY = 'waitlist:count:v1';
+
+function normalizeEmail(raw: unknown): string | null {
+  const s = typeof raw === 'string' ? raw.trim().toLowerCase() : '';
+  if (!s || s.length > 320) return null;
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s)) return null;
+  return s;
+}
+
+export async function POST(req: Request) {
   let body: unknown;
   try {
     body = await req.json();
   } catch {
-    return NextResponse.json({ ok: false, error: 'Invalid JSON' }, { status: 400 });
+    return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 });
+  }
+  const email = normalizeEmail((body as { email?: unknown })?.email);
+  if (!email) {
+    return NextResponse.json({ error: 'Valid email required' }, { status: 400 });
   }
 
-  if (!body || typeof body !== 'object' || typeof (body as { email?: unknown }).email !== 'string') {
-    return NextResponse.json({ ok: false, error: 'Email required' }, { status: 400 });
-  }
+  const admin = createAdminClient();
+  const { error } = await admin.from('waitlist').insert({
+    email,
+    source: typeof (body as { source?: unknown }).source === 'string'
+      ? String((body as { source: string }).source).slice(0, 120)
+      : 'auth-signup-coming-soon',
+  });
 
-  const raw = (body as { email: string }).email.trim();
-  const email = raw.toLowerCase();
-
-  if (!email || !EMAIL_RE.test(email)) {
-    return NextResponse.json({ ok: false, error: 'Invalid email format' }, { status: 400 });
-  }
-
-  if (!process.env.SUPABASE_SERVICE_ROLE_KEY || !process.env.NEXT_PUBLIC_SUPABASE_URL) {
-    return NextResponse.json({ ok: false, error: 'Waitlist temporarily unavailable' }, { status: 503 });
-  }
-
-  try {
-    const admin = createAdminClient();
-    const { error } = await admin.from('waitlist').insert({
-      email,
-      source: 'boom-or-bust-page',
-    });
-
-    if (error) {
-      // Unique violation — treat as success (already on list)
-      if (error.code === '23505') {
-        return NextResponse.json({ ok: true });
-      }
-      console.error('waitlist insert:', error.message);
-      return NextResponse.json({ ok: false, error: 'Could not save email' }, { status: 500 });
+  if (error) {
+    if (error.code === '23505') {
+      return NextResponse.json({ ok: true, duplicate: true });
     }
-
-    return NextResponse.json({ ok: true });
-  } catch (e) {
-    console.error('waitlist:', e);
-    return NextResponse.json({ ok: false, error: 'Server error' }, { status: 500 });
+    console.error('waitlist insert:', error);
+    return NextResponse.json({ error: 'Could not save email' }, { status: 500 });
   }
+
+  const redis = getUpstashRedis();
+  if (redis) await redis.del(COUNT_CACHE_KEY).catch(() => {});
+
+  return NextResponse.json({ ok: true });
 }

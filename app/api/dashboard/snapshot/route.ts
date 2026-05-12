@@ -70,6 +70,8 @@ export interface SnapshotMarketTrend {
 
 export interface SnapshotOffer {
   id: string;
+  /** Sleeper player_id — used for TFO verdict lookup + PlayerAvatar. */
+  player_id?: string;
   player: string;
   position: string;
   team: string;
@@ -191,6 +193,22 @@ export interface OvervaluedPlayer {
   overvalueScore: number;
   /** First matching `tfo_cache.verdict` across the user's leagues that roster this player. */
   tfoVerdict?: string | null;
+  /** BVI score from `player_values` (when table is populated). */
+  bviScore?: number;
+  /** bvi_score − ktc_value; negative = overvalued by market vs BVI model. */
+  bviDelta?: number;
+}
+
+/** Cross-league positional gap: how many of the user's leagues have a weak slot at this position. */
+export interface CrossLeagueGap {
+  /** e.g. "WR2", "RB1" */
+  positionLabel: string;
+  /** Number of leagues where this slot is weak (BUST verdict or below KTC threshold). */
+  weakCount: number;
+  /** Total leagues where user has players at this position. */
+  totalCount: number;
+  /** weakCount / totalCount × 100, rounded. */
+  fillPct: number;
 }
 
 export interface TradeScenario {
@@ -207,6 +225,28 @@ export interface ExposureTopRow {
   name: string;
   position: string;
   leagueCount: number;
+}
+
+/** A BVI-undervalued player that fills a roster gap in a specific league. */
+export interface RecommendedTarget {
+  player_id: string;
+  name: string;
+  position: string;
+  team: string;
+  photoUrl: string;
+  /** BVI score from `player_values.bvi_score` (rounded). */
+  bviScore: number;
+  /** KTC value from `player_values.ktc_value` (rounded). */
+  ktcValue: number;
+  /** bvi_score - ktc_value; positive = undervalued by market. */
+  bviDelta: number;
+  /** Roster-gap signal, e.g. "You're thin at WR2". */
+  gapReason: string;
+  /** Display string: "BVI: 8,420 | KTC: 7,100 | △+1,320 UNDERVALUED" */
+  bviLine: string;
+  tfoVerdict?: string | null;
+  leagueId: string;
+  leagueName: string;
 }
 
 export interface DashboardSnapshot {
@@ -280,6 +320,16 @@ export interface DashboardSnapshot {
   hubSpotlightByLeague: HubSpotlightByLeague;
   /** `tfo_cache.verdict` keyed by Sleeper `player_id` (first league with a row wins). */
   tfoVerdictByPlayerId: Record<string, string>;
+  /**
+   * 2–3 BVI-undervalued acquisition targets per league, prioritising roster gaps.
+   * Empty array when `player_values` table is not yet populated (show skeleton).
+   */
+  recommendedTargets: RecommendedTarget[];
+  /**
+   * Top 3 positional slots that are consistently weak across the user's leagues.
+   * "WR2 — weak in 8 of 15 leagues". Derived from tfo_cache verdicts + KTC thresholds.
+   */
+  crossLeagueGaps: CrossLeagueGap[];
 }
 
 // ── Helpers ────────────────────────────────────────────────────────────────
@@ -466,7 +516,7 @@ export async function GET() {
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   const redis = getRedis();
-  const cacheKey = `dashboard:snapshot:v7:${user.id}`;
+  const cacheKey = `dashboard:snapshot:v8:${user.id}`;
   if (redis) {
     try {
       const cached = await redis.get<DashboardSnapshot>(cacheKey);
@@ -599,6 +649,59 @@ export async function GET() {
       }
     }
   }
+
+  // ── 4b. Cross-league positional gap analysis ────────────────────────────
+  // Identifies which positional slots (WR2, RB3 …) are consistently weak
+  // across the user's leagues, using tfo_cache verdicts + KTC thresholds.
+  const crossLeagueGaps: CrossLeagueGap[] = (() => {
+    const posSlots = [
+      { pos: 'WR', rank: 1 }, { pos: 'WR', rank: 2 }, { pos: 'WR', rank: 3 },
+      { pos: 'RB', rank: 1 }, { pos: 'RB', rank: 2 },
+      { pos: 'QB', rank: 1 },
+      { pos: 'TE', rank: 1 },
+    ] as const;
+
+    // Minimum KTC for a slot to not be "weak" by market value alone
+    const KTC_FLOOR: Record<string, number> = { WR: 3500, RB: 3000, QB: 4000, TE: 2000 };
+
+    const results: CrossLeagueGap[] = [];
+    for (const { pos, rank } of posSlots) {
+      let weakCount = 0;
+      let totalCount = 0;
+      for (const lg of leagues) {
+        const my = userRosterByLeague[lg.id];
+        if (!my) continue;
+        // Collect user's players at this position, sort by KTC desc
+        const posPlayers = my.players
+          .filter((pid) => players[pid]?.position?.toUpperCase() === pos)
+          .sort(
+            (a, b) =>
+              (ktcMap[(players[b]?.full_name ?? '').toLowerCase()] ?? 0) -
+              (ktcMap[(players[a]?.full_name ?? '').toLowerCase()] ?? 0),
+          );
+        totalCount++;
+        const pid = posPlayers[rank - 1]; // 0-indexed target slot
+        if (!pid) {
+          // No player at this slot → definitely weak
+          weakCount++;
+          continue;
+        }
+        const verdict = tfoVerdictByLeaguePlayer.get(`${lg.id}:${pid}`) ?? '';
+        const ktcAtSlot = ktcMap[(players[pid]?.full_name ?? '').toLowerCase()] ?? 0;
+        const floor = KTC_FLOOR[pos] ?? 2500;
+        if (verdict.includes('BUST') || ktcAtSlot < floor) weakCount++;
+      }
+      if (totalCount > 0) {
+        results.push({
+          positionLabel: `${pos}${rank}`,
+          weakCount,
+          totalCount,
+          fillPct: Math.round((weakCount / totalCount) * 100),
+        });
+      }
+    }
+    return results.sort((a, b) => b.fillPct - a.fillPct).slice(0, 3);
+  })();
 
   // ── 5. Current week matchups (in parallel) ──────────────────────────────
   const matchupsByLeague = await Promise.all(
@@ -1147,6 +1250,7 @@ export async function GET() {
             const score = isYou ? Math.abs(t_random_score(pid)) : -Math.abs(t_random_score(pid));
             latestOffers.push({
               id: `${tx.transaction_id}-${pid}`,
+              player_id: pid,
               player: shortenName(p.full_name),
               position: p.position,
               team: p.team ?? '—',
@@ -1395,6 +1499,37 @@ export async function GET() {
       .filter((x): x is OvervaluedPlayer => x !== null);
   }
 
+  // ── BVI join for overvalued players ─────────────────────────────────────
+  // Attach player_values BVI data when available so the sidebar can display
+  // "BVI: {x} | KTC: {y} | △{delta} OVERVALUED" in JetBrains Mono.
+  if (overvalued.length > 0) {
+    try {
+      const ovIds = overvalued.map((p) => p.player_id);
+      const { data: bviRows } = await supabase
+        .from('player_values')
+        .select('player_id, bvi_score, ktc_value, delta')
+        .in('player_id', ovIds)
+        .eq('scoring_type', 'ppr');
+      if (bviRows?.length) {
+        type BVILite = { player_id: string; bvi_score: number; ktc_value: number; delta: number };
+        const bviMap = new Map<string, BVILite>(
+          (bviRows as BVILite[]).map((r) => [r.player_id, r]),
+        );
+        overvalued = overvalued.map((p) => {
+          const bvi = bviMap.get(p.player_id);
+          if (!bvi) return p;
+          return {
+            ...p,
+            bviScore: Math.round(Number(bvi.bvi_score)),
+            bviDelta: Math.round(Number(bvi.delta)),
+          };
+        });
+      }
+    } catch {
+      // Non-fatal — BVI fields remain undefined, sidebar falls back to KTC display
+    }
+  }
+
   let tradeScenario: TradeScenario | null = null;
   if (overvalued.length > 0 && waivers.length > 0) {
     const sellRow = overvalued[0]!;
@@ -1447,6 +1582,124 @@ export async function GET() {
       current_points: cand.pts,
     };
   };
+
+  // ── Recommended Targets: BVI undervalue × roster gaps ───────────────────
+  // Queries `player_values` (populated nightly by BVI engine). Returns empty
+  // array when table is unpopulated — client shows skeleton in that case.
+  const recommendedTargets: RecommendedTarget[] = await (async () => {
+    const out: RecommendedTarget[] = [];
+    try {
+      const { data: pvRows } = await supabase
+        .from('player_values')
+        .select('player_id, bvi_score, ktc_value, delta')
+        .gt('delta', 100)
+        .eq('scoring_type', 'ppr')
+        .order('delta', { ascending: false })
+        .limit(100);
+
+      if (!pvRows || pvRows.length === 0) return out;
+
+      // Build a fast BVI lookup by player_id
+      type PVRow = { player_id: string; bvi_score: number; ktc_value: number; delta: number };
+      const pvMap = new Map<string, PVRow>();
+      for (const raw of pvRows) {
+        const r = raw as PVRow;
+        pvMap.set(r.player_id, r);
+      }
+
+      // Dynasty roster depth targets by position
+      const NEEDED: Record<string, number> = { QB: 2, RB: 5, WR: 6, TE: 2 };
+
+      for (const lg of leagues) {
+        const my = userRosterByLeague[lg.id];
+        if (!my) continue;
+
+        // Sort each position bucket by KTC descending
+        const byPos: Record<string, string[]> = { QB: [], RB: [], WR: [], TE: [] };
+        for (const pid of my.players) {
+          const p = players[pid];
+          if (!p) continue;
+          const pos = p.position?.toUpperCase() ?? '';
+          if (byPos[pos]) byPos[pos]!.push(pid);
+        }
+        for (const pos of Object.keys(byPos)) {
+          byPos[pos]!.sort((a, b) => {
+            const ka = ktcMap[(players[a]?.full_name ?? '').toLowerCase()] ?? 0;
+            const kb = ktcMap[(players[b]?.full_name ?? '').toLowerCase()] ?? 0;
+            return kb - ka;
+          });
+        }
+
+        // Identify the weakest position slot (lowest KTC at their Nth player)
+        let gapPos = 'WR';
+        let gapRank = 3;
+        let worstKtc = Infinity;
+        for (const [pos, needed] of Object.entries(NEEDED)) {
+          const pids = byPos[pos] ?? [];
+          const slotIdx = Math.min(needed - 1, pids.length); // 0-indexed target slot
+          const pidAtSlot = pids[slotIdx];
+          const ktcAtSlot = pidAtSlot
+            ? ktcMap[(players[pidAtSlot]?.full_name ?? '').toLowerCase()] ?? 0
+            : 0;
+          if (ktcAtSlot < worstKtc) {
+            worstKtc = ktcAtSlot;
+            gapPos = pos;
+            gapRank = slotIdx + 1; // 1-indexed
+          }
+        }
+        const gapLabel = `${gapPos}${gapRank}`;
+
+        // Filter BVI-undervalued players not on this roster, ranked by (gap boost + delta)
+        const lgRosterSet = new Set(my.players);
+        const candidates = pvRows
+          .map((raw) => raw as PVRow)
+          .filter((r) => {
+            if (lgRosterSet.has(r.player_id)) return false;
+            const p = players[r.player_id];
+            return p && SKILL_POSITIONS.has(p.position?.toUpperCase() ?? '') && (p.team ?? '') !== '';
+          })
+          .sort((a, b) => {
+            const posA = players[a.player_id]?.position?.toUpperCase() ?? '';
+            const posB = players[b.player_id]?.position?.toUpperCase() ?? '';
+            const boostA = posA === gapPos ? 2000 : 0;
+            const boostB = posB === gapPos ? 2000 : 0;
+            return b.delta + boostB - (a.delta + boostA);
+          })
+          .slice(0, 3);
+
+        for (const r of candidates) {
+          const p = players[r.player_id];
+          if (!p) continue;
+          const bviScore = Math.round(Number(r.bvi_score));
+          const ktcVal = Math.round(Number(r.ktc_value));
+          const delta = Math.round(Number(r.delta));
+          const isGapPos = (p.position?.toUpperCase() ?? '') === gapPos;
+          const gapReason = isGapPos
+            ? `You're thin at ${gapLabel}`
+            : `BVI edge · ${p.position} undervalued`;
+          const bviLine = `BVI: ${bviScore.toLocaleString()} | KTC: ${ktcVal.toLocaleString()} | △${delta >= 0 ? '+' : ''}${delta.toLocaleString()} UNDERVALUED`;
+          out.push({
+            player_id: r.player_id,
+            name: p.full_name,
+            position: p.position,
+            team: p.team ?? '—',
+            photoUrl: photoUrl(r.player_id),
+            bviScore,
+            ktcValue: ktcVal,
+            bviDelta: delta,
+            gapReason,
+            bviLine,
+            tfoVerdict: tfoVerdictByPlayerId[r.player_id] ?? null,
+            leagueId: lg.id,
+            leagueName: lg.name ?? 'League',
+          });
+        }
+      }
+    } catch (err) {
+      console.error('[snapshot] recommendedTargets:', err);
+    }
+    return out;
+  })();
 
   // Hub rotation: boom/bust vs season avg when signal exists; else KTC / roster staples.
   const topByKtcIds = globalRanked
@@ -1673,6 +1926,8 @@ export async function GET() {
     tradeNote,
     hubSpotlightByLeague,
     tfoVerdictByPlayerId,
+    recommendedTargets,
+    crossLeagueGaps,
   };
 
   if (redis) {
