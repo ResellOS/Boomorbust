@@ -3,11 +3,13 @@ import Stripe from 'stripe';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { mergePreferenceData } from '@/lib/preferences/preference-data';
 
-function paidTierFromSubscription(sub: Stripe.Subscription): 'pro' | 'elite' {
+function paidTierFromSubscription(sub: Stripe.Subscription): 'pro' | 'elite' | 'all_pro_terminal' {
   const m = sub.metadata?.subscription_tier;
+  if (m === 'all_pro_terminal') return 'all_pro_terminal';
   if (m === 'elite') return 'elite';
   const priceId = sub.items.data[0]?.price?.id;
-  const elitePriceIds = [process.env.STRIPE_PRICE_ELITE_MONTHLY, process.env.STRIPE_PRICE_ELITE_YEARLY].filter(
+  if (priceId === process.env.STRIPE_ALL_PRO_TERMINAL_PRICE_ID) return 'all_pro_terminal';
+  const elitePriceIds = [process.env.STRIPE_PRICE_ELITE_MONTHLY, process.env.STRIPE_ELITE_PRICE_ID].filter(
     Boolean
   ) as string[];
   if (priceId && elitePriceIds.includes(priceId)) return 'elite';
@@ -38,7 +40,8 @@ export async function POST(request: NextRequest) {
       if (userId) {
         const { data: existing } = await supabase.from('profiles').select('preference_data').eq('id', userId).maybeSingle();
         const existingPd = existing?.preference_data as Record<string, unknown> | undefined;
-        const tier = session.metadata?.subscription_tier === 'elite' ? 'elite' : ('pro' as const);
+        const tierRaw = session.metadata?.subscription_tier;
+        const tier = (tierRaw === 'elite' ? 'elite' : tierRaw === 'all_pro_terminal' ? 'all_pro_terminal' : 'pro') as 'pro' | 'elite' | 'all_pro_terminal';
         const preference_data = mergePreferenceData(existingPd, { subscription_tier: tier });
 
         const { error } = await supabase.from('profiles').upsert({

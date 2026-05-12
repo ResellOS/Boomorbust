@@ -13,7 +13,7 @@ export async function POST(request: Request) {
   let interval: CheckoutInterval = 'month';
   try {
     const body = await request.json().catch(() => ({}));
-    if (body?.tier === 'elite' || body?.tier === 'pro') tier = body.tier;
+    if (body?.tier === 'elite' || body?.tier === 'pro' || body?.tier === 'all_pro_terminal') tier = body.tier;
     if (body?.interval === 'year' || body?.interval === 'month') interval = body.interval;
   } catch {
     /* defaults */

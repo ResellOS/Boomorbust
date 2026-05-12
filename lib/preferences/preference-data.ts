@@ -15,8 +15,8 @@ export interface UserPreferenceData {
   /** Legacy drag-order positional ranking — derived from position_priority when missing */
   positionalRanking?: ('QB' | 'RB' | 'WR' | 'TE')[];
   hiddenLeagues?: string[];
-  /** elite vs pro entitlement (also uses is_paid heuristic in layout when unset) */
-  subscription_tier?: 'pro' | 'elite';
+  /** Paid tier entitlement — all_pro_terminal is the top tier at $20/mo */
+  subscription_tier?: 'pro' | 'elite' | 'all_pro_terminal';
   digest_enabled?: boolean;
   notify_injury_email?: boolean;
   notify_price_email?: boolean;

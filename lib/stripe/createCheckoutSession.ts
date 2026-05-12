@@ -1,24 +1,32 @@
 import Stripe from 'stripe';
 
-export type CheckoutTier = 'pro' | 'elite';
+export type CheckoutTier = 'pro' | 'elite' | 'all_pro_terminal';
 export type CheckoutInterval = 'month' | 'year';
 
-/** Resolve Stripe Price ID — falls back to STRIPE_PRICE_ID for partial env setups */
 function resolvePriceId(tier: CheckoutTier, interval: CheckoutInterval): string | null {
-  const legacy = process.env.STRIPE_PRICE_ID;
+  const e = process.env;
   if (tier === 'pro' && interval === 'month') {
-    return process.env.STRIPE_PRICE_PRO_MONTHLY ?? legacy ?? null;
+    return e.STRIPE_PRICE_PRO_MONTHLY ?? e.STRIPE_PRO_PRICE_ID ?? null;
   }
   if (tier === 'pro' && interval === 'year') {
-    return process.env.STRIPE_PRICE_PRO_YEARLY ?? legacy ?? null;
+    return e.STRIPE_PRICE_PRO_YEARLY ?? null;
   }
   if (tier === 'elite' && interval === 'month') {
-    return process.env.STRIPE_PRICE_ELITE_MONTHLY ?? legacy ?? null;
+    return e.STRIPE_PRICE_ELITE_MONTHLY ?? e.STRIPE_ELITE_PRICE_ID ?? null;
   }
   if (tier === 'elite' && interval === 'year') {
-    return process.env.STRIPE_PRICE_ELITE_YEARLY ?? legacy ?? null;
+    return e.STRIPE_PRICE_ELITE_YEARLY ?? null;
   }
-  return legacy ?? null;
+  if (tier === 'all_pro_terminal') {
+    return e.STRIPE_ALL_PRO_TERMINAL_PRICE_ID ?? null;
+  }
+  return null;
+}
+
+function tierMetadata(tier: CheckoutTier): string {
+  if (tier === 'elite') return 'elite';
+  if (tier === 'all_pro_terminal') return 'all_pro_terminal';
+  return 'pro';
 }
 
 export async function createCheckoutSession(params: {
@@ -36,6 +44,7 @@ export async function createCheckoutSession(params: {
   }
 
   const site = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000';
+  const tierMeta = tierMetadata(params.tier);
   const session = await stripe.checkout.sessions.create({
     mode: 'subscription',
     payment_method_types: ['card'],
@@ -43,15 +52,9 @@ export async function createCheckoutSession(params: {
     success_url: `${site}${params.successPath ?? '/dashboard?subscribed=1'}`,
     cancel_url: `${site}${params.cancelPath ?? '/dashboard/settings'}`,
     customer_email: params.email ?? undefined,
-    metadata: {
-      user_id: params.userId,
-      subscription_tier: params.tier === 'elite' ? 'elite' : 'pro',
-    },
+    metadata: { user_id: params.userId, subscription_tier: tierMeta },
     subscription_data: {
-      metadata: {
-        user_id: params.userId,
-        subscription_tier: params.tier === 'elite' ? 'elite' : 'pro',
-      },
+      metadata: { user_id: params.userId, subscription_tier: tierMeta },
     },
   });
 
