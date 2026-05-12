@@ -1,0 +1,19 @@
+{
+  "crons": [
+    { "path": "/api/cron/collect-drafts", "schedule": "0 3 * * *" },
+    { "path": "/api/cron/sync-sleeper", "schedule": "0 4 * * *" },
+    { "path": "/api/cron/sync-ktc", "schedule": "0 5 * * *" },
+    { "path": "/api/cron/sync-injuries", "schedule": "0 6 * * *" },
+    { "path": "/api/cron/sync-projections", "schedule": "0 7 * * *" },
+    { "path": "/api/cron/check-price-alerts", "schedule": "0 8 * * *" },
+    { "path": "/api/cron/send-digest", "schedule": "0 11 * * 1" },
+    { "path": "/api/cron/sync-manager-profiles", "schedule": "0 4 * * 1" },
+    { "path": "/api/cron/aggregate-market", "schedule": "0 5 * * 3" },
+    { "path": "/api/cron/calculate-bbv", "schedule": "0 6 * * 3" },
+    { "path": "/api/cron/resolve-sitstart", "schedule": "0 10 * * 2" },
+    { "path": "/api/cron/update-college-rankings", "schedule": "0 8 * * 2" },
+    { "path": "/api/cron/sync-college", "schedule": "0 6 * * 2" },
+    { "path": "/api/cron/cache-tfo", "schedule": "0 2 * * *" },
+    { "path": "/api/cron/proactive-trades", "schedule": "0 7 * * *" }
+  ]
+}
