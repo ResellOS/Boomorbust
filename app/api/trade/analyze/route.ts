@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { analyzeTradeOffer, type TradeAnalysis } from '@/lib/values/engine';
 import { resolveSleeperIdsByFullNames, getPlayersByIds } from '@/lib/sleeper/players';
 import { estimateDraftPickKtc } from '@/lib/picks/advisor';
+import { requireFeature } from '@/lib/access/gates';
 
 type Slot = 'early' | 'mid' | 'late';
 
@@ -48,6 +49,9 @@ function scoreToBar(score: number): number {
 }
 
 export async function POST(request: NextRequest) {
+  const access = await requireFeature('smart_counter');
+  if (access instanceof NextResponse) return access;
+  const { userId: _userId } = access;
   const supabase = createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
