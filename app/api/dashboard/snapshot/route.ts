@@ -17,6 +17,9 @@ import {
   type RankedPlayer,
 } from '@/lib/health/leagueHealthScore';
 import { fetchWeekMatchups } from '@/lib/external/matchups';
+import { calculateTFOScore } from '@/lib/tfo/formula';
+import { inferTFOInputFromHub } from '@/components/dashboard/radarMetrics';
+import { calculateBBSM } from '@/lib/bbsm/formula';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -91,6 +94,11 @@ export interface SnapshotWaiverTarget {
   addCount: number;
   addValue: string;
   trending: boolean;
+  tfoScore?: number;
+  grade?: string;
+  verdict?: string;
+  signal?: string;
+  signalColor?: string;
 }
 
 export interface RotationPlayer {
@@ -109,6 +117,25 @@ export interface RotationPlayer {
   forecastDelta?: number;
 }
 
+/** Player Hub spotlight row: `tfo_*` from `tfo_cache` + narrative from live TFO formula. */
+export interface HubSpotlightPlayer extends RotationPlayer {
+  tfoScore: number;
+  tfoGrade: string;
+  tfoReasoning: string;
+  /** Raw `tfo_cache.verdict` for wire / comparisons (may differ from live formula verdict). */
+  tfoVerdict: string | null;
+}
+
+export type HubSpotlightByLeague = Record<string, { boom: HubSpotlightPlayer | null; bust: HubSpotlightPlayer | null }>;
+
+/** Per-league KTC rollup by skill position for portfolio chart drill-down. */
+export interface LeaguePositionKtcTotals {
+  QB: number;
+  RB: number;
+  WR: number;
+  TE: number;
+}
+
 export interface PortfolioPoint {
   /** Index 0..n-1 in the rolling history window. */
   index: number;
@@ -118,6 +145,8 @@ export interface PortfolioPoint {
   total: number;
   /** Per-league value at this point keyed by league_id. */
   byLeague: Record<string, number>;
+  /** Per-league KTC sums by QB/RB/WR/TE at this history index (same players as byLeague). */
+  byLeaguePositionKtc: Record<string, LeaguePositionKtcTotals>;
 }
 
 /** Per-league portfolio MVP: biggest share of your weekly team scoring. */
@@ -133,6 +162,8 @@ export interface PortfolioMvpSlice {
   weeklyPts: number;
   /** NFL matchup for current week, e.g. "ATL vs CIN" (from Sleeper schedule). */
   matchupLabel?: string | null;
+  /** `tfo_cache.verdict` for this player in this league (when present). */
+  tfoVerdict?: string | null;
 }
 
 export interface LeagueHealthSlice {
@@ -158,6 +189,8 @@ export interface OvervaluedPlayer {
   moPts: number;
   /** Higher = more "market premium" vs this week's scoring. */
   overvalueScore: number;
+  /** First matching `tfo_cache.verdict` across the user's leagues that roster this player. */
+  tfoVerdict?: string | null;
 }
 
 export interface TradeScenario {
@@ -167,6 +200,13 @@ export interface TradeScenario {
   /** Model-implied edge % on the buy side. */
   gainPct: number;
   summaryLine: string;
+}
+
+export interface ExposureTopRow {
+  player_id: string;
+  name: string;
+  position: string;
+  leagueCount: number;
 }
 
 export interface DashboardSnapshot {
@@ -229,11 +269,17 @@ export interface DashboardSnapshot {
   leagues: SnapshotLeague[];
   /** All `player_id` values on your Sleeper rosters (defense-in-depth for client filters). */
   ownedPlayerIds?: string[];
+  /** Same player held across multiple leagues (concentration risk). */
+  exposureTop?: ExposureTopRow[];
   tradeNote: {
     body: string;
     verdict: 'BOOM' | 'BUST' | 'FAIR';
     confidence: number;
   };
+  /** Per-league BOOM/BUST from `tfo_cache` (your roster only). */
+  hubSpotlightByLeague: HubSpotlightByLeague;
+  /** `tfo_cache.verdict` keyed by Sleeper `player_id` (first league with a row wins). */
+  tfoVerdictByPlayerId: Record<string, string>;
 }
 
 // ── Helpers ────────────────────────────────────────────────────────────────
@@ -272,6 +318,110 @@ function getRedis(): Redis | null {
     url: process.env.UPSTASH_REDIS_REST_URL,
     token: process.env.UPSTASH_REDIS_REST_TOKEN,
   });
+}
+
+type TfoCachePick = { player_id: string; tfo_score: number; grade: string | null; verdict: string | null };
+
+function buildHubSpotlightPlayer(
+  row: TfoCachePick,
+  players: PlayerMap,
+  ktcMap: Record<string, number>,
+  currentWeekPtsByPid: Record<string, number>,
+  seasonAvgPpg: Record<string, number>,
+  forecast: 'boom' | 'bust',
+): HubSpotlightPlayer | null {
+  const p = players[row.player_id];
+  if (!p || !SKILL_POSITIONS.has(String(p.position ?? '').toUpperCase())) return null;
+  const ktcVal = ktcMap[(p.full_name ?? '').toLowerCase()] ?? 0;
+  const cur = currentWeekPtsByPid[row.player_id];
+  const avg = seasonAvgPpg[row.player_id];
+  const hub = {
+    player_id: row.player_id,
+    position: p.position,
+    team: p.team ?? '—',
+    ktc_value: ktcVal,
+    seasonAvgPpg: avg !== undefined ? Math.round(avg * 10) / 10 : undefined,
+    current_points: cur,
+    forecastDelta:
+      avg !== undefined && cur !== undefined ? Math.round((cur - avg) * 10) / 10 : undefined,
+  };
+  const tfoReasoning = calculateTFOScore(inferTFOInputFromHub(hub, forecast)).reasoning;
+  const gradeStr = String(row.grade ?? 'VIABLE').replace(/_/g, ' ');
+  return {
+    player_id: row.player_id,
+    name: p.full_name,
+    position: p.position,
+    team: p.team ?? '—',
+    photoUrl: photoUrl(row.player_id),
+    current_points: cur,
+    ktc_value: ktcVal,
+    seasonAvgPpg: hub.seasonAvgPpg,
+    forecastDelta: hub.forecastDelta,
+    tfoScore: Math.round(Number(row.tfo_score) * 10) / 10,
+    tfoGrade: gradeStr,
+    tfoReasoning,
+    tfoVerdict: row.verdict ? String(row.verdict).trim().toUpperCase().replace(/\s+/g, '_') : null,
+  };
+}
+
+async function loadHubSpotlightByLeague(
+  supabase: ReturnType<typeof createClient>,
+  leagues: Array<{ id: string }>,
+  userRosterByLeague: Record<string, { players: string[] }>,
+  players: PlayerMap,
+  ktcMap: Record<string, number>,
+  currentWeekPtsByPid: Record<string, number>,
+  seasonAvgPpg: Record<string, number>,
+): Promise<HubSpotlightByLeague> {
+  const entries = await Promise.all(
+    leagues.map(async (lg) => {
+      const my = userRosterByLeague[lg.id];
+      if (!my) return [lg.id, { boom: null, bust: null }] as const;
+      const skillPids = my.players.filter((pid) => {
+        const p = players[pid];
+        return p && SKILL_POSITIONS.has(String(p.position ?? '').toUpperCase());
+      });
+      if (!skillPids.length) return [lg.id, { boom: null, bust: null }] as const;
+
+      const { data: cacheRows, error } = await supabase
+        .from('tfo_cache')
+        .select('player_id,tfo_score,grade,verdict')
+        .eq('league_id', lg.id)
+        .in('player_id', skillPids);
+
+      if (error || !cacheRows?.length) return [lg.id, { boom: null, bust: null }] as const;
+
+      const byPid = new Map<string, TfoCachePick>();
+      for (const raw of cacheRows) {
+        const row = raw as TfoCachePick;
+        const score = Number(row.tfo_score);
+        const prev = byPid.get(row.player_id);
+        if (!prev || score > prev.tfo_score) byPid.set(row.player_id, { ...row, tfo_score: score });
+      }
+      const arr = Array.from(byPid.values());
+      if (!arr.length) return [lg.id, { boom: null, bust: null }] as const;
+
+      let boomRow = arr[0]!;
+      for (const r of arr) {
+        if (r.tfo_score > boomRow.tfo_score || (r.tfo_score === boomRow.tfo_score && r.player_id < boomRow.player_id)) {
+          boomRow = r;
+        }
+      }
+
+      let bustRow: TfoCachePick | null = null;
+      for (const r of arr) {
+        if (r.player_id === boomRow.player_id) continue;
+        if (!bustRow || r.tfo_score < bustRow.tfo_score) bustRow = r;
+      }
+
+      const boom = buildHubSpotlightPlayer(boomRow, players, ktcMap, currentWeekPtsByPid, seasonAvgPpg, 'boom');
+      const bust =
+        bustRow != null ? buildHubSpotlightPlayer(bustRow, players, ktcMap, currentWeekPtsByPid, seasonAvgPpg, 'bust') : null;
+
+      return [lg.id, { boom, bust }] as const;
+    }),
+  );
+  return Object.fromEntries(entries) as HubSpotlightByLeague;
 }
 
 function buildRankedPlayers(
@@ -316,7 +466,7 @@ export async function GET() {
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   const redis = getRedis();
-  const cacheKey = `dashboard:snapshot:v5:${user.id}`;
+  const cacheKey = `dashboard:snapshot:v7:${user.id}`;
   if (redis) {
     try {
       const cached = await redis.get<DashboardSnapshot>(cacheKey);
@@ -419,6 +569,35 @@ export async function GET() {
     const my = userRosterByLeague[lg.id];
     if (!my) continue;
     for (const id of my.players) rosterIds.add(id);
+  }
+
+  const tfoVerdictByLeaguePlayer = new Map<string, string>();
+  const tfoVerdictByPlayerId: Record<string, string> = {};
+  {
+    const leagueIdsOnly = leagues.map((l) => l.id);
+    if (leagueIdsOnly.length) {
+      const { data: tfoRows } = await supabase
+        .from('tfo_cache')
+        .select('league_id, player_id, verdict')
+        .in('league_id', leagueIdsOnly);
+      for (const row of tfoRows ?? []) {
+        const r = row as { league_id?: string; player_id?: string; verdict?: string | null };
+        const lid = String(r.league_id ?? '');
+        const pid = String(r.player_id ?? '');
+        const ver = r.verdict != null ? String(r.verdict).trim() : '';
+        if (!lid || !pid || !ver) continue;
+        tfoVerdictByLeaguePlayer.set(`${lid}:${pid}`, ver);
+      }
+      for (const lg of leagues) {
+        const my = userRosterByLeague[lg.id];
+        if (!my) continue;
+        for (const pid of my.players) {
+          if (tfoVerdictByPlayerId[pid]) continue;
+          const hit = tfoVerdictByLeaguePlayer.get(`${lg.id}:${pid}`);
+          if (hit) tfoVerdictByPlayerId[pid] = hit;
+        }
+      }
+    }
   }
 
   // ── 5. Current week matchups (in parallel) ──────────────────────────────
@@ -532,6 +711,7 @@ export async function GET() {
         ktcValue: d.ktcValue,
         valueHistory: mvpHistories[i] ?? [],
         matchupLabel: null,
+        tfoVerdict: tfoVerdictByLeaguePlayer.get(`${d.leagueId}:${d.playerId}`) ?? null,
         player: {
           player_id: d.playerId,
           name: 'Unknown',
@@ -554,6 +734,7 @@ export async function GET() {
       ktcValue: d.ktcValue,
       valueHistory: mvpHistories[i] ?? [],
       matchupLabel,
+      tfoVerdict: tfoVerdictByLeaguePlayer.get(`${d.leagueId}:${d.playerId}`) ?? null,
       player: {
         player_id: d.playerId,
         name: p.full_name,
@@ -742,6 +923,24 @@ export async function GET() {
   const boomRotation = toForecastRotation(boomCandidates);
   const bustRotation = toForecastRotation(bustCandidates);
 
+  let hubSpotlightByLeague: HubSpotlightByLeague = {};
+  try {
+    hubSpotlightByLeague = await loadHubSpotlightByLeague(
+      supabase,
+      leagues,
+      userRosterByLeague,
+      players,
+      ktcMap,
+      currentWeekPtsByPid,
+      seasonAvgPpg,
+    );
+  } catch (err) {
+    console.error('[snapshot] hubSpotlightByLeague:', err);
+    for (const lg of leagues) {
+      hubSpotlightByLeague[lg.id] = { boom: null, bust: null };
+    }
+  }
+
   if (bustCandidates[0]) {
     const bc = bustCandidates[0]!;
     threat = {
@@ -877,6 +1076,37 @@ export async function GET() {
     const p = players[t.player_id];
     if (!p) continue;
     if (!SKILL_POSITIONS.has(p.position?.toUpperCase() ?? '')) continue;
+    const ktcCurrent = ktcMap[(p.full_name ?? '').toLowerCase()] ?? 0;
+    const depthOrder = (p as { depth_chart_order?: number }).depth_chart_order ?? 2;
+    const opportunityScore = depthOrder === 1 ? 85 : depthOrder === 2 ? 55 : 30;
+    let tfoScore: number | undefined;
+    let grade: string | undefined;
+    let verdict: string | undefined;
+    let signal: string | undefined;
+    let signalColor: string | undefined;
+    const pos = p.position?.toUpperCase() as 'QB' | 'RB' | 'WR' | 'TE' | undefined;
+    if (pos && ['QB', 'RB', 'WR', 'TE'].includes(pos) && p.team) {
+      try {
+        const tfo = calculateTFOScore({
+          playerId: t.player_id,
+          position: pos,
+          age: p.age ?? 25,
+          team: p.team,
+          ocScheme: 'default',
+          opportunityScore,
+          olGrade: 65,
+          wrCastGrade: 65,
+          redZoneShare: depthOrder === 1 ? 25 : 10,
+          ktcValue: ktcCurrent,
+        });
+        const bbsm = calculateBBSM({ tfoScore: tfo.tfoScore, ktcCurrent, ktcPrior: 0 });
+        tfoScore = tfo.tfoScore;
+        grade = tfo.grade;
+        verdict = tfo.verdict;
+        signal = bbsm.signal;
+        signalColor = bbsm.signalColor;
+      } catch {}
+    }
     waivers.push({
       player_id: t.player_id,
       name: p.full_name,
@@ -886,6 +1116,11 @@ export async function GET() {
       addCount: t.count,
       addValue: `+${Math.min(99, Math.round((t.count / 1000) * 100))}% Add`,
       trending: true,
+      tfoScore,
+      grade,
+      verdict,
+      signal,
+      signalColor,
     });
     if (waivers.length >= 6) break;
   }
@@ -1096,6 +1331,7 @@ export async function GET() {
       seasonAvgPpg: Math.round(ppg * 10) / 10,
       moPts,
       overvalueScore,
+      tfoVerdict: tfoVerdictByPlayerId[rp.id] ?? null,
     });
   }
   overvaluedRaw.sort((a, b) => b.moPts - a.moPts || b.ktcValue - a.ktcValue);
@@ -1125,6 +1361,7 @@ export async function GET() {
         seasonAvgPpg: Math.round(ppg * 10) / 10,
         moPts,
         overvalueScore: Math.round(ktcVal + ppgDelta * 120),
+        tfoVerdict: tfoVerdictByPlayerId[rp.id] ?? null,
       });
     }
     negDeltaRows.sort((a, b) => b.ktcValue - a.ktcValue || a.moPts - b.moPts);
@@ -1134,7 +1371,7 @@ export async function GET() {
   if (overvalued.length === 0 && skillOwned.length > 0) {
     const topKtc = [...skillOwned].sort((a, b) => b.ktcValue - a.ktcValue).slice(0, 3);
     overvalued = topKtc
-      .map((rp) => {
+      .map((rp): OvervaluedPlayer | null => {
         const p = players[rp.id];
         if (!p) return null;
         const ppg = seasonAvgPpg[rp.id] ?? 0;
@@ -1152,7 +1389,8 @@ export async function GET() {
           seasonAvgPpg: Math.round(ppg * 10) / 10,
           moPts,
           overvalueScore: Math.round(ktcVal),
-        } satisfies OvervaluedPlayer;
+          tfoVerdict: tfoVerdictByPlayerId[rp.id] ?? null,
+        };
       })
       .filter((x): x is OvervaluedPlayer => x !== null);
   }
@@ -1300,25 +1538,40 @@ export async function GET() {
     for (let idx = 0; idx < maxLen; idx++) {
       let total = 0;
       const byLeague: Record<string, number> = {};
+      const byLeaguePositionKtc: Record<string, LeaguePositionKtcTotals> = {};
       for (const lg of leagues) {
         const my = userRosterByLeague[lg.id];
         if (!my) continue;
         let lgSum = 0;
+        const posTot: LeaguePositionKtcTotals = { QB: 0, RB: 0, WR: 0, TE: 0 };
         for (const pid of my.players) {
           const series = histMap[pid];
+          let val: number;
           if (!series || series.length === 0) {
             // Fall back to current KTC if we have no series for this player
             const p = players[pid];
-            const fallback = p ? ktcMap[(p.full_name ?? '').toLowerCase()] ?? 0 : 0;
-            lgSum += fallback;
-            continue;
+            val = p ? ktcMap[(p.full_name ?? '').toLowerCase()] ?? 0 : 0;
+            lgSum += val;
+          } else {
+            // Right-align: index "idx" counts from the end (oldest..newest)
+            const offset = idx + (maxLen - series.length);
+            val = offset >= 0 && offset < series.length ? series[offset]! : (series[0] ?? 0);
+            lgSum += val;
           }
-          // Right-align: index "idx" counts from the end (oldest..newest)
-          const offset = idx + (maxLen - series.length);
-          const val = offset >= 0 && offset < series.length ? series[offset]! : (series[0] ?? 0);
-          lgSum += val;
+          const pRow = players[pid];
+          const posRaw = (pRow?.position ?? '').toUpperCase();
+          if (posRaw === 'QB') posTot.QB += val;
+          else if (posRaw === 'RB') posTot.RB += val;
+          else if (posRaw === 'WR') posTot.WR += val;
+          else if (posRaw === 'TE') posTot.TE += val;
         }
         byLeague[lg.id] = lgSum;
+        byLeaguePositionKtc[lg.id] = {
+          QB: Math.round(posTot.QB),
+          RB: Math.round(posTot.RB),
+          WR: Math.round(posTot.WR),
+          TE: Math.round(posTot.TE),
+        };
         total += lgSum;
       }
       points.push({
@@ -1326,6 +1579,7 @@ export async function GET() {
         label: `T-${maxLen - 1 - idx}`,
         total: Math.round(total),
         byLeague,
+        byLeaguePositionKtc,
       });
     }
     return points;
@@ -1361,6 +1615,16 @@ export async function GET() {
       confidence: 50,
     };
   })();
+
+  const exposureTop: ExposureTopRow[] = Array.from(rosterDupCount.entries())
+    .filter(([, n]) => n >= 2)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 5)
+    .flatMap(([id, leagueCount]) => {
+      const p = players[id];
+      if (!p || !SKILL_POSITIONS.has(p.position?.toUpperCase() ?? '')) return [];
+      return [{ player_id: id, name: p.full_name, position: p.position, leagueCount }];
+    });
 
   const snapshot: DashboardSnapshot = {
     loading: false,
@@ -1405,7 +1669,10 @@ export async function GET() {
     playerGaps,
     leagues: summaryLeagues,
     ownedPlayerIds: Array.from(rosterIds),
+    exposureTop,
     tradeNote,
+    hubSpotlightByLeague,
+    tfoVerdictByPlayerId,
   };
 
   if (redis) {
