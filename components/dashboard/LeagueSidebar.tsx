@@ -1,276 +1,231 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { clsx } from 'clsx';
-import { ChevronRight, PanelRightClose, PanelRightOpen } from 'lucide-react';
-import { createClient } from '@/lib/supabase/client';
+import { useEffect, useRef, useState } from 'react';
 import { useDashboardLeagueStore } from '@/store/dashboardLeagueStore';
+import type { LeagueSummary, LeaguesListResponse } from '@/app/api/leagues/route';
 
-export type ContentionStatus = 'CONTENDING' | 'REBUILDING' | 'TRANSITIONING';
+// ─── Constants ────────────────────────────────────────────────────────────────
 
-export interface LeagueSidebarRow {
+const BOOM = '#36E7A1';
+const INACTIVE = '#94A3B8';
+const BORDER_COLOR = 'rgba(255,255,255,0.06)';
+
+// ─── Section header ───────────────────────────────────────────────────────────
+
+function SectionHeader({ label }: { label: string }) {
+  return (
+    <p
+      className="uppercase tracking-widest mb-2 px-3 leading-none"
+      style={{
+        fontFamily: 'var(--font-body), Inter, sans-serif',
+        fontSize: 10,
+        color: '#64748B',
+        letterSpacing: '0.12em',
+      }}
+    >
+      {label}
+    </p>
+  );
+}
+
+// ─── Divider ──────────────────────────────────────────────────────────────────
+
+function Divider() {
+  return (
+    <div
+      className="my-3 mx-3"
+      style={{ height: 1, background: BORDER_COLOR }}
+      aria-hidden
+    />
+  );
+}
+
+// ─── League item ─────────────────────────────────────────────────────────────
+
+function LeagueItem({
+  id: _id,
+  label,
+  active,
+  onClick,
+}: {
   id: string;
-  name: string;
-  season: string;
-  wins: number;
-  losses: number;
-  contention: ContentionStatus;
+  label: string;
+  active: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      title={label}
+      className="w-full text-left truncate px-3 py-2 rounded-r-lg transition-colors duration-100 leading-tight"
+      style={{
+        fontFamily: 'var(--font-body), Inter, sans-serif',
+        fontSize: 14,
+        color: active ? BOOM : INACTIVE,
+        background: active ? 'rgba(6,78,59,0.25)' : 'transparent',
+        borderLeft: active ? `2px solid ${BOOM}` : '2px solid transparent',
+        cursor: 'pointer',
+      }}
+      onMouseEnter={(e) => {
+        if (!active) {
+          (e.currentTarget as HTMLButtonElement).style.color = '#ffffff';
+        }
+      }}
+      onMouseLeave={(e) => {
+        if (!active) {
+          (e.currentTarget as HTMLButtonElement).style.color = INACTIVE;
+        }
+      }}
+    >
+      {label}
+    </button>
+  );
 }
 
-function deriveContention(wins: number, losses: number): ContentionStatus {
-  const games = wins + losses;
-  if (games < 1) return 'TRANSITIONING';
-  const pct = wins / games;
-  if (pct >= 0.55) return 'CONTENDING';
-  if (pct <= 0.38) return 'REBUILDING';
-  return 'TRANSITIONING';
+// ─── Skeleton ─────────────────────────────────────────────────────────────────
+
+function SidebarSkeleton() {
+  const rows = [5, 7, 6, 5, 8, 6, 5, 7, 6, 5];
+  return (
+    <div className="px-3 py-4 flex flex-col gap-1" aria-hidden aria-label="Loading leagues">
+      {/* section header */}
+      <div className="h-2 w-16 rounded mb-2 animate-pulse bg-white/[0.08]" />
+      {/* "All Leagues" item */}
+      <div className="h-8 w-full rounded animate-pulse bg-white/[0.06]" />
+      <Divider />
+      <div className="h-2 w-20 rounded mb-2 animate-pulse bg-white/[0.08]" />
+      {rows.slice(0, 6).map((w, i) => (
+        <div
+          key={i}
+          className="h-8 rounded animate-pulse bg-white/[0.05]"
+          style={{ width: `${w * 10}%` }}
+        />
+      ))}
+      <Divider />
+      <div className="h-2 w-24 rounded mb-2 animate-pulse bg-white/[0.08]" />
+      {rows.slice(6).map((w, i) => (
+        <div
+          key={i}
+          className="h-8 rounded animate-pulse bg-white/[0.04]"
+          style={{ width: `${w * 10}%` }}
+        />
+      ))}
+    </div>
+  );
 }
 
-const CONTENTION_STYLES: Record<
-  ContentionStatus,
-  { bg: string; border: string; text: string }
-> = {
-  CONTENDING: {
-    bg: 'rgba(54,231,161,0.14)',
-    border: 'rgba(54,231,161,0.45)',
-    text: '#36E7A1',
-  },
-  REBUILDING: {
-    bg: 'rgba(167,139,250,0.12)',
-    border: 'rgba(167,139,250,0.42)',
-    text: '#A78BFA',
-  },
-  TRANSITIONING: {
-    bg: 'rgba(251,191,36,0.12)',
-    border: 'rgba(251,191,36,0.4)',
-    text: '#FBBF24',
-  },
-};
+// ─── LeagueSidebar ────────────────────────────────────────────────────────────
 
-function readRecord(settings: Record<string, unknown> | null | undefined): { wins: number; losses: number } {
-  if (!settings || typeof settings !== 'object') return { wins: 0, losses: 0 };
-  const w = Number(settings.wins);
-  const l = Number(settings.losses);
-  return {
-    wins: Number.isFinite(w) ? w : 0,
-    losses: Number.isFinite(l) ? l : 0,
-  };
-}
-
-interface LeagueSidebarProps {
-  /** Grid / flex placement (e.g. `col-span-12 lg:col-span-2 lg:order-2`). */
+export interface LeagueSidebarProps {
   className?: string;
 }
 
-export default function LeagueSidebar({ className = '' }: LeagueSidebarProps) {
-  const activeLeagueId = useDashboardLeagueStore((s) => s.activeLeagueId);
+export default function LeagueSidebar({ className }: LeagueSidebarProps) {
+  const activeLeagueId  = useDashboardLeagueStore((s) => s.activeLeagueId);
   const setActiveLeagueId = useDashboardLeagueStore((s) => s.setActiveLeagueId);
 
-  const [rows, setRows] = useState<LeagueSidebarRow[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [mobileOpen, setMobileOpen] = useState(false);
-
-  const load = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    const supabase = createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    if (!user) {
-      setRows([]);
-      setLoading(false);
-      return;
-    }
-
-    const [{ data: profile }, { data: leagueRows, error: lgErr }] = await Promise.all([
-      supabase.from('profiles').select('sleeper_user_id').eq('id', user.id).maybeSingle(),
-      supabase.from('leagues').select('id,name,season').eq('user_id', user.id).order('name', { ascending: true }),
-    ]);
-
-    if (lgErr) {
-      setError(lgErr.message);
-      setRows([]);
-      setLoading(false);
-      return;
-    }
-
-    const leagues = leagueRows ?? [];
-    const ownerSid = profile?.sleeper_user_id ? String(profile.sleeper_user_id) : null;
-    const leagueIds = leagues.map((l) => l.id);
-
-    const rosterMap = new Map<string, { wins: number; losses: number }>();
-    if (ownerSid && leagueIds.length) {
-      const { data: rosterRows } = await supabase
-        .from('rosters')
-        .select('league_id,owner_id,settings')
-        .in('league_id', leagueIds);
-
-      for (const r of rosterRows ?? []) {
-        if (String(r.owner_id ?? '') !== ownerSid) continue;
-        const rec = readRecord(r.settings as Record<string, unknown> | null);
-        rosterMap.set(r.league_id, rec);
-      }
-    }
-
-    const built: LeagueSidebarRow[] = leagues.map((lg) => {
-      const rec = rosterMap.get(lg.id) ?? { wins: 0, losses: 0 };
-      return {
-        id: lg.id,
-        name: lg.name ?? 'League',
-        season: String(lg.season ?? ''),
-        wins: rec.wins,
-        losses: rec.losses,
-        contention: deriveContention(rec.wins, rec.losses),
-      };
-    });
-
-    setRows(built);
-    setLoading(false);
-  }, []);
+  const [myLeagues,    setMyLeagues]    = useState<LeagueSummary[]>([]);
+  const [otherLeagues, setOtherLeagues] = useState<LeagueSummary[]>([]);
+  const [loading,      setLoading]      = useState(true);
+  const fetchedRef = useRef(false);
 
   useEffect(() => {
-    void load();
-  }, [load]);
+    if (fetchedRef.current) return;
+    fetchedRef.current = true;
 
-  const activeName = useMemo(() => rows.find((r) => r.id === activeLeagueId)?.name ?? null, [rows, activeLeagueId]);
+    (async () => {
+      try {
+        const res = await fetch('/api/leagues', { credentials: 'include' });
+        if (!res.ok) throw new Error('fetch failed');
+        const json = (await res.json()) as LeaguesListResponse;
+        setMyLeagues(json.myLeagues ?? []);
+        setOtherLeagues(json.otherLeagues ?? []);
+      } catch {
+        // Silent fail — sidebar shows empty state
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, []);
 
-  const selectLeague = (id: string) => {
-    setActiveLeagueId(id);
-    setMobileOpen(false);
-  };
-
-  const list = (
-    <div className="flex flex-col gap-2 p-2 lg:p-0">
-      <div className="flex items-center justify-between px-1 lg:px-0">
-        <h2 className="text-[10px] font-black uppercase tracking-[0.22em] text-slate-500 font-mono">
-          Leagues
-        </h2>
-      </div>
-      {loading ? (
-        <div className="space-y-2 px-1">
-          {[0, 1, 2].map((i) => (
-            <div key={i} className="h-16 rounded-lg bg-white/[0.04] skeleton border border-white/[0.06]" />
-          ))}
-        </div>
-      ) : error ? (
-        <p className="text-[10px] text-red-400/90 px-1 font-mono">{error}</p>
-      ) : rows.length === 0 ? (
-        <p className="text-[10px] text-slate-500 px-1 font-mono">No leagues synced.</p>
-      ) : (
-        <ul className="slim-scroll flex max-h-[min(60vh,420px)] flex-col gap-2 overflow-y-auto pr-0.5 lg:max-h-[calc(100vh-8rem)]">
-          {rows.map((lg) => {
-            const active = activeLeagueId === lg.id;
-            const cs = CONTENTION_STYLES[lg.contention];
-            return (
-              <li key={lg.id}>
-                <button
-                  type="button"
-                  onClick={() => selectLeague(lg.id)}
-                  className={clsx(
-                    'w-full rounded-xl border text-left transition-all duration-200',
-                    'bg-[rgba(8,12,17,0.55)] backdrop-blur-md px-3 py-2.5',
-                    active
-                      ? 'border-[rgba(34,211,238,0.45)] shadow-[0_0_0_1px_rgba(34,211,238,0.25),0_0_20px_rgba(34,211,238,0.12)]'
-                      : 'border-white/[0.08] hover:border-white/[0.14] hover:bg-white/[0.03]',
-                  )}
-                >
-                  <div className="flex items-start justify-between gap-2">
-                    <p className="min-w-0 flex-1 truncate text-[12px] font-bold uppercase tracking-tight text-white">
-                      {lg.name}
-                    </p>
-                    {active ? <ChevronRight className="h-3.5 w-3.5 shrink-0 text-[#22D3EE]" aria-hidden /> : null}
-                  </div>
-                  <p className="mt-1 font-mono text-[11px] tabular-nums text-[#94A3B8]">
-                    {lg.wins}-{lg.losses}
-                    <span className="text-slate-600"> · </span>
-                    <span className="text-[9px] text-slate-600">{lg.season}</span>
-                  </p>
-                  <span
-                    className="mt-2 inline-block rounded-full border px-2 py-0.5 text-[8px] font-black uppercase tracking-wider font-mono"
-                    style={{
-                      background: cs.bg,
-                      borderColor: cs.border,
-                      color: cs.text,
-                    }}
-                  >
-                    {lg.contention}
-                  </span>
-                </button>
-              </li>
-            );
-          })}
-        </ul>
-      )}
-    </div>
-  );
+  // 'all' (or null) = empire-level / all-leagues context
+  const isAllActive = activeLeagueId === 'all' || activeLeagueId === null;
 
   return (
-    <div className={clsx('flex flex-col gap-2', className)}>
-      {/* Mobile: trigger */}
-      <div className="flex items-center justify-between gap-2 border-b border-white/[0.06] bg-[rgba(6,9,16,0.85)] px-3 py-2 lg:hidden">
-        <button
-          type="button"
-          onClick={() => setMobileOpen(true)}
-          className="flex min-w-0 flex-1 items-center justify-between rounded-lg border border-white/[0.1] bg-white/[0.04] px-3 py-2 text-left active:scale-[0.99]"
-        >
-          <span className="truncate text-[11px] font-bold uppercase tracking-wide text-white">
-            {activeName ?? 'Select league'}
-          </span>
-          <PanelRightOpen className="h-4 w-4 shrink-0 text-[#22D3EE]" aria-hidden />
-        </button>
-      </div>
+    /*
+     * 200px fixed-width column, full height below 56px nav.
+     * Hidden on mobile — leagues accessible via TopNav dropdown on small screens.
+     */
+    <aside
+      className={`hidden lg:flex flex-col w-[200px] shrink-0 sticky top-14 h-[calc(100vh-3.5rem)] overflow-y-auto ${className ?? ''}`}
+      style={{
+        borderRight: `1px solid ${BORDER_COLOR}`,
+      }}
+      aria-label="League selector"
+    >
+      {loading ? (
+        <SidebarSkeleton />
+      ) : (
+        <div className="px-3 py-4 flex flex-col">
 
-      {/* Mobile drawer */}
-      <div
-        className={clsx(
-          'fixed inset-0 z-[60] lg:hidden',
-          mobileOpen ? 'pointer-events-auto' : 'pointer-events-none',
-        )}
-        aria-hidden={!mobileOpen}
-      >
-        <button
-          type="button"
-          className={clsx(
-            'absolute inset-0 bg-black/60 transition-opacity',
-            mobileOpen ? 'opacity-100' : 'opacity-0',
+          {/* ── ALL LEAGUES section ──────────────────────────────── */}
+          <SectionHeader label="All Leagues" />
+
+          <LeagueItem
+            id="all"
+            label="All Leagues"
+            active={isAllActive}
+            onClick={() => setActiveLeagueId('all')}
+          />
+
+          {/* ── MY LEAGUES section ───────────────────────────────── */}
+          {myLeagues.length > 0 && (
+            <>
+              <Divider />
+              <SectionHeader label="My Leagues" />
+              {myLeagues.map((lg) => (
+                <LeagueItem
+                  key={lg.id}
+                  id={lg.id}
+                  label={lg.name}
+                  active={activeLeagueId === lg.id}
+                  onClick={() => setActiveLeagueId(lg.id)}
+                />
+              ))}
+            </>
           )}
-          onClick={() => setMobileOpen(false)}
-          aria-label="Close overlay"
-        />
-        <aside
-          className={clsx(
-            'absolute right-0 top-0 flex h-full w-[min(100%,20rem)] flex-col border-l border-white/[0.1] bg-[#0a0d14] shadow-2xl transition-transform duration-200 ease-out',
-            mobileOpen ? 'translate-x-0' : 'translate-x-full',
+
+          {/* ── OTHER LEAGUES section (conditional) ─────────────── */}
+          {otherLeagues.length > 0 && (
+            <>
+              <Divider />
+              <SectionHeader label="Other Leagues" />
+              {otherLeagues.map((lg) => (
+                <LeagueItem
+                  key={lg.id}
+                  id={lg.id}
+                  label={lg.name}
+                  active={activeLeagueId === lg.id}
+                  onClick={() => setActiveLeagueId(lg.id)}
+                />
+              ))}
+            </>
           )}
-        >
-          <div className="flex items-center justify-between border-b border-white/[0.06] px-3 py-2">
-            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Your leagues</span>
-            <button
-              type="button"
-              className="rounded-md p-1.5 text-slate-400 hover:bg-white/5 hover:text-white"
-              onClick={() => setMobileOpen(false)}
-              aria-label="Close"
+
+          {/* Empty state */}
+          {!loading && myLeagues.length === 0 && otherLeagues.length === 0 && (
+            <p
+              className="px-3 text-[12px] text-slate-600 mt-4"
+              style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}
             >
-              <PanelRightClose className="h-4 w-4" />
-            </button>
-          </div>
-          {list}
-        </aside>
-      </div>
-
-      {/* Desktop: sticky column */}
-      <aside className="hidden lg:flex lg:flex-1 lg:flex-col lg:min-h-0">
-        <div
-          className={clsx(
-            'glass-panel flex flex-col overflow-hidden rounded-xl border border-white/[0.1]',
-            'lg:sticky lg:top-20 lg:max-h-[calc(100vh-5.5rem)]',
+              No leagues found.
+              <br />
+              Sync via Onboarding.
+            </p>
           )}
-        >
-          {list}
         </div>
-      </aside>
-    </div>
+      )}
+    </aside>
   );
 }
