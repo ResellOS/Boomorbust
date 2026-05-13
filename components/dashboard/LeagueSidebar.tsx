@@ -144,7 +144,7 @@ export default function LeagueSidebar({ className = '' }: LeagueSidebarProps) {
   const list = (
     <div className="flex flex-col gap-2 p-2 lg:p-0">
       <div className="flex items-center justify-between px-1 lg:px-0">
-        <h2 className="text-[10px] font-black uppercase tracking-[0.22em] text-slate-500 font-mono-tactical">
+        <h2 className="text-[10px] font-black uppercase tracking-[0.22em] text-slate-500 font-mono">
           Leagues
         </h2>
       </div>
@@ -155,9 +155,9 @@ export default function LeagueSidebar({ className = '' }: LeagueSidebarProps) {
           ))}
         </div>
       ) : error ? (
-        <p className="text-[10px] text-red-400/90 px-1 font-mono-tactical">{error}</p>
+        <p className="text-[10px] text-red-400/90 px-1 font-mono">{error}</p>
       ) : rows.length === 0 ? (
-        <p className="text-[10px] text-slate-500 px-1 font-mono-tactical">No leagues synced.</p>
+        <p className="text-[10px] text-slate-500 px-1 font-mono">No leagues synced.</p>
       ) : (
         <ul className="slim-scroll flex max-h-[min(60vh,420px)] flex-col gap-2 overflow-y-auto pr-0.5 lg:max-h-[calc(100vh-8rem)]">
           {rows.map((lg) => {
@@ -182,13 +182,13 @@ export default function LeagueSidebar({ className = '' }: LeagueSidebarProps) {
                     </p>
                     {active ? <ChevronRight className="h-3.5 w-3.5 shrink-0 text-[#22D3EE]" aria-hidden /> : null}
                   </div>
-                  <p className="mt-1 font-mono-tactical text-[11px] tabular-nums text-[#94A3B8]">
+                  <p className="mt-1 font-mono text-[11px] tabular-nums text-[#94A3B8]">
                     {lg.wins}-{lg.losses}
                     <span className="text-slate-600"> · </span>
                     <span className="text-[9px] text-slate-600">{lg.season}</span>
                   </p>
                   <span
-                    className="mt-2 inline-block rounded-full border px-2 py-0.5 text-[8px] font-black uppercase tracking-wider font-mono-tactical"
+                    className="mt-2 inline-block rounded-full border px-2 py-0.5 text-[8px] font-black uppercase tracking-wider font-mono"
                     style={{
                       background: cs.bg,
                       borderColor: cs.border,

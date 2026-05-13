@@ -668,7 +668,7 @@ export default function PortfolioPage() {
           <h1 className="display font-normal leading-none tracking-tight text-[var(--gold)] text-[clamp(2rem,5vw,3rem)]">
             DYNASTY PORTFOLIO
           </h1>
-          <p className="mt-3 font-mono-tactical text-[10px] font-bold uppercase tracking-[0.22em] text-[#64748B]">
+          <p className="mt-3 font-mono text-[10px] font-bold uppercase tracking-[0.22em] text-[#64748B]">
             YOUR 3-YEAR EMPIRE WINDOW
           </p>
         </header>

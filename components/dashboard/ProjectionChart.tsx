@@ -185,8 +185,11 @@ export default function ProjectionChart({
 }: Props) {
   const id = useId();
 
-  const safeData = data.length > 0 ? data : [0, 0];
-  const safeLabels = labels.length === safeData.length ? labels : safeData.map((_, i) => `T-${i}`);
+  const safeData = useMemo(() => (data.length > 0 ? data : [0, 0]), [data]);
+  const safeLabels = useMemo(
+    () => (labels.length === safeData.length ? labels : safeData.map((_, i) => `T-${i}`)),
+    [labels, safeData],
+  );
 
   const fmt = (n: number) => (valueFormatter ? valueFormatter(n) : n.toFixed(1));
 
@@ -313,7 +316,7 @@ export default function ProjectionChart({
                   </p>
                   <p className="flex items-baseline gap-1.5 leading-none">
                     <span
-                      className="text-2xl sm:text-3xl lg:text-[2.65rem] font-black font-mono-tactical tracking-tight tabular-nums"
+                      className="text-2xl sm:text-3xl lg:text-[2.65rem] font-black font-mono tracking-tight tabular-nums"
                       style={{
                         color: positionMode ? '#22D3EE' : EMERALD,
                         textShadow: positionMode
@@ -323,7 +326,7 @@ export default function ProjectionChart({
                     >
                       {scoreHighlightNumeric}
                     </span>
-                    <span className="text-xs sm:text-sm font-bold font-mono-tactical text-slate-400 mt-0.5">
+                    <span className="text-xs sm:text-sm font-bold font-mono text-slate-400 mt-0.5">
                       {scoreHighlightSuffix}
                     </span>
                   </p>
@@ -334,7 +337,7 @@ export default function ProjectionChart({
                     {scoreHighlightLabel}
                   </p>
                   <p
-                    className="text-2xl sm:text-3xl lg:text-4xl font-black font-mono-tactical leading-none tracking-tight tabular-nums"
+                    className="text-2xl sm:text-3xl lg:text-4xl font-black font-mono leading-none tracking-tight tabular-nums"
                     style={{
                       color: EMERALD,
                       textShadow:
@@ -346,7 +349,7 @@ export default function ProjectionChart({
                 </>
               ) : null}
               {subtitle ? (
-                <p className="text-[10px] uppercase tracking-wider text-slate-500 font-mono-tactical pt-0.5">
+                <p className="text-[10px] uppercase tracking-wider text-slate-500 font-mono pt-0.5">
                   {subtitle}
                 </p>
               ) : null}
@@ -464,7 +467,7 @@ export default function ProjectionChart({
                             fill={s.color}
                             fontSize="8"
                             fontWeight="700"
-                            fontFamily="var(--font-mono-tactical), ui-monospace, monospace"
+                            fontFamily="var(--font-mono), ui-monospace, monospace"
                             textAnchor="start"
                           >
                             {s.position}
@@ -512,7 +515,7 @@ export default function ProjectionChart({
                         fill={EMERALD}
                         fontSize="11"
                         fontWeight="800"
-                        fontFamily="var(--font-mono-tactical), ui-monospace, monospace"
+                        fontFamily="var(--font-mono), ui-monospace, monospace"
                         textAnchor="end"
                         style={{
                           filter:
@@ -539,7 +542,7 @@ export default function ProjectionChart({
                 fill="#475569"
                 fontSize="10"
                 fontWeight="700"
-                fontFamily="var(--font-mono-tactical), ui-monospace, monospace"
+                fontFamily="var(--font-mono), ui-monospace, monospace"
                 textAnchor="middle"
               >
                 {label}
@@ -549,11 +552,11 @@ export default function ProjectionChart({
         </svg>
 
         <div className="flex flex-col gap-1 mt-1 px-1">
-          <span className="text-[9px] font-mono-tactical text-slate-600 uppercase tracking-wider">
+          <span className="text-[9px] font-mono text-slate-600 uppercase tracking-wider">
             {bench !== null ? `${benchmarkLabel}: ${fmt(bench)}` : '\u00a0'}
           </span>
           {positionMode && multiPaths.length ? (
-            <div className="flex flex-wrap items-center gap-x-[12px] gap-y-1 font-mono-tactical text-[8px] text-[#94A3B8]">
+            <div className="flex flex-wrap items-center gap-x-[12px] gap-y-1 font-mono text-[8px] text-[#94A3B8]">
               {multiPaths.map((s) => (
                 <span key={s.position} className="inline-flex items-center gap-1.5">
                   <span className="w-2 h-2 rounded-full shrink-0" style={{ background: s.color }} aria-hidden />
@@ -562,7 +565,7 @@ export default function ProjectionChart({
               ))}
             </div>
           ) : !positionMode ? (
-            <div className="flex flex-wrap items-center gap-x-[12px] gap-y-1 font-mono-tactical text-[8px] text-[#94A3B8]">
+            <div className="flex flex-wrap items-center gap-x-[12px] gap-y-1 font-mono text-[8px] text-[#94A3B8]">
               <span className="inline-flex items-center gap-1.5">
                 <span className="w-2 h-2 rounded-full shrink-0 bg-[#36E7A1]" aria-hidden />
                 AGGREGATE
@@ -584,7 +587,7 @@ export default function ProjectionChart({
                   style={{ left: `${left}%`, maxWidth: 110 }}
                 >
                   <div
-                    className="text-[9px] font-mono-tactical font-bold leading-tight"
+                    className="text-[9px] font-mono font-bold leading-tight"
                     style={{ color: EMERALD, textShadow: '0 0 10px rgba(54,231,161,0.45)' }}
                   >
                     {a.player}

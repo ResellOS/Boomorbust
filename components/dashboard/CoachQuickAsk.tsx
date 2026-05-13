@@ -75,7 +75,7 @@ export default function CoachQuickAsk({ className = '' }: { className?: string }
         <h4 className="font-bold uppercase tracking-[0.06em] text-white leading-tight" style={{ fontFamily: 'var(--font-display)', fontSize: '16px' }}>
           Dynasty Coach Quick Ask
         </h4>
-        <p className="mt-0.5 font-mono-tactical text-[7px] uppercase tracking-[0.12em] text-[#64748B]">
+        <p className="mt-0.5 font-mono text-[7px] uppercase tracking-[0.12em] text-[#64748B]">
           Streams from /api/coach/chat · empire context
         </p>
       </div>
@@ -89,7 +89,7 @@ export default function CoachQuickAsk({ className = '' }: { className?: string }
         }}
         placeholder="Ask the Analyst..."
         disabled={loading}
-        className="w-full rounded-md border border-white/[0.08] bg-black/30 px-2 py-1.5 text-[10px] text-white placeholder:text-[#475569] outline-none focus:border-[#22D3EE]/40 font-mono-tactical"
+        className="w-full rounded-md border border-white/[0.08] bg-black/30 px-2 py-1.5 text-[10px] text-white placeholder:text-[#475569] outline-none focus:border-[#22D3EE]/40 font-mono"
       />
 
       <button
@@ -97,7 +97,7 @@ export default function CoachQuickAsk({ className = '' }: { className?: string }
         onClick={() => void submit()}
         disabled={loading || !question.trim()}
         className={clsx(
-          'rounded-md py-1 text-[9px] font-mono-tactical font-black uppercase tracking-wide transition-colors',
+          'rounded-md py-1 text-[9px] font-mono font-black uppercase tracking-wide transition-colors',
           loading || !question.trim()
             ? 'bg-white/[0.06] text-[#475569] cursor-not-allowed'
             : 'bg-[#22D3EE]/20 text-[#22D3EE] border border-[#22D3EE]/35 hover:bg-[#22D3EE]/28',
@@ -106,11 +106,11 @@ export default function CoachQuickAsk({ className = '' }: { className?: string }
         {loading ? 'Thinking…' : 'Ask Coach'}
       </button>
 
-      {error ? <p className="text-[9px] text-[#EF4444] font-mono-tactical px-0.5">{error}</p> : null}
+      {error ? <p className="text-[9px] text-[#EF4444] font-mono px-0.5">{error}</p> : null}
 
       {reply ? (
         <div className="max-h-[140px] overflow-y-auto slim-scroll rounded-md border border-white/[0.06] bg-black/25 px-2 py-1.5">
-          <p className="text-[9px] text-[#CBD5E1] leading-relaxed whitespace-pre-wrap font-mono-tactical">{reply}</p>
+          <p className="text-[9px] text-[#CBD5E1] leading-relaxed whitespace-pre-wrap font-mono">{reply}</p>
         </div>
       ) : null}
     </div>

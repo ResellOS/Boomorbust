@@ -20,6 +20,9 @@ export async function GET(request: Request) {
   if (!users?.length) return NextResponse.json({ synced: 0 });
 
   let synced = 0;
+  let skipped = 0;
+  const redis = getRedis();
+
   for (const user of users) {
     const { data: profile } = await db
       .from('profiles')
@@ -28,6 +31,25 @@ export async function GET(request: Request) {
       .single();
 
     if (!profile?.sleeper_user_id) continue;
+
+    // Skip users with no activity since last sync (offseason optimization)
+    const lastSyncKey = `sync:last:${user.id}`;
+    const activityKey = `sync:activity:${user.id}`;
+    if (redis) {
+      try {
+        const [lastSync, hasActivity] = await Promise.all([
+          redis.get<string>(lastSyncKey),
+          redis.get<string>(activityKey),
+        ]);
+        if (lastSync && !hasActivity) {
+          const hoursSince = (Date.now() - new Date(lastSync).getTime()) / 3600000;
+          if (hoursSince < 48) {
+            skipped++;
+            continue;
+          }
+        }
+      } catch { /* fall through and sync */ }
+    }
 
     try {
       const leagues = await fetchUserLeagues(profile.sleeper_user_id, '2025');
@@ -57,18 +79,25 @@ export async function GET(request: Request) {
           }, { onConflict: 'roster_id,league_id' });
         }
       }
+
+      if (redis) {
+        try {
+          await redis.set(`sync:last:${user.id}`, new Date().toISOString(), { ex: 604800 });
+          await redis.del(`sync:activity:${user.id}`);
+        } catch { /* non-fatal */ }
+      }
+
       synced++;
     } catch (err) {
       console.error(`sync-sleeper failed for user ${user.id}:`, err);
     }
   }
 
-  const redis = getRedis();
   if (redis) {
     try {
       await redis.set('metrics:pipeline:sleeper', new Date().toISOString(), { ex: 172800 });
     } catch {}
   }
 
-  return NextResponse.json({ synced });
+  return NextResponse.json({ synced, skipped, total: users.length });
 }

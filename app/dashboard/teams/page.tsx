@@ -128,7 +128,7 @@ function BhsPill({ player }: { player: TeamCardPlayer }) {
       <span
         className="text-[10px] font-bold shrink-0"
         style={{
-          fontFamily: 'var(--font-mono-tactical), "JetBrains Mono", monospace',
+          fontFamily: 'var(--font-mono), "JetBrains Mono", monospace',
           color: meta.color,
         }}
       >
@@ -137,7 +137,7 @@ function BhsPill({ player }: { player: TeamCardPlayer }) {
       <div className="min-w-0 flex-1">
         <p
           className="text-[11px] font-medium text-white truncate leading-tight"
-          style={{ fontFamily: 'var(--font-mono-tactical), "JetBrains Mono", monospace' }}
+          style={{ fontFamily: 'var(--font-mono), "JetBrains Mono", monospace' }}
         >
           {player.name.split(' ').pop()}
         </p>
@@ -145,7 +145,7 @@ function BhsPill({ player }: { player: TeamCardPlayer }) {
           className="text-[9px] truncate"
           style={{
             color: posColor,
-            fontFamily: 'var(--font-mono-tactical), "JetBrains Mono", monospace',
+            fontFamily: 'var(--font-mono), "JetBrains Mono", monospace',
           }}
         >
           {player.position} · {player.team}
@@ -170,13 +170,13 @@ function ContentionWindowBar({ window: cw }: { window: ContentionWindow }) {
       <div className="flex justify-between items-center">
         <span
           className="text-[10px] text-white/40"
-          style={{ fontFamily: 'var(--font-mono-tactical), "JetBrains Mono", monospace' }}
+          style={{ fontFamily: 'var(--font-mono), "JetBrains Mono", monospace' }}
         >
           {currentYear}
         </span>
         <span
           className="text-[10px] text-white/40"
-          style={{ fontFamily: 'var(--font-mono-tactical), "JetBrains Mono", monospace' }}
+          style={{ fontFamily: 'var(--font-mono), "JetBrains Mono", monospace' }}
         >
           {currentYear + totalSpan}
         </span>
@@ -229,14 +229,14 @@ function FullAnalysis({ card }: { card: TeamCard }) {
       <div>
         <p
           className="text-[10px] text-white/40 uppercase tracking-wider mb-2"
-          style={{ fontFamily: 'var(--font-mono-tactical), "JetBrains Mono", monospace' }}
+          style={{ fontFamily: 'var(--font-mono), "JetBrains Mono", monospace' }}
         >
           Contention Timeline
         </p>
         <ContentionWindowBar window={cw} />
         <p
           className="text-[10px] text-white/50 mt-2"
-          style={{ fontFamily: 'var(--font-mono-tactical), "JetBrains Mono", monospace' }}
+          style={{ fontFamily: 'var(--font-mono), "JetBrains Mono", monospace' }}
         >
           {cw.reasoning}
         </p>
@@ -247,7 +247,7 @@ function FullAnalysis({ card }: { card: TeamCard }) {
         <div>
           <p
             className="text-[10px] text-white/40 uppercase tracking-wider mb-2"
-            style={{ fontFamily: 'var(--font-mono-tactical), "JetBrains Mono", monospace' }}
+            style={{ fontFamily: 'var(--font-mono), "JetBrains Mono", monospace' }}
           >
             Roster Age by Position
           </p>
@@ -268,18 +268,18 @@ function FullAnalysis({ card }: { card: TeamCard }) {
                     className="text-[10px] font-bold mb-0.5"
                     style={{
                       color: POS_COLOR[pos] ?? '#94A3B8',
-                      fontFamily: 'var(--font-mono-tactical), "JetBrains Mono", monospace',
+                      fontFamily: 'var(--font-mono), "JetBrains Mono", monospace',
                     }}
                   >
                     {pos}
                   </p>
                   <p
                     className="text-[13px] font-bold text-white"
-                    style={{ fontFamily: 'var(--font-mono-tactical), "JetBrains Mono", monospace' }}
+                    style={{ fontFamily: 'var(--font-mono), "JetBrains Mono", monospace' }}
                   >
                     {data.avgAge.toFixed(1)}
                   </p>
-                  <p className="text-[9px] text-white/30" style={{ fontFamily: 'var(--font-mono-tactical), "JetBrains Mono", monospace' }}>
+                  <p className="text-[9px] text-white/30" style={{ fontFamily: 'var(--font-mono), "JetBrains Mono", monospace' }}>
                     avg yrs · {data.count}p
                   </p>
                 </div>
@@ -298,7 +298,7 @@ function FullAnalysis({ card }: { card: TeamCard }) {
         >
           <p
             className="text-[9px] text-white/40 mb-1 uppercase"
-            style={{ fontFamily: 'var(--font-mono-tactical), "JetBrains Mono", monospace' }}
+            style={{ fontFamily: 'var(--font-mono), "JetBrains Mono", monospace' }}
           >
             KTC Trend
           </p>
@@ -312,7 +312,7 @@ function FullAnalysis({ card }: { card: TeamCard }) {
                   : cw.ktcTrend === 'FALLING'
                     ? '#EF4444'
                     : '#64748B',
-              fontFamily: 'var(--font-mono-tactical), "JetBrains Mono", monospace',
+              fontFamily: 'var(--font-mono), "JetBrains Mono", monospace',
             }}
           >
             {cw.ktcTrend}
@@ -326,13 +326,13 @@ function FullAnalysis({ card }: { card: TeamCard }) {
         >
           <p
             className="text-[9px] text-white/40 mb-1 uppercase"
-            style={{ fontFamily: 'var(--font-mono-tactical), "JetBrains Mono", monospace' }}
+            style={{ fontFamily: 'var(--font-mono), "JetBrains Mono", monospace' }}
           >
             Avg Age
           </p>
           <p
             className="text-[14px] font-bold text-white"
-            style={{ fontFamily: 'var(--font-mono-tactical), "JetBrains Mono", monospace' }}
+            style={{ fontFamily: 'var(--font-mono), "JetBrains Mono", monospace' }}
           >
             {cw.avgAge.toFixed(1)}
           </p>
@@ -345,7 +345,7 @@ function FullAnalysis({ card }: { card: TeamCard }) {
         >
           <p
             className="text-[9px] text-white/40 mb-1 uppercase"
-            style={{ fontFamily: 'var(--font-mono-tactical), "JetBrains Mono", monospace' }}
+            style={{ fontFamily: 'var(--font-mono), "JetBrains Mono", monospace' }}
           >
             TFO Avg
           </p>
@@ -353,7 +353,7 @@ function FullAnalysis({ card }: { card: TeamCard }) {
             className="text-[14px] font-bold"
             style={{
               color: cw.avgTFO != null && cw.avgTFO >= 75 ? '#36E7A1' : cw.avgTFO != null && cw.avgTFO < 55 ? '#EF4444' : '#FBBF24',
-              fontFamily: 'var(--font-mono-tactical), "JetBrains Mono", monospace',
+              fontFamily: 'var(--font-mono), "JetBrains Mono", monospace',
             }}
           >
             {cw.avgTFO != null ? cw.avgTFO : '—'}
@@ -370,7 +370,7 @@ function FullAnalysis({ card }: { card: TeamCard }) {
           border: '1px solid rgba(34,211,238,0.30)',
           color: '#22D3EE',
           boxShadow: '0 0 12px rgba(34,211,238,0.15)',
-          fontFamily: 'var(--font-mono-tactical), "JetBrains Mono", monospace',
+          fontFamily: 'var(--font-mono), "JetBrains Mono", monospace',
         }}
       >
         Explore Trade Moves
@@ -411,13 +411,13 @@ function TeamCardView({ card }: { card: TeamCard }) {
         <div className="min-w-0">
           <p
             className="text-[11px] text-white/40 uppercase tracking-wider truncate"
-            style={{ fontFamily: 'var(--font-mono-tactical), "JetBrains Mono", monospace' }}
+            style={{ fontFamily: 'var(--font-mono), "JetBrains Mono", monospace' }}
           >
             {card.leagueName}
           </p>
           <h3
             className="text-[15px] font-bold text-white truncate mt-0.5 leading-tight"
-            style={{ fontFamily: 'var(--font-bebas-neue), "Bebas Neue", sans-serif', letterSpacing: '0.04em' }}
+            style={{ fontFamily: 'var(--font-display), "Bebas Neue", sans-serif', letterSpacing: '0.04em' }}
           >
             {card.teamName ?? 'My Team'}
           </h3>
@@ -430,7 +430,7 @@ function TeamCardView({ card }: { card: TeamCard }) {
               background: `${statusMeta.color}18`,
               border: `1px solid ${statusMeta.color}44`,
               boxShadow: statusMeta.glow,
-              fontFamily: 'var(--font-mono-tactical), "JetBrains Mono", monospace',
+              fontFamily: 'var(--font-mono), "JetBrains Mono", monospace',
             }}
           >
             {statusMeta.label}
@@ -444,7 +444,7 @@ function TeamCardView({ card }: { card: TeamCard }) {
           <Trophy size={12} className="text-white/30" />
           <span
             className="text-[13px] font-bold text-white"
-            style={{ fontFamily: 'var(--font-mono-tactical), "JetBrains Mono", monospace' }}
+            style={{ fontFamily: 'var(--font-mono), "JetBrains Mono", monospace' }}
           >
             {card.wins}–{card.losses}
             {card.ties > 0 ? `–${card.ties}` : ''}
@@ -452,7 +452,7 @@ function TeamCardView({ card }: { card: TeamCard }) {
         </div>
         <span
           className="text-[11px] text-white/40"
-          style={{ fontFamily: 'var(--font-mono-tactical), "JetBrains Mono", monospace' }}
+          style={{ fontFamily: 'var(--font-mono), "JetBrains Mono", monospace' }}
         >
           {winPct}% win rate
         </span>
@@ -460,7 +460,7 @@ function TeamCardView({ card }: { card: TeamCard }) {
           <Users size={11} className="text-white/30" />
           <span
             className="text-[10px] text-white/30"
-            style={{ fontFamily: 'var(--font-mono-tactical), "JetBrains Mono", monospace' }}
+            style={{ fontFamily: 'var(--font-mono), "JetBrains Mono", monospace' }}
           >
             {card.totalPlayers}p
           </span>
@@ -478,7 +478,7 @@ function TeamCardView({ card }: { card: TeamCard }) {
         <div className="flex items-center justify-between mb-2">
           <span
             className="text-[10px] text-white/40 uppercase tracking-wider"
-            style={{ fontFamily: 'var(--font-mono-tactical), "JetBrains Mono", monospace' }}
+            style={{ fontFamily: 'var(--font-mono), "JetBrains Mono", monospace' }}
           >
             Contention Window
           </span>
@@ -486,7 +486,7 @@ function TeamCardView({ card }: { card: TeamCard }) {
             className="text-[12px] font-bold"
             style={{
               color: statusMeta.color,
-              fontFamily: 'var(--font-mono-tactical), "JetBrains Mono", monospace',
+              fontFamily: 'var(--font-mono), "JetBrains Mono", monospace',
             }}
           >
             Peak: {peakLabel}
@@ -503,7 +503,7 @@ function TeamCardView({ card }: { card: TeamCard }) {
             className="text-[11px] italic"
             style={{
               color: '#64748B',
-              fontFamily: 'var(--font-mono-tactical), "JetBrains Mono", monospace',
+              fontFamily: 'var(--font-mono), "JetBrains Mono", monospace',
             }}
           >
             {card.managerTitle}
@@ -516,7 +516,7 @@ function TeamCardView({ card }: { card: TeamCard }) {
         <div>
           <p
             className="text-[10px] text-white/30 uppercase tracking-wider mb-2"
-            style={{ fontFamily: 'var(--font-mono-tactical), "JetBrains Mono", monospace' }}
+            style={{ fontFamily: 'var(--font-mono), "JetBrains Mono", monospace' }}
           >
             Top Moves
           </p>
@@ -536,7 +536,7 @@ function TeamCardView({ card }: { card: TeamCard }) {
           background: 'rgba(255,255,255,0.04)',
           border: '1px solid rgba(255,255,255,0.10)',
           color: 'rgba(255,255,255,0.60)',
-          fontFamily: 'var(--font-mono-tactical), "JetBrains Mono", monospace',
+          fontFamily: 'var(--font-mono), "JetBrains Mono", monospace',
         }}
       >
         {expanded ? (
@@ -605,7 +605,7 @@ export default function TeamsPage() {
         <Link
           href="/dashboard"
           className="flex items-center gap-1.5 text-white/40 hover:text-white/80 transition-colors"
-          style={{ fontFamily: 'var(--font-mono-tactical), "JetBrains Mono", monospace', fontSize: 11 }}
+          style={{ fontFamily: 'var(--font-mono), "JetBrains Mono", monospace', fontSize: 11 }}
         >
           <ChevronLeft size={14} />
           Dashboard
@@ -613,7 +613,7 @@ export default function TeamsPage() {
         <span className="text-white/20 text-xs">/</span>
         <span
           className="text-white/60 text-[11px] uppercase tracking-widest"
-          style={{ fontFamily: 'var(--font-mono-tactical), "JetBrains Mono", monospace' }}
+          style={{ fontFamily: 'var(--font-mono), "JetBrains Mono", monospace' }}
         >
           All Teams
         </span>
@@ -628,19 +628,19 @@ export default function TeamsPage() {
               <div>
                 <p
                   className="text-[11px] text-white/40 uppercase tracking-widest mb-1"
-                  style={{ fontFamily: 'var(--font-mono-tactical), "JetBrains Mono", monospace' }}
+                  style={{ fontFamily: 'var(--font-mono), "JetBrains Mono", monospace' }}
                 >
                   Dynasty Command Center
                 </p>
                 <h1
                   className="text-[32px] sm:text-[40px] font-bold text-white leading-none"
-                  style={{ fontFamily: 'var(--font-bebas-neue), "Bebas Neue", sans-serif', letterSpacing: '0.04em' }}
+                  style={{ fontFamily: 'var(--font-display), "Bebas Neue", sans-serif', letterSpacing: '0.04em' }}
                 >
                   ALL TEAMS
                 </h1>
                 <p
                   className="text-[12px] text-white/40 mt-1"
-                  style={{ fontFamily: 'var(--font-mono-tactical), "JetBrains Mono", monospace' }}
+                  style={{ fontFamily: 'var(--font-mono), "JetBrains Mono", monospace' }}
                 >
                   Full contention analysis across all your leagues
                 </p>
@@ -661,14 +661,14 @@ export default function TeamsPage() {
                         className="text-[18px] sm:text-[22px] font-bold"
                         style={{
                           color,
-                          fontFamily: 'var(--font-mono-tactical), "JetBrains Mono", monospace',
+                          fontFamily: 'var(--font-mono), "JetBrains Mono", monospace',
                         }}
                       >
                         {value}
                       </p>
                       <p
                         className="text-[9px] text-white/30 uppercase tracking-wider"
-                        style={{ fontFamily: 'var(--font-mono-tactical), "JetBrains Mono", monospace' }}
+                        style={{ fontFamily: 'var(--font-mono), "JetBrains Mono", monospace' }}
                       >
                         {label}
                       </p>
@@ -692,7 +692,7 @@ export default function TeamsPage() {
                     <span
                       className="text-[10px] text-white/40"
                       style={{
-                        fontFamily: 'var(--font-mono-tactical), "JetBrains Mono", monospace',
+                        fontFamily: 'var(--font-mono), "JetBrains Mono", monospace',
                       }}
                     >
                       {meta.label}
@@ -714,14 +714,14 @@ export default function TeamsPage() {
             >
               <p
                 className="text-[13px] text-red-400"
-                style={{ fontFamily: 'var(--font-mono-tactical), "JetBrains Mono", monospace' }}
+                style={{ fontFamily: 'var(--font-mono), "JetBrains Mono", monospace' }}
               >
                 {error}
               </p>
               <button
                 onClick={load}
                 className="mt-3 text-[11px] text-red-400/60 underline hover:text-red-400"
-                style={{ fontFamily: 'var(--font-mono-tactical), "JetBrains Mono", monospace' }}
+                style={{ fontFamily: 'var(--font-mono), "JetBrains Mono", monospace' }}
               >
                 Retry
               </button>
@@ -749,13 +749,13 @@ export default function TeamsPage() {
               <Users size={32} className="mx-auto mb-3 text-white/20" />
               <p
                 className="text-[14px] text-white/40"
-                style={{ fontFamily: 'var(--font-mono-tactical), "JetBrains Mono", monospace' }}
+                style={{ fontFamily: 'var(--font-mono), "JetBrains Mono", monospace' }}
               >
                 No leagues found.
               </p>
               <p
                 className="text-[11px] text-white/25 mt-1"
-                style={{ fontFamily: 'var(--font-mono-tactical), "JetBrains Mono", monospace' }}
+                style={{ fontFamily: 'var(--font-mono), "JetBrains Mono", monospace' }}
               >
                 Import your Sleeper leagues in{' '}
                 <a href="/onboarding" className="underline hover:text-white/50">

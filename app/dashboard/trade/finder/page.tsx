@@ -52,7 +52,7 @@ const SELECT_STYLE: CSSProperties = {
   background: 'rgba(255,255,255,0.04)',
   border: '1px solid rgba(255,255,255,0.12)',
   color: '#fff',
-  fontFamily: 'var(--font-mono-tactical), "JetBrains Mono", ui-monospace, monospace',
+  fontFamily: 'var(--font-mono), "JetBrains Mono", ui-monospace, monospace',
   fontSize: 13,
   padding: '10px 14px',
   borderRadius: 8,
@@ -550,13 +550,13 @@ export default function TradeFinderPage() {
           </p>
           <p
             className="mt-3 uppercase tracking-[0.14em]"
-            style={{ fontFamily: 'var(--font-mono-tactical), "JetBrains Mono", monospace', fontSize: 11, color: '#22D3EE' }}
+            style={{ fontFamily: 'var(--font-mono), "JetBrains Mono", monospace', fontSize: 11, color: '#22D3EE' }}
           >
             Behavioral trade matching built around your partners
           </p>
           {(intent === 'buy' || intent === 'sell') && (finderTargetLabel || targetPlayerId) ? (
             <p
-              className="mt-2 max-w-2xl font-mono-tactical text-[10px] font-bold uppercase tracking-[0.12em]"
+              className="mt-2 max-w-2xl font-mono text-[10px] font-bold uppercase tracking-[0.12em]"
               style={{
                 color: intent === 'sell' ? '#EF4444' : '#36E7A1',
                 textShadow:
@@ -572,10 +572,10 @@ export default function TradeFinderPage() {
 
         {/* Section 1 */}
         <section className="space-y-6 mb-12">
-          <h2 className="text-[11px] font-mono-tactical uppercase tracking-[0.2em] text-[#64748B]">I want to trade</h2>
+          <h2 className="text-[11px] font-mono uppercase tracking-[0.2em] text-[#64748B]">I want to trade</h2>
 
           <div>
-            <label className="block text-[10px] font-mono-tactical uppercase tracking-[0.15em] text-[#475569] mb-2">
+            <label className="block text-[10px] font-mono uppercase tracking-[0.15em] text-[#475569] mb-2">
               League
             </label>
             <select
@@ -595,11 +595,11 @@ export default function TradeFinderPage() {
           </div>
 
           <div>
-            <label className="block text-[10px] font-mono-tactical uppercase tracking-[0.15em] text-[#475569] mb-2">
+            <label className="block text-[10px] font-mono uppercase tracking-[0.15em] text-[#475569] mb-2">
               Select one player from your roster
             </label>
             {!myRoster ? (
-              <p className="text-sm text-[#64748B] font-mono-tactical">
+              <p className="text-sm text-[#64748B] font-mono">
                 {rostersLoading ? 'Loading roster…' : 'Link your Sleeper account to see your roster.'}
               </p>
             ) : (
@@ -614,12 +614,12 @@ export default function TradeFinderPage() {
                   onFocus={() => setPlayerOpen(true)}
                   placeholder="Search your roster…"
                   readOnly={!!selectedPlayer}
-                  className="glass-panel w-full rounded-lg px-3 py-2.5 text-sm text-white placeholder:text-[#475569] border border-white/[0.12] bg-white/[0.04] font-mono-tactical"
+                  className="glass-panel w-full rounded-lg px-3 py-2.5 text-sm text-white placeholder:text-[#475569] border border-white/[0.12] bg-white/[0.04] font-mono"
                 />
                 {selectedPlayer && (
                   <button
                     type="button"
-                    className="absolute right-2 top-1/2 -translate-y-1/2 text-[11px] text-[#22D3EE] font-mono-tactical uppercase"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 text-[11px] text-[#22D3EE] font-mono uppercase"
                     onClick={() => {
                       setSelectedPlayer(null);
                       setPlayerQuery('');
@@ -647,7 +647,7 @@ export default function TradeFinderPage() {
                               setPosTab(tab);
                             }}
                             className={clsx(
-                              'text-[10px] font-bold px-2 py-1 rounded font-mono-tactical',
+                              'text-[10px] font-bold px-2 py-1 rounded font-mono',
                               posTab === tab ? 'bg-[#22D3EE]/20 text-[#22D3EE]' : 'text-[#64748B] hover:text-white',
                             )}
                           >
@@ -671,7 +671,7 @@ export default function TradeFinderPage() {
                               <PlayerAvatar playerId={p.player_id} playerName={p.name} position={p.position} size={40} />
                               <div className="flex-1 min-w-0">
                                 <p className="text-[13px] text-white truncate">{p.name}</p>
-                                <p className="text-[10px] font-mono-tactical text-[#64748B]">
+                                <p className="text-[10px] font-mono text-[#64748B]">
                                   {p.position} · {p.ktc.toLocaleString()} KTC
                                 </p>
                               </div>
@@ -688,7 +688,7 @@ export default function TradeFinderPage() {
 
           {selectedPlayer && (
             <div className="max-w-md">
-              <p className="text-[10px] font-mono-tactical uppercase tracking-[0.15em] text-[#475569] mb-2">
+              <p className="text-[10px] font-mono uppercase tracking-[0.15em] text-[#475569] mb-2">
                 TFO card · piece you are shopping
               </p>
               <TfoTradeCard player={selectedPlayer} side="give" />
@@ -700,11 +700,11 @@ export default function TradeFinderPage() {
         {selectedPlayer && (
           <section className="mb-12">
             <div className="flex items-center justify-between gap-4 mb-4">
-              <h2 className="text-[11px] font-mono-tactical uppercase tracking-[0.2em] text-[#64748B]">
+              <h2 className="text-[11px] font-mono uppercase tracking-[0.2em] text-[#64748B]">
                 Match results
               </h2>
               {bbstLoading && (
-                <span className="flex items-center gap-2 text-[11px] text-[#94A3B8] font-mono-tactical">
+                <span className="flex items-center gap-2 text-[11px] text-[#94A3B8] font-mono">
                   <Loader2 className="w-3.5 h-3.5 animate-spin" />
                   Syncing transactions…
                 </span>
@@ -712,7 +712,7 @@ export default function TradeFinderPage() {
             </div>
 
             {bbstMatches.length === 0 ? (
-              <p className="text-sm text-[#64748B] font-mono-tactical">No counterparty match yet — try another league or player.</p>
+              <p className="text-sm text-[#64748B] font-mono">No counterparty match yet — try another league or player.</p>
             ) : (
               <div className="grid gap-4 md:grid-cols-2">
                 {bbstMatches.map((row) => {
@@ -733,7 +733,7 @@ export default function TradeFinderPage() {
                       <div className="flex items-start justify-between gap-3 mb-4">
                         <div>
                           <p className="text-white font-bold text-[14px] leading-tight">{mgrName}</p>
-                          <p className="text-[11px] text-[#94A3B8] font-mono-tactical mt-1">{leagueLabel}</p>
+                          <p className="text-[11px] text-[#94A3B8] font-mono mt-1">{leagueLabel}</p>
                         </div>
                         <span
                           className={clsx(
@@ -747,30 +747,30 @@ export default function TradeFinderPage() {
 
                       <div className="flex flex-col sm:flex-row items-center justify-center gap-3 py-4 border-y border-white/[0.06]">
                         <div className="text-center flex-1 min-w-0">
-                          <p className="text-[9px] font-mono-tactical uppercase text-[#64748B] mb-1">You give</p>
+                          <p className="text-[9px] font-mono uppercase text-[#64748B] mb-1">You give</p>
                           <p className="text-sm text-white font-semibold truncate">{selectedPlayer.name}</p>
-                          <p className="text-[11px] font-mono-tactical text-[#94A3B8] tabular-nums">
+                          <p className="text-[11px] font-mono text-[#94A3B8] tabular-nums">
                             {selectedPlayer.ktc.toLocaleString()} KTC
                           </p>
                         </div>
                         <ArrowLeftRight className="w-5 h-5 text-[#22D3EE] shrink-0" aria-hidden />
                         <div className="text-center flex-1 min-w-0">
-                          <p className="text-[9px] font-mono-tactical uppercase text-[#64748B] mb-1">They give</p>
+                          <p className="text-[9px] font-mono uppercase text-[#64748B] mb-1">They give</p>
                           <p className="text-sm text-white font-semibold truncate">{row.theirGive.name}</p>
-                          <p className="text-[11px] font-mono-tactical text-[#94A3B8] tabular-nums">
+                          <p className="text-[11px] font-mono text-[#94A3B8] tabular-nums">
                             {row.theirGive.ktc.toLocaleString()} KTC
                           </p>
                         </div>
                       </div>
 
-                      <p className={clsx('text-center text-[12px] font-mono-tactical font-bold mt-3', gapColor(net))}>
+                      <p className={clsx('text-center text-[12px] font-mono font-bold mt-3', gapColor(net))}>
                         Value gap: {gapLabel}
                       </p>
                       <p className="text-[12px] text-[#CBD5E1] leading-relaxed mt-3">{row.whyAccept}</p>
 
                       <div className="mt-4 grid grid-cols-2 gap-3 text-[11px]">
                         <div className="rounded-lg bg-white/[0.04] border border-white/[0.06] p-3">
-                          <p className="text-[9px] font-mono-tactical uppercase text-[#64748B] mb-1">3-year impact · you</p>
+                          <p className="text-[9px] font-mono uppercase text-[#64748B] mb-1">3-year impact · you</p>
                           <p className="text-white font-bold flex items-center gap-1">
                             {row.empire === 'UP' && <span className="text-emerald-400">↑</span>}
                             {row.empire === 'DOWN' && <span className="text-rose-400">↓</span>}
@@ -779,7 +779,7 @@ export default function TradeFinderPage() {
                           </p>
                         </div>
                         <div className="rounded-lg bg-white/[0.04] border border-white/[0.06] p-3">
-                          <p className="text-[9px] font-mono-tactical uppercase text-[#64748B] mb-1">Their fill</p>
+                          <p className="text-[9px] font-mono uppercase text-[#64748B] mb-1">Their fill</p>
                           <p className="text-[#E2E8F0] leading-snug">{row.theirFill}</p>
                         </div>
                       </div>
@@ -796,7 +796,7 @@ export default function TradeFinderPage() {
                         <button
                           type="button"
                           onClick={() => openTradeCalc(row.opponent, row.theirGive)}
-                          className="text-[11px] font-bold font-mono-tactical uppercase tracking-wide px-4 py-2 rounded-lg bg-[#22D3EE]/15 text-[#22D3EE] border border-[#22D3EE]/35 hover:bg-[#22D3EE]/25 transition"
+                          className="text-[11px] font-bold font-mono uppercase tracking-wide px-4 py-2 rounded-lg bg-[#22D3EE]/15 text-[#22D3EE] border border-[#22D3EE]/35 hover:bg-[#22D3EE]/25 transition"
                         >
                           View full trade
                         </button>
@@ -816,7 +816,7 @@ export default function TradeFinderPage() {
             onClick={() => setIntelOpen((o) => !o)}
             className="w-full flex items-center justify-between glass-panel rounded-xl px-4 py-3 border border-white/[0.1]"
           >
-            <span className="text-[11px] font-mono-tactical uppercase tracking-[0.2em] text-white">
+            <span className="text-[11px] font-mono uppercase tracking-[0.2em] text-white">
               Manager intel · league-wide
             </span>
             {intelOpen ? <ChevronUp className="w-4 h-4 text-[#94A3B8]" /> : <ChevronDown className="w-4 h-4 text-[#94A3B8]" />}
@@ -851,12 +851,12 @@ export default function TradeFinderPage() {
 
                   <div className="flex flex-wrap gap-1.5 mb-3">
                     {row.tags.length === 0 ? (
-                      <span className="text-[11px] text-[#475569] font-mono-tactical">No strong pattern yet</span>
+                      <span className="text-[11px] text-[#475569] font-mono">No strong pattern yet</span>
                     ) : (
                       row.tags.map((t) => (
                         <span
                           key={t}
-                          className="text-[10px] font-mono-tactical px-2 py-0.5 rounded bg-white/[0.06] text-[#CBD5E1] border border-white/[0.08]"
+                          className="text-[10px] font-mono px-2 py-0.5 rounded bg-white/[0.06] text-[#CBD5E1] border border-white/[0.08]"
                         >
                           {t}
                         </span>
@@ -864,7 +864,7 @@ export default function TradeFinderPage() {
                     )}
                   </div>
 
-                  <p className="text-[10px] font-mono-tactical uppercase text-[#64748B] mb-1">Last 3 trades</p>
+                  <p className="text-[10px] font-mono uppercase text-[#64748B] mb-1">Last 3 trades</p>
                   <ul className="space-y-2 mb-3">
                     {row.last3.length === 0 ? (
                       <li className="text-[12px] text-[#475569]">No trades in the last five weeks.</li>
@@ -878,7 +878,7 @@ export default function TradeFinderPage() {
                     )}
                   </ul>
 
-                  <p className="text-[10px] font-mono-tactical uppercase text-[#64748B] mb-1">Best pitch angle</p>
+                  <p className="text-[10px] font-mono uppercase text-[#64748B] mb-1">Best pitch angle</p>
                   <p className="text-[13px] text-[#CBD5E1] leading-relaxed">{row.pitchAngle}</p>
                 </div>
               ))}

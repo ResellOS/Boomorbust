@@ -60,7 +60,7 @@ const SIZES: Record<AdSlotSize, SizeCfg> = {
 // ─── Design tokens ────────────────────────────────────────────────────────────
 
 const MONO = {
-  fontFamily: 'var(--font-mono-tactical, "JetBrains Mono", monospace)',
+  fontFamily: 'var(--font-mono, "JetBrains Mono", monospace)',
 } as const;
 
 // ─── Component ───────────────────────────────────────────────────────────────

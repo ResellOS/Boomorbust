@@ -94,7 +94,7 @@ export default function BoomOrBustComingSoonPage() {
         {/* HERO */}
         <section>
           <span
-            className="inline-block rounded-[20px] border px-4 py-1.5 text-[11px] font-bold font-mono-tactical uppercase tracking-[0.15em]"
+            className="inline-block rounded-[20px] border px-4 py-1.5 text-[11px] font-bold font-mono uppercase tracking-[0.15em]"
             style={{
               background: 'rgba(251,191,36,0.1)',
               borderColor: 'rgba(251,191,36,0.25)',
@@ -247,7 +247,7 @@ export default function BoomOrBustComingSoonPage() {
           </p>
           <Link
             href="/dashboard/lineup"
-            className="mt-2 inline-block text-sm font-mono-tactical font-semibold text-[#22D3EE] hover:text-[#67E8F9] transition-colors"
+            className="mt-2 inline-block text-sm font-mono font-semibold text-[#22D3EE] hover:text-[#67E8F9] transition-colors"
           >
             Go to Lineup Optimizer →
           </Link>

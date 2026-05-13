@@ -148,13 +148,13 @@ function PlayerRow({
             {offer.player}
           </span>
           <span
-            className="shrink-0 rounded px-1 py-px text-[7px] font-black uppercase font-mono-tactical"
+            className="shrink-0 rounded px-1 py-px text-[7px] font-black uppercase font-mono"
             style={{ background: `${posColor}22`, color: posColor }}
           >
             {offer.position ?? '—'}
           </span>
           {offer.team && offer.team !== '—' && (
-            <span className="shrink-0 text-[7px] text-[var(--text-muted)] font-mono-tactical">
+            <span className="shrink-0 text-[7px] text-[var(--text-muted)] font-mono">
               {offer.team}
             </span>
           )}
@@ -162,7 +162,7 @@ function PlayerRow({
 
         {/* TFO + Grade */}
         <div className="flex items-center gap-2">
-          <span className="font-mono-tactical text-[8px] text-[var(--text-muted)] tabular-nums">
+          <span className="font-mono text-[8px] text-[var(--text-muted)] tabular-nums">
             TFO{' '}
             <span className="text-white font-black">
               {tfoScore != null ? tfoScore : '—'}
@@ -170,7 +170,7 @@ function PlayerRow({
           </span>
           {grade && (
             <span
-              className="font-mono-tactical text-[7px] font-black uppercase"
+              className="font-mono text-[7px] font-black uppercase"
               style={{ color: gradeColor }}
             >
               {grade}
@@ -179,7 +179,7 @@ function PlayerRow({
         </div>
 
         {/* BVI / KTC */}
-        <span className="font-mono-tactical text-[7px] text-[var(--text-muted)] tabular-nums">
+        <span className="font-mono text-[7px] text-[var(--text-muted)] tabular-nums">
           KTC ~{fmtKtc(ktcApprox)}
         </span>
       </div>
@@ -252,7 +252,7 @@ export default function TradeAnalyzePanel({
             background: 'rgba(34,211,238,0.07)',
           }}
         >
-          <span className="font-mono-tactical text-[8px] font-black text-[#22D3EE] uppercase tracking-[0.1em]">
+          <span className="font-mono text-[8px] font-black text-[#22D3EE] uppercase tracking-[0.1em]">
             TRE
           </span>
         </span>
@@ -276,10 +276,10 @@ export default function TradeAnalyzePanel({
         ) : (
           /* Empty state */
           <div className="flex flex-col items-center justify-center py-8 gap-2">
-            <p className="font-mono-tactical text-[12px] text-[#475569] text-center leading-relaxed">
+            <p className="font-mono text-[12px] text-[#475569] text-center leading-relaxed">
               No pending offers
             </p>
-            <p className="font-mono-tactical text-[9px] text-[#334155] text-center">
+            <p className="font-mono text-[9px] text-[#334155] text-center">
               Trade activity syncs automatically from Sleeper
             </p>
           </div>
@@ -289,7 +289,7 @@ export default function TradeAnalyzePanel({
           {/* League label */}
           {offer!.league && (
             <div className="flex items-center gap-2 -mt-1">
-              <span className="font-mono-tactical text-[8px] uppercase tracking-[0.12em] text-[var(--text-muted)]">
+              <span className="font-mono text-[8px] uppercase tracking-[0.12em] text-[var(--text-muted)]">
                 {offer!.league}
               </span>
               <div className="flex-1 h-px bg-white/[0.05]" />
@@ -300,7 +300,7 @@ export default function TradeAnalyzePanel({
           <div className="grid grid-cols-2 gap-2 sm:gap-3">
             {/* YOU GIVE */}
             <div>
-              <p className="font-mono-tactical text-[7px] font-black uppercase tracking-[0.15em] mb-1.5 text-[#EF4444]">
+              <p className="font-mono text-[7px] font-black uppercase tracking-[0.15em] mb-1.5 text-[#EF4444]">
                 You Give
               </p>
               <div className="space-y-1.5">
@@ -313,11 +313,11 @@ export default function TradeAnalyzePanel({
                     />
                   ))
                 ) : (
-                  <p className="font-mono-tactical text-[9px] text-[#475569] py-3 text-center">—</p>
+                  <p className="font-mono text-[9px] text-[#475569] py-3 text-center">—</p>
                 )}
               </div>
               {offer!.give.length > 0 && (
-                <p className="font-mono-tactical text-[8px] tabular-nums text-[#EF4444] mt-1.5 text-right">
+                <p className="font-mono text-[8px] tabular-nums text-[#EF4444] mt-1.5 text-right">
                   Total ~{fmtKtc(offer!.giveKtc)}
                 </p>
               )}
@@ -326,7 +326,7 @@ export default function TradeAnalyzePanel({
             {/* Divider + swap icon (visible on larger widths) */}
             {/* YOU GET */}
             <div>
-              <p className="font-mono-tactical text-[7px] font-black uppercase tracking-[0.15em] mb-1.5 text-[#36E7A1]">
+              <p className="font-mono text-[7px] font-black uppercase tracking-[0.15em] mb-1.5 text-[#36E7A1]">
                 You Get
               </p>
               <div className="space-y-1.5">
@@ -339,11 +339,11 @@ export default function TradeAnalyzePanel({
                     />
                   ))
                 ) : (
-                  <p className="font-mono-tactical text-[9px] text-[#475569] py-3 text-center">—</p>
+                  <p className="font-mono text-[9px] text-[#475569] py-3 text-center">—</p>
                 )}
               </div>
               {offer!.get.length > 0 && (
-                <p className="font-mono-tactical text-[8px] tabular-nums text-[#36E7A1] mt-1.5 text-right">
+                <p className="font-mono text-[8px] tabular-nums text-[#36E7A1] mt-1.5 text-right">
                   Total ~{fmtKtc(offer!.getKtc)}
                 </p>
               )}
@@ -372,7 +372,7 @@ export default function TradeAnalyzePanel({
             </p>
             {offer!.delta !== 0 && (
               <p
-                className="font-mono-tactical text-[9px] tabular-nums mt-0.5"
+                className="font-mono text-[9px] tabular-nums mt-0.5"
                 style={{ color: vs!.color, opacity: 0.7 }}
               >
                 {offer!.delta >= 0 ? '+' : ''}
@@ -382,7 +382,7 @@ export default function TradeAnalyzePanel({
           </div>
 
           {/* Reasoning */}
-          <p className="font-mono-tactical text-[10px] leading-relaxed text-[#64748B]">
+          <p className="font-mono text-[10px] leading-relaxed text-[#64748B]">
             {offer!.reasoning}
           </p>
 
@@ -391,7 +391,7 @@ export default function TradeAnalyzePanel({
             <button
               type="button"
               onClick={() => goToTrade()}
-              className="flex-1 h-8 rounded-lg border border-white/[0.10] bg-white/[0.05] text-[9px] font-mono-tactical font-black uppercase tracking-wide text-[#94A3B8] hover:text-white hover:bg-white/[0.09] transition-colors"
+              className="flex-1 h-8 rounded-lg border border-white/[0.10] bg-white/[0.05] text-[9px] font-mono font-black uppercase tracking-wide text-[#94A3B8] hover:text-white hover:bg-white/[0.09] transition-colors"
             >
               View Full Analysis →
             </button>
@@ -401,7 +401,7 @@ export default function TradeAnalyzePanel({
               <button
                 type="button"
                 onClick={() => setCounterOpen((v) => !v)}
-                className="flex items-center gap-1 h-8 rounded-lg border px-3 text-[9px] font-mono-tactical font-black uppercase tracking-wide transition-colors"
+                className="flex items-center gap-1 h-8 rounded-lg border px-3 text-[9px] font-mono font-black uppercase tracking-wide transition-colors"
                 style={{
                   borderColor: vs!.border,
                   background: vs!.bg,
@@ -453,12 +453,12 @@ export default function TradeAnalyzePanel({
                       className="w-full text-left px-3 py-2 hover:bg-white/[0.04] transition-colors"
                     >
                       <p
-                        className="font-mono-tactical text-[9px] font-black uppercase tracking-wide"
+                        className="font-mono text-[9px] font-black uppercase tracking-wide"
                         style={{ color }}
                       >
                         {label}
                       </p>
-                      <p className="font-mono-tactical text-[8px] text-[#475569] mt-0.5">
+                      <p className="font-mono text-[8px] text-[#475569] mt-0.5">
                         {sub}
                       </p>
                     </button>

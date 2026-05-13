@@ -14,6 +14,7 @@
     { "path": "/api/cron/update-college-rankings", "schedule": "0 8 * * 2" },
     { "path": "/api/cron/sync-college", "schedule": "0 6 * * 2" },
     { "path": "/api/cron/cache-tfo", "schedule": "0 2 * * *" },
-    { "path": "/api/cron/proactive-trades", "schedule": "0 7 * * *" }
+    { "path": "/api/cron/proactive-trades", "schedule": "0 7 * * *" },
+    { "path": "/api/cron/seed-players", "schedule": "0 0 * * 1" }
   ]
 }

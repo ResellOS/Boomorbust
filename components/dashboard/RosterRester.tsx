@@ -60,7 +60,7 @@ export default function RosterRester({
           <ShieldCheck className="w-3 h-3 text-[#22D3EE]" />
           Roster Rester
         </h3>
-        <span className="text-[8px] font-mono-tactical text-slate-600 uppercase">
+        <span className="text-[8px] font-mono text-slate-600 uppercase">
           Battle readiness
         </span>
       </div>
@@ -91,7 +91,7 @@ export default function RosterRester({
             <circle cx="50" cy="50" r="40" fill={`url(#rester-glass-${uid})`} />
 
             <text
-              className="font-mono-tactical uppercase"
+              className="font-mono uppercase"
               fill="rgba(248,250,252,0.35)"
               fontSize="5.4"
               fontWeight="800"
@@ -130,7 +130,7 @@ export default function RosterRester({
           </svg>
           <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
             <span
-              className="text-3xl font-black font-mono-tactical leading-none"
+              className="text-3xl font-black font-mono leading-none"
               style={{
                 color: ringColor,
                 textShadow: `0 0 10px ${ringSoft}, 0 0 24px ${ringSoft}`,
@@ -154,7 +154,7 @@ export default function RosterRester({
           {entries.map((e, i) => (
             <li
               key={i}
-              className="flex items-center gap-2 text-[11px] font-mono-tactical"
+              className="flex items-center gap-2 text-[11px] font-mono"
             >
               <span
                 className="w-2 h-2 rounded-full shrink-0"
@@ -171,7 +171,7 @@ export default function RosterRester({
       </div>
 
       {leagueContext && (
-        <p className="mt-3 text-[9px] text-slate-600 font-mono-tactical uppercase tracking-wider truncate border-t border-white/[0.04] pt-2">
+        <p className="mt-3 text-[9px] text-slate-600 font-mono uppercase tracking-wider truncate border-t border-white/[0.04] pt-2">
           {leagueContext}
         </p>
       )}

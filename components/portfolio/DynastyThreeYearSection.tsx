@@ -133,7 +133,7 @@ export default function DynastyThreeYearSection({
     <section className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h2 className="font-mono-tactical text-[10px] font-black uppercase tracking-[0.2em] text-[#64748B]">
+          <h2 className="font-mono text-[10px] font-black uppercase tracking-[0.2em] text-[#64748B]">
             ROSTER TRAJECTORY
           </h2>
           <p className="text-xs text-[var(--text-secondary)]">TFO score outlook · 2025–2027</p>
@@ -151,7 +151,7 @@ export default function DynastyThreeYearSection({
               type="button"
               onClick={() => setSortMode(b.id)}
               className={clsx(
-                'rounded-lg border px-3 py-1.5 text-[10px] font-bold font-mono-tactical uppercase tracking-wide transition',
+                'rounded-lg border px-3 py-1.5 text-[10px] font-bold font-mono uppercase tracking-wide transition',
                 sortMode === b.id
                   ? 'border-[var(--cyan)] bg-[var(--cyan)]/15 text-white'
                   : 'border-white/10 bg-white/[0.04] text-[#94A3B8] hover:border-white/20',
@@ -165,7 +165,7 @@ export default function DynastyThreeYearSection({
 
       <div className="glass-panel relative min-h-[300px] overflow-visible rounded-xl p-4">
         {dynLoading && (
-          <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/30 text-[11px] font-mono-tactical text-[#94A3B8]">
+          <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/30 text-[11px] font-mono text-[#94A3B8]">
             Loading dynasty model…
           </div>
         )}
@@ -199,7 +199,7 @@ export default function DynastyThreeYearSection({
                   y={yScore(rl.y) + 3}
                   fill={rl.color}
                   fontSize={8}
-                  fontFamily="var(--font-mono-tactical), JetBrains Mono, monospace"
+                  fontFamily="var(--font-mono), JetBrains Mono, monospace"
                 >
                   {rl.label}
                 </text>
@@ -224,7 +224,7 @@ export default function DynastyThreeYearSection({
                 textAnchor="end"
                 fill="#475569"
                 fontSize={7}
-                fontFamily="var(--font-mono-tactical), monospace"
+                fontFamily="var(--font-mono), monospace"
               >
                 {tick}
               </text>
@@ -238,7 +238,7 @@ export default function DynastyThreeYearSection({
                 textAnchor="middle"
                 fill="#64748B"
                 fontSize={10}
-                fontFamily="var(--font-mono-tactical), monospace"
+                fontFamily="var(--font-mono), monospace"
               >
                 {yr}
               </text>
@@ -288,7 +288,7 @@ export default function DynastyThreeYearSection({
                     textAnchor="middle"
                     fill={col}
                     fontSize={8}
-                    fontFamily="var(--font-mono-tactical), JetBrains Mono, monospace"
+                    fontFamily="var(--font-mono), JetBrains Mono, monospace"
                   >
                     {shortInitialLast(row.name)}
                   </text>
@@ -306,8 +306,8 @@ export default function DynastyThreeYearSection({
               }}
             >
               <p className="truncate font-semibold text-white">{tip.name}</p>
-              <p className="font-mono-tactical text-[#94A3B8]">{tip.position}</p>
-              <p className="mt-1 font-mono-tactical text-[#36E7A1]">
+              <p className="font-mono text-[#94A3B8]">{tip.position}</p>
+              <p className="mt-1 font-mono text-[#36E7A1]">
                 {tip.year}: <span className="text-white">{tip.score}</span> TFO
               </p>
             </div>
@@ -330,7 +330,7 @@ export default function DynastyThreeYearSection({
             <div className="text-[24px] font-bold tabular-nums" style={{ fontFamily: 'var(--font-display)', color: s.c }}>
               {s.v}
             </div>
-            <div className="mt-0.5 text-[9px] font-mono-tactical uppercase tracking-[0.1em] text-[#64748B]">{s.k}</div>
+            <div className="mt-0.5 text-[9px] font-mono uppercase tracking-[0.1em] text-[#64748B]">{s.k}</div>
           </div>
         ))}
       </div>
@@ -381,7 +381,7 @@ function PlayerThreeYearCard({ row }: { row: PortfolioThreeYearRow }) {
         <div className="min-w-0 flex-1">
           <p className="truncate text-[13px] font-semibold text-white">{row.name}</p>
           <span
-            className="mt-0.5 inline-block rounded px-1.5 py-0.5 text-[9px] font-black font-mono-tactical"
+            className="mt-0.5 inline-block rounded px-1.5 py-0.5 text-[9px] font-black font-mono"
             style={{
               background: `${CARD_POS_BADGE[row.position]}22`,
               color: CARD_POS_BADGE[row.position],
@@ -399,11 +399,11 @@ function PlayerThreeYearCard({ row }: { row: PortfolioThreeYearRow }) {
           const col = scoreBandColor(cell.s);
           return (
             <div key={cell.y} className={clsx('px-1 py-1 text-center', i > 0 && 'border-l border-white/[0.06]')}>
-              <p className="text-center text-[8px] font-mono-tactical text-[#64748B]">{cell.y}</p>
-              <p className="text-center text-[16px] font-bold font-mono-tactical tabular-nums" style={{ color: col }}>
+              <p className="text-center text-[8px] font-mono text-[#64748B]">{cell.y}</p>
+              <p className="text-center text-[16px] font-bold font-mono tabular-nums" style={{ color: col }}>
                 {Math.round(cell.s)}
               </p>
-              <p className="text-center text-[7px] font-bold font-mono-tactical" style={{ color: col }}>
+              <p className="text-center text-[7px] font-bold font-mono" style={{ color: col }}>
                 {abbrevGrade(g)}
               </p>
             </div>
@@ -411,11 +411,11 @@ function PlayerThreeYearCard({ row }: { row: PortfolioThreeYearRow }) {
         })}
       </div>
 
-      <p className={clsx('mt-2 text-[9px] font-black font-mono-tactical', trend.className)}>{trend.text}</p>
+      <p className={clsx('mt-2 text-[9px] font-black font-mono', trend.className)}>{trend.text}</p>
 
       <span
         className={clsx(
-          'absolute bottom-2 right-2 rounded-[20px] border px-2 py-[2px] text-[8px] font-black font-mono-tactical',
+          'absolute bottom-2 right-2 rounded-[20px] border px-2 py-[2px] text-[8px] font-black font-mono',
           badgeCls,
         )}
       >

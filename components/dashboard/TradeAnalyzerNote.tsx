@@ -40,7 +40,7 @@ export default function TradeAnalyzerNote({
             Trade Analyzer
           </h3>
           <span
-            className="text-[10px] font-black font-mono-tactical px-2 py-0.5 rounded border"
+            className="text-[10px] font-black font-mono px-2 py-0.5 rounded border"
             style={{
               color: '#36E7A1',
               borderColor: 'rgba(54,231,161,0.35)',
@@ -51,7 +51,7 @@ export default function TradeAnalyzerNote({
           </span>
         </div>
 
-        <p className="text-[11px] text-slate-400 leading-snug font-mono-tactical mb-3">{summaryLine}</p>
+        <p className="text-[11px] text-slate-400 leading-snug font-mono mb-3">{summaryLine}</p>
 
         <div className="flex items-center justify-center gap-2 py-2">
           <div className="flex flex-col items-center gap-1 min-w-0 flex-1">
@@ -103,7 +103,7 @@ export default function TradeAnalyzerNote({
           </div>
         </div>
 
-        <p className="text-[10px] text-slate-600 font-mono-tactical mt-2 border-t border-white/[0.04] pt-2">
+        <p className="text-[10px] text-slate-600 font-mono mt-2 border-t border-white/[0.04] pt-2">
           {body}
         </p>
       </div>
@@ -119,7 +119,7 @@ export default function TradeAnalyzerNote({
         </h3>
         {verdict && (
           <span
-            className="text-[10px] font-black font-mono-tactical px-2 py-0.5 rounded border"
+            className="text-[10px] font-black font-mono px-2 py-0.5 rounded border"
             style={{
               color: verdictColor,
               borderColor: `${verdictColor}40`,
@@ -131,7 +131,7 @@ export default function TradeAnalyzerNote({
         )}
       </div>
 
-      <p className="text-[11px] text-slate-500 leading-relaxed font-mono-tactical">{body}</p>
+      <p className="text-[11px] text-slate-500 leading-relaxed font-mono">{body}</p>
     </div>
   );
 }

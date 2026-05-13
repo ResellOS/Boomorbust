@@ -23,11 +23,11 @@ export default function OvervaluedAssets({ players, contextLeagueId = null, clas
         <h3 className="text-[10px] font-black uppercase tracking-[0.28em] text-slate-300">
           Top 3 Overvalued
         </h3>
-        <span className="text-[8px] font-mono-tactical text-slate-600 uppercase">MO · PPG</span>
+        <span className="text-[8px] font-mono text-slate-600 uppercase">MO · PPG</span>
       </div>
 
       {players.length === 0 ? (
-        <p className="text-[10px] text-slate-600 font-mono-tactical py-4 text-center">
+        <p className="text-[10px] text-slate-600 font-mono py-4 text-center">
           No sell signals — market aligned with production.
         </p>
       ) : (
@@ -62,16 +62,16 @@ export default function OvervaluedAssets({ players, contextLeagueId = null, clas
                     SELL
                   </span>
                 </div>
-                <div className="text-[9px] text-slate-500 font-mono-tactical">
+                <div className="text-[9px] text-slate-500 font-mono">
                   {p.position} · {p.team} · {p.seasonAvgPpg?.toFixed(1) ?? '—'} PPG roll ·{' '}
                   {p.weeklyPts.toFixed(1)} wk
                 </div>
               </div>
               <div className="text-right shrink-0">
-                <div className="text-[10px] font-mono-tactical font-black text-[#36E7A1]">
+                <div className="text-[10px] font-mono font-black text-[#36E7A1]">
                   {formatKtc(p.ktcValue)}
                 </div>
-                <div className="text-[8px] text-[#EF4444] font-mono-tactical font-bold">
+                <div className="text-[8px] text-[#EF4444] font-mono font-bold">
                   MO {p.moPts >= 0 ? '+' : ''}
                   {p.moPts?.toFixed(1) ?? '—'}
                 </div>

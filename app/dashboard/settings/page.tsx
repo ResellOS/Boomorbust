@@ -761,7 +761,7 @@ export default function SettingsPage() {
                   onAppendLeagueId={(id) => setLeagueIdsDraft((prev) => appendLeagueIdToDraft(prev, id))}
                 />
                 <div>
-                  <label className="text-xs uppercase tracking-widest text-[var(--text-muted)] block mb-2 font-mono-tactical">
+                  <label className="text-xs uppercase tracking-widest text-[var(--text-muted)] block mb-2 font-mono">
                     Enter league ID{' '}
                     <span className="normal-case text-[var(--text-muted)] font-[family-name:var(--font-body)] tracking-normal">
                       (one per line or comma-separated)

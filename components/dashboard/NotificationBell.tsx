@@ -220,7 +220,7 @@ export default function NotificationBell() {
         <Bell className="h-[18px] w-[18px]" strokeWidth={2} />
         {!loading && unreadCount > 0 ? (
           <span
-            className="notif-badge-count pointer-events-none absolute -right-0.5 -top-0.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-[#EF4444] px-1 text-[10px] font-bold leading-none text-white font-mono-tactical tabular-nums ring-2 ring-[#060910]"
+            className="notif-badge-count pointer-events-none absolute -right-0.5 -top-0.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-[#EF4444] px-1 text-[10px] font-bold leading-none text-white font-mono tabular-nums ring-2 ring-[#060910]"
             aria-label={`${unreadCount} unread`}
           >
             {unreadCount > 99 ? '99+' : unreadCount}
@@ -235,14 +235,14 @@ export default function NotificationBell() {
           )}
         >
           <div className="flex items-center justify-between border-b border-white/[0.06] px-3 py-2">
-            <span className="font-mono-tactical text-[10px] font-black uppercase tracking-[0.2em] text-[#64748B]">
+            <span className="font-mono text-[10px] font-black uppercase tracking-[0.2em] text-[#64748B]">
               Inbox
             </span>
             {loading ? <Loader2 className="h-3.5 w-3.5 animate-spin text-[#64748B]" /> : null}
           </div>
           <ul className="slim-scroll max-h-[min(64vh,360px)] overflow-y-auto p-2">
             {!loading && items.length === 0 ? (
-              <li className="px-2 py-6 text-center font-mono-tactical text-[11px] text-[#64748B]">No unread alerts.</li>
+              <li className="px-2 py-6 text-center font-mono text-[11px] text-[#64748B]">No unread alerts.</li>
             ) : null}
             {items.map(({ row, displayName, reason, href }) => (
               <li key={row.id} className="mb-2 last:mb-0">
@@ -255,15 +255,15 @@ export default function NotificationBell() {
                     <p className="min-w-0 truncate text-[12px] font-semibold text-white">{displayName}</p>
                     <span
                       className={clsx(
-                        'shrink-0 rounded border px-1.5 py-0.5 text-[8px] font-black uppercase tracking-wider font-mono-tactical',
+                        'shrink-0 rounded border px-1.5 py-0.5 text-[8px] font-black uppercase tracking-wider font-mono',
                         badgeClassForType(String(row.type)),
                       )}
                     >
                       {labelForType(String(row.type))}
                     </span>
                   </div>
-                  <p className="mt-1 line-clamp-2 text-[10px] leading-snug text-[#94A3B8] font-mono-tactical">{reason}</p>
-                  <div className="mt-2 flex items-center justify-end gap-1 text-[10px] font-bold uppercase tracking-wide text-[#22D3EE] font-mono-tactical">
+                  <p className="mt-1 line-clamp-2 text-[10px] leading-snug text-[#94A3B8] font-mono">{reason}</p>
+                  <div className="mt-2 flex items-center justify-end gap-1 text-[10px] font-bold uppercase tracking-wide text-[#22D3EE] font-mono">
                     Open
                     <ChevronRight className="h-3 w-3" aria-hidden />
                   </div>
@@ -274,7 +274,7 @@ export default function NotificationBell() {
           <div className="border-t border-white/[0.06] px-2 py-2 text-center">
             <Link
               href="/dashboard/trade/finder"
-              className="font-mono-tactical text-[10px] font-bold uppercase tracking-wide text-[#64748B] hover:text-[#22D3EE]"
+              className="font-mono text-[10px] font-bold uppercase tracking-wide text-[#64748B] hover:text-[#22D3EE]"
               onClick={() => setOpen(false)}
             >
               Trade finder

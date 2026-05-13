@@ -120,6 +120,7 @@ export default function SplashScreen({ ready = false }: SplashScreenProps) {
               border: '1px solid rgba(6,182,212,0.4)',
             }}
           >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="/images/logo-icon.png"
               alt=""

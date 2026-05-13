@@ -201,7 +201,7 @@ export default function PlayerHubCard({
         </span>
         <div className="flex items-center gap-1.5">
           {typeof rotationIndex === 'number' && typeof rotationTotal === 'number' && rotationTotal > 1 && (
-            <span className="text-[8px] font-mono-tactical text-slate-600 uppercase tracking-wider">
+            <span className="text-[8px] font-mono text-slate-600 uppercase tracking-wider">
               {rotationIndex + 1} / {rotationTotal}
             </span>
           )}
@@ -243,7 +243,7 @@ export default function PlayerHubCard({
           </h3>
           <p
             className={clsx(
-              'font-bold text-slate-500 uppercase tracking-wider mt-0.5 font-mono-tactical truncate',
+              'font-bold text-slate-500 uppercase tracking-wider mt-0.5 font-mono truncate',
               compact ? 'text-[8px]' : 'text-[9px]',
             )}
           >
@@ -251,14 +251,14 @@ export default function PlayerHubCard({
           </p>
           {typeof tfoScore === 'number' && tfoGrade && (
             <>
-              <p className="mt-1 text-[11px] leading-tight font-mono-tactical tracking-[0.04em]">
+              <p className="mt-1 text-[11px] leading-tight font-mono tracking-[0.04em]">
                 <span style={{ color: tfoAccentColor }}>TFO {Math.round(tfoScore)}</span>
                 <span style={{ color: '#64748B' }}> · </span>
                 <span style={{ color: '#94A3B8' }}>{tfoGrade.replace(/_/g, ' ')}</span>
               </p>
               {tfoReasoning ? (
                 <p
-                  className="mt-0.5 max-w-full overflow-hidden text-ellipsis whitespace-nowrap font-mono-tactical text-[10px] leading-snug text-[#64748B]"
+                  className="mt-0.5 max-w-full overflow-hidden text-ellipsis whitespace-nowrap font-mono text-[10px] leading-snug text-[#64748B]"
                   title={tfoReasoning}
                 >
                   {tfoReasoning}
@@ -269,7 +269,7 @@ export default function PlayerHubCard({
         </div>
         <div className="text-right shrink-0">
           <div
-            className={clsx('font-black font-mono-tactical leading-none', compact ? 'text-lg' : 'text-2xl')}
+            className={clsx('font-black font-mono leading-none', compact ? 'text-lg' : 'text-2xl')}
             style={{
               color: deltaColor,
               textShadow: deltaGlow,
@@ -280,7 +280,7 @@ export default function PlayerHubCard({
           </div>
           <div
             className={clsx(
-              'uppercase tracking-widest text-slate-500 mt-0.5 font-bold font-mono-tactical',
+              'uppercase tracking-widest text-slate-500 mt-0.5 font-bold font-mono',
               compact ? 'text-[7px]' : 'text-[8px]',
             )}
           >
@@ -441,7 +441,7 @@ export default function PlayerHubCard({
                 fontWeight={600}
                 textAnchor={anchor}
                 dominantBaseline="middle"
-                fontFamily="var(--font-mono-tactical), JetBrains Mono, ui-monospace, monospace"
+                fontFamily="var(--font-mono), JetBrains Mono, ui-monospace, monospace"
               >
                 {m.label}
               </text>

@@ -585,7 +585,7 @@ export default function DashboardPage() {
           <button
             type="button"
             onClick={() => setChartVsLeague((v) => !v)}
-            className={`text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded border transition-colors font-mono-tactical ${
+            className={`text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded border transition-colors font-mono ${
               chartVsLeague
                 ? 'text-[#22D3EE] border-[#22D3EE]/40 bg-[#22D3EE]/10'
                 : 'text-slate-500 border-white/10 hover:text-white'
@@ -598,26 +598,26 @@ export default function DashboardPage() {
           <button
             type="button"
             onClick={() => setActiveLeagueId(null)}
-            className="text-[10px] font-bold text-slate-400 hover:text-white transition-colors font-mono-tactical"
+            className="text-[10px] font-bold text-slate-400 hover:text-white transition-colors font-mono"
           >
             Clear league
           </button>
         ) : null}
       </div>
     ),
-    [chartBenchmark, chartHasPositions, chartVsLeague, activeLeagueId],
+    [chartBenchmark, chartHasPositions, chartVsLeague, activeLeagueId, setChartVsLeague, setActiveLeagueId],
   );
 
   if (error && !data) {
     return (
       <div className="flex min-h-screen overflow-y-auto w-full flex-col items-center justify-center bg-[#060910] px-6 text-center">
-        <div className="text-[#EF4444] font-black italic uppercase tracking-widest mb-2 font-mono-tactical">
+        <div className="text-[#EF4444] font-black italic uppercase tracking-widest mb-2 font-mono">
           Snapshot Unavailable
         </div>
         <p className="text-slate-500 text-[11px] mb-4 max-w-md">{error ?? 'Could not load your live dashboard.'}</p>
         <Link
           href="/onboarding"
-          className="text-[11px] font-bold text-[#22D3EE] hover:text-white border border-[#22D3EE]/30 rounded-md px-3 py-1.5 font-mono-tactical"
+          className="text-[11px] font-bold text-[#22D3EE] hover:text-white border border-[#22D3EE]/30 rounded-md px-3 py-1.5 font-mono"
         >
           Re-sync Sleeper Leagues →
         </Link>
@@ -638,6 +638,7 @@ export default function DashboardPage() {
       <div className="glass-panel flex flex-col !rounded-xl border-white/[0.12]">
         <div className="flex shrink-0 items-center justify-between gap-3 border-b border-white/[0.06] px-3 py-2">
           <div className="flex min-w-0 items-center gap-2">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/images/logo-icon.png" alt="" height={28} width={28} className="h-7 w-7 shrink-0 object-contain" />
             <span
               className="truncate text-[24px] font-bold uppercase tracking-[0.05em] text-white"
@@ -646,7 +647,7 @@ export default function DashboardPage() {
               BOOM OR BUST
             </span>
           </div>
-          <div className="flex items-center gap-2 font-mono-tactical text-[12px] text-[#94A3B8] tabular-nums min-h-[1.25rem]">
+          <div className="flex items-center gap-2 font-mono text-[12px] text-[#94A3B8] tabular-nums min-h-[1.25rem]">
             <span className="live-dot shrink-0" />
             {empireForUi ? (
               <span className="whitespace-nowrap">

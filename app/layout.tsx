@@ -9,19 +9,19 @@ import './globals.css';
 const bebasNeue = Bebas_Neue({
   weight: '400',
   subsets: ['latin'],
-  variable: '--font-bebas-neue',
+  variable: '--font-display',
   display: 'swap',
 });
 
 const inter = Inter({
   subsets: ['latin'],
-  variable: '--font-inter',
+  variable: '--font-body',
   display: 'swap',
 });
 
 const jetbrainsMono = JetBrains_Mono({
   subsets: ['latin'],
-  variable: '--font-mono-tactical',
+  variable: '--font-mono',
   display: 'swap',
 });
 

@@ -44,9 +44,7 @@ html {
   --team-primary-rgb: 99, 102, 241;
   --team-secondary: #22d3ee;
 
-  /* Fonts — set by next/font on <body> via variables */
-  --font-display: var(--font-bebas-neue), 'Bebas Neue', sans-serif;
-  --font-body: var(--font-inter), 'Inter', system-ui, sans-serif;
+  /* --font-display, --font-body, --font-mono: set on <body> via next/font (app/layout.tsx) */
 
   /* Shadows */
   --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.4);
@@ -228,6 +226,147 @@ h3 {
   animation: fadeSlideUp 0.65s ease-out forwards;
 }
 
+/* Landing hero — load sequence (0.6s ease) */
+@keyframes landingHeroFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes landingHeroFadeInRight {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.landing-hero-h1 {
+  opacity: 0;
+  animation: landingHeroFadeUp 0.6s ease forwards;
+}
+
+.landing-hero-sub {
+  opacity: 0;
+  animation: landingHeroFadeUp 0.6s ease 0.2s forwards;
+}
+
+.landing-hero-ctas {
+  opacity: 0;
+  animation: landingHeroFadeUp 0.6s ease 0.4s forwards;
+}
+
+.landing-hero-mockup {
+  opacity: 0;
+  animation: landingHeroFadeInRight 0.65s ease 0.5s forwards;
+}
+
+/* Scroll-triggered reveals */
+.landing-reveal-up {
+  opacity: 0;
+  transform: translateY(18px);
+  transition:
+    opacity 0.55s ease,
+    transform 0.55s ease;
+}
+
+.landing-reveal-up.landing-reveal-up--in {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.landing-stagger-up > * {
+  opacity: 0;
+  transform: translateY(14px);
+  transition:
+    opacity 0.5s ease,
+    transform 0.5s ease;
+}
+
+.landing-stagger-up.landing-stagger-up--in > * {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.landing-stagger-up.landing-stagger-up--in > *:nth-child(1) {
+  transition-delay: 0s;
+}
+.landing-stagger-up.landing-stagger-up--in > *:nth-child(2) {
+  transition-delay: 0.1s;
+}
+.landing-stagger-up.landing-stagger-up--in > *:nth-child(3) {
+  transition-delay: 0.2s;
+}
+.landing-stagger-up.landing-stagger-up--in > *:nth-child(4) {
+  transition-delay: 0.3s;
+}
+.landing-stagger-up.landing-stagger-up--in > *:nth-child(5) {
+  transition-delay: 0.4s;
+}
+.landing-stagger-up.landing-stagger-up--in > *:nth-child(6) {
+  transition-delay: 0.5s;
+}
+
+.landing-stagger-fade > * {
+  opacity: 0;
+  transition: opacity 0.55s ease;
+}
+
+.landing-stagger-fade.landing-stagger-fade--in > * {
+  opacity: 1;
+}
+
+.landing-stagger-fade.landing-stagger-fade--in > *:nth-child(1) {
+  transition-delay: 0s;
+}
+.landing-stagger-fade.landing-stagger-fade--in > *:nth-child(2) {
+  transition-delay: 0.1s;
+}
+.landing-stagger-fade.landing-stagger-fade--in > *:nth-child(3) {
+  transition-delay: 0.2s;
+}
+.landing-stagger-fade.landing-stagger-fade--in > *:nth-child(4) {
+  transition-delay: 0.3s;
+}
+.landing-stagger-fade.landing-stagger-fade--in > *:nth-child(5) {
+  transition-delay: 0.4s;
+}
+.landing-stagger-fade.landing-stagger-fade--in > *:nth-child(6) {
+  transition-delay: 0.5s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .landing-hero-h1,
+  .landing-hero-sub,
+  .landing-hero-ctas,
+  .landing-hero-mockup {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .landing-reveal-up,
+  .landing-stagger-up > *,
+  .landing-stagger-fade > * {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+
+  .landing-stagger-up.landing-stagger-up--in > *,
+  .landing-stagger-fade.landing-stagger-fade--in > * {
+    transition-delay: 0ms !important;
+  }
+}
+
 @keyframes marquee {
   0% {
     transform: translateX(100%);
@@ -267,9 +406,17 @@ h3 {
   }
 }
 
-/* Mono numerals for tactical readouts */
+/* JetBrains Mono: tabular numerals for scores, stats, prices (Tailwind `font-mono` uses --font-mono) */
+@layer utilities {
+  .font-mono {
+    font-feature-settings: 'tnum' 1, 'zero' 1;
+    letter-spacing: 0.02em;
+  }
+}
+
+/* Legacy alias — prefer `font-mono` */
 .font-mono-tactical {
-  font-family: var(--font-mono-tactical), 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-family: var(--font-mono), 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   font-feature-settings: 'tnum' 1, 'zero' 1;
   letter-spacing: 0.02em;
 }

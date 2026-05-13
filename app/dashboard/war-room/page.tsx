@@ -609,7 +609,7 @@ function TacticalMap({
       {/* Player TFO tooltip */}
       {playerTip && (
         <div
-          className="pointer-events-none absolute z-[60] w-[min(200px,45vw)] rounded-lg border border-white/10 bg-[var(--bg-card)]/95 px-3 py-2 text-[10px] shadow-xl backdrop-blur-sm font-mono-tactical"
+          className="pointer-events-none absolute z-[60] w-[min(200px,45vw)] rounded-lg border border-white/10 bg-[var(--bg-card)]/95 px-3 py-2 text-[10px] shadow-xl backdrop-blur-sm font-mono"
           style={{ left: playerTip.left, top: playerTip.top }}
         >
           <p className="font-semibold text-white truncate">{playerTip.dot.name}</p>
@@ -965,12 +965,12 @@ export default function WarRoomPage() {
                       style={{ borderLeftWidth: 4, borderLeftColor: st.border }}
                     >
                       <div className="flex flex-wrap items-start gap-x-3 gap-y-1 pl-3">
-                        <span className="font-mono-tactical text-[9px] text-[#475569] shrink-0 tabular-nums w-[3.25rem]">
+                        <span className="font-mono text-[9px] text-[#475569] shrink-0 tabular-nums w-[3.25rem]">
                           {tickerTime(idx)}
                         </span>
                         <div className="flex flex-wrap items-center gap-1.5 shrink-0">
                           <span
-                            className="font-mono-tactical text-[9px] font-black uppercase tracking-wide px-2 py-0.5 rounded-full"
+                            className="font-mono text-[9px] font-black uppercase tracking-wide px-2 py-0.5 rounded-full"
                             style={{
                               backgroundColor: st.pillBg,
                               color: st.pillText,
@@ -980,7 +980,7 @@ export default function WarRoomPage() {
                             {entry.kind}
                           </span>
                           <span
-                            className="font-mono-tactical text-[9px] font-bold uppercase px-2 py-0.5 rounded-full"
+                            className="font-mono text-[9px] font-bold uppercase px-2 py-0.5 rounded-full"
                             style={{
                               backgroundColor: st.pillBg,
                               color: st.pillText,
@@ -998,7 +998,7 @@ export default function WarRoomPage() {
               )}
               {/* Blinking cursor */}
               <div className="flex gap-2 items-center text-xs text-[#36E7A1] py-2 px-1 opacity-80">
-                <span className="font-mono-tactical text-[9px] text-[#475569]">NOW</span>
+                <span className="font-mono text-[9px] text-[#475569]">NOW</span>
                 <span className="animate-pulse font-mono">█</span>
               </div>
             </div>

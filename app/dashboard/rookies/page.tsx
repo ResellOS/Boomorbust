@@ -497,7 +497,7 @@ export default function RookiesPage() {
           <h1 className="display text-[48px] leading-none uppercase tracking-[0.04em] bg-gradient-to-b from-white to-[#22D3EE] bg-clip-text text-transparent">
             ROOKIE DRAFT INTELLIGENCE
           </h1>
-          <p className="font-mono-tactical mt-3 text-[11px] tracking-[0.2em] text-[#22D3EE]">
+          <p className="font-mono mt-3 text-[11px] tracking-[0.2em] text-[#22D3EE]">
             F-FIG SCOUTING GRADES · {displayYear} CLASS
           </p>
           <p className="mt-4 text-[var(--text-secondary)] text-sm md:text-base max-w-2xl">
@@ -809,13 +809,13 @@ function ProspectRow(props: {
             </div>
             <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 mt-1">
               <span
-                className="font-mono-tactical font-black uppercase tracking-[0.12em]"
+                className="font-mono font-black uppercase tracking-[0.12em]"
                 style={{ fontSize: '8px', color: '#FBBF24' }}
               >
                 {p.draft_year} NFL DRAFT
               </span>
               {roundPickSlotLabel(p.draft_round, p.draft_pick) ? (
-                <span className="font-mono-tactical text-[9px] text-[#64748B]">
+                <span className="font-mono text-[9px] text-[#64748B]">
                   {roundPickSlotLabel(p.draft_round, p.draft_pick)}
                 </span>
               ) : null}
@@ -832,7 +832,7 @@ function ProspectRow(props: {
         </div>
 
         <span
-          className="font-mono-tactical font-bold whitespace-nowrap shrink-0"
+          className="font-mono font-bold whitespace-nowrap shrink-0"
           style={{
             fontSize: '9px',
             padding: '3px 8px',
@@ -848,11 +848,11 @@ function ProspectRow(props: {
         <div className={landingWrap}>
           <div className="flex items-center gap-2">
             {logoUrl ? <Image src={logoUrl} alt="" width={22} height={22} className="shrink-0" unoptimized /> : null}
-            <span className="font-mono-tactical text-[11px] font-black tracking-tight" style={{ color: teamPrimary }}>
+            <span className="font-mono text-[11px] font-black tracking-tight" style={{ color: teamPrimary }}>
               {p.nfl_team ?? '—'}
             </span>
           </div>
-          <span className="font-mono-tactical text-[9px] font-bold tracking-[0.08em] text-[var(--text-muted)]">
+          <span className="font-mono text-[9px] font-bold tracking-[0.08em] text-[var(--text-muted)]">
             {landing.label} · {Math.round(tfo)} TFO
           </span>
         </div>
@@ -870,7 +870,7 @@ function ProspectRow(props: {
             >
               {p.ffig_grade}
             </p>
-            <p className="font-mono-tactical text-[9px] font-bold tracking-[0.12em] mt-0.5" style={{ color: gradeStyle.color }}>
+            <p className="font-mono text-[9px] font-bold tracking-[0.12em] mt-0.5" style={{ color: gradeStyle.color }}>
               {gradeStyle.band}
             </p>
           </div>

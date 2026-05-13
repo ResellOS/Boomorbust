@@ -112,7 +112,7 @@ function TargetCard({ target }: { target: RecommendedTarget }) {
           </div>
           {/* Position badge */}
           <span
-            className="absolute -bottom-0.5 -right-0.5 rounded-full px-1 py-px text-[7px] font-black uppercase font-mono-tactical border"
+            className="absolute -bottom-0.5 -right-0.5 rounded-full px-1 py-px text-[7px] font-black uppercase font-mono border"
             style={{ background: `${pc}22`, borderColor: `${pc}55`, color: pc }}
           >
             {target.position}
@@ -138,18 +138,18 @@ function TargetCard({ target }: { target: RecommendedTarget }) {
           {/* BVI line — three segments in JetBrains Mono */}
           <div className="flex flex-wrap gap-x-2 gap-y-0.5">
             {bviPart && (
-              <span className="font-mono-tactical text-[8px] text-[var(--text-secondary)]">
+              <span className="font-mono text-[8px] text-[var(--text-secondary)]">
                 {bviPart}
               </span>
             )}
             {ktcPart && (
-              <span className="font-mono-tactical text-[8px] text-[var(--text-muted)]">
+              <span className="font-mono text-[8px] text-[var(--text-muted)]">
                 {ktcPart}
               </span>
             )}
             {deltaPart && (
               <span
-                className="font-mono-tactical text-[8px] font-black"
+                className="font-mono text-[8px] font-black"
                 style={{ color: glowColor }}
               >
                 {deltaPart}
@@ -160,7 +160,7 @@ function TargetCard({ target }: { target: RecommendedTarget }) {
 
         {/* Acquire chevron */}
         <div
-          className="shrink-0 mt-1 opacity-0 group-hover:opacity-100 transition-opacity text-[10px] font-mono-tactical font-black uppercase"
+          className="shrink-0 mt-1 opacity-0 group-hover:opacity-100 transition-opacity text-[10px] font-mono font-black uppercase"
           style={{ color: glowColor }}
         >
           →
@@ -210,7 +210,7 @@ export default function RecommendedTargets({
           </p>
         </div>
         <div className="ml-auto shrink-0 rounded-full border border-[#36E7A1]/30 bg-[#36E7A1]/08 px-2 py-0.5">
-          <span className="font-mono-tactical text-[8px] font-black text-[#36E7A1] uppercase tracking-[0.1em]">
+          <span className="font-mono text-[8px] font-black text-[#36E7A1] uppercase tracking-[0.1em]">
             BVI Engine
           </span>
         </div>

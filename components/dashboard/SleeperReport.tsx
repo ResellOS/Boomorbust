@@ -92,7 +92,7 @@ export default function SleeperReport({
         OTA · SLEEPER REPORT
       </h3>
       <p
-        className="font-mono-tactical mb-4 uppercase font-semibold"
+        className="font-mono mb-4 uppercase font-semibold"
         style={{ fontSize: '8px', color: '#22D3EE', letterSpacing: '0.2em' }}
       >
         LOW ROSTER · HIGH UPSIDE
@@ -100,7 +100,7 @@ export default function SleeperReport({
 
       {filtered.length === 0 ? (
         <div className="rounded-[10px] border border-dashed border-white/[0.08] px-3 py-6 text-center">
-          <p className="text-[10px] font-mono-tactical uppercase tracking-widest text-[#64748B]">
+          <p className="text-[10px] font-mono uppercase tracking-widest text-[#64748B]">
             No low-roster movers match this filter right now
           </p>
         </div>
@@ -156,7 +156,7 @@ export default function SleeperReport({
                     </div>
                   </div>
                   <span
-                    className="shrink-0 font-mono-tactical font-bold tabular-nums whitespace-nowrap px-1.5 py-0.5 rounded border"
+                    className="shrink-0 font-mono font-bold tabular-nums whitespace-nowrap px-1.5 py-0.5 rounded border"
                     style={{
                       fontSize: '8px',
                       background: 'rgba(34,211,238,0.1)',
@@ -169,14 +169,14 @@ export default function SleeperReport({
                 </div>
 
                 <div className="mb-2">
-                  <span className={clsx('text-[9px] font-black font-mono-tactical', trend.className)}>
+                  <span className={clsx('text-[9px] font-black font-mono', trend.className)}>
                     {trend.text}
                   </span>
                 </div>
 
                 {showAddPill ? (
                   <div
-                    className="inline-block font-mono-tactical font-bold uppercase rounded border px-2 py-0.5"
+                    className="inline-block font-mono font-bold uppercase rounded border px-2 py-0.5"
                     style={{
                       fontSize: '8px',
                       background: 'rgba(54,231,161,0.1)',

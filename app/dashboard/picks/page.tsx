@@ -200,7 +200,7 @@ function PickCard({
         </span>
       </div>
 
-      <div className={clsx('rounded-xl border px-3 py-2 text-center font-mono-tactical text-[11px] font-black tracking-wide', VERDICT_BADGE[verdict])}>
+      <div className={clsx('rounded-xl border px-3 py-2 text-center font-mono text-[11px] font-black tracking-wide', VERDICT_BADGE[verdict])}>
         {verdict === 'KEEP' ? 'KEEP' : verdict === 'SELL' ? 'SELL' : 'NEUTRAL'} ·{' '}
         {teamWindow === 'rebuild'
           ? 'Rebuild window'
@@ -244,7 +244,7 @@ function PickCard({
       <p className="text-sm text-[#CBD5E1]">{qa.roster_context}</p>
 
       <div className="rounded-xl border border-indigo-500/20 bg-indigo-500/[0.06] px-3 py-2.5">
-        <p className="text-[10px] uppercase tracking-[0.18em] text-indigo-300/90 font-semibold mb-0.5 font-mono-tactical">
+        <p className="text-[10px] uppercase tracking-[0.18em] text-indigo-300/90 font-semibold mb-0.5 font-mono">
           LEAGUE CONTEXT
         </p>
         <p className="text-xs text-white font-medium">{leagueBlurb.headline}</p>
@@ -291,7 +291,7 @@ function TeamNeedsStrip({ needs }: { needs: TeamNeedsProfile }) {
       <p className="text-[11px] text-[#94A3B8] mb-3 leading-relaxed">
         Position grades from average TFO on your roster (QB / RB / WR / TE only).
       </p>
-      <p className="font-mono-tactical text-[13px] font-bold text-[#CBD5E1] mb-4 flex flex-wrap items-center gap-x-1 gap-y-1">
+      <p className="font-mono text-[13px] font-bold text-[#CBD5E1] mb-4 flex flex-wrap items-center gap-x-1 gap-y-1">
         {order.map((pos, i) => {
           const g = needs.byPos[pos];
           return (
@@ -310,7 +310,7 @@ function TeamNeedsStrip({ needs }: { needs: TeamNeedsProfile }) {
             <div
               key={pos}
               className={clsx(
-                'inline-flex items-center gap-2 rounded-full border px-3 py-1.5 font-mono-tactical text-xs font-bold',
+                'inline-flex items-center gap-2 rounded-full border px-3 py-1.5 font-mono text-xs font-bold',
                 NEED_CHIP[g.tone],
               )}
             >
@@ -551,7 +551,7 @@ export default function PicksPage() {
         {!loading && teamNeeds && selectedLeagueObj ? <TeamNeedsStrip needs={teamNeeds} /> : null}
 
         {!loading && teamWindow && selectedLeagueObj ? (
-          <p className="text-[11px] text-[#64748B] mt-3 mb-6 font-mono-tactical uppercase tracking-wide">
+          <p className="text-[11px] text-[#64748B] mt-3 mb-6 font-mono uppercase tracking-wide">
             Arc · {teamWindow === 'rebuild' ? 'Rebuild bias' : teamWindow === 'contend' ? 'Contention bias' : 'Balanced'}{' '}
             (from roster trend + total KTC){userRosterId != null ? ` · Your roster #${userRosterId}` : ''}
           </p>

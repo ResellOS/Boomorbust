@@ -16,7 +16,7 @@ import type {
 
 // ─── Design tokens ────────────────────────────────────────────────────────────
 
-const MONO = { fontFamily: 'var(--font-mono-tactical, "JetBrains Mono", monospace)' };
+const MONO = { fontFamily: 'var(--font-mono, "JetBrains Mono", monospace)' };
 const GLASS = {
   background: 'rgba(255,255,255,0.04)',
   backdropFilter: 'blur(24px)',

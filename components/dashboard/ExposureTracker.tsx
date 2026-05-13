@@ -54,7 +54,7 @@ export default function ExposureTracker({
         EXPOSURE TRACKER
       </h3>
       <p
-        className="font-mono-tactical mb-3 uppercase font-semibold"
+        className="font-mono mb-3 uppercase font-semibold"
         style={{ fontSize: '8px', color: '#EF4444', letterSpacing: '0.15em' }}
       >
         PORTFOLIO CONCENTRATION RISK
@@ -62,7 +62,7 @@ export default function ExposureTracker({
 
       {highRisk ? (
         <div
-          className="font-mono-tactical font-bold uppercase mb-3 rounded border"
+          className="font-mono font-bold uppercase mb-3 rounded border"
           style={{
             fontSize: '8px',
             padding: '6px 10px',
@@ -106,7 +106,7 @@ export default function ExposureTracker({
                 </div>
               </div>
               <span
-                className="shrink-0 font-mono-tactical font-bold tabular-nums"
+                className="shrink-0 font-mono font-bold tabular-nums"
                 style={{ fontSize: '8px', color: labelColor }}
               >
                 {r.leagueCount}/{totalLeagues} lgs

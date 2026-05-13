@@ -28,8 +28,8 @@ import { calculatePlayerDynastyScore } from '@/lib/values/engine';
 import type { OptimizerScanPlayerRow, OptimizerScanResponse } from '@/app/api/optimizer/scan/route';
 
 // ─── Font helpers ──────────────────────────────────────────────────────────
-const F_BEBAS = { fontFamily: 'var(--font-bebas-neue), "Bebas Neue", Impact, sans-serif' } as const;
-const F_INTER = { fontFamily: 'var(--font-inter), Inter, system-ui, sans-serif' } as const;
+const F_BEBAS = { fontFamily: 'var(--font-display), "Bebas Neue", Impact, sans-serif' } as const;
+const F_INTER = { fontFamily: 'var(--font-body), Inter, system-ui, sans-serif' } as const;
 
 // ─── Positions ─────────────────────────────────────────────────────────────
 const KEY_POSITIONS = ['QB', 'RB', 'WR', 'TE'] as const;

@@ -3,6 +3,8 @@ import Anthropic from '@anthropic-ai/sdk';
 import { Redis } from '@upstash/redis';
 import { createClient } from '@/lib/supabase/server';
 import { buildSystemPrompt, buildCoachPortfolioContext } from '@/lib/coach/context';
+import { checkAIRateLimit, rateLimitExceededResponse } from '@/lib/rateLimit/ai';
+import { checkBudget, trackSpend, estimateCost } from '@/lib/ai/budget';
 
 const anthropic = new Anthropic();
 const PRO_DAILY_CAP = 10;
@@ -80,13 +82,22 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  let remainingAfter: number | null = null;
+  const rateCheck = await checkAIRateLimit(user.id, tier);
+  let remainingAfter: number | null = rateCheck.limit >= 999 ? null : rateCheck.remaining;
 
+  if (!rateCheck.allowed) {
+    return new Response(
+      JSON.stringify({ ...rateLimitExceededResponse(rateCheck, tier), code: 'RATE_LIMITED' }),
+      { status: 429, headers: { 'Content-Type': 'application/json' } },
+    );
+  }
+
+  // Legacy Pro slot — kept for existing RPC compatibility
   if (tier === 'pro') {
     const { ok, remaining } = await consumeProSlot(supabase, user.id);
     if (!ok) {
       return new Response(
-        JSON.stringify({ error: 'Daily limit reached (10 messages). Resets at midnight UTC.' }),
+        JSON.stringify({ error: 'Daily limit reached. Resets at midnight UTC.' }),
         { status: 429, headers: { 'Content-Type': 'application/json' } }
       );
     }
@@ -131,6 +142,20 @@ export async function POST(request: NextRequest) {
     `You are Dynasty Coach — an expert dynasty fantasy football analyst with complete access to this manager's Sleeper-backed rosters. Be specific, direct, and reference actual players and league situations. Always explain your reasoning. Be opinionated and give a clear recommendation. Mention KTC dynasty value tiers when discussing trades. ${focusLine}${systemContext ? `\n\n${systemContext}` : ''}`
   );
 
+  // Hard monthly budget gate
+  const budget = await checkBudget();
+  if (!budget.allowed) {
+    return new Response(
+      JSON.stringify({
+        error: 'AI service temporarily unavailable',
+        message: 'Monthly AI budget reached. Service resets on the 1st.',
+        resetDate: new Date(new Date().getFullYear(), new Date().getMonth() + 1, 1).toISOString(),
+        code: 'BUDGET_EXCEEDED',
+      }),
+      { status: 503, headers: { 'Content-Type': 'application/json' } },
+    );
+  }
+
   const stream = anthropic.messages.stream({
     model: 'claude-sonnet-4-6',
     max_tokens: 1024,
@@ -144,12 +169,22 @@ export async function POST(request: NextRequest) {
   const readable = new ReadableStream({
     async start(controller) {
       try {
+        let inputTokens = 0;
+        let outputTokens = 0;
         for await (const event of stream) {
           if (event.type === 'content_block_delta' && event.delta.type === 'text_delta') {
             controller.enqueue(encoder.encode(event.delta.text));
           }
+          if (event.type === 'message_start') {
+            inputTokens = event.message.usage?.input_tokens ?? 0;
+          }
+          if (event.type === 'message_delta') {
+            outputTokens = (event.usage as { output_tokens?: number } | undefined)?.output_tokens ?? 0;
+          }
         }
         controller.enqueue(encoder.encode(`\n\x00${JSON.stringify(payload)}`));
+        // Track spend after stream completes (non-blocking)
+        void trackSpend(estimateCost(inputTokens, outputTokens));
       } finally {
         controller.close();
       }

@@ -283,7 +283,7 @@ function WireLineView({ line }: { line: WireLine }) {
         p.k === 'p' ? (
           <span
             key={i}
-            className="font-mono-tactical text-[10px] font-semibold leading-none tracking-[-0.02em] [font-variant:small-caps]"
+            className="font-mono text-[10px] font-semibold leading-none tracking-[-0.02em] [font-variant:small-caps]"
             style={{ color: posHex(p.pos) }}
           >
             {p.name}
@@ -291,7 +291,7 @@ function WireLineView({ line }: { line: WireLine }) {
         ) : (
           <span
             key={i}
-            className="font-mono-tactical text-[10px] font-medium leading-none tracking-[0.04em] text-[#64748B] [font-variant:small-caps]"
+            className="font-mono text-[10px] font-medium leading-none tracking-[0.04em] text-[#64748B] [font-variant:small-caps]"
           >
             {p.s}
           </span>
@@ -324,7 +324,7 @@ export default function DashboardNewsWire({
   useEffect(() => {
     if (!data) return;
     writeWireMap(nextByPid);
-  }, [data, persistSig]);
+  }, [data, persistSig, nextByPid]);
 
   return (
     <div className="dashboard-news-wire relative flex h-9 min-h-9 w-full shrink-0 items-stretch overflow-hidden border-b border-white/[0.05] bg-[rgba(0,0,0,0.42)]">
@@ -337,7 +337,7 @@ export default function DashboardNewsWire({
         aria-hidden
       />
       <div className="flex h-full w-11 shrink-0 items-center justify-center border-r border-white/[0.07] bg-white/[0.03]">
-        <span className="font-mono-tactical text-[8px] font-bold leading-none tracking-[0.22em] text-[#475569] [font-variant:small-caps]">
+        <span className="font-mono text-[8px] font-bold leading-none tracking-[0.22em] text-[#475569] [font-variant:small-caps]">
           Wire
         </span>
       </div>

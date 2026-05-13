@@ -220,7 +220,7 @@ function waiverSignal(w: WaiverSidebarTarget): { label: string; color: string } 
 }
 
 const sectionTitleClass =
-  'px-2 pt-2 pb-[3px] font-mono-tactical text-[7px] uppercase tracking-[0.15em] text-[#475569]';
+  'px-2 pt-2 pb-[3px] font-mono text-[7px] uppercase tracking-[0.15em] text-[#475569]';
 
 const sectionDividerClass = 'border-t border-white/[0.04] pt-1';
 
@@ -283,7 +283,7 @@ export default function TradeHubSidebar({
         style={{ borderColor: 'rgba(255,255,255,0.06)' }}
       >
         <div className="text-center">
-          <p className="font-mono-tactical text-[7px] uppercase tracking-[0.1em] text-[#475569]">WEEK</p>
+          <p className="font-mono text-[7px] uppercase tracking-[0.1em] text-[#475569]">WEEK</p>
           <p
             className="mt-0.5 tabular-nums text-white"
             style={{ fontFamily: 'var(--font-display)', fontSize: 16 }}
@@ -292,7 +292,7 @@ export default function TradeHubSidebar({
           </p>
         </div>
         <div className="text-center">
-          <p className="font-mono-tactical text-[7px] uppercase tracking-[0.1em] text-[#475569]">RECORD</p>
+          <p className="font-mono text-[7px] uppercase tracking-[0.1em] text-[#475569]">RECORD</p>
           <p
             className="mt-0.5 tabular-nums font-semibold"
             style={{ fontFamily: 'var(--font-display)', fontSize: 16, color: recordColor }}
@@ -301,7 +301,7 @@ export default function TradeHubSidebar({
           </p>
         </div>
         <div className="text-center">
-          <p className="font-mono-tactical text-[7px] uppercase tracking-[0.1em] text-[#475569]">EMPIRE</p>
+          <p className="font-mono text-[7px] uppercase tracking-[0.1em] text-[#475569]">EMPIRE</p>
           <p
             className="mt-0.5 tabular-nums"
             style={{ fontFamily: 'var(--font-display)', fontSize: 16, color: '#22D3EE' }}
@@ -322,7 +322,7 @@ export default function TradeHubSidebar({
               ))}
             </div>
           ) : tradeInbox.length === 0 ? (
-            <p className="text-center text-[10px] italic text-[#475569] py-3 px-2 font-mono-tactical">
+            <p className="text-center text-[10px] italic text-[#475569] py-3 px-2 font-mono">
               No pending offers
             </p>
           ) : (
@@ -345,19 +345,19 @@ export default function TradeHubSidebar({
                     className="w-full text-left glass-panel mb-[3px] last:mb-0 px-2 py-1.5 rounded-md hover:bg-white/[0.04] transition-colors cursor-pointer"
                     style={{ borderRadius: 6 }}
                   >
-                    <div className="font-mono-tactical text-[8px] text-[#64748B] truncate" title={t.league}>
+                    <div className="font-mono text-[8px] text-[#64748B] truncate" title={t.league}>
                       {truncateText(t.league, 14)}
                     </div>
                     <div className="flex justify-between gap-2 mt-1 items-start">
                       <div
-                        className="min-w-0 flex-1 font-mono-tactical text-[9px] leading-snug"
+                        className="min-w-0 flex-1 font-mono text-[9px] leading-snug"
                         style={{ color: '#EF4444' }}
                         title={giveLabel}
                       >
                         ↓ {truncateText(giveLabel, 28)}
                       </div>
                       <div
-                        className="min-w-0 flex-1 text-right font-mono-tactical text-[9px] leading-snug"
+                        className="min-w-0 flex-1 text-right font-mono text-[9px] leading-snug"
                         style={{ color: '#36E7A1' }}
                         title={getLabel}
                       >
@@ -365,12 +365,12 @@ export default function TradeHubSidebar({
                       </div>
                     </div>
                     <div className="flex items-center justify-between gap-2 mt-1">
-                      <span className="font-mono-tactical text-[8px] text-[#94A3B8] tabular-nums">
+                      <span className="font-mono text-[8px] text-[#94A3B8] tabular-nums">
                         You {formatCompactKtc(t.yourKtc)} vs {formatCompactKtc(t.theirKtc)} ·{' '}
                         <span style={{ color: t.delta >= 0 ? '#36E7A1' : '#EF4444' }}>{deltaStr}</span>
                       </span>
                       <span
-                        className="shrink-0 font-mono-tactical text-[7px] font-black uppercase px-1.5 py-0.5 rounded-full border"
+                        className="shrink-0 font-mono text-[7px] font-black uppercase px-1.5 py-0.5 rounded-full border"
                         style={{
                           background: verdictStyles.bg,
                           borderColor: verdictStyles.border,
@@ -398,7 +398,7 @@ export default function TradeHubSidebar({
               <div className="skeleton h-11 w-full rounded-md" />
             </div>
           ) : sellHighs.length === 0 ? (
-            <p className="text-[9px] text-[#475569] font-mono-tactical py-1">No sell signals loaded.</p>
+            <p className="text-[9px] text-[#475569] font-mono py-1">No sell signals loaded.</p>
           ) : (
             sellHighs.map((p) => {
               const hasBvi = typeof p.bviScore === 'number' && typeof p.bviDelta === 'number';
@@ -420,7 +420,7 @@ export default function TradeHubSidebar({
                   <div className="flex items-center justify-between gap-2">
                     <div className="min-w-0 flex items-center gap-1.5">
                       <span
-                        className="shrink-0 text-[7px] font-black uppercase px-1 py-0.5 rounded border font-mono-tactical"
+                        className="shrink-0 text-[7px] font-black uppercase px-1 py-0.5 rounded border font-mono"
                         style={{
                           borderColor: 'rgba(239,68,68,0.40)',
                           background: 'rgba(239,68,68,0.12)',
@@ -430,14 +430,14 @@ export default function TradeHubSidebar({
                       >
                         SELL
                       </span>
-                      <span className="text-[8px] text-white font-semibold truncate font-mono-tactical">
+                      <span className="text-[8px] text-white font-semibold truncate font-mono">
                         {truncateText(p.name, 11)}
                       </span>
                     </div>
-                    <span className="shrink-0 text-[7px] font-mono-tactical text-[#64748B]">{p.position}</span>
+                    <span className="shrink-0 text-[7px] font-mono text-[#64748B]">{p.position}</span>
                   </div>
                   <p
-                    className="font-mono-tactical text-[7px] truncate leading-snug"
+                    className="font-mono text-[7px] truncate leading-snug"
                     style={{ color: '#EF4444' }}
                     title={bviLine}
                   >
@@ -469,16 +469,16 @@ export default function TradeHubSidebar({
               <div className="skeleton h-7 w-full rounded-md" />
             </div>
           ) : crossLeagueGaps.length === 0 ? (
-            <p className="text-[9px] text-[#475569] font-mono-tactical py-1">Sync more leagues to see gaps.</p>
+            <p className="text-[9px] text-[#475569] font-mono py-1">Sync more leagues to see gaps.</p>
           ) : (
             <ul className="space-y-1.5">
               {crossLeagueGaps.map((gap) => (
                 <li key={gap.positionLabel}>
                   <div className="flex items-center justify-between mb-0.5 gap-2">
-                    <span className="font-mono-tactical text-[8px] font-bold text-white">
+                    <span className="font-mono text-[8px] font-bold text-white">
                       {gap.positionLabel}
                     </span>
-                    <span className="font-mono-tactical text-[7px] text-[#64748B] tabular-nums">
+                    <span className="font-mono text-[7px] text-[#64748B] tabular-nums">
                       weak in {gap.weakCount}/{gap.totalCount} leagues
                     </span>
                   </div>
@@ -530,7 +530,7 @@ export default function TradeHubSidebar({
               <div className="skeleton h-8 w-full rounded-md" />
             </div>
           ) : topWaivers.length === 0 ? (
-            <p className="text-[9px] text-[#475569] font-mono-tactical py-1">No waiver intel.</p>
+            <p className="text-[9px] text-[#475569] font-mono py-1">No waiver intel.</p>
           ) : (
             topWaivers.map((w) => {
               const pos = (w.position ?? '').toUpperCase();
@@ -541,18 +541,18 @@ export default function TradeHubSidebar({
                   <div className="flex items-center justify-between gap-2">
                   <div className="flex items-center gap-2 min-w-0">
                     <span
-                      className="shrink-0 text-[7px] font-black uppercase px-1 py-0.5 rounded font-mono-tactical text-black"
+                      className="shrink-0 text-[7px] font-black uppercase px-1 py-0.5 rounded font-mono text-black"
                       style={{ background: stripe }}
                     >
                       {pos.slice(0, 3)}
                     </span>
-                    <span className="text-[8px] text-white truncate font-mono-tactical font-semibold">
+                    <span className="text-[8px] text-white truncate font-mono font-semibold">
                       {truncateText(w.name, 12)}
                     </span>
                   </div>
                   <div className="shrink-0 text-right flex flex-col items-end">
-                    <span className="text-[8px] font-mono-tactical text-[#94A3B8] tabular-nums">{waiverMetric(w)}</span>
-                    <span className="text-[8px] font-mono-tactical font-black" style={{ color: sig.color }}>
+                    <span className="text-[8px] font-mono text-[#94A3B8] tabular-nums">{waiverMetric(w)}</span>
+                    <span className="text-[8px] font-mono font-black" style={{ color: sig.color }}>
                       {sig.label}
                     </span>
                   </div>
@@ -584,14 +584,14 @@ export default function TradeHubSidebar({
               ))}
             </ul>
           ) : leaguesDisplay.length === 0 ? (
-            <p className="text-[9px] text-[#475569] font-mono-tactical py-1">No leagues synced.</p>
+            <p className="text-[9px] text-[#475569] font-mono py-1">No leagues synced.</p>
           ) : (
             <>
               <ul className="space-y-0.5">
                 {leaguesDisplay.map((lg) => (
                   <li
                     key={lg.id}
-                    className="flex items-center gap-2 font-mono-tactical text-[8px] py-[3px] px-2 rounded-sm hover:bg-white/[0.02]"
+                    className="flex items-center gap-2 font-mono text-[8px] py-[3px] px-2 rounded-sm hover:bg-white/[0.02]"
                   >
                     <span
                       className="w-2 h-2 rounded-full shrink-0"
@@ -621,7 +621,7 @@ export default function TradeHubSidebar({
                 <div className="pt-2 px-2 flex justify-end">
                   <Link
                     href="/dashboard/mission-control"
-                    className="text-[8px] font-bold text-[#22D3EE] hover:text-white transition-colors font-mono-tactical uppercase tracking-wider"
+                    className="text-[8px] font-bold text-[#22D3EE] hover:text-white transition-colors font-mono uppercase tracking-wider"
                   >
                     View All →
                   </Link>
@@ -647,7 +647,7 @@ export default function TradeHubSidebar({
               key={a.path}
               type="button"
               onClick={() => router.push(a.path)}
-              className="h-[26px] flex-1 rounded border border-white/[0.06] bg-white/[0.04] text-[8px] font-mono-tactical font-black text-[#94A3B8] transition-colors hover:bg-white/[0.08] uppercase tracking-tight"
+              className="h-[26px] flex-1 rounded border border-white/[0.06] bg-white/[0.04] text-[8px] font-mono font-black text-[#94A3B8] transition-colors hover:bg-white/[0.08] uppercase tracking-tight"
             >
               {a.label}
             </button>
@@ -657,7 +657,7 @@ export default function TradeHubSidebar({
 
       {onClose ? (
         <div className="px-3 py-1 border-t border-white/[0.04] flex justify-end shrink-0">
-          <button type="button" onClick={onClose} className="text-[10px] text-slate-500 hover:text-white font-mono-tactical">
+          <button type="button" onClick={onClose} className="text-[10px] text-slate-500 hover:text-white font-mono">
             Close
           </button>
         </div>
@@ -665,12 +665,12 @@ export default function TradeHubSidebar({
 
       {userTier === 'free' ? (
         <div className="px-2 py-2 border-t border-white/[0.06] shrink-0 bg-black/25">
-          <p className="font-mono-tactical text-[8px] text-[#22D3EE] uppercase tracking-[0.2em]">🔒 UNLOCK MORE INTEL</p>
-          <p className="mt-1 font-mono-tactical text-[7px] text-[#64748B] leading-snug">Pro: Unlimited trades + scouting</p>
-          <p className="font-mono-tactical text-[7px] text-[#64748B] leading-snug">Elite: Full TFO access + reports</p>
+          <p className="font-mono text-[8px] text-[#22D3EE] uppercase tracking-[0.2em]">🔒 UNLOCK MORE INTEL</p>
+          <p className="mt-1 font-mono text-[7px] text-[#64748B] leading-snug">Pro: Unlimited trades + scouting</p>
+          <p className="font-mono text-[7px] text-[#64748B] leading-snug">Elite: Full TFO access + reports</p>
           <Link
             href="/dashboard/settings#billing"
-            className="inline-block mt-2 font-mono-tactical text-[8px] text-[#22D3EE] hover:text-white uppercase tracking-wider"
+            className="inline-block mt-2 font-mono text-[8px] text-[#22D3EE] hover:text-white uppercase tracking-wider"
           >
             UPGRADE →
           </Link>
@@ -682,7 +682,7 @@ export default function TradeHubSidebar({
         className="px-2 py-2 border-t border-white/[0.06] shrink-0 text-center"
         style={{ background: 'rgba(54,231,161,0.10)' }}
       >
-        <span className="font-mono-tactical text-[8px] font-black uppercase tracking-[0.2em] text-[#36E7A1]">
+        <span className="font-mono text-[8px] font-black uppercase tracking-[0.2em] text-[#36E7A1]">
           TFO MODEL ACTIVE
         </span>
       </div>

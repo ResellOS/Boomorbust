@@ -10,7 +10,7 @@ const CYAN = '#06B6D4';
 const EMERALD = '#10B981';
 const RED = '#EF4444';
 
-const FONT_BEBAS = { fontFamily: 'var(--font-bebas-neue), "Bebas Neue", Impact, sans-serif' } as const;
+const FONT_BEBAS = { fontFamily: 'var(--font-display), "Bebas Neue", Impact, sans-serif' } as const;
 
 type ScatterDatum = { id: string; label: string; mv: number; sals: number };
 

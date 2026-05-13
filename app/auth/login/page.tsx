@@ -82,7 +82,7 @@ export default function LoginPage() {
             </button>
           </form>
 
-          <p className="mt-6 text-center text-[10px] text-[#475569] font-mono-tactical">
+          <p className="mt-6 text-center text-[10px] text-[#475569] font-mono">
             New accounts opening soon.
           </p>
         </div>

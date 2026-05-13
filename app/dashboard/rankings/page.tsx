@@ -29,8 +29,8 @@ const GREEN = '#34d399';
 const AMBER = '#fbbf24';
 const RED = '#f87171';
 
-const F_BEBAS = { fontFamily: 'var(--font-bebas-neue), "Bebas Neue", Impact, sans-serif' } as const;
-const F_INTER = { fontFamily: 'var(--font-inter), Inter, system-ui, sans-serif' } as const;
+const F_BEBAS = { fontFamily: 'var(--font-display), "Bebas Neue", Impact, sans-serif' } as const;
+const F_INTER = { fontFamily: 'var(--font-body), Inter, system-ui, sans-serif' } as const;
 const F_MONO = { fontFamily: '"JetBrains Mono", "Fira Code", "Cascadia Mono", ui-monospace, monospace' } as const;
 
 // ─── Constants ──────────────────────────────────────────────────────────────

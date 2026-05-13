@@ -137,7 +137,6 @@ export async function getKTCValues(): Promise<KTCPlayer[]> {
     [];
 
   if (players.length) {
-    console.log(`[ktc] loaded ${players.length} players`);
     if (redis) {
       try {
         await redis.set(REDIS_KEY, players, { ex: TTL });

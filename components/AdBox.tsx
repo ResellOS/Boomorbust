@@ -46,7 +46,7 @@ export default function AdBox({ slot, tier, premiumContent, className }: AdBoxPr
       <div
         style={{
           fontSize: '9px',
-          fontFamily: 'var(--font-mono-tactical), ui-monospace, monospace',
+          fontFamily: 'var(--font-mono), ui-monospace, monospace',
           color: '#475569',
           letterSpacing: '0.15em',
           textTransform: 'uppercase',
@@ -74,7 +74,7 @@ export default function AdBox({ slot, tier, premiumContent, className }: AdBoxPr
           style={{
             fontSize: '11px',
             color: '#475569',
-            fontFamily: 'var(--font-mono-tactical), ui-monospace, monospace',
+            fontFamily: 'var(--font-mono), ui-monospace, monospace',
             textAlign: 'center',
           }}
         >
@@ -83,7 +83,7 @@ export default function AdBox({ slot, tier, premiumContent, className }: AdBoxPr
 
         <Link
           href="/dashboard/settings#billing"
-          className="font-mono-tactical text-[9px] uppercase tracking-[0.1em] no-underline rounded-full px-2.5 py-1 border transition-colors hover:bg-[#22D3EE]/15"
+          className="font-mono text-[9px] uppercase tracking-[0.1em] no-underline rounded-full px-2.5 py-1 border transition-colors hover:bg-[#22D3EE]/15"
           style={{
             color: '#22D3EE',
             borderColor: 'rgba(34,211,238,0.2)',

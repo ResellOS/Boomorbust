@@ -50,26 +50,26 @@ export default function MyLeaguesCompact({
       {portfolioHealth && (
         <div className="mb-2 flex gap-1 border-b border-white/[0.06] p-2">
           <div className="flex-1 text-center">
-            <div className="font-mono-tactical text-[18px] font-black tabular-nums text-[#22D3EE]">
+            <div className="font-mono text-[18px] font-black tabular-nums text-[#22D3EE]">
               {portfolioHealth.total}
             </div>
-            <div className="mt-0.5 text-[8px] font-mono-tactical uppercase tracking-[0.1em] text-[#64748B]">
+            <div className="mt-0.5 text-[8px] font-mono uppercase tracking-[0.1em] text-[#64748B]">
               Leagues
             </div>
           </div>
           <div className="flex-1 text-center">
-            <div className="font-mono-tactical text-[18px] font-black tabular-nums text-[#36E7A1]">
+            <div className="font-mono text-[18px] font-black tabular-nums text-[#36E7A1]">
               {portfolioHealth.winning}
             </div>
-            <div className="mt-0.5 text-[8px] font-mono-tactical uppercase tracking-[0.1em] text-[#64748B]">
+            <div className="mt-0.5 text-[8px] font-mono uppercase tracking-[0.1em] text-[#64748B]">
               Winning
             </div>
           </div>
           <div className="flex-1 text-center">
-            <div className="font-mono-tactical text-[18px] font-black tabular-nums text-[#EF4444]">
+            <div className="font-mono text-[18px] font-black tabular-nums text-[#EF4444]">
               {portfolioHealth.atRisk}
             </div>
-            <div className="mt-0.5 text-[8px] font-mono-tactical uppercase tracking-[0.1em] text-[#64748B]">
+            <div className="mt-0.5 text-[8px] font-mono uppercase tracking-[0.1em] text-[#64748B]">
               At Risk
             </div>
           </div>
@@ -79,7 +79,7 @@ export default function MyLeaguesCompact({
         <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-300 flex items-center gap-2">
           <Trophy className="w-3 h-3 text-[#FBBF24]" />
           My Leagues
-          <span className="text-[10px] font-mono-tactical text-slate-600">({count})</span>
+          <span className="text-[10px] font-mono text-slate-600">({count})</span>
         </h3>
         <div className="flex items-center gap-2">
           {onSelect && selectedId && (
@@ -131,7 +131,7 @@ export default function MyLeaguesCompact({
                   {lg.name}
                 </div>
                 {lg.meta && (
-                  <div className="text-[9px] text-slate-600 font-mono-tactical">
+                  <div className="text-[9px] text-slate-600 font-mono">
                     {lg.meta}
                   </div>
                 )}

@@ -88,6 +88,7 @@ export default function HeroSection() {
 
           {/* Logo — multiply removes white boxes from any PNG bg */}
           <Link href="/" aria-label="Boom or Bust" className="shrink-0 flex items-center gap-2.5">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="/images/logo-full2.png"
               alt="Boom or Bust"

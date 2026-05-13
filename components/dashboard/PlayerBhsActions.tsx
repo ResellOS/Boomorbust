@@ -93,13 +93,13 @@ export default function PlayerBhsActions({
         if (!disabled) go(path);
       }}
       className={clsx(
-        'rounded-full border font-mono-tactical font-black uppercase transition',
+        'rounded-full border font-mono font-black uppercase transition',
         compact ? 'px-1.5 py-0.5 text-[7px] tracking-[0.06em]' : 'px-2 py-0.5 text-[8px] tracking-[0.08em]',
         disabled ? 'cursor-not-allowed opacity-35' : 'cursor-pointer',
         isActive ? 'border-opacity-90' : 'border-white/[0.12] opacity-80 hover:opacity-100',
       )}
       style={{
-        fontFamily: 'var(--font-mono-tactical), "JetBrains Mono", ui-monospace, monospace',
+        fontFamily: 'var(--font-mono), "JetBrains Mono", ui-monospace, monospace',
         color: isActive ? color : '#64748B',
         borderColor: isActive ? `${color}99` : 'rgba(255,255,255,0.12)',
         background: isActive ? `${color}18` : 'rgba(255,255,255,0.04)',

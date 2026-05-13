@@ -64,7 +64,7 @@ export default function SignUpPage() {
         </p>
 
         {success ? (
-          <p className="mt-10 text-[15px] text-[#36E7A1] font-mono-tactical">You&apos;re on the list. 🚀</p>
+          <p className="mt-10 text-[15px] text-[#36E7A1] font-mono">You&apos;re on the list. 🚀</p>
         ) : (
           <form onSubmit={handleSubmit} className="mt-10 w-full max-w-md flex flex-col gap-3 sm:flex-row sm:items-stretch">
             <input
@@ -73,13 +73,13 @@ export default function SignUpPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="you@example.com"
-              className="min-h-[48px] flex-1 rounded-xl border border-white/[0.12] bg-white/[0.04] px-4 py-3 text-sm text-white placeholder:text-[#475569] outline-none focus:border-[#22D3EE] focus:ring-1 focus:ring-[#22D3EE] font-mono-tactical shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]"
+              className="min-h-[48px] flex-1 rounded-xl border border-white/[0.12] bg-white/[0.04] px-4 py-3 text-sm text-white placeholder:text-[#475569] outline-none focus:border-[#22D3EE] focus:ring-1 focus:ring-[#22D3EE] font-mono shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]"
               autoComplete="email"
             />
             <button
               type="submit"
               disabled={loading}
-              className="min-h-[48px] shrink-0 rounded-xl bg-[#6366F1] px-5 py-3 text-[11px] font-bold uppercase tracking-[0.12em] text-white transition hover:bg-[#5254cc] disabled:opacity-50 font-mono-tactical whitespace-nowrap"
+              className="min-h-[48px] shrink-0 rounded-xl bg-[#6366F1] px-5 py-3 text-[11px] font-bold uppercase tracking-[0.12em] text-white transition hover:bg-[#5254cc] disabled:opacity-50 font-mono whitespace-nowrap"
             >
               {loading ? '…' : 'NOTIFY ME ON LAUNCH'}
             </button>
@@ -88,7 +88,7 @@ export default function SignUpPage() {
         {error ? <p className="mt-4 text-sm text-red-400">{error}</p> : null}
 
         <div className="mt-12 w-full max-w-md text-center">
-          <p className="text-[9px] uppercase tracking-[0.08em] text-[#64748B] font-mono-tactical">
+          <p className="text-[9px] uppercase tracking-[0.08em] text-[#64748B] font-mono">
             Follow for weekly player predictions:
           </p>
           <div className="mt-3 flex justify-center">
@@ -96,11 +96,11 @@ export default function SignUpPage() {
               href={TWITTER_HREF}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center rounded-[20px] px-[14px] py-[6px] text-[11px] font-mono-tactical transition hover:opacity-90"
+              className="inline-flex items-center rounded-[20px] px-[14px] py-[6px] text-[11px] font-mono transition hover:opacity-90"
               style={{
                 color: '#22D3EE',
                 border: '1px solid rgba(34,211,238,0.2)',
-                fontFamily: "var(--font-mono-tactical), 'JetBrains Mono', ui-monospace, monospace",
+                fontFamily: "var(--font-mono), 'JetBrains Mono', ui-monospace, monospace",
               }}
             >
               𝕏 @YourHandle

@@ -100,7 +100,7 @@ export default function StarTistCard({
           Portfolio MVP
         </h3>
         {typeof winSharePct === 'number' && (
-          <span className="text-[9px] font-mono-tactical text-[#36E7A1] font-black" style={{ textShadow: '0 0 10px rgba(54,231,161,0.4)' }}>
+          <span className="text-[9px] font-mono text-[#36E7A1] font-black" style={{ textShadow: '0 0 10px rgba(54,231,161,0.4)' }}>
             {winSharePct.toFixed(0)}% share
           </span>
         )}
@@ -124,11 +124,11 @@ export default function StarTistCard({
         </div>
         <div className="min-w-0 flex-1">
           <div className="text-sm font-black text-white truncate">{player.name}</div>
-          <div className="text-[10px] text-slate-500 font-mono-tactical">
+          <div className="text-[10px] text-slate-500 font-mono">
             {player.position} · {player.team}
           </div>
           {leagueLabel && (
-            <div className="text-[9px] text-slate-600 font-mono-tactical truncate mt-0.5">
+            <div className="text-[9px] text-slate-600 font-mono truncate mt-0.5">
               {leagueLabel}
             </div>
           )}
@@ -137,7 +137,7 @@ export default function StarTistCard({
 
       <div className="mt-3 pt-3 border-t border-white/[0.04]">
         <div
-          className="text-[10px] font-black uppercase tracking-widest font-mono-tactical text-[#36E7A1]"
+          className="text-[10px] font-black uppercase tracking-widest font-mono text-[#36E7A1]"
           style={{ textShadow: '0 0 12px rgba(54,231,161,0.45), 0 0 24px rgba(54,231,161,0.2)' }}
         >
           {status}
@@ -152,12 +152,12 @@ export default function StarTistCard({
             <div className="flex items-end gap-3 min-w-0">
               <div className="flex items-baseline gap-1 leading-none">
                 <span
-                  className="text-3xl font-black font-mono-tactical tracking-tight text-[#36E7A1]"
+                  className="text-3xl font-black font-mono tracking-tight text-[#36E7A1]"
                   style={{ textShadow: '0 0 18px rgba(54,231,161,0.5), 0 0 40px rgba(54,231,161,0.2)' }}
                 >
                   {metricMain}
                 </span>
-                <span className="text-sm font-bold font-mono-tactical text-slate-400 pb-0.5">{metricSuffix}</span>
+                <span className="text-sm font-bold font-mono text-slate-400 pb-0.5">{metricSuffix}</span>
               </div>
               {sparklineValues && sparklineValues.length >= 2 && (
                 <PerformanceSparkline values={sparklineValues} />
@@ -166,7 +166,7 @@ export default function StarTistCard({
           ) : (
             <div className="flex items-end gap-3">
               <div
-                className="text-3xl font-black font-mono-tactical text-[#36E7A1] leading-none tracking-tight"
+                className="text-3xl font-black font-mono text-[#36E7A1] leading-none tracking-tight"
                 style={{ textShadow: '0 0 18px rgba(54,231,161,0.5), 0 0 40px rgba(54,231,161,0.2)' }}
               >
                 {metric ?? '—'}
@@ -177,7 +177,7 @@ export default function StarTistCard({
             </div>
           )}
         </div>
-        <div className="text-[10px] text-slate-500 mt-1.5 font-mono-tactical">{subline}</div>
+        <div className="text-[10px] text-slate-500 mt-1.5 font-mono">{subline}</div>
         {player.player_id ? (
           <div className="mt-2 border-t border-white/[0.06] pt-2">
             <PlayerBhsActions

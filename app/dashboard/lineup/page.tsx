@@ -661,7 +661,7 @@ export default function LineupPage() {
                   <div className="relative">
                     <OptimalGauge pct={data?.gaugePct ?? 0} />
                     <span className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none gap-1 px-2 text-center">
-                      <span className="font-mono-tactical text-[9px] uppercase tracking-[0.15em] text-[#64748B]">
+                      <span className="font-mono text-[9px] uppercase tracking-[0.15em] text-[#64748B]">
                         LINEUP STRENGTH
                       </span>
                       <span
@@ -734,7 +734,7 @@ export default function LineupPage() {
                     <h2 className="display text-[28px] text-white leading-tight tracking-wide">
                       WEEK {data.meta?.week ?? week} LINEUP INTELLIGENCE
                     </h2>
-                    <p className="font-mono-tactical mt-2 text-[11px] text-[#64748B] tabular-nums">
+                    <p className="font-mono mt-2 text-[11px] text-[#64748B] tabular-nums">
                       {lineupIntelCounts.starters} starters · {lineupIntelCounts.bench} bench ·{' '}
                       {data.projectedStarterPoints != null ? `${data.projectedStarterPoints.toFixed(1)}` : '—'} proj pts
                     </p>
@@ -805,11 +805,11 @@ export default function LineupPage() {
                                         })}
                                       </div>
                                     ) : null}
-                                    <p className="font-mono-tactical text-[11px] text-[var(--text-muted)] mt-2">
+                                    <p className="font-mono text-[11px] text-[var(--text-muted)] mt-2">
                                       {r.team ? `${r.position} · ${r.team}` : r.position}
                                     </p>
                                     {opt ? (
-                                      <p className="font-mono-tactical text-[11px] text-[var(--text-secondary)] mt-1 flex flex-wrap items-center gap-1.5">
+                                      <p className="font-mono text-[11px] text-[var(--text-secondary)] mt-1 flex flex-wrap items-center gap-1.5">
                                         <span className="text-[20px] leading-none shrink-0" aria-hidden>
                                           {lineupWeatherGlyph(opt.weather.condition, opt.weather.score)}
                                         </span>
@@ -822,7 +822,7 @@ export default function LineupPage() {
                                         </span>
                                       </p>
                                     ) : typeof r.matchup_rank === 'number' ? (
-                                      <p className="font-mono-tactical text-[11px] text-[var(--text-muted)] mt-1">
+                                      <p className="font-mono text-[11px] text-[var(--text-muted)] mt-1">
                                         vs {r.opponent_abbr ?? '?'} ({r.matchup_grade} matchup · def rank {r.matchup_rank})
                                       </p>
                                     ) : null}
@@ -848,7 +848,7 @@ export default function LineupPage() {
                                       </button>
                                     ) : null}
                                     <span
-                                      className="inline-flex shrink-0 items-center justify-center rounded-full border font-black uppercase tracking-wide font-mono-tactical"
+                                      className="inline-flex shrink-0 items-center justify-center rounded-full border font-black uppercase tracking-wide font-mono"
                                       style={{
                                         fontSize: '14px',
                                         padding: '6px 16px',
@@ -863,19 +863,19 @@ export default function LineupPage() {
                                   {opt ? (
                                     <>
                                       <span>
-                                        Start <span className="text-white tabular-nums font-mono-tactical">{Math.round(opt.startScore)}</span>
+                                        Start <span className="text-white tabular-nums font-mono">{Math.round(opt.startScore)}</span>
                                       </span>
                                       <span>
-                                        TFO <span className="text-white tabular-nums font-mono-tactical">{Math.round(opt.tfoScore)}</span>
+                                        TFO <span className="text-white tabular-nums font-mono">{Math.round(opt.tfoScore)}</span>
                                       </span>
                                       <span>
-                                        Matchup <span className="text-white tabular-nums font-mono-tactical">{Math.round(opt.matchupGrade)}</span>
+                                        Matchup <span className="text-white tabular-nums font-mono">{Math.round(opt.matchupGrade)}</span>
                                       </span>
                                       <div className="flex flex-col gap-0.5">
-                                        <span className="font-mono-tactical text-[8px] uppercase tracking-[0.12em] text-[#64748B]">
+                                        <span className="font-mono text-[8px] uppercase tracking-[0.12em] text-[#64748B]">
                                           PROJ
                                         </span>
-                                        <span className="font-mono-tactical text-sm font-bold text-white tabular-nums">
+                                        <span className="font-mono text-sm font-bold text-white tabular-nums">
                                           {opt.projectedPoints.low.toFixed(1)}–{opt.projectedPoints.high.toFixed(1)} pts
                                         </span>
                                       </div>
@@ -925,7 +925,7 @@ export default function LineupPage() {
             {/* Close calls */}
             {(borderlineLoading || borderlineStream) && (
               <section
-                className="rounded-lg p-4 font-mono-tactical"
+                className="rounded-lg p-4 font-mono"
                 style={{
                   background: 'rgba(0,0,0,0.4)',
                   border: '1px solid rgba(255,255,255,0.06)',

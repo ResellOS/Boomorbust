@@ -130,7 +130,7 @@ export default function TfoTradeCard({
           {primary.grade.replace(/_/g, ' ')}
         </span>
       </div>
-      <div className="flex flex-wrap gap-2 mb-3 text-[11px] font-mono-tactical">
+      <div className="flex flex-wrap gap-2 mb-3 text-[11px] font-mono">
         {triple.map(({ label, r }, i) => {
           const prev = i > 0 ? triple[i - 1]!.r?.tfoScore : null;
           const cur = r?.tfoScore;
@@ -162,7 +162,7 @@ export default function TfoTradeCard({
           {primary.reasoning.length > 120 ? `${primary.reasoning.slice(0, 117)}…` : primary.reasoning}
         </p>
       </div>
-      <p className="text-[9px] text-[#475569] mt-2 font-mono-tactical uppercase">
+      <p className="text-[9px] text-[#475569] mt-2 font-mono uppercase">
         {side === 'give' ? 'You give' : 'You get'}
       </p>
     </div>

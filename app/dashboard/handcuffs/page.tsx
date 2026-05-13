@@ -234,16 +234,16 @@ function HandcuffStarterCard({
           <div className="min-w-0 flex-1">
             <p className="text-white font-semibold text-sm truncate">{result.starter_name}</p>
             {result.starter_team && (
-              <p className="text-[11px] text-[#94A3B8] font-mono-tactical truncate">{result.starter_team}</p>
+              <p className="text-[11px] text-[#94A3B8] font-mono truncate">{result.starter_team}</p>
             )}
             <span className="inline-block mt-1 text-[10px] font-black px-2 py-0.5 rounded bg-emerald-500/25 text-emerald-300 border border-emerald-500/35">
               RB
             </span>
-            <p className="text-[11px] font-mono-tactical text-[#94A3B8] mt-1 tabular-nums">
+            <p className="text-[11px] font-mono text-[#94A3B8] mt-1 tabular-nums">
               {result.starter_ktc > 0 ? `${result.starter_ktc.toLocaleString()} KTC` : 'KTC —'}
             </p>
             {injuryFlag(injuryStatus) && (
-              <p className="text-[11px] text-red-400 font-mono-tactical mt-1 flex items-center gap-1">
+              <p className="text-[11px] text-red-400 font-mono mt-1 flex items-center gap-1">
                 <span aria-hidden>⚑</span>
                 {injuryStatus}
               </p>
@@ -259,7 +259,7 @@ function HandcuffStarterCard({
         <div className="flex gap-3 flex-1 min-w-0">
           {!display || display.status === 'NOT_FOUND' ? (
             <div className="flex flex-col justify-center">
-              <p className="text-[13px] text-[#475569] font-mono-tactical">No handcuff found</p>
+              <p className="text-[13px] text-[#475569] font-mono">No handcuff found</p>
               <p className="text-[11px] text-[#475569] mt-1">Depth chart pair not in database.</p>
             </div>
           ) : (
@@ -278,14 +278,14 @@ function HandcuffStarterCard({
                 {display.status === 'YOU_OWN' && (
                   <>
                     <p className="text-[12px] font-bold text-[#36E7A1]">✓ PROTECTED</p>
-                    <p className="text-[11px] text-[#94A3B8] font-mono-tactical">You own the handcuff</p>
+                    <p className="text-[11px] text-[#94A3B8] font-mono">You own the handcuff</p>
                   </>
                 )}
 
                 {display.status === 'AVAILABLE' && (
                   <>
                     <p className="text-[12px] font-bold text-[#FBBF24]">⚠ AVAILABLE</p>
-                    <p className="text-[11px] text-[#FBBF24] font-mono-tactical font-semibold">Add immediately</p>
+                    <p className="text-[11px] text-[#FBBF24] font-mono font-semibold">Add immediately</p>
                   </>
                 )}
 
@@ -294,13 +294,13 @@ function HandcuffStarterCard({
                     <p className="text-[12px] font-bold text-[#EF4444]">
                       🔒 {managerLabel(oppMgr)}
                     </p>
-                    <p className="text-[11px] text-[#94A3B8] font-mono-tactical">
+                    <p className="text-[11px] text-[#94A3B8] font-mono">
                       Owned by {managerLabel(oppMgr)}
                     </p>
 
                     {tradeChip && display.player_id && (
                       <div className="mt-2 rounded-lg border border-white/[0.08] bg-white/[0.04] p-3 space-y-2">
-                        <p className="text-[10px] font-mono-tactical uppercase tracking-wider text-[#64748B]">
+                        <p className="text-[10px] font-mono uppercase tracking-wider text-[#64748B]">
                           Trade for protection
                         </p>
                         <p className="text-[12px] text-[#E2E8F0] leading-snug">
@@ -316,7 +316,7 @@ function HandcuffStarterCard({
                         {delta != null && (
                           <p
                             className={clsx(
-                              'text-[11px] font-mono-tactical font-bold',
+                              'text-[11px] font-mono font-bold',
                               Math.abs(delta) <= 300 ? 'text-[#36E7A1]' : 'text-[#94A3B8]',
                             )}
                           >
@@ -328,7 +328,7 @@ function HandcuffStarterCard({
                         <button
                           type="button"
                           onClick={sendBbst}
-                          className="w-full mt-1 text-[11px] font-black font-mono-tactical uppercase tracking-wide py-2 rounded-lg bg-[#22D3EE]/15 text-[#22D3EE] border border-[#22D3EE]/35 hover:bg-[#22D3EE]/25 transition"
+                          className="w-full mt-1 text-[11px] font-black font-mono uppercase tracking-wide py-2 rounded-lg bg-[#22D3EE]/15 text-[#22D3EE] border border-[#22D3EE]/35 hover:bg-[#22D3EE]/25 transition"
                         >
                           Send BBST
                         </button>
@@ -342,7 +342,7 @@ function HandcuffStarterCard({
         </div>
       </div>
 
-      <p className="text-[9px] text-[#475569] font-mono-tactical uppercase tracking-wider mt-3 truncate">
+      <p className="text-[9px] text-[#475569] font-mono uppercase tracking-wider mt-3 truncate">
         {leagueName}
       </p>
     </div>
@@ -570,7 +570,7 @@ export default function HandcuffsPage() {
           <p
             className="mt-2 uppercase tracking-[0.12em]"
             style={{
-              fontFamily: 'var(--font-mono-tactical), "JetBrains Mono", monospace',
+              fontFamily: 'var(--font-mono), "JetBrains Mono", monospace',
               fontSize: 11,
               color: '#36E7A1',
             }}
@@ -582,7 +582,7 @@ export default function HandcuffsPage() {
         {!loading && leagues.length === 0 && (
           <div className="text-center py-16 glass-panel rounded-xl border border-white/[0.08]">
             <p className="text-white font-medium">No leagues linked</p>
-            <p className="text-[#94A3B8] text-sm mt-1 font-mono-tactical">Add a league from onboarding or settings.</p>
+            <p className="text-[#94A3B8] text-sm mt-1 font-mono">Add a league from onboarding or settings.</p>
           </div>
         )}
 
@@ -597,7 +597,7 @@ export default function HandcuffsPage() {
                     type="button"
                     onClick={() => setActiveLeagueId(lg.id)}
                     className={clsx(
-                      'relative shrink-0 px-3 py-2.5 text-[12px] font-mono-tactical font-bold transition',
+                      'relative shrink-0 px-3 py-2.5 text-[12px] font-mono font-bold transition',
                       active ? 'text-white' : 'text-[#64748B] hover:text-[#94A3B8]',
                     )}
                   >
@@ -616,7 +616,7 @@ export default function HandcuffsPage() {
         )}
 
         {activePack?.myRoster && leagueRows.length > 0 && (
-          <div className="flex flex-wrap gap-4 mb-6 font-mono-tactical text-[12px]">
+          <div className="flex flex-wrap gap-4 mb-6 font-mono text-[12px]">
             <span className="text-red-400 font-bold">
               {leagueStrip.critical} CRITICAL
             </span>
@@ -634,7 +634,7 @@ export default function HandcuffsPage() {
         {loading && <Skeleton />}
 
         {!loading && activePack && !activePack.myRoster && (
-          <p className="text-[#94A3B8] text-sm font-mono-tactical">
+          <p className="text-[#94A3B8] text-sm font-mono">
             Connect your Sleeper account to identify your roster in this league.
           </p>
         )}
@@ -642,7 +642,7 @@ export default function HandcuffsPage() {
         {!loading && activePack?.myRoster && leagueRows.length === 0 && (
           <div className="text-center py-16 glass-panel rounded-xl border border-white/[0.08]">
             <p className="text-white font-medium">No RB handcuff situations</p>
-            <p className="text-[#94A3B8] text-sm mt-1 font-mono-tactical">
+            <p className="text-[#94A3B8] text-sm mt-1 font-mono">
               Starters may not match known depth-chart pairs, or lineups are empty off-season.
             </p>
           </div>

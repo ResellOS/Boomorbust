@@ -24,7 +24,7 @@ import type {
 
 // ─── Design tokens ────────────────────────────────────────────────────────────
 
-const MONO = { fontFamily: 'var(--font-mono-tactical, "JetBrains Mono", monospace)' } as const;
+const MONO = { fontFamily: 'var(--font-mono, "JetBrains Mono", monospace)' } as const;
 
 const POS_COLOR: Record<string, string> = {
   QB: '#FBBF24',

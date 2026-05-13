@@ -13,15 +13,18 @@ function StatPair({
   numColor: string;
   numClassName?: string;
 }) {
+  const numeric = /\d/.test(num);
   return (
     <div>
       <div
-        className={`font-bold leading-none max-w-[min(100vw-3rem,320px)] break-words sm:max-w-none ${numClassName ?? 'text-[52px]'}`}
-        style={{ fontFamily: 'var(--font-display)', color: numColor }}
+        className={`font-bold leading-none max-w-[min(100vw-3rem,320px)] break-words sm:max-w-none ${numeric ? 'font-mono tabular-nums' : ''} ${numClassName ?? 'text-[52px]'}`}
+        style={{ fontFamily: numeric ? undefined : 'var(--font-body)', color: numColor }}
       >
         {num}
       </div>
-      <div className="mt-0.5 text-[12px] text-[#64748B] font-mono-tactical">{label}</div>
+      <div className="mt-0.5 text-[12px] text-[#64748B]" style={{ fontFamily: 'var(--font-body)' }}>
+        {label}
+      </div>
     </div>
   );
 }
@@ -51,7 +54,7 @@ export default function WaitlistStatRow() {
   }
 
   if (count < 10) {
-    return <StatPair num="EARLY ACCESS" label="MANAGERS ON WAITLIST" numColor="#A78BFA" />;
+    return <StatPair num="EARLY ACCESS" label="MANAGERS ON WAITLIST" numColor="#A78BFA" numClassName="text-[clamp(22px,4vw,52px)]" />;
   }
 
   return (

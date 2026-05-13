@@ -27,26 +27,29 @@ export default function LandingWaitlistUrgency() {
 
   return (
     <section
-      className="text-center"
+      className="px-4 py-8 text-center sm:px-6 sm:py-10"
       style={{
         background: 'rgba(54,231,161,0.04)',
         borderTop: '1px solid rgba(54,231,161,0.1)',
         borderBottom: '1px solid rgba(54,231,161,0.1)',
-        padding: '24px 48px',
       }}
     >
-      <h2 className="text-[28px] text-[#36E7A1]" style={{ fontFamily: 'var(--font-display)' }}>
+      <h2
+        className="text-[clamp(1.15rem,5.5vw,1.75rem)] text-[#36E7A1] sm:text-[clamp(1.35rem,4vw,1.75rem)]"
+        style={{ fontFamily: 'var(--font-display)' }}
+      >
         🚀 EARLY ACCESS IS LIMITED
       </h2>
       <p
-        className="mx-auto mt-3 max-w-[520px] text-[14px] leading-relaxed text-[#94A3B8]"
+        className="mx-auto mt-3 max-w-[520px] text-[13px] leading-relaxed text-[#94A3B8] sm:text-[14px]"
         style={{ fontFamily: 'var(--font-body)' }}
       >
-        {n} managers already on the waitlist. Launch pricing locks in for founding members only.
+        <span className="font-mono tabular-nums font-semibold text-[#94A3B8]">{n}</span>{' '}
+        managers already on the waitlist. Launch pricing locks in for founding members only.
       </p>
       <Link
-        href="/auth/signup"
-        className="mt-6 inline-flex items-center gap-1 rounded-[10px] px-8 py-[14px] text-[15px] font-bold text-[#060910] transition-opacity hover:opacity-95"
+        href="/signup"
+        className="mt-6 inline-flex min-h-[44px] items-center justify-center gap-1 rounded-[10px] px-6 py-3 text-[14px] font-bold text-[#0a0d14] transition-opacity hover:opacity-95 sm:px-8 sm:text-[15px]"
         style={{
           fontFamily: 'var(--font-body)',
           fontWeight: 700,

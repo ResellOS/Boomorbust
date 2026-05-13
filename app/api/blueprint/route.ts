@@ -4,14 +4,24 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { requireFeature } from '@/lib/access/gates';
+import { requireFeature, getUserTier } from '@/lib/access/gates';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { getRecommendedTargets } from '@/lib/recommendations/targets';
+import { checkAIRateLimit, rateLimitExceededResponse } from '@/lib/rateLimit/ai';
 
 export async function POST(request: NextRequest) {
   const access = await requireFeature('blueprint');
   if (access instanceof NextResponse) return access;
   const { userId } = access;
+
+  const tier = await getUserTier(userId);
+  const rateCheck = await checkAIRateLimit(userId, tier);
+  if (!rateCheck.allowed) {
+    return NextResponse.json(
+      { ...rateLimitExceededResponse(rateCheck, tier), code: 'RATE_LIMITED' },
+      { status: 429 },
+    );
+  }
 
   let body: { league_id: string };
   try {
