@@ -29,25 +29,38 @@ function countersForOffer(offerId: string): SmartCounterCardDto[] {
       label: 'RESPONSE 3 · CONSERVATIVE',
       title: 'Protect Assets',
       description: 'Minimize risk, maintain depth',
-      modification: '✦ Remove: Amon-Ra St. Brown',
+      modification: '✦ Tighten picks to protect downside',
       treScoreDisplay: '+3.1',
     },
   ];
 }
 
-export async function GET(req: NextRequest) {
+export async function POST(req: NextRequest) {
   const gate = await requireFeature('smart_counter');
   if (gate instanceof NextResponse) return gate;
 
-  const offerId = req.nextUrl.searchParams.get('offer_id')?.trim();
-  if (!offerId) {
-    return NextResponse.json({ error: 'offer_id is required' }, { status: 400 });
+  let body: unknown;
+  try {
+    body = await req.json();
+  } catch {
+    return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 });
   }
 
-  const body: SmartCounterApiResponse = {
+  const offer = (body as { offer?: unknown }).offer;
+  if (!offer || typeof offer !== 'object') {
+    return NextResponse.json({ error: 'offer object is required' }, { status: 400 });
+  }
+
+  const id = (offer as { id?: unknown }).id;
+  if (typeof id !== 'string' || !id.trim()) {
+    return NextResponse.json({ error: 'offer.id is required' }, { status: 400 });
+  }
+
+  const offerId = id.trim();
+  const bodyOut: SmartCounterApiResponse = {
     offerId,
     responses: countersForOffer(offerId),
   };
 
-  return NextResponse.json(body);
+  return NextResponse.json(bodyOut);
 }

@@ -19,12 +19,12 @@ export interface IncomingOffersTabPanelProps {
 export default function IncomingOffersTabPanel({ stats, statsLoading }: IncomingOffersTabPanelProps) {
   return (
     <div className="flex min-h-0 w-full min-w-0 flex-1 flex-col gap-4">
-      <div className="flex min-h-0 w-full min-w-0 flex-1 flex-col gap-4 lg:min-h-0 lg:flex-row lg:items-stretch lg:gap-4">
-        <div className="flex min-h-0 w-full min-w-0 flex-col lg:w-[53%] lg:max-w-[53%] lg:shrink-0">
-          <IncomingOffersPanel />
+      <div className="flex w-full min-w-0 flex-none flex-col gap-4 lg:min-h-0 lg:flex-1 lg:flex-row lg:items-stretch lg:gap-4">
+        <div className="flex w-full min-w-0 flex-col lg:h-full lg:w-[53%] lg:max-w-[53%] lg:shrink-0">
+          <IncomingOffersPanel totalOfferCount={stats?.incomingOffers ?? null} />
         </div>
-        <div className="flex min-h-0 w-full min-w-0 flex-col lg:w-[47%] lg:max-w-[47%] lg:shrink-0">
-          <SmartCounterPanel className="flex h-full min-h-0 w-full flex-col lg:max-w-none" />
+        <div className="flex w-full min-w-0 flex-col lg:h-full lg:w-[47%] lg:max-w-[47%] lg:shrink-0">
+          <SmartCounterPanel className="flex h-full min-h-0 w-full max-w-full flex-col lg:max-w-none" />
         </div>
       </div>
 

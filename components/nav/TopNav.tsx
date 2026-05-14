@@ -7,11 +7,21 @@ import { ChevronDown, LogOut, Menu, Settings, User, X } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import NotificationBell from '@/components/dashboard/NotificationBell';
 import { SyncButton } from '@/components/dashboard/SyncButton';
+import { useUserTierStore } from '@/store/userTierStore';
+import type { SubscriptionTier } from '@/lib/access/gates';
 
 const NAV_BG = '#0a0d14';
 const BOOM = '#36E7A1';
 const CYAN = '#22D3EE';
 const INACTIVE = '#94a3b8';
+
+function resolveTierBadge(tier: SubscriptionTier | null): { text: string; color: string } | null {
+  if (!tier || tier === 'free') return null;
+  if (tier === 'all_pro_terminal') return { text: 'All-Pro Terminal', color: '#A78BFA' };
+  if (tier === 'elite') return { text: 'Veteran', color: CYAN };
+  if (tier === 'pro') return { text: 'Rookie', color: CYAN };
+  return null;
+}
 
 const NAV_LINKS = [
   { label: 'Dashboard', href: '/dashboard', exact: true },
@@ -189,10 +199,12 @@ function UserAccountMenu({
   displayName,
   initials,
   onSignOut,
+  tierBadge,
 }: {
   displayName: string;
   initials: string;
   onSignOut: () => void;
+  tierBadge: { text: string; color: string } | null;
 }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -233,12 +245,25 @@ function UserAccountMenu({
         >
           {initials}
         </div>
-        <span
-          className="hidden md:inline max-w-[120px] truncate text-[13px] font-medium text-white"
-          style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}
-        >
-          Dynasty Empire
-        </span>
+        <div className="hidden md:flex flex-col items-start min-w-0 max-w-[120px]">
+          <span
+            className="truncate text-[13px] font-medium text-white leading-tight"
+            style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}
+          >
+            Dynasty Empire
+          </span>
+          {tierBadge ? (
+            <span
+              className="truncate text-[10px] font-semibold leading-tight"
+              style={{
+                fontFamily: 'var(--font-mono), JetBrains Mono, monospace',
+                color: tierBadge.color,
+              }}
+            >
+              {tierBadge.text}
+            </span>
+          ) : null}
+        </div>
         <ChevronDown
           size={14}
           className={`hidden md:block shrink-0 transition-transform duration-150 ${open ? 'rotate-180' : ''}`}
@@ -430,6 +455,12 @@ export default function TopNav({ email, username }: TopNavProps) {
   const router = useRouter();
   const supabase = createClient();
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const { tier, fetchTier } = useUserTierStore();
+  const tierBadge = resolveTierBadge(tier);
+
+  useEffect(() => {
+    void fetchTier();
+  }, [fetchTier]);
 
   const displayName = username?.trim() || email.split('@')[0] || 'Manager';
   const initials = initialsFrom(displayName);
@@ -499,7 +530,7 @@ export default function TopNav({ email, username }: TopNavProps) {
             </div>
             <NavEmpireWidget />
             <div className="hidden sm:block">
-              <UserAccountMenu displayName={displayName} initials={initials} onSignOut={handleSignOut} />
+              <UserAccountMenu displayName={displayName} initials={initials} onSignOut={handleSignOut} tierBadge={tierBadge} />
             </div>
             <button
               type="button"

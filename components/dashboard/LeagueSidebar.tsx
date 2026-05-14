@@ -124,6 +124,7 @@ export interface LeagueSidebarProps {
 export default function LeagueSidebar({ className }: LeagueSidebarProps) {
   const activeLeagueId  = useDashboardLeagueStore((s) => s.activeLeagueId);
   const setActiveLeagueId = useDashboardLeagueStore((s) => s.setActiveLeagueId);
+  const setLeagues = useDashboardLeagueStore((s) => s.setLeagues);
 
   const [myLeagues,    setMyLeagues]    = useState<LeagueSummary[]>([]);
   const [otherLeagues, setOtherLeagues] = useState<LeagueSummary[]>([]);
@@ -141,6 +142,7 @@ export default function LeagueSidebar({ className }: LeagueSidebarProps) {
         const json = (await res.json()) as LeaguesListResponse;
         setMyLeagues(json.myLeagues ?? []);
         setOtherLeagues(json.otherLeagues ?? []);
+        setLeagues([...(json.myLeagues ?? []), ...(json.otherLeagues ?? [])]);
       } catch {
         // Silent fail — sidebar shows empty state
       } finally {

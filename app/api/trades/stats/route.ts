@@ -29,7 +29,8 @@ export async function GET(request: NextRequest) {
   } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-  const leagueId = request.nextUrl.searchParams.get('league_id');
+  const leagueId =
+    request.nextUrl.searchParams.get('league_id') ?? request.nextUrl.searchParams.get('leagueId');
   const hubParams = new URLSearchParams();
   if (leagueId && leagueId !== 'all') hubParams.set('league_id', leagueId);
 

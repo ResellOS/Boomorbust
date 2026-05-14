@@ -4,7 +4,7 @@ import type { TradeHubStatsPayload } from './types';
 
 function FooterSkeleton() {
   return (
-    <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+    <div className="grid grid-cols-2 gap-x-3 gap-y-4 sm:gap-4 lg:grid-cols-4">
       {Array.from({ length: 4 }).map((_, i) => (
         <div key={i} className="min-w-0 space-y-2">
           <div className="h-2 w-24 animate-pulse rounded bg-white/[0.08]" />
@@ -41,8 +41,8 @@ export default function TradeHubFooterStatusBar({ stats, loading }: TradeHubFoot
 
   return (
     <div className="mt-6 w-full border-t border-white/[0.06] pt-4">
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <div className="min-w-0">
+      <div className="grid grid-cols-2 gap-x-3 gap-y-4 sm:gap-4 lg:grid-cols-4">
+        <div className="min-h-[44px] min-w-0 py-1 sm:min-h-0">
           <p
             className="text-[9px] font-semibold uppercase tracking-wide text-[#64748B]"
             style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}
@@ -57,7 +57,7 @@ export default function TradeHubFooterStatusBar({ stats, loading }: TradeHubFoot
           </p>
         </div>
 
-        <div className="min-w-0">
+        <div className="min-h-[44px] min-w-0 py-1 sm:min-h-0">
           <p
             className="text-[9px] font-semibold uppercase tracking-wide text-[#64748B]"
             style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}
@@ -75,7 +75,7 @@ export default function TradeHubFooterStatusBar({ stats, loading }: TradeHubFoot
           </p>
         </div>
 
-        <div className="min-w-0">
+        <div className="min-h-[44px] min-w-0 py-1 sm:min-h-0">
           <p
             className="text-[9px] font-semibold uppercase tracking-wide text-[#64748B]"
             style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}
@@ -93,7 +93,7 @@ export default function TradeHubFooterStatusBar({ stats, loading }: TradeHubFoot
           </p>
         </div>
 
-        <div className="min-w-0">
+        <div className="min-h-[44px] min-w-0 py-1 sm:min-h-0">
           <p
             className="text-[9px] font-semibold uppercase tracking-wide text-[#64748B]"
             style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}

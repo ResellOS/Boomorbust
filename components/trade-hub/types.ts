@@ -104,6 +104,8 @@ export type IncomingReceiveItem =
 
 export interface IncomingOfferApi {
   id: string;
+  leagueId: string;
+  createdAt: string;
   leagueLetter: string;
   leagueIconBg: string;
   leagueName: string;
@@ -179,7 +181,7 @@ export interface TradeHistoryApiResponse {
 
 export function timeAgo(createdAt: string): string {
   const diff = Date.now() - new Date(createdAt).getTime();
-  const mins = Math.floor(diff / 60_000);
+  const mins = Math.max(0, Math.floor(diff / 60_000));
   if (mins < 60) return `${mins}m ago`;
   const hrs = Math.floor(mins / 60);
   if (hrs < 24) return `${hrs}h ago`;

@@ -49,7 +49,7 @@ export default function TradeTabs({ stats, statsLoading }: TradeTabsProps) {
           style={{ WebkitOverflowScrolling: 'touch' }}
         >
           <div
-            className="flex w-max min-w-full flex-nowrap items-end justify-start gap-6 lg:gap-8"
+            className="flex w-max flex-nowrap items-end justify-start gap-6 lg:gap-8"
             role="tablist"
             aria-label="Trade Hub sections"
           >

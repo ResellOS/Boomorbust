@@ -4,12 +4,18 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
 import { Lock } from 'lucide-react';
+import clsx from 'clsx';
 import type { TreSuggestionRowDto, TreSuggestionsApiResponse } from './types';
 import { photoUrl } from './types';
+import { useDashboardLeagueStore } from '@/store/dashboardLeagueStore';
 
 type UserTier = 'free' | 'pro' | 'elite' | 'all_pro_terminal';
 
 const GLASS = 'rounded-xl border border-white/[0.08] bg-white/[0.03] backdrop-blur-[24px]';
+
+function treEdgeClass(edge: string): string {
+  return edge.trim().startsWith('-') ? 'text-red-400' : 'text-[#36E7A1]';
+}
 
 function SuggestionAvatar({ playerId, name }: { playerId: string; name: string }) {
   const [err, setErr] = useState(false);
@@ -51,11 +57,11 @@ function LockedOverlay() {
         className="mt-3 max-w-[280px] text-[14px] font-medium text-white"
         style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}
       >
-        TRE Suggestions require Veteran or All-Pro
+        TRE Suggestions are locked on Free and Rookie. Upgrade to Veteran or All-Pro Terminal.
       </p>
       <Link
         href="/pricing"
-        className="mt-4 rounded-lg bg-emerald-500 px-5 py-2 text-[13px] font-semibold text-black transition-colors hover:bg-emerald-400"
+        className="mt-4 inline-flex min-h-[44px] items-center justify-center rounded-lg bg-emerald-500 px-5 py-2 text-[13px] font-semibold text-black transition-colors hover:bg-emerald-400"
         style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}
       >
         Upgrade Now →
@@ -78,17 +84,21 @@ function RowSkeleton() {
 }
 
 function SuggestionRow({ row }: { row: TreSuggestionRowDto }) {
+  const edgeCls = treEdgeClass(row.treEdge);
   return (
     <button
       type="button"
-      className="flex w-full cursor-pointer items-center gap-3 border-b border-white/[0.04] py-3 text-left transition-colors last:border-b-0 hover:bg-white/[0.03]"
+      className="flex min-h-[52px] w-full cursor-pointer items-center gap-3 border-b border-white/[0.04] py-2.5 text-left transition-colors last:border-b-0 hover:bg-white/[0.03] sm:min-h-0 sm:py-3"
     >
       <SuggestionAvatar playerId={row.playerId} name={row.playerDisplayName} />
       <div className="min-w-0 flex-1">
-        <p className="text-[13px] font-medium text-white" style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}>
+        <p
+          className="truncate text-[13px] font-medium text-white"
+          style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}
+        >
           {row.headline}
         </p>
-        <p className="text-[11px] text-[#64748B]" style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}>
+        <p className="truncate text-[11px] text-[#64748B]" style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}>
           Target: {row.targetName}
         </p>
       </div>
@@ -100,7 +110,7 @@ function SuggestionRow({ row }: { row: TreSuggestionRowDto }) {
           TRE EDGE
         </p>
         <p
-          className="text-[18px] font-bold tabular-nums text-[#36E7A1]"
+          className={clsx('text-[18px] font-bold tabular-nums', edgeCls)}
           style={{ fontFamily: 'var(--font-mono), JetBrains Mono, monospace' }}
         >
           {row.treEdge}
@@ -115,6 +125,7 @@ export interface TRESuggestionsPanelProps {
 }
 
 export default function TRESuggestionsPanel({ className }: TRESuggestionsPanelProps) {
+  const activeLeagueId = useDashboardLeagueStore((s) => s.activeLeagueId);
   const [tier, setTier] = useState<UserTier | null>(null);
   const [data, setData] = useState<TreSuggestionsApiResponse | null>(null);
   const [loading, setLoading] = useState(false);
@@ -148,19 +159,23 @@ export default function TRESuggestionsPanel({ className }: TRESuggestionsPanelPr
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch('/api/trades/suggestions', { credentials: 'include' });
+      const q =
+        activeLeagueId && activeLeagueId !== 'all'
+          ? `?leagueId=${encodeURIComponent(activeLeagueId)}`
+          : '';
+      const res = await fetch(`/api/trades/suggestions${q}`, { credentials: 'include' });
       if (!res.ok) {
         const j = (await res.json().catch(() => ({}))) as { error?: string };
         throw new Error(j.error ?? `HTTP ${res.status}`);
       }
       setData((await res.json()) as TreSuggestionsApiResponse);
-    } catch (e) {
-      setError((e as Error).message ?? 'Failed to load suggestions');
+    } catch {
+      setError('Unable to load suggestions. Try again.');
       setData(null);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [activeLeagueId]);
 
   useEffect(() => {
     if (tier === null || isTierLocked) {
@@ -178,7 +193,7 @@ export default function TRESuggestionsPanel({ className }: TRESuggestionsPanelPr
     <div className={`relative ${GLASS} ${rootClass}`}>
       {tier !== null && isTierLocked ? <LockedOverlay /> : null}
 
-      <div className="flex flex-wrap items-start justify-between gap-3 border-b border-white/[0.06] px-4 py-3">
+      <div className="flex flex-col gap-2 border-b border-white/[0.06] px-3 py-3 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between sm:gap-3 sm:px-4">
         <div className="min-w-0">
           <p
             className="text-[12px] font-semibold uppercase tracking-wide text-[#64748B]"
@@ -191,15 +206,15 @@ export default function TRESuggestionsPanel({ className }: TRESuggestionsPanelPr
           </p>
         </div>
         <Link
-          href="#"
-          className="shrink-0 text-[12px] text-[#22D3EE] hover:underline"
+          href="/dashboard/trade-hub"
+          className="inline-flex min-h-[44px] shrink-0 items-center text-[12px] text-[#22D3EE] hover:bg-white/[0.04] hover:underline sm:min-h-0"
           style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}
         >
           View All Suggestions →
         </Link>
       </div>
 
-      <div className="px-4 pb-1 pt-0">
+      <div className="px-3 pb-1 pt-0 sm:px-4">
         {tier !== null && isTierLocked ? (
           <div className="min-h-[200px]" aria-hidden />
         ) : tier === null || loading ? (
@@ -209,9 +224,19 @@ export default function TRESuggestionsPanel({ className }: TRESuggestionsPanelPr
             <RowSkeleton />
           </div>
         ) : error ? (
-          <p className="py-6 text-center text-[13px] text-red-400" style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}>
-            {error}
-          </p>
+          <div className="flex flex-col items-center gap-3 py-6 text-center">
+            <p className="text-[13px] text-red-400" style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}>
+              {error}
+            </p>
+            <button
+              type="button"
+              onClick={() => void loadSuggestions()}
+              className="min-h-[44px] rounded-lg border border-white/[0.12] bg-white/[0.05] px-4 text-[13px] text-white hover:bg-white/[0.08]"
+              style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}
+            >
+              Retry
+            </button>
+          </div>
         ) : data?.suggestions?.length ? (
           <div>
             {data.suggestions.map((row) => (

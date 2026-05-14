@@ -148,7 +148,10 @@ export async function GET(request: NextRequest) {
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   const url = new URL(request.url);
-  const leagueIdParam = url.searchParams.get('league_id');
+  const leagueIdParam = url.searchParams.get('league_id') ?? url.searchParams.get('leagueId');
+  /** When true, incoming/history/suggestions include all user leagues. */
+  const scopeAllLeagues = !leagueIdParam || leagueIdParam === 'all';
+  const activeLeagueId = scopeAllLeagues ? null : leagueIdParam;
 
   const supabase = createAdminClient();
 
@@ -156,18 +159,17 @@ export async function GET(request: NextRequest) {
   const [leaguesResult, profileResult, nflStateResult] = await Promise.all([
     supabase
       .from('leagues')
-      .select('league_id, name, season')
+      .select('id, name, season')
       .eq('user_id', user.id),
     supabase.from('profiles').select('sleeper_user_id').eq('id', user.id).maybeSingle(),
     fetchNflState(),
   ]);
 
-  const leagues = (leaguesResult.data ?? []) as { league_id: string; name: string; season: string }[];
+  const leagues = (leaguesResult.data ?? []) as { id: string; name: string; season: string }[];
   const sleeperUserId = profileResult.data?.sleeper_user_id as string | null;
   const currentWeek = nflStateResult?.week ?? 1;
 
-  const leagueList: TradeHubLeague[] = leagues.map((l) => ({ id: l.league_id, name: l.name }));
-  const activeLeagueId = leagueIdParam ?? (leagues[0]?.league_id ?? null);
+  const leagueList: TradeHubLeague[] = leagues.map((l) => ({ id: l.id, name: l.name }));
 
   // ── 2. Parallel: player DB, TFO cache, player values, DMP, rosters ───────
   const [playerDbRaw, tfoResult, pvResult, dmpResult, rosterResult, notifResult] = await Promise.all([
@@ -175,18 +177,18 @@ export async function GET(request: NextRequest) {
     supabase
       .from('tfo_cache')
       .select('player_id, league_id, tfo_score, grade, verdict, calculated_at')
-      .in('league_id', leagues.map((l) => l.league_id)),
+      .in('league_id', leagues.map((l) => l.id)),
     supabase
       .from('player_values')
       .select('player_id, bvi_score, ktc_value, delta, trend, signal'),
     supabase
       .from('dmp_profiles')
       .select('user_id, league_id, title')
-      .in('league_id', leagues.map((l) => l.league_id)),
+      .in('league_id', leagues.map((l) => l.id)),
     supabase
       .from('rosters')
       .select('owner_id, player_ids, league_id, roster_id')
-      .in('league_id', leagues.map((l) => l.league_id)),
+      .in('league_id', leagues.map((l) => l.id)),
     supabase
       .from('notifications')
       .select('id, type, message, metadata, created_at, league_id')
@@ -258,8 +260,8 @@ export async function GET(request: NextRequest) {
   const leagueUsersMap = new Map<string, SleeperUser[]>();
   await Promise.all(
     leagues.slice(0, 10).map(async (lg) => {
-      const users = await fetchLeagueUsers(lg.league_id);
-      if (users) leagueUsersMap.set(lg.league_id, users);
+      const users = await fetchLeagueUsers(lg.id);
+      if (users) leagueUsersMap.set(lg.id, users);
     }),
   );
 
@@ -267,7 +269,7 @@ export async function GET(request: NextRequest) {
   const txnResults = await Promise.all(
     leagues.slice(0, 10).flatMap((lg) =>
       weeksToScan.map(async (week) => {
-        const txns = await fetchTransactions(lg.league_id, week).catch(() => null);
+        const txns = await fetchTransactions(lg.id, week).catch(() => null);
         return { league: lg, week, txns: txns ?? [] };
       }),
     ),
@@ -276,9 +278,9 @@ export async function GET(request: NextRequest) {
   const seenTxnIds = new Set<string>();
 
   for (const { league, week, txns } of txnResults) {
-    const myRoster = myRosterByLeague.get(league.league_id);
+    const myRoster = myRosterByLeague.get(league.id);
     const myRosterId = myRoster?.roster_id;
-    const lgUsers = leagueUsersMap.get(league.league_id) ?? [];
+    const lgUsers = leagueUsersMap.get(league.id) ?? [];
 
     for (const tx of txns as SleeperTransaction[]) {
       if (tx.type !== 'trade') continue;
@@ -294,7 +296,7 @@ export async function GET(request: NextRequest) {
 
       // Resolve opponent's Sleeper user_id via rosters table
       const opponentRosterRow = (rosterResult.data ?? []).find(
-        (r) => r.league_id === league.league_id && (r as RosterRow).roster_id === opponentRosterId,
+        (r) => r.league_id === league.id && (r as RosterRow).roster_id === opponentRosterId,
       ) as RosterRow | undefined;
       const opponentSleeperUserId = opponentRosterRow?.owner_id ?? null;
 
@@ -304,7 +306,7 @@ export async function GET(request: NextRequest) {
 
       // DMP title for opponent
       const opponentDmpTitle = opponentSleeperUserId
-        ? (dmpMap.get(`${league.league_id}:${opponentSleeperUserId}`) ?? null)
+        ? (dmpMap.get(`${league.id}:${opponentSleeperUserId}`) ?? null)
         : null;
 
       // Build asset lists from adds/drops
@@ -314,7 +316,7 @@ export async function GET(request: NextRequest) {
       const myPicksReceived: TradeHubAsset[] = [];
 
       for (const [pid, toRosterId] of Object.entries(tx.adds ?? {})) {
-        const asset = buildAsset(pid, league.league_id);
+        const asset = buildAsset(pid, league.id);
         if (toRosterId === myRosterId) {
           myReceive.push(asset);
         } else {
@@ -361,7 +363,7 @@ export async function GET(request: NextRequest) {
 
       const offer: TradeHubOffer = {
         id: tx.transaction_id,
-        league_id: league.league_id,
+        league_id: league.id,
         league_name: league.name,
         opponent_sleeper_id: opponentSleeperUserId,
         opponent_name: opponentName,
@@ -379,7 +381,7 @@ export async function GET(request: NextRequest) {
       } else {
         const historyItem: TradeHistoryItem = {
           id: tx.transaction_id,
-          league_id: league.league_id,
+          league_id: league.id,
           league_name: league.name,
           opponent_name: opponentName,
           gave: allGive,
@@ -412,7 +414,7 @@ export async function GET(request: NextRequest) {
     const meta = n.metadata ?? {};
     const targetPid = (meta.player_id as string | undefined) ?? '';
     const leagueId = n.league_id ?? '';
-    const leagueName = leagues.find((l) => l.league_id === leagueId)?.name ?? leagueId;
+    const leagueName = leagues.find((l) => l.id === leagueId)?.name ?? leagueId;
 
     return {
       id: n.id,
@@ -469,10 +471,15 @@ export async function GET(request: NextRequest) {
     });
 
   // ── 6. Response ──────────────────────────────────────────────────────────
+  function inLeagueScope<T extends { league_id: string }>(rows: T[]): T[] {
+    if (scopeAllLeagues) return rows;
+    return rows.filter((r) => r.league_id === leagueIdParam);
+  }
+
   const payload: TradeHubData = {
-    incomingOffers,
-    proactiveTrades,
-    tradeHistory: tradeHistory.slice(0, 20),
+    incomingOffers: inLeagueScope(incomingOffers),
+    proactiveTrades: inLeagueScope(proactiveTrades),
+    tradeHistory: inLeagueScope(tradeHistory).slice(0, 20),
     bviUndervalued: undervalued,
     bviOvervalued: overvalued,
     leagues: leagueList,

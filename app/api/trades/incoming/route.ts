@@ -1,114 +1,35 @@
-import { NextResponse } from 'next/server';
+import { NextResponse, type NextRequest } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import type { IncomingOfferApi, IncomingOffersResponse } from '@/components/trade-hub/types';
+import { fetchTradeHubData } from '@/lib/trade-hub/fetchTradeHubData';
+import { mapTradeHubOfferToIncoming } from '@/lib/trade-hub/mapIncomingFromTradeHub';
+import type { IncomingOffersResponse } from '@/components/trade-hub/types';
 
 export const dynamic = 'force-dynamic';
 
-const MOCK_OFFERS: IncomingOfferApi[] = [
-  {
-    id: 'mock-1',
-    leagueLetter: 'D',
-    leagueIconBg: '#EF4444',
-    leagueName: 'Dynasty 1QB',
-    timeAgo: '10m ago',
-    isNew: true,
-    proposerTeam: 'Team Alpha',
-    proposerHandle: '@AlphaManager',
-    proposerReceives: [
-      {
-        kind: 'player',
-        name: 'Justin Jefferson',
-        position: 'WR',
-        team: 'MIN',
-        playerId: '6786',
-      },
-    ],
-    recipientTeam: 'Team You',
-    recipientHandle: '@YourTeam',
-    recipientReceives: [
-      { kind: 'pick', label: '1st Round Pick (2025)' },
-      { kind: 'pick', label: '2026 1st Round Pick' },
-      {
-        kind: 'player',
-        name: 'Amon-Ra St. Brown',
-        position: 'WR',
-        team: 'DET',
-        playerId: '7547',
-      },
-    ],
-    treEdge: '+18.4',
-  },
-  {
-    id: 'mock-2',
-    leagueLetter: 'R',
-    leagueIconBg: '#EF4444',
-    leagueName: 'Redraft Main',
-    timeAgo: '25m ago',
-    isNew: false,
-    proposerTeam: 'Team Beta',
-    proposerHandle: '@BetaManager',
-    proposerReceives: [
-      {
-        kind: 'player',
-        name: 'Bijan Robinson',
-        position: 'RB',
-        team: 'ATL',
-        playerId: '9509',
-      },
-    ],
-    recipientTeam: 'Team You',
-    recipientHandle: '@YourTeam',
-    recipientReceives: [
-      {
-        kind: 'player',
-        name: 'Jonathan Taylor',
-        position: 'RB',
-        team: 'IND',
-        playerId: '4034',
-      },
-      { kind: 'pick', label: '2nd Round Pick' },
-    ],
-    treEdge: '+12.7',
-  },
-  {
-    id: 'mock-3',
-    leagueLetter: 'D',
-    leagueIconBg: '#EF4444',
-    leagueName: 'Dynasty SF',
-    timeAgo: '45m ago',
-    isNew: false,
-    proposerTeam: 'Team Gamma',
-    proposerHandle: '@GammaManager',
-    proposerReceives: [
-      {
-        kind: 'player',
-        name: 'CeeDee Lamb',
-        position: 'WR',
-        team: 'DAL',
-        playerId: '5012',
-      },
-    ],
-    recipientTeam: 'Team You',
-    recipientHandle: '@YourTeam',
-    recipientReceives: [
-      { kind: 'pick', label: '1st Round Pick (2025)' },
-      { kind: 'pick', label: '2nd Round Pick (2025)' },
-    ],
-    treEdge: '+8.9',
-  },
-];
-
-export async function GET() {
+export async function GET(request: NextRequest) {
   const supabase = createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-  const payload: IncomingOffersResponse = {
-    offers: MOCK_OFFERS,
-    totalCount: 24,
-  };
+  const leagueId = request.nextUrl.searchParams.get('leagueId') ?? request.nextUrl.searchParams.get('league_id');
 
-  return NextResponse.json(payload);
+  try {
+    const hub = await fetchTradeHubData(request, leagueId);
+    const leagueIndex = new Map(hub.leagues.map((l, i) => [l.id, i]));
+
+    const offers = hub.incomingOffers.map((o) =>
+      mapTradeHubOfferToIncoming(o, leagueIndex.get(o.league_id) ?? 0),
+    );
+
+    const payload: IncomingOffersResponse = {
+      offers,
+      totalCount: offers.length,
+    };
+
+    return NextResponse.json(payload);
+  } catch {
+    return NextResponse.json({ error: 'Failed to load offers' }, { status: 502 });
+  }
 }

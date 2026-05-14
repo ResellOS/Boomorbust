@@ -21,7 +21,15 @@ export async function GET(request: Request) {
 
   let synced = 0;
   let skipped = 0;
+  let totalRostersSynced = 0;
+  let totalRosterErrors = 0;
   const redis = getRedis();
+
+  async function logError(source: string, message: string, userId: string, metadata: Record<string, unknown>) {
+    try {
+      await db.from('error_logs').insert({ source, message, user_id: userId, metadata });
+    } catch { /* non-fatal */ }
+  }
 
   for (const user of users) {
     const { data: profile } = await db
@@ -54,8 +62,9 @@ export async function GET(request: Request) {
     try {
       const leagues = await fetchUserLeagues(profile.sleeper_user_id, '2025');
       if (!leagues?.length) continue;
+
       for (const league of leagues) {
-        await db.from('leagues').upsert({
+        const { error: leagueError } = await db.from('leagues').upsert({
           id: league.league_id,
           user_id: user.id,
           name: league.name,
@@ -64,19 +73,47 @@ export async function GET(request: Request) {
           scoring_settings: league.scoring_settings,
           settings: league.settings,
           status: league.status,
+          synced_at: new Date().toISOString(),
         }, { onConflict: 'id' });
 
-        const rosters = await fetchLeagueRosters(league.league_id);
-        if (!rosters?.length) continue;
-        for (const roster of rosters) {
-          await db.from('rosters').upsert({
-            roster_id: roster.roster_id,
+        if (leagueError) {
+          console.error(`[sync-sleeper] league ${league.league_id} upsert failed:`, leagueError.message);
+          await logError('cron/sync-sleeper/leagues', leagueError.message, user.id, {
             league_id: league.league_id,
-            owner_id: roster.owner_id,
-            players: roster.players ?? [],
-            starters: roster.starters ?? [],
-            settings: mergeSleeperRosterSettings(roster as unknown as Record<string, unknown>),
-          }, { onConflict: 'roster_id,league_id' });
+            code: leagueError.code,
+          });
+          continue;
+        }
+
+        const rosters = await fetchLeagueRosters(league.league_id);
+        console.log(`[sync-sleeper] user ${user.id} league ${league.league_id}: ${rosters?.length ?? 'null'} rosters`);
+
+        if (!rosters?.length) continue;
+
+        for (const roster of rosters) {
+          const { error: rosterError } = await db.from('rosters').upsert(
+            {
+              roster_id: roster.roster_id,
+              league_id: league.league_id,
+              owner_id: roster.owner_id,
+              players: roster.players ?? [],
+              starters: roster.starters ?? [],
+              settings: mergeSleeperRosterSettings(roster as unknown as Record<string, unknown>),
+            },
+            { onConflict: 'roster_id,league_id' },
+          );
+
+          if (rosterError) {
+            console.error(`[sync-sleeper] roster ${roster.roster_id} upsert failed:`, rosterError.message);
+            totalRosterErrors++;
+            await logError('cron/sync-sleeper/rosters', rosterError.message, user.id, {
+              roster_id: roster.roster_id,
+              league_id: league.league_id,
+              code: rosterError.code,
+            });
+          } else {
+            totalRostersSynced++;
+          }
         }
       }
 
@@ -89,7 +126,8 @@ export async function GET(request: Request) {
 
       synced++;
     } catch (err) {
-      console.error(`sync-sleeper failed for user ${user.id}:`, err);
+      console.error(`[sync-sleeper] failed for user ${user.id}:`, err);
+      await logError('cron/sync-sleeper', String(err), user.id, {});
     }
   }
 
@@ -99,5 +137,11 @@ export async function GET(request: Request) {
     } catch {}
   }
 
-  return NextResponse.json({ synced, skipped, total: users.length });
+  return NextResponse.json({
+    synced,
+    skipped,
+    total: users.length,
+    rosters_synced: totalRostersSynced,
+    roster_errors: totalRosterErrors,
+  });
 }
