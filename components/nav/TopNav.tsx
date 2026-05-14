@@ -6,6 +6,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { ChevronDown, LogOut, Menu, Settings, User, X } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import NotificationBell from '@/components/dashboard/NotificationBell';
+import { SyncButton } from '@/components/dashboard/SyncButton';
 
 const NAV_BG = '#0a0d14';
 const BOOM = '#36E7A1';
@@ -492,6 +493,7 @@ export default function TopNav({ email, username }: TopNavProps) {
           </nav>
 
           <div className="ml-auto flex shrink-0 items-center gap-2 sm:gap-3 lg:ml-0">
+            <SyncButton />
             <div className="flex items-center [&_button]:h-10 [&_button]:w-10 [&_button]:min-h-[44px] [&_button]:min-w-[44px] [&_svg]:!h-5 [&_svg]:!w-5">
               <NotificationBell />
             </div>

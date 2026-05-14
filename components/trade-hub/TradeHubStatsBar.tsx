@@ -1,13 +1,14 @@
 'use client';
 
+import clsx from 'clsx';
 import type { TradeHubStatsPayload } from './types';
 
 const GLASS = 'rounded-xl border border-white/[0.08] bg-white/[0.03] backdrop-blur-[24px]';
 
 function StatCardSkeleton() {
   return (
-    <div className={`${GLASS} flex flex-1 flex-col items-center justify-center px-6 py-5`}>
-      <div className="h-8 w-14 animate-pulse rounded bg-white/[0.08]" />
+    <div className={`${GLASS} flex min-h-[92px] flex-1 flex-col items-center justify-center px-4 py-4 sm:min-h-0 sm:px-6 sm:py-5`}>
+      <div className="h-7 w-12 animate-pulse rounded bg-white/[0.08] sm:h-8 sm:w-14" />
       <div className="mt-3 h-3 w-24 animate-pulse rounded bg-white/[0.06]" />
     </div>
   );
@@ -24,10 +25,10 @@ function StatCard({
 }) {
   return (
     <div
-      className={`${GLASS} flex flex-1 flex-col items-center justify-center px-6 py-5 text-center min-w-0`}
+      className={`${GLASS} flex min-h-[92px] flex-1 flex-col items-center justify-center px-4 py-4 text-center min-w-0 sm:min-h-0 sm:px-6 sm:py-5`}
     >
       <span
-        className="text-[32px] font-bold leading-none tabular-nums"
+        className="text-[26px] font-bold leading-none tabular-nums sm:text-[32px]"
         style={{
           fontFamily: 'var(--font-mono), "JetBrains Mono", monospace',
           color: valueColor,
@@ -54,12 +55,11 @@ export default function TradeHubStatsBar({ stats, loading }: TradeHubStatsBarPro
   if (loading) {
     return (
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-5">
-        {Array.from({ length: 4 }).map((_, i) => (
-          <StatCardSkeleton key={i} />
+        {Array.from({ length: 5 }).map((_, i) => (
+          <div key={i} className={clsx(i === 4 && 'col-span-2 lg:col-span-1')}>
+            <StatCardSkeleton />
+          </div>
         ))}
-        <div className="col-span-2 lg:col-span-1">
-          <StatCardSkeleton />
-        </div>
       </div>
     );
   }

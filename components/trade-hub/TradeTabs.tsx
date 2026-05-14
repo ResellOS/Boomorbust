@@ -2,6 +2,7 @@
 
 import { lazy, Suspense, useCallback, useState } from 'react';
 import clsx from 'clsx';
+import type { TradeHubStatsPayload } from './types';
 
 const LazyIncomingOffers = lazy(() => import('./tabs/IncomingOffersTabPanel'));
 const LazySmartCounter = lazy(() => import('./tabs/SmartCounterTabPanel'));
@@ -26,7 +27,12 @@ function TabPanelFallback() {
   );
 }
 
-export default function TradeTabs() {
+export interface TradeTabsProps {
+  stats: TradeHubStatsPayload | null;
+  statsLoading: boolean;
+}
+
+export default function TradeTabs({ stats, statsLoading }: TradeTabsProps) {
   const [activeTab, setActiveTab] = useState<TradeTabId>('INCOMING_OFFERS');
   const [visited, setVisited] = useState<Set<TradeTabId>>(() => new Set<TradeTabId>(['INCOMING_OFFERS']));
 
@@ -37,41 +43,47 @@ export default function TradeTabs() {
 
   return (
     <div className="flex min-h-0 w-full min-w-0 flex-1 flex-col">
-      <div
-        className="flex w-full flex-nowrap items-end justify-start gap-8 overflow-x-auto border-b border-white/[0.06] scrollbar-hide"
-        style={{ WebkitOverflowScrolling: 'touch' }}
-        role="tablist"
-        aria-label="Trade Hub sections"
-      >
-        {TABS.map((tab) => {
-          const isActive = activeTab === tab.id;
-          return (
-            <button
-              key={tab.id}
-              id={tab.buttonId}
-              type="button"
-              role="tab"
-              aria-selected={isActive}
-              tabIndex={isActive ? 0 : -1}
-              onClick={() => selectTab(tab.id)}
-              className={clsx(
-                'relative shrink-0 whitespace-nowrap border-0 bg-transparent px-0 pb-0 text-left uppercase tracking-wide transition-colors',
-                'min-h-[44px] text-[13px] leading-none',
-                isActive ? 'font-medium text-white' : 'font-normal text-[#64748B] hover:text-[#94a3b8]',
-              )}
-              style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}
-            >
-              <span className="inline-flex min-h-[44px] items-center">{tab.label}</span>
-              {isActive ? (
-                <span
-                  aria-hidden
-                  className="pointer-events-none absolute bottom-0 left-0 right-0 rounded-[1px]"
-                  style={{ height: 2, background: '#36E7A1', boxShadow: '0 0 10px rgba(54,231,161,0.35)' }}
-                />
-              ) : null}
-            </button>
-          );
-        })}
+      <div className="min-w-0 border-b border-white/[0.06]">
+        <div
+          className="-mx-1 overflow-x-auto overflow-y-hidden px-1 scrollbar-hide"
+          style={{ WebkitOverflowScrolling: 'touch' }}
+        >
+          <div
+            className="flex w-max min-w-full flex-nowrap items-end justify-start gap-6 lg:gap-8"
+            role="tablist"
+            aria-label="Trade Hub sections"
+          >
+            {TABS.map((tab) => {
+              const isActive = activeTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  id={tab.buttonId}
+                  type="button"
+                  role="tab"
+                  aria-selected={isActive}
+                  tabIndex={isActive ? 0 : -1}
+                  onClick={() => selectTab(tab.id)}
+                  className={clsx(
+                    'relative shrink-0 flex-none whitespace-nowrap border-0 bg-transparent px-1 pb-2 text-left uppercase tracking-wide transition-colors',
+                    'min-h-[44px] text-[12px] leading-none sm:text-[13px]',
+                    isActive ? 'font-medium text-white' : 'font-normal text-[#64748B] hover:text-[#94a3b8]',
+                  )}
+                  style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}
+                >
+                  <span className="inline-flex min-h-[44px] max-w-none items-center">{tab.label}</span>
+                  {isActive ? (
+                    <span
+                      aria-hidden
+                      className="pointer-events-none absolute bottom-0 left-0 right-0 rounded-[1px]"
+                      style={{ height: 2, background: '#36E7A1', boxShadow: '0 0 10px rgba(54,231,161,0.35)' }}
+                    />
+                  ) : null}
+                </button>
+              );
+            })}
+          </div>
+        </div>
       </div>
 
       <div className="mt-4 min-h-0 w-full min-w-0 flex-1">
@@ -84,7 +96,7 @@ export default function TradeTabs() {
             className="flex min-h-0 min-w-0 flex-1 flex-col"
           >
             <Suspense fallback={<TabPanelFallback />}>
-              <LazyIncomingOffers />
+              <LazyIncomingOffers stats={stats} statsLoading={statsLoading} />
             </Suspense>
           </div>
         ) : null}

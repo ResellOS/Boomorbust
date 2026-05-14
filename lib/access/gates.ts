@@ -10,6 +10,7 @@
  *   mrs_scores         → rookie+
  *   bvi_scores         → rookie+
  *   dmp_profiles       → veteran+
+ *   tre_suggestions    → veteran+
  */
 
 import { createClient } from '@/lib/supabase/server';
@@ -25,7 +26,8 @@ export type GatedFeature =
   | 'proactive_trades'
   | 'mrs_scores'
   | 'bvi_scores'
-  | 'dmp_profiles';
+  | 'dmp_profiles'
+  | 'tre_suggestions';
 
 // ─── Feature → minimum tier ───────────────────────────────────────────────────
 
@@ -36,6 +38,7 @@ const FEATURE_REQUIREMENTS: Record<GatedFeature, SubscriptionTier[]> = {
   blueprint: ['elite', 'all_pro_terminal'],
   dmp_profiles: ['elite', 'all_pro_terminal'],
   proactive_trades: ['all_pro_terminal'],
+  tre_suggestions: ['elite', 'all_pro_terminal'],
 };
 
 // ─── Tier ordering ────────────────────────────────────────────────────────────

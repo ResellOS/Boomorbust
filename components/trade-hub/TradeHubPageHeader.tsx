@@ -4,7 +4,7 @@ export default function TradeHubPageHeader() {
   return (
     <header className="mb-0">
       <h1
-        className="font-bold leading-none text-white text-[32px]"
+        className="text-[26px] font-bold leading-tight text-white sm:text-[32px] sm:leading-none"
         style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}
       >
         Trade Hub

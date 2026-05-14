@@ -1,12 +1,11 @@
 'use client';
 
+import TradeHistoryPanel from '../TradeHistoryPanel';
+
 export default function TradeHistoryTabPanel() {
   return (
-    <div
-      className="min-h-[120px] rounded-xl border border-white/[0.06] bg-white/[0.02] p-6 text-[13px] text-[#64748B]"
-      style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}
-    >
-      Trade history content loads here.
+    <div className="w-full min-w-0">
+      <TradeHistoryPanel limit={15} className="mx-auto w-full max-w-5xl lg:max-w-none" />
     </div>
   );
 }

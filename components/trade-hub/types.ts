@@ -71,13 +71,24 @@ export interface TradeHubData {
   activeLeagueId:   string | null;
 }
 
-/** `/api/trades/stats` response — header stats bar only. */
+/** `/api/trades/stats` — header stats bar + footer status strip. */
 export interface TradeHubStatsPayload {
   incomingOffers: number;
   leagues: number;
   treSuggestions: number;
   avgTreEdge: number | null;
   acceptWinRatePct: number | null;
+  /** Bottom status bar — TRE engine */
+  treEngineStatus: string;
+  treLastRunLabel: string;
+  /** Bottom status bar — smart counter */
+  smartCounterAccuracyPct: number;
+  smartCounterAccuracyTier: string;
+  /** Bottom status bar — suggestions */
+  suggestionSuccessRatePct: number;
+  suggestionSuccessTier: string;
+  /** Bottom status bar — volume */
+  tradeVolumeThisMonth: number;
 }
 
 /** `/api/trades/incoming` — incoming offers panel. */
@@ -127,6 +138,41 @@ export interface SmartCounterCardDto {
 export interface SmartCounterApiResponse {
   offerId: string;
   responses: SmartCounterCardDto[];
+}
+
+/** `/api/trades/suggestions` — TRE suggested trades panel. */
+export interface TreSuggestionRowDto {
+  id: string;
+  playerId: string;
+  playerDisplayName: string;
+  headline: string;
+  targetName: string;
+  treEdge: string;
+}
+
+export interface TreSuggestionsApiResponse {
+  suggestions: TreSuggestionRowDto[];
+}
+
+/** `/api/trades/history` — trade history table panel. */
+export type TradeHistoryVerdict = 'SMASH' | 'FAIR' | 'MISS';
+
+export interface TradeHistoryRowDto {
+  id: string;
+  timeLabel: string;
+  givenPlayerId: string;
+  givenName: string;
+  /** Aging / risk flag (e.g. veteran TE). */
+  givenWarning?: boolean;
+  /** Primary player for avatar on received side; optional when text-only. */
+  receivedPlayerId?: string | null;
+  receivedDisplay: string;
+  verdict: TradeHistoryVerdict;
+  scoreDisplay: string;
+}
+
+export interface TradeHistoryApiResponse {
+  trades: TradeHistoryRowDto[];
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
