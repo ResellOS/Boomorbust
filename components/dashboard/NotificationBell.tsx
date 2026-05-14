@@ -91,9 +91,9 @@ function defaultHref(row: NotificationRow, playerName: string): string {
     const q = new URLSearchParams();
     if (pid) q.set('playerId', pid);
     if (lid) q.set('leagueId', lid);
-    return `/dashboard/trade/finder?${q.toString()}`;
+    return `/trade-hub?${q.toString()}`;
   }
-  return `/dashboard/scouting?player=${encName}`;
+  return `/rookies?player=${encName}`;
 }
 
 function resolveHref(row: NotificationRow, playerName: string): string {
@@ -219,20 +219,29 @@ export default function NotificationBell() {
       >
         <Bell className="h-[18px] w-[18px]" strokeWidth={2} />
         {!loading && unreadCount > 0 ? (
-          <span
-            className="notif-badge-count pointer-events-none absolute -right-0.5 -top-0.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-[#EF4444] px-1 text-[10px] font-bold leading-none text-white font-mono tabular-nums ring-2 ring-[#060910]"
-            aria-label={`${unreadCount} unread`}
-          >
-            {unreadCount > 99 ? '99+' : unreadCount}
-          </span>
+          <>
+            <span
+              aria-hidden
+              className="pointer-events-none absolute -right-0.5 -top-0.5 flex h-[18px] min-w-[18px] items-center justify-center"
+            >
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#EF4444] opacity-40" />
+            </span>
+            <span
+              className="notif-badge-count pointer-events-none absolute -right-0.5 -top-0.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-[#EF4444] px-1 text-[10px] font-bold leading-none text-white font-mono tabular-nums ring-2 ring-[#0a0d14]"
+              aria-label={`${unreadCount} unread`}
+            >
+              {unreadCount > 99 ? '99+' : unreadCount}
+            </span>
+          </>
         ) : null}
       </button>
 
       {open ? (
         <div
           className={clsx(
-            'absolute right-0 z-[80] mt-1 max-h-[min(72vh,420px)] w-[min(calc(100vw-1.5rem),22rem)] overflow-hidden rounded-xl border border-white/[0.1] bg-[#0a0d14] shadow-2xl sm:w-[min(100vw-2rem,24rem)]',
+            'absolute right-0 z-[80] mt-1 max-h-[min(72vh,420px)] w-[min(calc(100vw-1.5rem),22rem)] overflow-hidden rounded-xl border border-white/[0.1] bg-[#0a0d14] sm:w-[min(100vw-2rem,24rem)]',
           )}
+          style={{ boxShadow: '0 0 28px rgba(34,211,238,0.12)' }}
         >
           <div className="flex items-center justify-between border-b border-white/[0.06] px-3 py-2">
             <span className="font-mono text-[10px] font-black uppercase tracking-[0.2em] text-[#64748B]">
@@ -273,11 +282,11 @@ export default function NotificationBell() {
           </ul>
           <div className="border-t border-white/[0.06] px-2 py-2 text-center">
             <Link
-              href="/dashboard/trade/finder"
+              href="/trade-hub"
               className="font-mono text-[10px] font-bold uppercase tracking-wide text-[#64748B] hover:text-[#22D3EE]"
               onClick={() => setOpen(false)}
             >
-              Trade finder
+              Trade hub
             </Link>
           </div>
         </div>

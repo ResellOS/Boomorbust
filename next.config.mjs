@@ -33,6 +33,27 @@ const nextConfig = {
       },
     ];
   },
+  /** Legacy `/dashboard/*` URLs from older builds → canonical App Router paths (route group omits segment). */
+  async redirects() {
+    return [
+      { source: '/dashboard/lineup', destination: '/lineup', permanent: false },
+      { source: '/dashboard/lineup/:path*', destination: '/lineup', permanent: false },
+      { source: '/dashboard/trade-hub', destination: '/trade-hub', permanent: false },
+      { source: '/dashboard/trade', destination: '/trade-hub', permanent: false },
+      { source: '/dashboard/trade/:path*', destination: '/trade-hub', permanent: false },
+      { source: '/dashboard/scouting', destination: '/scouting', permanent: false },
+      { source: '/dashboard/scouting/:path*', destination: '/scouting', permanent: false },
+      { source: '/dashboard/rookies', destination: '/rookies', permanent: false },
+      { source: '/dashboard/coach', destination: '/coach', permanent: false },
+      { source: '/dashboard/settings', destination: '/settings', permanent: false },
+      { source: '/dashboard/waiver-wire', destination: '/waiver-wire', permanent: false },
+      { source: '/dashboard/digest', destination: '/digest', permanent: false },
+      { source: '/dashboard/wrapped', destination: '/wrapped', permanent: false },
+      { source: '/dashboard/rankings/arbitrage', destination: '/arbitrage', permanent: false },
+      { source: '/dashboard/rankings', destination: '/arbitrage', permanent: false },
+      { source: '/dashboard/blueprint', destination: '/digest', permanent: false },
+    ];
+  },
 };
 
 export default nextConfig;

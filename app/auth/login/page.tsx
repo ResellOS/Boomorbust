@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
+import { triggerAutoSync } from '@/lib/sync/autoSync';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -22,6 +23,7 @@ export default function LoginPage() {
     if (error) {
       setError(error.message);
     } else {
+      triggerAutoSync();
       router.push('/dashboard');
       router.refresh();
     }

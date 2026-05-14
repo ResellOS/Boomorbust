@@ -6,7 +6,6 @@ import { usePathname, useRouter } from 'next/navigation';
 import {
   Menu,
   X,
-  Bell,
   Settings,
   LayoutDashboard,
   ArrowLeftRight,
@@ -16,50 +15,44 @@ import {
 import { clsx } from 'clsx';
 import { createClient } from '@/lib/supabase/client';
 import type { EmpireTickerResult } from '@/lib/dashboard/empireTicker';
+import NotificationBell from '@/components/dashboard/NotificationBell';
+import { SyncButton } from '@/components/dashboard/SyncButton';
 
 const MAIN_NAV: Array<{ href: string; label: string; mobilePillar?: string }> = [
   { href: '/dashboard', label: 'Dashboard' },
-  { href: '/dashboard/lineup', label: 'Lineup', mobilePillar: 'START/SIT' },
-  { href: '/dashboard/trade', label: 'Trade', mobilePillar: 'TRADE' },
-  { href: '/dashboard/scouting', label: 'Scout', mobilePillar: 'SCOUT' },
+  { href: '/lineup', label: 'Lineup', mobilePillar: 'START/SIT' },
+  { href: '/trade-hub', label: 'Trade', mobilePillar: 'TRADE' },
+  { href: '/rookies', label: 'Scout', mobilePillar: 'SCOUT' },
 ];
 
 const MORE_SECTIONS: Array<{ title: string; links: Array<{ href: string; label: string }> }> = [
   {
-    title: 'ROSTER',
+    title: 'TERMINAL',
     links: [
-      { href: '/dashboard/handcuffs', label: 'Handcuffs' },
-      { href: '/dashboard/alerts', label: 'Alerts' },
-      { href: '/dashboard/portfolio', label: 'Portfolio' },
+      { href: '/trade-hub', label: 'Trade Hub' },
+      { href: '/waiver-wire', label: 'Waiver Wire' },
+      { href: '/digest', label: 'Weekly Digest' },
+      { href: '/arbitrage', label: 'Arbitrage Board' },
     ],
   },
   {
-    title: 'ANALYSIS',
+    title: 'DRAFT & SCOUT',
     links: [
-      { href: '/dashboard/rankings', label: 'Rankings' },
-      { href: '/dashboard/rankings/arbitrage', label: 'Arbitrage' },
-      { href: '/dashboard/picks', label: 'Picks' },
+      { href: '/rookies', label: 'Rookie Board' },
+      { href: '/scouting', label: 'Scouting Terminal' },
+      { href: '/wrapped', label: 'Dynasty Wrapped' },
     ],
   },
   {
-    title: 'DRAFT',
+    title: 'COACH',
     links: [
-      { href: '/dashboard/rookies', label: 'Rookies' },
-      { href: '/dashboard/war-room', label: 'War Room' },
-    ],
-  },
-  {
-    title: 'TOOLS',
-    links: [
-      { href: '/dashboard/managers', label: 'Managers' },
-      { href: '/dashboard/coach', label: 'Analyst' },
-      { href: '/dashboard/card-generator', label: '⚡ Cards' },
-      { href: '/dashboard/settings', label: 'Settings' },
+      { href: '/coach', label: 'Dynasty Coach' },
+      { href: '/settings', label: 'Settings' },
     ],
   },
 ];
 
-const MOBILE_BOTTOM_HREFS = ['/dashboard', '/dashboard/lineup', '/dashboard/trade', '/dashboard/scouting'] as const;
+const MOBILE_BOTTOM_HREFS = ['/dashboard', '/lineup', '/trade-hub', '/rookies'] as const;
 
 function TierBadge({ tier }: { tier: 'free' | 'pro' | 'elite' }) {
   const styles =
@@ -94,12 +87,6 @@ function isMoreRouteActive(pathname: string): boolean {
 
 function isLinkActive(pathname: string, href: string): boolean {
   if (href === '/dashboard') return pathname === '/dashboard';
-  if (href === '/dashboard/rankings') {
-    return (
-      pathname === '/dashboard/rankings' ||
-      (pathname.startsWith('/dashboard/rankings/') && !pathname.startsWith('/dashboard/rankings/arbitrage'))
-    );
-  }
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
@@ -182,9 +169,9 @@ export default function NavBar({ email, username, tier, empireTicker = null }: N
 
   const tabIcon = (href: string) => {
     if (href === '/dashboard') return LayoutDashboard;
-    if (href.includes('/lineup')) return BarChart3;
-    if (href.includes('/trade')) return ArrowLeftRight;
-    if (href.includes('/scouting')) return Crosshair;
+    if (href.includes('lineup')) return BarChart3;
+    if (href.includes('trade')) return ArrowLeftRight;
+    if (href.includes('rookies')) return Crosshair;
     return LayoutDashboard;
   };
 
@@ -316,21 +303,12 @@ export default function NavBar({ email, username, tier, empireTicker = null }: N
                 <span aria-hidden>→</span>
               </Link>
             )}
+            <SyncButton />
             <TierBadge tier={tier} />
-            <button
-              type="button"
-              className="relative p-1.5 sm:p-2 rounded-lg hover:bg-white/5 text-[#64748b] hover:text-white hidden sm:flex shrink-0"
-              aria-label="Notifications"
-            >
-              <Bell className="w-5 h-5" />
-              <span
-                className="absolute -top-0.5 -right-0.5 min-w-[15px] h-[15px] px-0.5 flex items-center justify-center rounded-full bg-[#EF4444] text-[9px] font-black text-white border border-black/70 shadow-[0_0_8px_rgba(239,68,68,0.85)] font-mono"
-                aria-hidden
-              >
-                1
-              </span>
-            </button>
-            <Link href="/dashboard/settings" className="flex items-center gap-1.5 sm:gap-2 group shrink-0">
+            <div className="flex shrink-0">
+              <NotificationBell />
+            </div>
+            <Link href="/settings" className="flex items-center gap-1.5 sm:gap-2 group shrink-0">
               <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-gradient-to-br from-[var(--indigo)]/40 to-[var(--cyan)]/20 flex items-center justify-center text-white text-xs sm:text-sm font-bold border border-[#1F2937] font-mono">
                 {initial}
               </div>
@@ -340,7 +318,7 @@ export default function NavBar({ email, username, tier, empireTicker = null }: N
               </div>
             </Link>
             <Link
-              href="/dashboard/settings"
+              href="/settings"
               className="hidden md:flex text-[#64748b] hover:text-white p-1.5 sm:p-2 shrink-0"
               aria-label="Settings"
             >

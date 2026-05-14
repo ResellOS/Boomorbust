@@ -2,11 +2,41 @@
 @tailwind components;
 @tailwind utilities;
 
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
 html {
   scroll-behavior: smooth;
+  /* Canonical dark background — prevents white flash before React hydrates */
+  background: #0a0d14;
+  /* Custom scrollbar (Firefox) */
+  scrollbar-color: #1e293b #0a0d14;
+  scrollbar-width: thin;
+}
+
+/* Custom scrollbar — Webkit (Chrome / Safari / Edge) */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #0a0d14;
+}
+::-webkit-scrollbar-thumb {
+  background: #1e293b;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #334155;
 }
 
 :root {
+  /* Canonical background token — matches #0a0d14 design spec */
+  --background: #0a0d14;
+
   /* Base */
   --bg-primary: #080b14;
   --bg-dark: #06080D;
@@ -808,5 +838,62 @@ h3 {
 @layer utilities {
   .text-balance {
     text-wrap: balance;
+  }
+
+  /* ── Mobile: hide scrollbars while keeping scroll behaviour ── */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* ── iOS Safe Area padding ── */
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  .pt-safe {
+    padding-top: env(safe-area-inset-top, 0px);
+  }
+
+  /* ── Horizontal snap scroll for card carousels ── */
+  .snap-x-mandatory {
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+  }
+  .snap-start {
+    scroll-snap-align: start;
+  }
+
+  /* ── Min touch target 44px (WCAG 2.5.5) ── */
+  .touch-target {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
+/* ── iOS Safari backdrop-filter fallback ──
+   When backdrop-filter is unsupported, degrade gracefully to a
+   slightly opaque background instead of a fully transparent one.   */
+@supports not (backdrop-filter: blur(1px)) {
+  .glass-panel,
+  .glass-panel-elevated,
+  .glass-card {
+    background: rgba(13, 17, 23, 0.92) !important;
+  }
+}
+
+/* ── Prevent horizontal overflow at root level ── */
+html, body {
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+/* ── iOS rubber-band scroll fix: avoid fixed elements inside scroll containers ── */
+@supports (-webkit-overflow-scrolling: touch) {
+  /* Ensure tables inside overflow-x-auto get touch momentum */
+  .overflow-x-auto {
+    -webkit-overflow-scrolling: touch;
   }
 }

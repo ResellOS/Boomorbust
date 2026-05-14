@@ -66,7 +66,11 @@ export default function RootLayout({
   const adsenseId = process.env.NEXT_PUBLIC_ADSENSE_PUBLISHER_ID;
 
   return (
-    <html lang="en">
+    /*
+     * style on <html> prevents white flash before CSS loads.
+     * The value is inlined so it applies before any stylesheet parse.
+     */
+    <html lang="en" style={{ background: '#0a0d14' }}>
       <head>
         {adsenseId && (
           <Script

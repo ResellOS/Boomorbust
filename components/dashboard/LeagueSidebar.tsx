@@ -158,7 +158,7 @@ export default function LeagueSidebar({ className }: LeagueSidebarProps) {
      * Hidden on mobile — leagues accessible via TopNav dropdown on small screens.
      */
     <aside
-      className={`hidden lg:flex flex-col w-[200px] shrink-0 sticky top-14 h-[calc(100vh-3.5rem)] overflow-y-auto ${className ?? ''}`}
+      className={`hidden lg:flex flex-col w-[200px] shrink-0 sticky top-14 h-[calc(100dvh-3.5rem)] overflow-y-auto ${className ?? ''}`}
       style={{
         borderRight: `1px solid ${BORDER_COLOR}`,
       }}

@@ -163,7 +163,7 @@ export default function LandingPricingSection() {
             <p className="text-[15px] font-semibold text-white" style={{ fontFamily: 'var(--font-body)' }}>
               All-Pro
             </p>
-            <PriceLine amount="20" color={PURPLE_TEXT} />
+            <PriceLine amount="25" color={PURPLE_TEXT} />
             <p className="mt-2 text-[13px] text-white/55" style={{ fontFamily: 'var(--font-body)' }}>
               The full arsenal. Maximum edge.
             </p>

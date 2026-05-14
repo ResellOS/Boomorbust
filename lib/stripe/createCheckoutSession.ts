@@ -50,7 +50,7 @@ export async function createCheckoutSession(params: {
     payment_method_types: ['card'],
     line_items: [{ price, quantity: 1 }],
     success_url: `${site}${params.successPath ?? '/dashboard?subscribed=1'}`,
-    cancel_url: `${site}${params.cancelPath ?? '/dashboard/settings'}`,
+    cancel_url: `${site}${params.cancelPath ?? '/settings'}`,
     customer_email: params.email ?? undefined,
     metadata: { user_id: params.userId, subscription_tier: tierMeta },
     subscription_data: {
