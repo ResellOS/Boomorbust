@@ -6,6 +6,7 @@ import type { TradeHubStatsPayload } from '@/components/trade-hub/types';
 import TradeHubPageHeader from '@/components/trade-hub/TradeHubPageHeader';
 import TradeHubStatsBar from '@/components/trade-hub/TradeHubStatsBar';
 import TradeTabs from '@/components/trade-hub/TradeTabs';
+import { TradeOfferSelectionProvider } from '@/components/trade-hub/TradeOfferSelectionContext';
 
 export default function TradeHubPage() {
   const activeLeagueId = useDashboardLeagueStore((s) => s.activeLeagueId);
@@ -53,8 +54,8 @@ export default function TradeHubPage() {
   }, [activeLeagueId]);
 
   return (
-    <div className="min-h-[calc(100dvh-3.5rem)]" style={{ background: '#0a0d14' }}>
-      <div className="mx-auto flex max-w-[1600px] flex-col gap-5 px-4 py-6 md:px-6">
+    <div className="flex min-h-[calc(100dvh-3.5rem)] flex-col bg-[#0a0d14]">
+      <div className="mx-auto flex min-h-0 w-full max-w-[1600px] flex-1 flex-col gap-5 px-6 py-6">
         <TradeHubPageHeader />
 
         {error ? (
@@ -65,7 +66,11 @@ export default function TradeHubPage() {
 
         <TradeHubStatsBar stats={stats} loading={loading} />
 
-        <TradeTabs />
+        <TradeOfferSelectionProvider>
+          <section className="flex min-h-0 min-w-0 flex-1 flex-col" aria-label="Trade Hub tabs">
+            <TradeTabs />
+          </section>
+        </TradeOfferSelectionProvider>
       </div>
     </div>
   );

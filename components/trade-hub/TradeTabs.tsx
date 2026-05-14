@@ -36,9 +36,9 @@ export default function TradeTabs() {
   }, []);
 
   return (
-    <div className="w-full">
+    <div className="flex min-h-0 w-full min-w-0 flex-1 flex-col">
       <div
-        className="mt-4 flex w-full flex-nowrap items-end justify-start gap-8 overflow-x-auto scrollbar-hide border-b border-white/[0.06]"
+        className="flex w-full flex-nowrap items-end justify-start gap-8 overflow-x-auto border-b border-white/[0.06] scrollbar-hide"
         style={{ WebkitOverflowScrolling: 'touch' }}
         role="tablist"
         aria-label="Trade Hub sections"
@@ -74,14 +74,14 @@ export default function TradeTabs() {
         })}
       </div>
 
-      <div className="mt-4 w-full min-w-0">
+      <div className="mt-4 min-h-0 w-full min-w-0 flex-1">
         {visited.has('INCOMING_OFFERS') ? (
           <div
             role="tabpanel"
             id="trade-panel-incoming-offers"
             aria-labelledby="trade-tab-incoming-offers"
             hidden={activeTab !== 'INCOMING_OFFERS'}
-            className="min-w-0"
+            className="flex min-h-0 min-w-0 flex-1 flex-col"
           >
             <Suspense fallback={<TabPanelFallback />}>
               <LazyIncomingOffers />

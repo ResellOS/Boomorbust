@@ -80,6 +80,55 @@ export interface TradeHubStatsPayload {
   acceptWinRatePct: number | null;
 }
 
+/** `/api/trades/incoming` — incoming offers panel. */
+export type IncomingReceiveItem =
+  | {
+      kind: 'player';
+      name: string;
+      position: string;
+      team: string;
+      playerId?: string | null;
+    }
+  | { kind: 'pick'; label: string };
+
+export interface IncomingOfferApi {
+  id: string;
+  leagueLetter: string;
+  leagueIconBg: string;
+  leagueName: string;
+  timeAgo: string;
+  isNew: boolean;
+  proposerTeam: string;
+  proposerHandle: string;
+  proposerReceives: IncomingReceiveItem[];
+  recipientTeam: string;
+  recipientHandle: string;
+  recipientReceives: IncomingReceiveItem[];
+  treEdge: string;
+}
+
+export interface IncomingOffersResponse {
+  offers: IncomingOfferApi[];
+  totalCount: number;
+}
+
+/** `/api/trades/counter` — smart counter panel (3 responses). */
+export type SmartCounterTierKey = 'aggressive' | 'balanced' | 'conservative';
+
+export interface SmartCounterCardDto {
+  tier: SmartCounterTierKey;
+  label: string;
+  title: string;
+  description: string;
+  modification: string;
+  treScoreDisplay: string;
+}
+
+export interface SmartCounterApiResponse {
+  offerId: string;
+  responses: SmartCounterCardDto[];
+}
+
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 export function timeAgo(createdAt: string): string {
