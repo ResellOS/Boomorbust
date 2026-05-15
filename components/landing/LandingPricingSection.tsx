@@ -8,7 +8,6 @@ import PricingCheckoutButton from '@/components/landing/PricingCheckoutButton';
 const BG = '#0a0d14';
 const BOOM = '#36E7A1';
 const PURPLE = '#A78BFA';
-const PURPLE_DEEP = '#7c3aed';
 
 const GLASS =
   'rounded-xl border border-white/[0.08] bg-white/[0.03] backdrop-blur-[24px] transition-transform duration-200 ease-out hover:scale-[1.01]';
@@ -109,7 +108,7 @@ export default function LandingPricingSection() {
             <p className="text-[15px] font-semibold text-white" style={{ fontFamily: 'var(--font-body)' }}>
               Veteran
             </p>
-            <PriceLine amount="10" color={BOOM} />
+            <PriceLine amount="15" color={BOOM} />
             <p className="mt-2 text-[13px] text-white/55" style={{ fontFamily: 'var(--font-body)' }}>
               Advanced features + Trade Hub.
             </p>
