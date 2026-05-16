@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState } from 'react';
 
@@ -44,12 +44,12 @@ export default function LandingFooterWaitlist() {
           className="mt-3 text-[clamp(1.75rem,9vw,3.25rem)] leading-none uppercase sm:mt-4 lg:text-[52px]"
           style={{ fontFamily: 'var(--font-display)' }}
         >
-          <span style={{ color: '#36E7A1' }}>BOOM</span>
+          <span style={{ color: '#3ECFAD' }}>BOOM</span>
           <span style={{ color: '#EF4444' }}> OR BUST</span>
         </p>
 
         {success ? (
-          <p className="mt-10 text-[15px] text-[#36E7A1]" style={{ fontFamily: 'var(--font-body)' }}>
+          <p className="mt-10 text-[15px] text-[#3ECFAD]" style={{ fontFamily: 'var(--font-body)' }}>
             You&apos;re on the list. 🚀
           </p>
         ) : (
@@ -70,7 +70,7 @@ export default function LandingFooterWaitlist() {
               className="min-h-[48px] shrink-0 rounded-xl px-6 py-3 text-[13px] font-bold text-[#0a0d14] transition-opacity hover:opacity-95 disabled:opacity-50 whitespace-nowrap uppercase tracking-wide"
               style={{
                 fontFamily: 'var(--font-body)',
-                background: 'linear-gradient(135deg, #36E7A1, #22D3EE)',
+                background: 'linear-gradient(135deg, #3ECFAD, #22D3EE)',
               }}
             >
               {loading ? '…' : 'GET EARLY ACCESS →'}

@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import type { ReactNode } from 'react';
 import Link from 'next/link';
@@ -6,8 +6,8 @@ import { useInViewOnce } from '@/hooks/useInViewOnce';
 import PricingCheckoutButton from '@/components/landing/PricingCheckoutButton';
 
 const BG = '#0a0d14';
-const BOOM = '#36E7A1';
-const PURPLE = '#A78BFA';
+const BOOM = '#3ECFAD';
+const PURPLE = '#8B5CF6';
 
 const GLASS =
   'rounded-xl border border-white/[0.08] bg-white/[0.03] backdrop-blur-[24px] transition-transform duration-200 ease-out hover:scale-[1.01]';
@@ -120,12 +120,12 @@ export default function LandingPricingSection() {
             </ul>
             <PricingCheckoutButton
               plan="veteran"
-              className="mt-8 flex min-h-[44px] w-full items-center justify-center rounded-lg border py-3 text-center text-[13px] font-semibold transition-[filter,box-shadow,background-color] duration-200 hover:brightness-110 hover:bg-[#36E7A1]/10 disabled:opacity-60"
+              className="mt-8 flex min-h-[44px] w-full items-center justify-center rounded-lg border py-3 text-center text-[13px] font-semibold transition-[filter,box-shadow,background-color] duration-200 hover:brightness-110 hover:bg-[#3ECFAD]/10 disabled:opacity-60"
               style={{
                 fontFamily: 'var(--font-body)',
-                borderColor: 'rgba(54, 231, 161, 0.55)',
+                borderColor: 'rgba(62, 207, 173, 0.55)',
                 color: BOOM,
-                boxShadow: '0 0 18px rgba(54, 231, 161, 0.18)',
+                boxShadow: '0 0 18px rgba(62, 207, 173, 0.18)',
               }}
             >
               Start <span className="font-mono tabular-nums">7</span>-Day Trial
@@ -174,7 +174,7 @@ export default function LandingPricingSection() {
               style={{
                 fontFamily: 'var(--font-body)',
                 background: BOOM,
-                boxShadow: '0 0 28px rgba(54, 231, 161, 0.45)',
+                boxShadow: '0 0 28px rgba(62, 207, 173, 0.45)',
               }}
             >
               Get All-Pro

@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useInViewOnce } from '@/hooks/useInViewOnce';
 
@@ -59,7 +59,7 @@ export default function LandingStatsBar() {
                 key={col.label}
                 className="flex min-w-[140px] flex-1 flex-col items-center justify-center px-4 py-7 text-center sm:min-w-[160px] sm:px-5 sm:py-8"
               >
-                <div className="font-['JetBrains_Mono'] text-[#36E7A1] text-[clamp(1.35rem,6vw,2.35rem)] font-bold leading-none tracking-tight tabular-nums sm:text-[clamp(1.75rem,3.5vw,2.35rem)]">
+                <div className="font-['JetBrains_Mono'] text-[#3ECFAD] text-[clamp(1.35rem,6vw,2.35rem)] font-bold leading-none tracking-tight tabular-nums sm:text-[clamp(1.75rem,3.5vw,2.35rem)]">
                   {col.value}
                 </div>
                 <div className="mt-2 max-w-[220px] text-xs leading-snug text-white/50 sm:mt-3" style={{ fontFamily: 'var(--font-body)' }}>

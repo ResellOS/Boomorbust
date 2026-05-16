@@ -1,8 +1,8 @@
 /**
  * POST /api/onboarding/calculate-tfo
- * Called immediately after Sleeper league sync completes for a new user.
- * Pre-warms TFO scores for all rostered players so the dashboard
- * isn't empty on first load.
+ * Pre-warms TFO scores for all of a new user's rostered players.
+ * Uses upsert_tfo_cache() stored procedure which handles the partial-index
+ * conflict: ON CONFLICT (player_id, scoring_type) WHERE league_id IS NULL.
  */
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -12,6 +12,23 @@ import { fetchAllPlayers } from '@/lib/sleeper/players';
 import { getKTCValues } from '@/lib/values/ktc';
 import { calculateTFOScore } from '@/lib/tfo/formula';
 
+const SCORING_TYPES = ['ppr', 'half_ppr', 'standard'] as const;
+
+function deriveGrade(score: number): string {
+  if (score >= 75) return 'A';
+  if (score >= 60) return 'B';
+  if (score >= 45) return 'C';
+  return 'D';
+}
+
+function deriveVerdict(score: number): string {
+  if (score >= 75) return 'BOOM';
+  if (score >= 60) return 'LEAN_BOOM';
+  if (score >= 45) return 'NEUTRAL';
+  if (score >= 30) return 'LEAN_BUST';
+  return 'BUST';
+}
+
 export async function POST(_request: NextRequest) {
   const supabase = createClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -19,7 +36,6 @@ export async function POST(_request: NextRequest) {
 
   const db = createAdminClient();
 
-  // Get all rosters for this user
   const { data: profile } = await db
     .from('profiles')
     .select('sleeper_user_id')
@@ -39,7 +55,6 @@ export async function POST(_request: NextRequest) {
     return NextResponse.json({ calculated: 0, message: 'No rosters found' });
   }
 
-  // Collect unique player IDs
   const playerIds = new Set<string>();
   for (const r of rosters as { players: string[] | null; league_id: string }[]) {
     for (const pid of r.players ?? []) {
@@ -67,15 +82,19 @@ export async function POST(_request: NextRequest) {
 
   const SKILL = new Set(['QB', 'RB', 'WR', 'TE']);
   let calculated = 0;
-  const errors: string[] = [];
-  const batchSize = 10;
+  let upsertErrors = 0;
+  const loggedErrors: string[] = [];
+
   const ids = Array.from(playerIds).filter((pid) => {
     const p = allPlayers[pid] as { position?: string } | undefined;
     return p && SKILL.has((p.position ?? '').toUpperCase());
   });
 
+  const batchSize = 10;
+
   for (let i = 0; i < ids.length; i += batchSize) {
     const batch = ids.slice(i, i + batchSize);
+
     await Promise.all(
       batch.map(async (pid) => {
         try {
@@ -89,14 +108,12 @@ export async function POST(_request: NextRequest) {
 
           const position = (raw.position ?? 'WR').toUpperCase() as 'QB' | 'RB' | 'WR' | 'TE';
           const ktcValue = ktcByName.get(raw.full_name.toLowerCase()) ?? 0;
-          const age = raw.age ?? 25;
-          const team = raw.team ?? 'FA';
 
           const tfoResult = calculateTFOScore({
             playerId: pid,
             position,
-            age,
-            team,
+            age: raw.age ?? 25,
+            team: raw.team ?? 'FA',
             ocScheme: 'default',
             opportunityScore: 50 + (ktcValue / 9500) * 40,
             olGrade: 60,
@@ -105,20 +122,48 @@ export async function POST(_request: NextRequest) {
             ktcValue,
           });
 
+          const score = tfoResult.tfoScore;
+          const grade = tfoResult.grade || deriveGrade(score);
+          const verdict = tfoResult.verdict || deriveVerdict(score);
           const now = new Date().toISOString();
-          await db.from('tfo_cache').upsert(
-            {
-              player_id: pid,
-              tfo_score: tfoResult.tfoScore,
-              grade: tfoResult.grade,
-              verdict: tfoResult.verdict,
-              calculated_at: now,
-            },
-            { onConflict: 'player_id' },
-          );
-          calculated++;
+
+          for (const scoringType of SCORING_TYPES) {
+            const { error } = await db.rpc('upsert_tfo_cache', {
+              p_player_id: pid,
+              p_scoring_type: scoringType,
+              p_tfo_score: score,
+              p_ops_score: 50,
+              p_sfs_score: 50,
+              p_ffig_score: 50,
+              p_sit_score: 50,
+              p_irs_score: 50,
+              p_grade: grade,
+              p_verdict: verdict,
+              p_calculated_at: now,
+            });
+
+            if (error) {
+              upsertErrors++;
+              loggedErrors.push(`${pid}/${scoringType}: ${error.message}`);
+              void db.from('error_logs').insert({
+                source: 'tfo-upsert',
+                message: error.message,
+                user_id: user.id,
+                metadata: { player_id: pid, scoring_type: scoringType, code: error.code },
+              });
+            } else {
+              calculated++;
+            }
+          }
         } catch (err) {
-          errors.push(`${pid}: ${String(err)}`);
+          const msg = String(err);
+          loggedErrors.push(`${pid}: ${msg}`);
+          void db.from('error_logs').insert({
+            source: 'tfo-upsert',
+            message: msg,
+            user_id: user.id,
+            metadata: { player_id: pid },
+          });
         }
       }),
     );
@@ -126,8 +171,10 @@ export async function POST(_request: NextRequest) {
 
   return NextResponse.json({
     calculated,
-    total: ids.length,
-    errors: errors.slice(0, 10),
-    message: `Pre-warmed TFO scores for ${calculated}/${ids.length} players`,
+    upsert_errors: upsertErrors,
+    total: ids.length * SCORING_TYPES.length,
+    players: ids.length,
+    errors: loggedErrors.slice(0, 10),
+    message: `Pre-warmed TFO scores for ${ids.length} players × ${SCORING_TYPES.length} scoring types`,
   });
 }

@@ -14,6 +14,7 @@ import PositionalNeedsTab  from '@/components/waiver/PositionalNeedsTab';
 import WhyTheseCards       from '@/components/waiver/WhyTheseCards';
 import RecentActivityFeed  from '@/components/waiver/RecentActivityFeed';
 import WaiverStatusBar     from '@/components/waiver/WaiverStatusBar';
+import HandcuffTracker     from '@/components/waiver/HandcuffTracker';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -210,6 +211,11 @@ export default function WaiverWirePage() {
             needs={data?.positionalNeeds ?? []}
             loading={loading}
           />
+        )}
+
+        {/* ── HANDCUFF TRACKER tab ────────────────────────────────────────────── */}
+        {activeTab === 'handcuffs' && (
+          <HandcuffTracker leagueId={activeLeagueId} />
         )}
       </div>
 

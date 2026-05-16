@@ -1,4 +1,4 @@
-
+﻿
 export type ProjectionCardProps = {
   playerName: string;
   position: string;
@@ -25,7 +25,7 @@ export type ProjectionCardProps = {
 export default function ProjectionCard(p: ProjectionCardProps) {
   return (
     <div
-      className="rounded-xl border border-white/[0.1] bg-[rgba(13,17,23,0.85)] p-4 shadow-[0_0_28px_rgba(34,211,238,0.12),0_0_48px_rgba(54,231,161,0.08)] backdrop-blur-md"
+      className="rounded-xl border border-white/[0.1] bg-[rgba(13,17,23,0.85)] p-4 shadow-[0_0_28px_rgba(34,211,238,0.12),0_0_48px_rgba(62,207,173,0.08)] backdrop-blur-md"
       style={{ fontFamily: 'var(--font-body)' }}
     >
       <div className="flex items-start justify-between gap-2 border-b border-white/[0.06] pb-3">

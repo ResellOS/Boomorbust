@@ -89,17 +89,23 @@ export async function POST(request: NextRequest) {
         ktcValue,
       });
 
-      await db.from('tfo_cache').upsert(
-        {
-          player_id: pid,
-          tfo_score: result.tfoScore,
-          grade: result.grade,
-          verdict: result.verdict,
-          calculated_at: new Date().toISOString(),
-        },
-        { onConflict: 'player_id' },
-      );
-      calculated++;
+      const now = new Date().toISOString();
+      for (const scoringType of ['ppr', 'half_ppr', 'standard'] as const) {
+        const { error } = await db.rpc('upsert_tfo_cache', {
+          p_player_id: pid,
+          p_scoring_type: scoringType,
+          p_tfo_score: result.tfoScore,
+          p_ops_score: 50,
+          p_sfs_score: 50,
+          p_ffig_score: 50,
+          p_sit_score: 50,
+          p_irs_score: 50,
+          p_grade: result.grade,
+          p_verdict: result.verdict,
+          p_calculated_at: now,
+        });
+        if (!error) calculated++;
+      }
     } catch { /* skip individual failures */ }
   }
 

@@ -29,7 +29,7 @@ export type RecentUserRow = {
   id: string;
   email: string | null;
   username: string | null;
-  tier: 'free' | 'pro' | 'elite';
+  tier: 'free' | 'pro' | 'elite' | 'all_pro_terminal';
   signedUpAt: string;
 };
 
@@ -72,10 +72,10 @@ async function fetchAllAuthUsers(db: ReturnType<typeof createAdminClient>) {
   return out;
 }
 
-function tierFromProfile(isPaid: boolean, pref: Record<string, unknown> | null | undefined): 'free' | 'pro' | 'elite' {
-  const t = pref?.subscription_tier;
-  if (t === 'elite') return 'elite';
-  if (isPaid) return 'pro';
+function tierFromProfile(isPaid: boolean, subscriptionTier?: string | null): 'free' | 'pro' | 'elite' | 'all_pro_terminal' {
+  if (subscriptionTier === 'all_pro_terminal') return 'all_pro_terminal';
+  if (subscriptionTier === 'elite') return 'elite';
+  if (subscriptionTier === 'pro' || isPaid) return 'pro';
   return 'free';
 }
 
@@ -122,7 +122,7 @@ export async function getAdminDashboardPayload(): Promise<AdminDashboardPayload>
   const thirtyDaysAgo = now - 30 * dayMs;
 
   const [profRes, allUsersChunk, bbRes, lgRes, errRes] = await Promise.all([
-    db.from('profiles').select('id, username, is_paid, preference_data'),
+    db.from('profiles').select('id, username, is_paid, subscription_tier, preference_data'),
     fetchAllAuthUsers(db),
     db.from('bbv_values').select('updated_at').order('updated_at', { ascending: false }).limit(1).maybeSingle(),
     db.from('leagues').select('synced_at').order('synced_at', { ascending: false }).limit(1).maybeSingle(),
@@ -158,12 +158,8 @@ export async function getAdminDashboardPayload(): Promise<AdminDashboardPayload>
   let proCount = 0;
   let eliteCount = 0;
   for (const p of profilesList) {
-    const pref =
-      p.preference_data && typeof p.preference_data === 'object' && p.preference_data !== null
-        ? (p.preference_data as Record<string, unknown>)
-        : {};
-    const tier = tierFromProfile(!!p.is_paid, pref);
-    if (tier === 'elite') eliteCount += 1;
+    const tier = tierFromProfile(!!p.is_paid, (p as unknown as { subscription_tier?: string }).subscription_tier);
+    if (tier === 'elite' || tier === 'all_pro_terminal') eliteCount += 1;
     else if (tier === 'pro') proCount += 1;
   }
 
@@ -270,15 +266,11 @@ export async function getAdminDashboardPayload(): Promise<AdminDashboardPayload>
 
   const recentUsers: RecentUserRow[] = newestSignups.map((u) => {
     const p = profMap.get(u.id);
-    const pref =
-      p?.preference_data && typeof p.preference_data === 'object' && p.preference_data !== null
-        ? (p.preference_data as Record<string, unknown>)
-        : {};
     return {
       id: u.id,
       email: u.email ?? null,
       username: p?.username ?? null,
-      tier: tierFromProfile(!!p?.is_paid, pref),
+      tier: tierFromProfile(!!p?.is_paid, (p as unknown as { subscription_tier?: string } | undefined)?.subscription_tier),
       signedUpAt: u.created_at,
     };
   });

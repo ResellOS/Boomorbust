@@ -43,7 +43,7 @@ export default function ProfileCard({ data, onEdit }: Props) {
   const stats = [
     { label: 'LEAGUES',          value: data.leagueCount.toString(),       color: '#A78BFA' },
     { label: 'CHAMPIONSHIPS',    value: data.championships.toString(),      color: '#A78BFA' },
-    { label: 'EMPIRE SCORE',     value: data.empireScore.toString(),        color: '#36E7A1', sub: 'Top 8%' },
+    { label: 'DYNASTY POWER RATING',     value: data.empireScore.toString(),        color: '#36E7A1', sub: 'Top 8%' },
     { label: 'PLAYERS ROSTERED', value: data.playersRostered.toString(),    color: '#22D3EE' },
     { label: 'TROPHIES',         value: data.trophies.toString(),           color: '#A78BFA' },
   ];

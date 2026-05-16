@@ -14,14 +14,7 @@ function getRedis(): Redis | null {
   return new Redis({ url: process.env.UPSTASH_REDIS_REST_URL, token: process.env.UPSTASH_REDIS_REST_TOKEN });
 }
 
-type Tier = 'free' | 'pro' | 'elite';
-
-function tierFromProfile(pref: Record<string, unknown> | null | undefined, isPaid: boolean): Tier {
-  const t = pref?.subscription_tier;
-  if (t === 'elite') return 'elite';
-  if (isPaid) return 'pro';
-  return 'free';
-}
+type Tier = 'free' | 'pro' | 'elite' | 'all_pro_terminal';
 
 /** Redis fallback when coach_usage RPC is not migrated yet */
 async function consumeProViaRedis(userId: string): Promise<{ allowed: boolean; remaining: number }> {
@@ -63,14 +56,16 @@ export async function POST(request: NextRequest) {
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('preference_data, is_paid')
+    .select('subscription_tier, is_paid')
     .eq('id', user.id)
     .single();
 
-  const tier = tierFromProfile(
-    profile?.preference_data as Record<string, unknown> | undefined,
-    profile?.is_paid ?? false
-  );
+  const rawTier = (profile as { subscription_tier?: string } | null)?.subscription_tier;
+  const tier: Tier =
+    rawTier === 'all_pro_terminal' ? 'all_pro_terminal'
+    : rawTier === 'elite' ? 'elite'
+    : rawTier === 'pro' || profile?.is_paid ? 'pro'
+    : 'free';
 
   if (tier === 'free') {
     return new Response(

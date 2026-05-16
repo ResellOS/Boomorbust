@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
@@ -29,13 +29,13 @@ export default function LandingWaitlistUrgency() {
     <section
       className="px-4 py-8 text-center sm:px-6 sm:py-10"
       style={{
-        background: 'rgba(54,231,161,0.04)',
-        borderTop: '1px solid rgba(54,231,161,0.1)',
-        borderBottom: '1px solid rgba(54,231,161,0.1)',
+        background: 'rgba(62,207,173,0.04)',
+        borderTop: '1px solid rgba(62,207,173,0.1)',
+        borderBottom: '1px solid rgba(62,207,173,0.1)',
       }}
     >
       <h2
-        className="text-[clamp(1.15rem,5.5vw,1.75rem)] text-[#36E7A1] sm:text-[clamp(1.35rem,4vw,1.75rem)]"
+        className="text-[clamp(1.15rem,5.5vw,1.75rem)] text-[#3ECFAD] sm:text-[clamp(1.35rem,4vw,1.75rem)]"
         style={{ fontFamily: 'var(--font-display)' }}
       >
         🚀 EARLY ACCESS IS LIMITED
@@ -53,7 +53,7 @@ export default function LandingWaitlistUrgency() {
         style={{
           fontFamily: 'var(--font-body)',
           fontWeight: 700,
-          background: 'linear-gradient(135deg, #36E7A1, #22D3EE)',
+          background: 'linear-gradient(135deg, #3ECFAD, #22D3EE)',
         }}
       >
         CLAIM YOUR SPOT →

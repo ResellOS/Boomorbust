@@ -1,13 +1,13 @@
-'use client';
+﻿'use client';
 
 import Link from 'next/link';
 import { useInViewOnce } from '@/hooks/useInViewOnce';
 
 const BG = '#0a0d14';
-const BOOM = '#36E7A1';
+const BOOM = '#3ECFAD';
 const CYAN = '#22D3EE';
 const AMBER = '#FBBF24';
-const PURPLE = '#A78BFA';
+const PURPLE = '#8B5CF6';
 
 const GLASS =
   'group flex h-full flex-col rounded-xl border border-white/[0.08] bg-white/[0.03] p-5 backdrop-blur-[24px] transition-[box-shadow,transform] duration-200 hover:-translate-y-0.5 sm:p-6';
@@ -80,7 +80,7 @@ const CARDS: (SvgCard | TextCard)[] = [
     Icon: IconBook,
   },
   {
-    icon: '≡', iconColor: '#36E7A1', iconBg: 'rgba(54,231,161,0.12)',
+    icon: '≡', iconColor: '#3ECFAD', iconBg: 'rgba(62,207,173,0.12)',
     title: 'Smart Rankings',
     body: 'Expert rankings based on form, matchups, and injury news.',
     link: 'View rankings →',

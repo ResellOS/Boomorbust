@@ -47,6 +47,7 @@ export async function POST(request: NextRequest) {
         const { error } = await supabase.from('profiles').upsert({
           id: userId,
           is_paid: true,
+          subscription_tier: tier,
           stripe_customer_id: customerId,
           preference_data,
         });
@@ -66,7 +67,7 @@ export async function POST(request: NextRequest) {
       if (profile) {
         const pd = { ...(mergePreferenceData(profile.preference_data as Record<string, unknown>, {}) as Record<string, unknown>) };
         delete pd.subscription_tier;
-        const { error } = await supabase.from('profiles').update({ is_paid: false, preference_data: pd }).eq('id', profile.id);
+        const { error } = await supabase.from('profiles').update({ is_paid: false, subscription_tier: 'free', preference_data: pd }).eq('id', profile.id);
         if (error) throw error;
       }
     }
@@ -93,7 +94,11 @@ export async function POST(request: NextRequest) {
           delete preference_data.subscription_tier;
         }
 
-        const { error } = await supabase.from('profiles').update({ is_paid, preference_data }).eq('id', profile.id);
+        const { error } = await supabase.from('profiles').update({
+          is_paid,
+          subscription_tier: is_paid ? tier : 'free',
+          preference_data,
+        }).eq('id', profile.id);
         if (error) throw error;
       }
     }

@@ -18,6 +18,8 @@ export interface PlayerAvatarProps {
   playerName: string;
   position: string;
   size?: number;
+  /** Use the smaller /thumb/ CDN variant (better for ≤64px circles) */
+  thumb?: boolean;
   className?: string;
   style?: CSSProperties;
 }
@@ -27,6 +29,7 @@ export default function PlayerAvatar({
   playerName,
   position,
   size = 40,
+  thumb = false,
   className = '',
   style = {},
 }: PlayerAvatarProps) {
@@ -67,7 +70,10 @@ export default function PlayerAvatar({
   return (
     // eslint-disable-next-line @next/next/no-img-element
     <img
-      src={`https://sleepercdn.com/content/nfl/players/${playerId}.jpg`}
+      src={thumb
+        ? `https://sleepercdn.com/content/nfl/players/thumb/${playerId}.jpg`
+        : `https://sleepercdn.com/content/nfl/players/${playerId}.jpg`
+      }
       width={size}
       height={size}
       alt={playerName ?? 'Player'}

@@ -60,7 +60,7 @@ export default function ScoutingEmpireWidget() {
       className="rounded-xl border border-white/[0.08] bg-white/[0.03] backdrop-blur-[24px] px-4 py-3 shrink-0"
       style={{ boxShadow: '0 0 24px rgba(54,231,161,0.08)' }}
     >
-      <p className="text-[10px] uppercase tracking-widest text-[#64748B] font-mono mb-1">EMPIRE SCORE</p>
+      <p className="text-[10px] uppercase tracking-widest text-[#64748B] font-mono mb-1">DYNASTY POWER RATING</p>
       <div className="flex items-end gap-3">
         <p className="text-[28px] font-bold leading-none tabular-nums" style={{ fontFamily: 'JetBrains Mono, monospace', color: '#36E7A1' }}>
           {score}

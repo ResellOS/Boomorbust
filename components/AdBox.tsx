@@ -8,7 +8,7 @@ export type AdBoxSlot = 'sidebar_top' | 'sidebar_mid' | 'dashboard_row' | 'dashb
 
 export interface AdBoxProps {
   slot: AdBoxSlot;
-  tier: 'free' | 'pro' | 'elite';
+  tier: 'free' | 'pro' | 'elite' | 'all_pro_terminal';
   premiumContent?: ReactNode;
   className?: string;
 }
@@ -26,7 +26,7 @@ function getAdContent(slot: AdBoxSlot): AdSlotContent {
 }
 
 export default function AdBox({ slot, tier, premiumContent, className }: AdBoxProps) {
-  const isPaid = tier === 'pro' || tier === 'elite';
+  const isPaid = tier === 'pro' || tier === 'elite' || tier === 'all_pro_terminal';
 
   /** Paid tiers never see placeholder ads — empty slot if premium not wired yet. */
   if (isPaid) {

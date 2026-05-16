@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { Redis } from '@upstash/redis';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import type { Verdict } from '@/components/dashboard/PlayerHubCard';
 
 export const dynamic = 'force-dynamic';
@@ -28,13 +29,15 @@ function getRedis(): Redis | null {
   return new Redis({ url: process.env.UPSTASH_REDIS_REST_URL, token: process.env.UPSTASH_REDIS_REST_TOKEN });
 }
 
-/** Map raw TFO cache verdict string → UI verdict (4-way). */
+/** Map raw TFO cache verdict string → UI verdict (4-way).
+ *  Handles both calculate-tfo verdicts (BOOM/LEAN_BOOM/NEUTRAL/LEAN_BUST/BUST)
+ *  and DMS tier values stored by cache-tfo (FAVORABLE/STABLE/TOUGH). */
 function mapVerdict(raw: string | null | undefined, overvalued: boolean): Verdict {
   if (overvalued) return 'SELL';
   const v = (raw ?? '').toUpperCase().replace(/\s+/g, '_');
-  if (v.includes('BOOM')) return 'BOOM';
-  if (v.includes('BUST')) return 'BUST';
-  if (v.includes('NEUTRAL') || v.includes('LEAN') || !v) return 'HOLD';
+  if (!v) return 'HOLD';
+  if (v.includes('BOOM') || v === 'FAVORABLE') return 'BOOM';
+  if (v.includes('BUST') || v === 'TOUGH') return 'BUST';
   return 'HOLD';
 }
 
@@ -215,68 +218,96 @@ export async function GET(req: Request) {
     } catch { /* fall through */ }
   }
 
-  // ── Cold path: query tfo_cache directly ───────────────────────────────────
-  const { data: leagueRows } = await supabase
-    .from('leagues')
-    .select('id')
-    .eq('user_id', user.id);
-  const leagueIds = (leagueRows ?? []).map((l) => String(l.id));
+  // ── Cold path: correct 7-step chain ──────────────────────────────────────
+  const db = createAdminClient();
 
-  if (!leagueIds.length) {
+  // Step 2: profiles WHERE id = user.id → sleeper_user_id
+  const { data: profile } = await db
+    .from('profiles')
+    .select('sleeper_user_id')
+    .eq('id', user.id)
+    .maybeSingle();
+
+  const sleeperUserId = (profile as { sleeper_user_id?: string | null } | null)?.sleeper_user_id;
+  if (!sleeperUserId) {
     return NextResponse.json({ players: [] } satisfies PlayersHubResponse);
   }
 
-  const filterLeagueIds = leagueId !== 'all' && leagueId
-    ? [leagueId]
-    : leagueIds;
+  // Step 3: rosters WHERE owner_id = sleeper_user_id, optionally filtered by league
+  const rosterQuery = db
+    .from('rosters')
+    .select('players')
+    .eq('owner_id', String(sleeperUserId));
+  const { data: rosterRows } = await (
+    leagueId && leagueId !== 'all'
+      ? rosterQuery.eq('league_id', leagueId)
+      : rosterQuery
+  );
 
-  const { data: tfoRows } = await supabase
+  // Step 4: flatten players arrays → allPlayerIds (deduplicated)
+  const seenIds = new Set<string>();
+  const allPlayerIds: string[] = [];
+  for (const r of rosterRows ?? []) {
+    for (const pid of (r.players as string[] | null) ?? []) {
+      if (pid && !seenIds.has(pid)) { seenIds.add(pid); allPlayerIds.push(pid); }
+    }
+  }
+
+  if (!allPlayerIds.length) {
+    return NextResponse.json({ players: [] } satisfies PlayersHubResponse);
+  }
+
+  // Step 5: tfo_cache WHERE player_id IN allPlayerIds — ppr scoring, no league_id filter
+  const { data: tfoRows } = await db
     .from('tfo_cache')
-    .select('player_id, tfo_score, grade, verdict, league_id')
-    .in('league_id', filterLeagueIds)
+    .select('player_id, tfo_score, grade, verdict')
+    .in('player_id', allPlayerIds)
+    .eq('scoring_type', 'ppr')
     .order('tfo_score', { ascending: false })
     .limit(50);
 
-  if (!tfoRows?.length) {
-    return NextResponse.json({ players: [] } satisfies PlayersHubResponse);
+  // Step 6: players WHERE player_id IN allPlayerIds → names, position, team
+  const { data: playerRows } = await db
+    .from('players')
+    .select('player_id, full_name, position, team')
+    .in('player_id', allPlayerIds);
+
+  // Step 7: join and return
+  const tfoScores = new Map<string, { tfo_score: number; verdict: string | null }>();
+  for (const t of tfoRows ?? []) {
+    tfoScores.set(String(t.player_id), { tfo_score: Number(t.tfo_score), verdict: t.verdict as string | null });
   }
 
-  // Deduplicate by player_id keeping highest tfo_score
-  const best = new Map<string, typeof tfoRows[0]>();
-  for (const row of tfoRows) {
-    const pid   = String(row.player_id);
-    const score = Number(row.tfo_score);
-    const prev  = best.get(pid);
-    if (!prev || score > Number(prev.tfo_score)) best.set(pid, row);
-  }
-
-  // Pull player names from Sleeper players table via rosters
-  const { data: rosterRows } = await supabase
-    .from('rosters')
-    .select('players')
-    .in('league_id', filterLeagueIds)
-    .limit(20);
-
-  // Build a crude name/pos/team map from rosterRows is not possible without
-  // the players API; return minimal data and let the card use its own fallback.
-  const entries: PlayerHubEntry[] = Array.from(best.values())
-    .slice(0, limit)
-    .map((row) => {
-      const score   = Math.round(Number(row.tfo_score));
-      const verdict = mapVerdict(String(row.verdict ?? ''), false);
-      return {
-        playerId: String(row.player_id),
-        name:     `Player ${String(row.player_id).slice(-4)}`, // placeholder until players are cached
-        position: 'WR',
-        team:     '—',
-        tfoScore: score,
-        verdict,
-        subLabel: deriveSubLabel(score, verdict),
-      };
+  const nameMap = new Map<string, { full_name: string; position: string; team: string }>();
+  for (const p of playerRows ?? []) {
+    nameMap.set(String(p.player_id), {
+      full_name: String(p.full_name ?? `Player ${String(p.player_id).slice(-4)}`),
+      position:  String(p.position ?? 'WR'),
+      team:      String(p.team ?? '—'),
     });
+  }
 
-  // Suppress unused variable warning
-  void rosterRows;
+  // Sort by tfo_score desc, then take top `limit` with real data first
+  const ranked = allPlayerIds
+    .map((pid) => ({ pid, score: tfoScores.get(pid)?.tfo_score ?? 0 }))
+    .sort((a, b) => b.score - a.score)
+    .slice(0, limit);
+
+  const entries: PlayerHubEntry[] = ranked.map(({ pid, score }) => {
+    const tfoEntry = tfoScores.get(pid);
+    const info     = nameMap.get(pid);
+    const roundedScore = Math.round(score);
+    const verdict  = mapVerdict(tfoEntry?.verdict ?? null, false);
+    return {
+      playerId: pid,
+      name:     info?.full_name ?? `Player ${pid.slice(-4)}`,
+      position: info?.position  ?? 'WR',
+      team:     info?.team      ?? '—',
+      tfoScore: roundedScore,
+      verdict,
+      subLabel: deriveSubLabel(roundedScore, verdict),
+    };
+  });
 
   return NextResponse.json({ players: entries } satisfies PlayersHubResponse);
 }

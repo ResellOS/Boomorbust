@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { clsx } from 'clsx';
 import AppBackground from '@/components/AppBackground';
@@ -17,31 +18,27 @@ function LandingNav() {
 
   return (
     <header
-      className="fixed top-0 left-0 right-0 z-50 h-16 flex items-center px-4 sm:px-6 border-b transition-all duration-300"
-      style={{
-        background: scrolled ? 'rgba(8,11,20,0.95)' : 'rgba(8,11,20,0.85)',
-        borderColor: 'var(--border)',
-        backdropFilter: 'blur(20px)',
-        WebkitBackdropFilter: 'blur(20px)',
-        boxShadow: scrolled ? '0 8px 32px rgba(0,0,0,0.35)' : undefined,
-      }}
+      className={`fixed top-0 left-0 right-0 z-50 h-16 flex items-center px-4 sm:px-6 bg-[#0a0d14]/90 backdrop-blur-xl border-b border-white/[0.06] transition-all duration-300 ${
+        scrolled ? 'shadow-[0_8px_32px_rgba(0,0,0,0.35)]' : ''
+      }`}
     >
       <div className="max-w-[1400px] mx-auto w-full flex items-center justify-between gap-4">
-        <Link href="/" className="flex items-center gap-2 shrink-0">
-          <span className="w-8 h-8 rounded-full bg-[var(--indigo)]/25 flex items-center justify-center text-lg">
-            🏆
-          </span>
-          <span className="display text-[22px] tracking-[3px]">
-            <span className="text-white">BOOM </span>
-            <span style={{ color: 'var(--indigo)' }}>OR BUST</span>
-          </span>
+        <Link href="/" className="flex items-center shrink-0">
+          <Image
+            src="/logo-full2.png"
+            alt="Boom or Bust"
+            width={180}
+            height={48}
+            className="h-10 w-auto object-contain"
+            priority
+          />
         </Link>
 
         <nav className="hidden lg:flex items-center gap-8 text-[14px]" style={{ color: 'var(--text-secondary)' }}>
           {[
             ['#features', 'Features'],
+            ['#how', 'How it Works'],
             ['#pricing', 'Pricing'],
-            ['#how', 'How It Works'],
           ].map(([href, label]) => (
             <a
               key={href}
@@ -61,15 +58,13 @@ function LandingNav() {
           >
             Sign In
           </Link>
-          <div className="flex flex-col items-end">
-            <Link
-              href="/auth/signup"
-              className="inline-flex items-center gap-2 bg-[var(--indigo)] text-white font-bold px-5 py-2.5 rounded-xl text-[15px] shadow-[0_0_40px_rgba(99,102,241,0.4)] hover:-translate-y-0.5 transition"
-            >
-              <span>🏈</span> Import My Leagues
-            </Link>
-            <span className="text-[11px] text-[var(--text-muted)] mt-1 hidden sm:block">Takes less than 10 seconds</span>
-          </div>
+          <Link
+            href="/auth/signup"
+            className="inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-[15px] font-bold text-[#0a0d14] shadow-[0_0_28px_rgba(54,231,161,0.45)] transition hover:-translate-y-0.5 hover:brightness-110"
+            style={{ background: '#36E7A1' }}
+          >
+            Import FB/Leagues
+          </Link>
         </div>
       </div>
     </header>
@@ -389,10 +384,13 @@ export default function LandingPage({ buildSha = 'local' }: { buildSha?: string 
 
         <footer className="border-t border-[var(--border)] py-10 px-4 sm:px-6">
           <div className="max-w-[1400px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-sm" style={{ color: 'var(--text-muted)' }}>
-            <div className="display text-lg tracking-[2px]">
-              <span className="text-white">BOOM </span>
-              <span className="text-[var(--indigo)]">OR BUST</span>
-            </div>
+            <Image
+              src="/logo-full2.png"
+              alt="Boom or Bust"
+              width={180}
+              height={48}
+              className="h-10 w-auto object-contain"
+            />
             <p>Dynasty command center for obsessive Sleeper managers.</p>
             <div className="flex gap-6">
               <Link href="/auth/login" className="hover:text-white transition">

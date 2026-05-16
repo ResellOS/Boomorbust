@@ -74,7 +74,7 @@ function StatsBar({ data }: { data: DigestData | null }) {
     { label: 'Players on Watch', value: s.playersOnWatch.toString(),       sub: 'Trending Up',                                link: 'View Watchlist',    color: '#22D3EE' },
     { label: 'League Headlines', value: s.leagueHeadlines.toString(),      sub: 'Big Stories',                                link: 'View Headlines',    color: '#A78BFA' },
     { label: 'Matchup Edges',    value: s.matchupEdges.toString(),         sub: 'You Have the Edge',                          link: 'View Matchups',     color: '#FBBF24' },
-    { label: 'Empire Score',     value: s.empireScore.toString(),          sub: s.empireGrade,                                link: null,                color: '#36E7A1' },
+    { label: 'Dynasty Power Rating',     value: s.empireScore.toString(),          sub: s.empireGrade,                                link: null,                color: '#36E7A1' },
   ];
 
   return (

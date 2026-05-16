@@ -3,10 +3,11 @@
 import type { WaiverTabId } from './types';
 
 const TABS: { id: WaiverTabId; label: string }[] = [
-  { id: 'wire',     label: 'WAIVER WIRE' },
-  { id: 'trending', label: 'TRENDING ADDS' },
-  { id: 'gaps',     label: 'ROSTER GAPS' },
-  { id: 'needs',    label: 'POSITIONAL NEEDS' },
+  { id: 'wire',       label: 'WAIVER WIRE' },
+  { id: 'trending',   label: 'TRENDING ADDS' },
+  { id: 'gaps',       label: 'ROSTER GAPS' },
+  { id: 'needs',      label: 'POSITIONAL NEEDS' },
+  { id: 'handcuffs',  label: 'HANDCUFF TRACKER' },
 ];
 
 interface Props {

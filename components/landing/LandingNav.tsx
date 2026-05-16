@@ -1,11 +1,10 @@
-'use client';
+﻿'use client';
 
+import Image from 'next/image';
 import Link from 'next/link';
 import { useCallback, useEffect, useId, useRef, useState } from 'react';
 
-const NAV_BG = '#0a0d14';
-const BOOM = '#36E7A1';
-const BUST_PURPLE = '#7c3aed';
+const BOOM = '#3ECFAD';
 
 const CENTER_LINKS = [
   { label: 'Features', href: '#features' },
@@ -18,65 +17,6 @@ const RESOURCES_ITEMS = [
   { label: 'Dynasty glossary', href: '/resources#glossary' },
   { label: 'Changelog', href: '/resources#changelog' },
 ] as const;
-
-function BobLogoMark({ className }: { className?: string }) {
-  const uid = useId().replace(/:/g, '');
-  const clipL = `bobL-${uid}`;
-  const clipR = `bobR-${uid}`;
-  return (
-    <svg className={className} viewBox="0 0 40 44" width={40} height={44} aria-hidden>
-      <defs>
-        <clipPath id={clipL}>
-          <rect x="0" y="0" width="20" height="44" />
-        </clipPath>
-        <clipPath id={clipR}>
-          <rect x="20" y="0" width="20" height="44" />
-        </clipPath>
-      </defs>
-      <text
-        x="2"
-        y="36"
-        fontSize="38"
-        fontWeight={700}
-        fontFamily="var(--font-display), Bebas Neue, sans-serif"
-        fill={BOOM}
-        clipPath={`url(#${clipL})`}
-      >
-        B
-      </text>
-      <text
-        x="2"
-        y="36"
-        fontSize="38"
-        fontWeight={700}
-        fontFamily="var(--font-display), Bebas Neue, sans-serif"
-        fill={BUST_PURPLE}
-        clipPath={`url(#${clipR})`}
-      >
-        B
-      </text>
-      <path
-        fill="#f8fafc"
-        d="M20.5 14.5l-3.2 5.6h2.4l-1.2 6.8 5.2-7.6h-2.1l1.5-4.8z"
-        style={{ filter: 'drop-shadow(0 0 5px rgba(54,231,161,0.5))' }}
-      />
-    </svg>
-  );
-}
-
-function BobWordmark() {
-  return (
-    <span
-      className="inline-flex items-baseline gap-1 whitespace-nowrap"
-      style={{ fontFamily: 'var(--font-display)' }}
-    >
-      <span className="text-[20px] tracking-[0.04em] sm:text-[26px]" style={{ color: BOOM }}>
-        BOOM
-      </span>
-      <span className="text-[20px] tracking-[0.04em] text-white sm:text-[26px]">OR BUST</span>
-    </span>
-  );
-}
 
 function ChevronDown({ open }: { open: boolean }) {
   return (
@@ -131,14 +71,17 @@ export default function LandingNav() {
   const linkStyle = { fontFamily: 'var(--font-body)' } as const;
 
   return (
-    <header
-      className="sticky top-0 z-[100] h-14 border-b border-white/[0.06]"
-      style={{ background: NAV_BG }}
-    >
+    <header className="sticky top-0 z-[100] h-[72px] bg-[#0a0d14]/90 backdrop-blur-xl border-b border-white/[0.06]">
       <div className="relative z-[110] mx-auto flex h-full w-full max-w-[1400px] items-center justify-between gap-3 px-4 sm:px-6 lg:px-10">
-        <Link href="/" className="flex shrink-0 items-center gap-2.5 sm:gap-3" aria-label="Boom or Bust home">
-          <BobLogoMark className="h-8 w-auto sm:h-9" />
-          <BobWordmark />
+        <Link href="/" className="flex items-center shrink-0">
+          <Image
+            src="/images/logo-full2.png"
+            alt="Boom or Bust"
+            width={260}
+            height={70}
+            className="h-[54px] w-auto object-contain"
+            priority
+          />
         </Link>
 
         <nav
@@ -190,7 +133,7 @@ export default function LandingNav() {
         <div className="flex shrink-0 items-center gap-2 sm:gap-3">
           <Link
             href="/login"
-            className="hidden min-h-[44px] items-center px-3 py-2 text-[14px] font-medium text-white/80 transition-colors duration-200 hover:text-white lg:inline-flex"
+            className="hidden min-h-[44px] items-center rounded-lg border border-white/[0.12] bg-transparent px-4 py-2 text-[14px] font-semibold text-white/90 transition-colors duration-200 hover:border-white/[0.2] hover:bg-white/[0.04] hover:text-white lg:inline-flex"
             style={linkStyle}
           >
             Sign In
@@ -198,17 +141,13 @@ export default function LandingNav() {
 
           <Link
             href="/signup"
-            className="hidden min-h-[44px] min-w-[132px] flex-col items-center justify-center rounded-xl px-4 py-1.5 text-center shadow-[0_0_22px_rgba(54,231,161,0.42),0_0_48px_rgba(54,231,161,0.16)] transition-[filter,box-shadow] duration-200 hover:brightness-110 hover:shadow-[0_0_20px_rgba(54,231,161,0.3)] lg:flex"
+            className="hidden min-h-[44px] items-center justify-center rounded-xl px-5 py-2.5 text-center text-[14px] font-bold text-[#0a0d14] shadow-[0_0_28px_rgba(62,207,173,0.45)] transition-[filter,box-shadow] duration-200 hover:brightness-110 hover:shadow-[0_0_32px_rgba(62,207,173,0.5)] lg:inline-flex"
             style={{
               fontFamily: 'var(--font-body)',
               background: BOOM,
-              color: '#ffffff',
             }}
           >
-            <span className="text-[14px] font-bold leading-tight text-white">Start Free</span>
-            <span className="text-[11px] font-medium leading-tight text-white/85" style={{ fontFamily: 'var(--font-body)' }}>
-              <span className="font-mono tabular-nums">$0</span> Forever
-            </span>
+            Import FB/Leagues
           </Link>
 
           <button
@@ -240,7 +179,7 @@ export default function LandingNav() {
       >
         <button
           type="button"
-          className={`absolute inset-0 bg-black/55 backdrop-blur-sm transition-opacity duration-200 ${
+          className={`absolute inset-0 bg-[#0a0d14]/80 backdrop-blur-sm transition-opacity duration-200 ${
             mobileOpen ? 'opacity-100' : 'opacity-0'
           }`}
           tabIndex={mobileOpen ? 0 : -1}
@@ -248,7 +187,7 @@ export default function LandingNav() {
           onClick={closeMobile}
         />
         <div
-          className={`absolute right-0 top-14 flex h-[calc(100dvh-3.5rem)] w-[min(100%,320px)] flex-col border-l border-white/[0.08] bg-[#0a0d14]/95 backdrop-blur-[24px] transition-transform duration-200 ease-out ${
+          className={`absolute right-0 top-[72px] flex h-[calc(100dvh-72px)] w-[min(100%,320px)] flex-col border-l border-white/[0.08] bg-[#0a0d14]/95 backdrop-blur-[24px] transition-transform duration-200 ease-out ${
             mobileOpen ? 'translate-x-0' : 'translate-x-full'
           }`}
         >
@@ -283,21 +222,18 @@ export default function LandingNav() {
           <div className="mt-auto flex flex-col gap-3 border-t border-white/[0.06] p-4">
             <Link
               href="/login"
-              className="flex min-h-[44px] items-center justify-center rounded-lg py-3 text-center text-[15px] font-medium text-white hover:bg-white/[0.06]"
+              className="flex min-h-[44px] items-center justify-center rounded-lg border border-white/[0.12] bg-transparent py-3 text-center text-[15px] font-semibold text-white hover:bg-white/[0.04]"
               onClick={closeMobile}
             >
               Sign In
             </Link>
             <Link
               href="/signup"
-              className="flex min-h-[48px] flex-col items-center justify-center rounded-xl py-3 shadow-[0_0_22px_rgba(54,231,161,0.38)] transition-[filter,box-shadow] duration-200 hover:brightness-110 hover:shadow-[0_0_20px_rgba(54,231,161,0.3)]"
+              className="flex min-h-[48px] items-center justify-center rounded-xl py-3 text-[15px] font-bold text-[#0a0d14] shadow-[0_0_28px_rgba(62,207,173,0.45)] transition-[filter,box-shadow] duration-200 hover:brightness-110 hover:shadow-[0_0_32px_rgba(62,207,173,0.5)]"
               style={{ background: BOOM, fontFamily: 'var(--font-body)' }}
               onClick={closeMobile}
             >
-              <span className="text-[15px] font-bold text-white">Start Free</span>
-              <span className="text-[12px] font-medium text-white/85" style={{ fontFamily: 'var(--font-body)' }}>
-                <span className="font-mono tabular-nums">$0</span> Forever
-              </span>
+              Import FB/Leagues
             </Link>
           </div>
         </div>

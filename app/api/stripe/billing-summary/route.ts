@@ -14,14 +14,9 @@ export async function GET() {
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('stripe_customer_id, is_paid, preference_data')
+    .select('stripe_customer_id, is_paid, subscription_tier')
     .eq('id', user.id)
     .single();
-
-  const pref =
-    profile?.preference_data && typeof profile.preference_data === 'object' && profile.preference_data !== null
-      ? (profile.preference_data as Record<string, unknown>)
-      : {};
 
   if (!profile?.is_paid) {
     return NextResponse.json({
@@ -35,8 +30,11 @@ export async function GET() {
     });
   }
 
-  const storedTier =
-    pref.subscription_tier === 'elite' ? ('elite' as const) : ('pro' as const);
+  const rawTier = (profile as { subscription_tier?: string } | null)?.subscription_tier;
+  const storedTier: 'pro' | 'elite' | 'all_pro_terminal' =
+    rawTier === 'all_pro_terminal' ? 'all_pro_terminal'
+    : rawTier === 'elite' ? 'elite'
+    : 'pro';
 
   if (!profile.stripe_customer_id) {
     return NextResponse.json({

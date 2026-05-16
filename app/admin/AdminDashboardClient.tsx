@@ -154,6 +154,62 @@ export default function AdminDashboardClient({
       logLine(`Seed FFIG: OK`);
     });
 
+  const seedPlayers = () =>
+    runAction('seedPlayers', async () => {
+      const res = await fetch('/api/admin/sync-players');
+      const body = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        toast.error(String((body as { error?: string }).error ?? 'Seed failed'));
+        logLine(`Seed Players: ✗`);
+        return;
+      }
+      toast.success('Players seeded');
+      logLine(`Seed Players: ${JSON.stringify(body)}`);
+    });
+
+  const syncSleeper = () =>
+    runAction('syncSleeper', async () => {
+      const res = await fetch('/api/sync/trigger');
+      const body = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        toast.error(String((body as { error?: string }).error ?? 'Sync failed'));
+        logLine(`Sync Sleeper: ✗`);
+        return;
+      }
+      toast.success('Sleeper synced');
+      logLine(`Sync Sleeper: ${JSON.stringify(body)}`);
+    });
+
+  const calculateTfo = () =>
+    runAction('tfo', async () => {
+      const res = await fetch('/api/onboarding/calculate-tfo', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({}),
+      });
+      const body = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        toast.error(String((body as { error?: string }).error ?? 'TFO failed'));
+        logLine(`Calculate TFO: ✗`);
+        return;
+      }
+      toast.success('TFO calculated');
+      logLine(`Calculate TFO: ${JSON.stringify(body)}`);
+    });
+
+  const runAllEngines = () =>
+    runAction('runEngines', async () => {
+      const res = await fetch('/api/admin/run-engines');
+      const body = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        toast.error(String((body as { error?: string }).error ?? 'Engine run failed'));
+        logLine(`Run All Engines: ✗`);
+        return;
+      }
+      toast.success('All engines complete');
+      logLine(`Run All Engines: ${JSON.stringify(body)}`);
+    });
+
   async function openProfile(id: string) {
     try {
       const res = await fetch(`/api/admin/user-profile?id=${encodeURIComponent(id)}`);
@@ -271,6 +327,10 @@ export default function AdminDashboardClient({
               onClick={triggerCron('calculate-bbv', 'BBV')}
             />
             <QuickAction title="Seed F-FIG Data" desc="Historical prospect rows" busy={busy['ffig']} onClick={seedFfig} />
+            <QuickAction title="Seed Players" desc="Sync all NFL players from Sleeper" busy={busy['seedPlayers']} onClick={seedPlayers} />
+            <QuickAction title="Sync Sleeper" desc="Sync leagues + rosters for current user" busy={busy['syncSleeper']} onClick={syncSleeper} />
+            <QuickAction title="Calculate TFO" desc="Run TFO engine for current user's roster" busy={busy['tfo']} onClick={calculateTfo} />
+            <QuickAction title="Run All Engines" desc="TFO → KTC → BVI in sequence" busy={busy['runEngines']} onClick={runAllEngines} />
           </div>
         </section>
 

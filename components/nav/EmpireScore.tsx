@@ -162,7 +162,7 @@ export default function EmpireScore({ sparklineData: sparklineProp, className }:
             letterSpacing: '0.12em',
           }}
         >
-          EMPIRE SCORE
+          DYNASTY POWER RATING
         </span>
 
         {/* Score value */}

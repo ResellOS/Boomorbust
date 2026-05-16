@@ -1,9 +1,9 @@
-'use client';
+﻿'use client';
 
 import { useInViewOnce } from '@/hooks/useInViewOnce';
 
 const BG = '#0a0d14';
-const BOOM = '#36E7A1';
+const BOOM = '#3ECFAD';
 const FEATURES = [
   'Multi-league portfolio view',
   'Performance data & analytics',
@@ -43,13 +43,13 @@ export default function LandingComparisonTable() {
           <ul className="flex flex-col gap-3">
             {FEATURES.map((f) => (
               <li key={f} className="flex items-center gap-3 text-[14px] text-white/90" style={{ fontFamily: 'var(--font-body)' }}>
-                <span className="shrink-0 font-bold" style={{ color: BOOM, filter: 'drop-shadow(0 0 6px rgba(54,231,161,0.45))' }}>✓</span>
+                <span className="shrink-0 font-bold" style={{ color: BOOM, filter: 'drop-shadow(0 0 6px rgba(62,207,173,0.45))' }}>✓</span>
                 {f}
               </li>
             ))}
           </ul>
           <div className="mt-6 border-t border-white/[0.06] pt-5">
-            <p className="font-mono text-[clamp(1.5rem,4vw,2rem)] font-bold tabular-nums" style={{ color: BOOM, textShadow: '0 0 20px rgba(54,231,161,0.3)' }}>
+            <p className="font-mono text-[clamp(1.5rem,4vw,2rem)] font-bold tabular-nums" style={{ color: BOOM, textShadow: '0 0 20px rgba(62,207,173,0.3)' }}>
               $0–$35<span className="text-[16px] font-normal text-white/50">/mo</span>
             </p>
             <p className="mt-1 text-[13px] text-[#64748B]" style={{ fontFamily: 'var(--font-body)' }}>

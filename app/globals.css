@@ -147,6 +147,20 @@ h3 {
   box-shadow: 0 0 15px #f59e0b;
 }
 
+@keyframes hero-metric-pulse {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 4px rgba(54, 231, 161, 0.45));
+  }
+  50% {
+    filter: drop-shadow(0 0 14px rgba(54, 231, 161, 0.85));
+  }
+}
+
+.hero-metric-pulse {
+  animation: hero-metric-pulse 4s ease-in-out infinite;
+}
+
 /* ── HUD glow + glass utilities (War Room theme) ─────────────────────────── */
 .glow-green {
   color: #36e7a1;

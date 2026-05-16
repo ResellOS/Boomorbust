@@ -1,5 +1,6 @@
 'use client';
 
+import React from 'react';
 import { useDashboardLeagueStore } from '@/store/dashboardLeagueStore';
 import EmpireScore from '@/components/nav/EmpireScore';
 import LeagueSidebar from '@/components/dashboard/LeagueSidebar';

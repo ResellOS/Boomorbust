@@ -98,23 +98,27 @@ export async function GET(request: Request) {
     for (const scoringType of SCORING_TYPES) {
       try {
         const result = calculateTFOScore(tfoInput);
+        const now = new Date().toISOString();
 
-        await supabase.from('tfo_cache').upsert(
-          {
-            player_id: playerId,
-            scoring_type: scoringType,
-            tfo_score: result.tfoScore,
-            grade: result.grade,
-            verdict: result.verdict,
-            flags: result.flags,
-            dms_score,
-            dms_tier,
-            calculated_at: new Date().toISOString(),
-          },
-          { onConflict: 'player_id,scoring_type' },
-        );
+        const { error } = await supabase.rpc('upsert_tfo_cache', {
+          p_player_id: playerId,
+          p_scoring_type: scoringType,
+          p_tfo_score: result.tfoScore,
+          p_ops_score: dms_score,
+          p_sfs_score: 50,
+          p_ffig_score: 50,
+          p_sit_score: 50,
+          p_irs_score: dms_tier === 'BOOM' ? 20 : dms_tier === 'FAVORABLE' ? 30 : dms_tier === 'TOUGH' ? 65 : dms_tier === 'BUST' ? 80 : 50,
+          p_grade: result.grade,
+          p_verdict: result.verdict,
+          p_calculated_at: now,
+        });
 
-        cached++;
+        if (error) {
+          errors++;
+        } else {
+          cached++;
+        }
       } catch {
         errors++;
       }

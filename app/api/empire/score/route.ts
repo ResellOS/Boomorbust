@@ -3,24 +3,13 @@ import { createClient } from '@/lib/supabase/server';
 
 export const dynamic = 'force-dynamic';
 
-// ─── grade / percentile lookup ───────────────────────────────────────────────
-
-interface GradeInfo {
-  grade: string;
-  percentile: string;
+function resolveGrade(score: number): string {
+  if (score >= 90) return 'Elite';
+  if (score >= 78) return 'Elite';
+  if (score >= 68) return 'High Value';
+  if (score >= 55) return 'Viable';
+  return 'Speculative';
 }
-
-function resolveGrade(score: number): GradeInfo {
-  if (score >= 90) return { grade: 'Elite',       percentile: 'Top 3%'  };
-  if (score >= 78) return { grade: 'Elite',       percentile: 'Top 8%'  };
-  if (score >= 68) return { grade: 'High Value',  percentile: 'Top 20%' };
-  if (score >= 55) return { grade: 'Viable',      percentile: 'Top 35%' };
-  return              { grade: 'Speculative', percentile: 'Top 50%' };
-}
-
-// ─── deterministic noise from userId ─────────────────────────────────────────
-// Gives each user a stable "activity score" component (0–25) without touching
-// live data that isn't built yet (KTC pipeline, TFO cache).
 
 function seededFloat(seed: string, index: number): number {
   let h = 2166136261;
@@ -28,50 +17,99 @@ function seededFloat(seed: string, index: number): number {
     h ^= seed.charCodeAt(i) + index * 31;
     h = Math.imul(h, 16777619);
   }
-  return (h >>> 0) / 0xffffffff; // 0..1
+  return (h >>> 0) / 0xffffffff;
 }
 
-function buildScore(userId: string, leagueCount: number): number {
-  // Base: 55 — average connected dynasty manager
-  // League breadth: up to +20 (caps at 8 leagues)
-  // Dynasty activity seed: up to +25 (stable per-user, changes each index)
-  const base          = 55;
-  const leaguePts     = Math.min(leagueCount * 2.5, 20);
-  const activityPts   = seededFloat(userId, 0) * 25;
-  const raw           = base + leaguePts + activityPts;
-  return Math.min(99.9, Math.max(40, parseFloat(raw.toFixed(1))));
+function fallbackScore(userId: string, leagueCount: number): number {
+  const base       = 55;
+  const leaguePts  = Math.min(leagueCount * 2.5, 20);
+  const activityPts = seededFloat(userId, 0) * 25;
+  return Math.min(99.9, Math.max(40, parseFloat((base + leaguePts + activityPts).toFixed(1))));
 }
-
-function buildSparkline(userId: string, score: number): number[] {
-  // 7 weekly data points trending toward current score
-  // Earlier weeks start lower and vary slightly
-  return Array.from({ length: 7 }, (_, i) => {
-    const progress  = i / 6;                                    // 0→1
-    const trendBase = score * (0.70 + progress * 0.30);         // ramps to score
-    const noise     = (seededFloat(userId, i + 1) - 0.5) * 8;  // ±4 jitter
-    return parseFloat(Math.min(100, Math.max(20, trendBase + noise)).toFixed(1));
-  });
-}
-
-// ─── route ───────────────────────────────────────────────────────────────────
 
 export async function GET() {
   const supabase = createClient();
 
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-  const { data: leagues } = await supabase
+  // Get sleeper_user_id for roster matching
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('sleeper_user_id')
+    .eq('id', user.id)
+    .maybeSingle();
+
+  const sleeperUserId = profile?.sleeper_user_id ? String(profile.sleeper_user_id) : null;
+
+  // Get user's leagues
+  const { data: leagueRows } = await supabase
     .from('leagues')
     .select('id')
     .eq('user_id', user.id);
 
-  const leagueCount = leagues?.length ?? 0;
-  const score       = buildScore(user.id, leagueCount);
-  const sparkline   = buildSparkline(user.id, score);
-  const { grade, percentile } = resolveGrade(score);
+  const leagueIds = (leagueRows ?? []).map((l) => String(l.id));
 
-  return NextResponse.json({ score, grade, percentile, sparklineData: sparkline });
+  let score: number;
+  const tfoScores: number[] = [];
+
+  if (sleeperUserId && leagueIds.length > 0) {
+    // Get all roster player IDs for this user
+    const { data: rosters } = await supabase
+      .from('rosters')
+      .select('players')
+      .in('league_id', leagueIds)
+      .eq('owner_id', sleeperUserId);
+
+    const playerIds = new Set<string>();
+    for (const roster of rosters ?? []) {
+      for (const pid of (roster.players as string[] | null) ?? []) {
+        playerIds.add(pid);
+      }
+    }
+
+    if (playerIds.size > 0) {
+      const { data: tfoRows } = await supabase
+        .from('tfo_cache')
+        .select('tfo_score')
+        .in('player_id', Array.from(playerIds))
+        .not('tfo_score', 'is', null);
+
+      for (const row of tfoRows ?? []) {
+        const s = Number(row.tfo_score);
+        if (Number.isFinite(s) && s > 0) tfoScores.push(s);
+      }
+    }
+  }
+
+  if (tfoScores.length > 0) {
+    const avg = tfoScores.reduce((sum, s) => sum + s, 0) / tfoScores.length;
+    score = Math.min(99.9, Math.max(40, parseFloat(avg.toFixed(1))));
+  } else {
+    score = fallbackScore(user.id, leagueIds.length);
+  }
+
+  const tier =
+    score >= 85 ? 'ELITE'
+    : score >= 70 ? 'HIGH VALUE'
+    : score >= 55 ? 'VIABLE'
+    : 'SPECULATIVE';
+
+  const percentile =
+    score >= 80 ? 'Top 10%'
+    : score >= 65 ? 'Top 35%'
+    : score >= 50 ? 'Top 65%'
+    : 'Bottom 35%';
+
+  const grade = resolveGrade(score);
+
+  // Stable sparkline — 7 days trending to current score
+  const sparklineData = Array.from({ length: 7 }, (_, i) => {
+    const progress  = i / 6;
+    const base      = score * (0.70 + progress * 0.30);
+    const noise     = (seededFloat(user.id, i + 1) - 0.5) * 8;
+    return parseFloat(Math.min(100, Math.max(20, base + noise)).toFixed(1));
+  });
+
+  return NextResponse.json({ score, grade, tier, percentile, sparklineData });
 }

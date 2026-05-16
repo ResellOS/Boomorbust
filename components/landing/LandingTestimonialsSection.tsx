@@ -1,9 +1,9 @@
-'use client';
+﻿'use client';
 
 import { useInViewOnce } from '@/hooks/useInViewOnce';
 
 const BG = '#0a0d14';
-const BOOM = '#36E7A1';
+const BOOM = '#3ECFAD';
 const MUTED = '#64748B';
 
 const GLASS =
@@ -63,7 +63,7 @@ export default function LandingTestimonialsSection() {
               <div className="flex items-start gap-3">
                 <div
                   className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-white/[0.1] font-mono text-[13px] font-bold text-white/90"
-                  style={{ background: 'rgba(54,231,161,0.12)', boxShadow: '0 0 16px rgba(54,231,161,0.2)' }}
+                  style={{ background: 'rgba(62,207,173,0.12)', boxShadow: '0 0 16px rgba(62,207,173,0.2)' }}
                   aria-hidden
                 >
                   {c.initials}
@@ -85,7 +85,7 @@ export default function LandingTestimonialsSection() {
                 style={{
                   fontFamily: 'var(--font-body)',
                   background: BOOM,
-                  boxShadow: '0 0 14px rgba(54,231,161,0.35)',
+                  boxShadow: '0 0 14px rgba(62,207,173,0.35)',
                 }}
               >
                 {c.badge}

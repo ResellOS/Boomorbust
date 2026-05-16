@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
 import { triggerAutoSync } from '@/lib/sync/autoSync';
@@ -55,9 +56,17 @@ export default function LoginPage() {
             </div>
 
             <div>
-              <label className="block text-sm text-text-secondary mb-1.5">
-                Password
-              </label>
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="block text-sm text-text-secondary">
+                  Password
+                </label>
+                <Link
+                  href="/auth/forgot-password"
+                  className="text-[11px] text-[#64748B] hover:text-[#22D3EE] transition"
+                >
+                  Forgot password?
+                </Link>
+              </div>
               <input
                 type="password"
                 value={password}

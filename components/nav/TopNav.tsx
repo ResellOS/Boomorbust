@@ -168,7 +168,7 @@ function NavEmpireWidget() {
           className="text-[10px] uppercase tracking-widest leading-none text-[#64748B]"
           style={{ fontFamily: 'var(--font-mono), JetBrains Mono, monospace' }}
         >
-          EMPIRE SCORE
+          DYNASTY POWER RATING
         </span>
         <span
           className="text-[24px] font-bold leading-none tabular-nums text-[#36E7A1]"

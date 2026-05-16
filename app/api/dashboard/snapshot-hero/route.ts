@@ -9,7 +9,7 @@ export const revalidate = 0;
 
 /** Lightweight payload so empire + portfolio headline can render before the full snapshot finishes. */
 export interface DashboardHeroSnapshot {
-  userTier: 'free' | 'pro' | 'elite';
+  userTier: 'free' | 'pro' | 'elite' | 'all_pro_terminal';
   week: number;
   empire: {
     score: number;
@@ -30,7 +30,7 @@ export async function GET() {
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   const [{ data: profile }, { data: leagueRows }] = await Promise.all([
-    supabase.from('profiles').select('sleeper_user_id, is_paid, preference_data').eq('id', user.id).maybeSingle(),
+    supabase.from('profiles').select('sleeper_user_id, is_paid, subscription_tier').eq('id', user.id).maybeSingle(),
     supabase
       .from('leagues')
       .select('id, name, season, total_rosters')
@@ -41,13 +41,11 @@ export async function GET() {
   const leagues = leagueRows ?? [];
   const ownerSid = profile?.sleeper_user_id ? String(profile.sleeper_user_id) : null;
 
-  const pref =
-    profile?.preference_data && typeof profile.preference_data === 'object' && profile.preference_data !== null
-      ? (profile.preference_data as Record<string, unknown>)
-      : {};
-  let userTier: 'free' | 'pro' | 'elite' = 'free';
-  if (pref.subscription_tier === 'elite') userTier = 'elite';
-  else if (profile?.is_paid) userTier = 'pro';
+  let userTier: 'free' | 'pro' | 'elite' | 'all_pro_terminal' = 'free';
+  const rawTier = (profile as { subscription_tier?: string } | null)?.subscription_tier;
+  if (rawTier === 'all_pro_terminal') userTier = 'all_pro_terminal';
+  else if (rawTier === 'elite') userTier = 'elite';
+  else if (rawTier === 'pro' || profile?.is_paid) userTier = 'pro';
 
   if (!leagues.length) {
     return NextResponse.json(

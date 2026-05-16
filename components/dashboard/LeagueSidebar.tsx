@@ -10,36 +10,6 @@ const BOOM = '#36E7A1';
 const INACTIVE = '#94A3B8';
 const BORDER_COLOR = 'rgba(255,255,255,0.06)';
 
-// ─── Section header ───────────────────────────────────────────────────────────
-
-function SectionHeader({ label }: { label: string }) {
-  return (
-    <p
-      className="uppercase tracking-widest mb-2 px-3 leading-none"
-      style={{
-        fontFamily: 'var(--font-body), Inter, sans-serif',
-        fontSize: 10,
-        color: '#64748B',
-        letterSpacing: '0.12em',
-      }}
-    >
-      {label}
-    </p>
-  );
-}
-
-// ─── Divider ──────────────────────────────────────────────────────────────────
-
-function Divider() {
-  return (
-    <div
-      className="my-3 mx-3"
-      style={{ height: 1, background: BORDER_COLOR }}
-      aria-hidden
-    />
-  );
-}
-
 // ─── League item ─────────────────────────────────────────────────────────────
 
 function LeagueItem({
@@ -89,25 +59,11 @@ function SidebarSkeleton() {
   const rows = [5, 7, 6, 5, 8, 6, 5, 7, 6, 5];
   return (
     <div className="px-3 py-4 flex flex-col gap-1" aria-hidden aria-label="Loading leagues">
-      {/* section header */}
-      <div className="h-2 w-16 rounded mb-2 animate-pulse bg-white/[0.08]" />
-      {/* "All Leagues" item */}
       <div className="h-8 w-full rounded animate-pulse bg-white/[0.06]" />
-      <Divider />
-      <div className="h-2 w-20 rounded mb-2 animate-pulse bg-white/[0.08]" />
-      {rows.slice(0, 6).map((w, i) => (
+      {rows.map((w, i) => (
         <div
           key={i}
           className="h-8 rounded animate-pulse bg-white/[0.05]"
-          style={{ width: `${w * 10}%` }}
-        />
-      ))}
-      <Divider />
-      <div className="h-2 w-24 rounded mb-2 animate-pulse bg-white/[0.08]" />
-      {rows.slice(6).map((w, i) => (
-        <div
-          key={i}
-          className="h-8 rounded animate-pulse bg-white/[0.04]"
           style={{ width: `${w * 10}%` }}
         />
       ))}
@@ -169,11 +125,9 @@ export default function LeagueSidebar({ className }: LeagueSidebarProps) {
       {loading ? (
         <SidebarSkeleton />
       ) : (
-        <div className="px-3 py-4 flex flex-col">
+        <div className="px-3 py-4 flex flex-col gap-0.5">
 
-          {/* ── ALL LEAGUES section ──────────────────────────────── */}
-          <SectionHeader label="All Leagues" />
-
+          {/* All Leagues */}
           <LeagueItem
             id="all"
             label="All Leagues"
@@ -181,42 +135,19 @@ export default function LeagueSidebar({ className }: LeagueSidebarProps) {
             onClick={() => setActiveLeagueId('all')}
           />
 
-          {/* ── MY LEAGUES section ───────────────────────────────── */}
-          {myLeagues.length > 0 && (
-            <>
-              <Divider />
-              <SectionHeader label="My Leagues" />
-              {myLeagues.map((lg) => (
-                <LeagueItem
-                  key={lg.id}
-                  id={lg.id}
-                  label={lg.name}
-                  active={activeLeagueId === lg.id}
-                  onClick={() => setActiveLeagueId(lg.id)}
-                />
-              ))}
-            </>
-          )}
-
-          {/* ── OTHER LEAGUES section (conditional) ─────────────── */}
-          {otherLeagues.length > 0 && (
-            <>
-              <Divider />
-              <SectionHeader label="Other Leagues" />
-              {otherLeagues.map((lg) => (
-                <LeagueItem
-                  key={lg.id}
-                  id={lg.id}
-                  label={lg.name}
-                  active={activeLeagueId === lg.id}
-                  onClick={() => setActiveLeagueId(lg.id)}
-                />
-              ))}
-            </>
-          )}
+          {/* All user leagues — flat list, no section headers */}
+          {[...myLeagues, ...otherLeagues].map((lg) => (
+            <LeagueItem
+              key={lg.id}
+              id={lg.id}
+              label={lg.name}
+              active={activeLeagueId === lg.id}
+              onClick={() => setActiveLeagueId(lg.id)}
+            />
+          ))}
 
           {/* Empty state */}
-          {!loading && myLeagues.length === 0 && otherLeagues.length === 0 && (
+          {myLeagues.length === 0 && otherLeagues.length === 0 && (
             <p
               className="px-3 text-[12px] text-slate-600 mt-4"
               style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}

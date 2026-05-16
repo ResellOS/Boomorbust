@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useInViewOnce } from '@/hooks/useInViewOnce';
 
@@ -17,7 +17,7 @@ export default function LandingDynastyStatsSection() {
   return (
     <section
       className="border-y border-emerald-500/15 py-20 sm:py-24"
-      style={{ background: 'rgba(54,231,161,0.04)' }}
+      style={{ background: 'rgba(62,207,173,0.04)' }}
     >
       <div ref={ref} className={`landing-reveal-up mx-auto max-w-[1100px] px-4 sm:px-6 lg:px-10 ${inView ? 'landing-reveal-up--in' : ''}`}>
         <h2
@@ -46,8 +46,8 @@ export default function LandingDynastyStatsSection() {
               Verified <span style={{ color: '#22D3EE' }}>✓</span>
             </p>
             <p
-              className="font-mono text-[clamp(1.75rem,5vw,2.5rem)] font-bold leading-none tabular-nums text-[#36E7A1]"
-              style={{ textShadow: '0 0 28px rgba(54,231,161,0.35)' }}
+              className="font-mono text-[clamp(1.75rem,5vw,2.5rem)] font-bold leading-none tabular-nums text-[#3ECFAD]"
+              style={{ textShadow: '0 0 28px rgba(62,207,173,0.35)' }}
             >
               42-18-2
             </p>
@@ -59,8 +59,8 @@ export default function LandingDynastyStatsSection() {
             </p>
           </article>
 
-          <article className="rounded-xl border border-white/[0.08] bg-white/[0.03] p-6 backdrop-blur-[24px] sm:p-8" style={{ boxShadow: '0 0 24px rgba(167,139,250,0.18)' }}>
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-[#A78BFA]/40 text-[#A78BFA]" style={{ boxShadow: '0 0 18px rgba(167,139,250,0.35)' }} aria-hidden>
+          <article className="rounded-xl border border-white/[0.08] bg-white/[0.03] p-6 backdrop-blur-[24px] sm:p-8" style={{ boxShadow: '0 0 24px rgba(139,92,246,0.18)' }}>
+            <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-[#8B5CF6]/40 text-[#8B5CF6]" style={{ boxShadow: '0 0 18px rgba(139,92,246,0.35)' }} aria-hidden>
               <svg width={26} height={26} viewBox="0 0 24 24" fill="none">
                 <path d="M12 15a3 3 0 100-6 3 3 0 000 6z" stroke="currentColor" strokeWidth={1.5} />
                 <path
@@ -70,7 +70,7 @@ export default function LandingDynastyStatsSection() {
                 />
               </svg>
             </div>
-            <p className="mt-4 text-[13px] font-bold uppercase tracking-[0.12em] text-[#A78BFA]" style={{ fontFamily: 'var(--font-body)' }}>
+            <p className="mt-4 text-[13px] font-bold uppercase tracking-[0.12em] text-[#8B5CF6]" style={{ fontFamily: 'var(--font-body)' }}>
               Refinement Feedback Loop
             </p>
             <p className="mt-2 text-[13px] leading-relaxed text-[#94A3B8]" style={{ fontFamily: 'var(--font-body)' }}>

@@ -1,240 +1,222 @@
-'use client';
+﻿'use client';
 
-import { useEffect, useState } from 'react';
-import Image from 'next/image';
-import { clsx } from 'clsx';
+import { useEffect, useMemo, useState } from 'react';
 
-const SECTIONS = ['dash', 'portfolio', 'rankings'] as const;
+const CHROME = '#1a1d2a';
+const BOOM = '#3ECFAD';
+const CYAN = '#22D3EE';
+const PURPLE = '#8B5CF6';
 
-export default function HeroMockup() {
-  const [section, setSection] = useState(0);
-  const [fade, setFade] = useState(true);
+function easeOutCubic(t: number) {
+  return 1 - (1 - t) ** 3;
+}
 
+function useCountUp(target: number, durationMs: number, decimals: number) {
+  const [v, setV] = useState(0);
   useEffect(() => {
-    const t = setInterval(() => {
-      setFade(false);
-      setTimeout(() => {
-        setSection((s) => (s + 1) % SECTIONS.length);
-        setFade(true);
-      }, 300);
-    }, 4000);
-    return () => clearInterval(t);
-  }, []);
+    let start: number | null = null;
+    let raf = 0;
+    const tick = (now: number) => {
+      if (start === null) start = now;
+      const t = Math.min(1, (now - start) / durationMs);
+      const eased = t >= 1 ? 1 : easeOutCubic(t);
+      setV(target * eased);
+      if (t < 1) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [target, durationMs]);
+  const formatted = useMemo(() => {
+    if (decimals <= 0) return String(Math.round(v));
+    return v.toFixed(decimals);
+  }, [v, decimals]);
+  return formatted;
+}
 
+function pentagonPoints(cx: number, cy: number, r: number, vals: number[]): string {
+  const n = 5;
+  const pts: string[] = [];
+  for (let i = 0; i < n; i++) {
+    const angle = -Math.PI / 2 + (i * 2 * Math.PI) / n;
+    const rr = r * vals[i];
+    pts.push(`${cx + rr * Math.cos(angle)},${cy + rr * Math.sin(angle)}`);
+  }
+  return pts.join(' ');
+}
+
+function MiniPentagon({
+  vals,
+  stroke,
+  visible,
+}: {
+  vals: number[];
+  stroke: string;
+  visible: boolean;
+}) {
+  const cx = 50;
+  const cy = 52;
+  const r = 36;
+  const outer = pentagonPoints(cx, cy, r, [1, 1, 1, 1, 1]);
+  const inner = pentagonPoints(cx, cy, r, vals);
   return (
-    <div
-      className="relative card-lg overflow-hidden animate-float"
-      style={{
-        boxShadow:
-          '0 40px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(99,102,241,0.1), 0 0 120px rgba(99,102,241,0.08)',
-        background: 'var(--bg-card)',
-      }}
-    >
-      <div
-        className="flex items-center justify-between px-4 py-3 border-b"
-        style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border)' }}
-      >
-        <div className="flex gap-1.5 items-center">
-          <span className="w-2.5 h-2.5 rounded-full bg-red-500/80" />
-          <span className="w-2.5 h-2.5 rounded-full bg-amber-400/90" />
-          <span className="w-2.5 h-2.5 rounded-full bg-green-500/80" />
-        </div>
-        <p className="text-xs sm:text-sm text-[var(--text-secondary)] text-center flex-1 truncate px-2">
-          Good morning, Champ 👑 <span className="text-[var(--text-muted)]">·</span> Week 8 · 6 leagues synced
-        </p>
-        <div className="flex items-center gap-2 text-[var(--text-muted)]">
-          <span className="text-xs hidden sm:inline">All Leagues (6) ▾</span>
-          <span className="text-sm">⚙</span>
-        </div>
-      </div>
-
-      <div
-        className={clsx(
-          'p-4 min-h-[340px] transition-opacity duration-300',
-          fade ? 'opacity-100' : 'opacity-0'
-        )}
-      >
-        {SECTIONS[section] === 'dash' && <MockDash />}
-        {SECTIONS[section] === 'portfolio' && <MockPortfolio />}
-        {SECTIONS[section] === 'rankings' && <MockRankings />}
-      </div>
-
-      <div className="flex justify-center gap-2 pb-4">
-        {SECTIONS.map((_, i) => (
-          <button
-            key={i}
-            type="button"
-            aria-label={`View section ${i + 1}`}
-            onClick={() => {
-              setFade(false);
-              setTimeout(() => {
-                setSection(i);
-                setFade(true);
-              }, 250);
-            }}
-            className={clsx(
-              'h-2 rounded-full transition-all',
-              section === i ? 'w-6 bg-[var(--indigo)]' : 'w-2 bg-[var(--text-muted)]'
-            )}
-          />
-        ))}
-      </div>
-    </div>
+    <svg viewBox="0 0 100 104" className="mx-auto h-16 w-full max-w-[88px]" aria-hidden>
+      <polygon points={outer} fill="rgba(255,255,255,0.02)" stroke="rgba(255,255,255,0.1)" strokeWidth={1} />
+      <polygon
+        points={inner}
+        fill={`${stroke}18`}
+        stroke={stroke}
+        strokeWidth={1.25}
+        style={{
+          opacity: visible ? 1 : 0,
+          transform: visible ? 'scale(1)' : 'scale(0.8)',
+          transformOrigin: '50px 52px',
+          transition: 'opacity 0.45s ease-out, transform 0.45s ease-out',
+          filter: visible ? `drop-shadow(0 0 6px ${stroke}55)` : 'none',
+        }}
+      />
+    </svg>
   );
 }
 
-function MockDash() {
+const PLAYERS = [
+  { name: "Ja'Marr Chase", line: 'WR · CIN', posColor: CYAN, vals: [0.92, 0.88, 0.9, 0.94, 0.86], score: 92 },
+  { name: 'Bijan Robinson', line: 'RB · ATL', posColor: BOOM, vals: [0.9, 0.92, 0.85, 0.88, 0.9], score: 88 },
+  { name: 'CeeDee Lamb', line: 'WR · DAL', posColor: CYAN, vals: [0.9, 0.87, 0.88, 0.91, 0.85], score: 90 },
+  { name: 'Sam LaPorta', line: 'TE · DET', posColor: PURPLE, vals: [0.72, 0.68, 0.7, 0.74, 0.66], score: 82 },
+] as const;
+
+const TITLE = 'Good Morning, Champ! 🏆';
+
+export default function HeroMockup() {
+  const empire = useCountUp(52.4, 1500, 1);
+  const trade = useCountUp(18.4, 1800, 1);
+  const winPct = useCountUp(78, 1600, 0);
+
+  const [chartOn, setChartOn] = useState<boolean[]>(() => PLAYERS.map(() => false));
+  useEffect(() => {
+    const timers = PLAYERS.map((_, i) =>
+      window.setTimeout(() => {
+        setChartOn((prev) => {
+          const next = [...prev];
+          next[i] = true;
+          return next;
+        });
+      }, 200 * i),
+    );
+    return () => timers.forEach(clearTimeout);
+  }, []);
+
+  const [cursorOn, setCursorOn] = useState(true);
+  useEffect(() => {
+    const t = window.setTimeout(() => setCursorOn(false), 2000);
+    return () => clearTimeout(t);
+  }, []);
+
   return (
-    <div className="space-y-4">
-      <div className="grid grid-cols-2 gap-3">
-        <div className="card-sm p-3 border border-green-500/20">
-          <p className="text-[10px] uppercase tracking-widest text-[var(--text-muted)]">Week 8 Lineup Edge</p>
-          <p className="display text-[36px] text-green-400 leading-none my-2">+18.4</p>
-          <svg viewBox="0 0 80 28" className="w-full h-7">
-            <path
-              d="M0 20 L15 14 L30 18 L45 8 L60 12 L80 4"
-              fill="none"
-              stroke="#34d399"
-              strokeWidth="2"
-            />
-          </svg>
-          <p className="text-[11px] text-[var(--text-muted)] mt-1">vs optimal lineups</p>
-          <span className="inline-block mt-2 text-[10px] font-semibold px-2 py-0.5 rounded bg-green-500/15 text-green-400">
-            ↑ Projected edge
-          </span>
+    <div className="bg-[#0a0d14]">
+      {/* Browser chrome */}
+      <div className="flex items-center gap-3 border-b border-white/[0.06] px-3 py-2.5 sm:px-4" style={{ background: CHROME }}>
+        <div className="flex shrink-0 gap-1.5" aria-hidden>
+          <span className="h-2.5 w-2.5 rounded-full bg-[#FF5F57]" />
+          <span className="h-2.5 w-2.5 rounded-full bg-[#FEBC2E]" />
+          <span className="h-2.5 w-2.5 rounded-full bg-[#28C840]" />
         </div>
-        <div className="card-sm p-3 border border-red-500/25">
-          <p className="text-[10px] font-bold text-red-400 flex items-center gap-1">⊗ TRADE ALERT</p>
-          <p className="text-[11px] text-[var(--text-secondary)] mt-1">You&apos;re overpaying by</p>
-          <p className="display text-[36px] text-red-400 leading-none">22%</p>
-          <p className="text-xs text-white">For James Conner</p>
-          <div className="flex gap-2 mt-2 text-[10px]">
-            <span className="bg-white/5 rounded px-2 py-1">A. St.Brown WR</span>
-            <span className="text-[var(--text-muted)]">vs</span>
-            <span className="bg-white/5 rounded px-2 py-1">J. Conner RB</span>
-          </div>
-          <button type="button" className="mt-2 text-[11px] font-bold text-[var(--indigo)]">
-            View Trade
-          </button>
+        <div className="min-w-0 flex-1 rounded-md border border-white/[0.08] bg-black/30 px-3 py-1.5 text-center">
+          <span className="truncate font-mono text-[11px] text-white/50 sm:text-[12px]">boomorbust.app/dashboard</span>
         </div>
       </div>
-      <div>
-        <p className="text-xs text-[var(--text-muted)] mb-2">League overview · 8 of 8 synced</p>
-        <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-thin">
-          {['North Star', 'Bloodbath', 'Dynasty Dogs', 'Win Now'].map((n, i) => (
+
+      <div className="space-y-4 p-3 sm:space-y-5 sm:p-5">
+        <div className="text-center">
+          <h2 className="inline-flex items-center justify-center gap-0.5 text-[12px] font-semibold text-white sm:text-[13px]" style={{ fontFamily: 'var(--font-body)' }}>
+            <span>{TITLE}</span>
+            {cursorOn ? (
+              <span className="ml-0.5 inline-block h-4 w-px animate-pulse bg-[#3ECFAD]" aria-hidden />
+            ) : null}
+          </h2>
+          <p className="mt-1 font-mono text-[10px] text-white/40 sm:text-[11px]">
+            <span className="tabular-nums">Week 8</span>
+            <span> · </span>
+            <span className="tabular-nums">6</span> of <span className="tabular-nums">9</span> matchups
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 gap-2 sm:grid-cols-3 sm:gap-3">
+          <div className="rounded-xl border border-white/[0.08] bg-white/[0.03] px-3 py-3 backdrop-blur-[24px]">
+            <div className="text-[9px] font-semibold uppercase tracking-[0.14em] text-white/45" style={{ fontFamily: 'var(--font-body)' }}>
+              Empire Score
+            </div>
             <div
-              key={n}
-              className="flex items-center gap-2 shrink-0 rounded-lg px-3 py-2 bg-[var(--bg-surface)] border border-[var(--border)]"
+              className="hero-metric-pulse mt-1 font-mono text-[clamp(1.25rem,4vw,1.75rem)] font-bold tabular-nums text-[#3ECFAD]"
+              style={{ textShadow: '0 0 20px rgba(62,207,173,0.35)' }}
             >
-              <div className="w-7 h-7 rounded-full bg-indigo-500/30" />
-              <div>
-                <p className="text-xs font-semibold text-white whitespace-nowrap">{n}</p>
-                <p className="text-[10px] text-[var(--text-muted)]">
-                  {(5 + i) % 3}-{10 - i} · #{((i % 4) + 1) as 1 | 2 | 3 | 4}
-                </p>
+              {empire}
+            </div>
+          </div>
+          <div className="rounded-xl border border-white/[0.08] bg-white/[0.03] px-3 py-3 backdrop-blur-[24px]">
+            <div className="text-[9px] font-semibold uppercase tracking-[0.14em] text-white/45" style={{ fontFamily: 'var(--font-body)' }}>
+              Trade Edge
+            </div>
+            <div
+              className="hero-metric-pulse mt-1 font-mono text-[clamp(1.25rem,4vw,1.75rem)] font-bold tabular-nums text-[#3ECFAD]"
+              style={{ textShadow: '0 0 20px rgba(62,207,173,0.35)' }}
+            >
+              +{trade}
+            </div>
+          </div>
+          <div className="rounded-xl border border-white/[0.08] bg-white/[0.03] px-3 py-3 backdrop-blur-[24px]">
+            <div className="text-[9px] font-semibold uppercase tracking-[0.14em] text-white/45" style={{ fontFamily: 'var(--font-body)' }}>
+              Win Probability
+            </div>
+            <div
+              className="hero-metric-pulse mt-1 font-mono text-[clamp(1.25rem,4vw,1.75rem)] font-bold tabular-nums text-[#3ECFAD]"
+              style={{ textShadow: '0 0 20px rgba(62,207,173,0.35)' }}
+            >
+              {winPct}%
+            </div>
+          </div>
+        </div>
+
+        <div className="flex flex-wrap items-center justify-between gap-2 border-t border-white/[0.06] pt-3">
+          <span className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/50" style={{ fontFamily: 'var(--font-body)' }}>
+            Your top players
+          </span>
+          <span className="text-[10px] font-semibold text-[#22D3EE]" style={{ fontFamily: 'var(--font-body)' }}>
+            View roster →
+          </span>
+        </div>
+
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-3">
+          {PLAYERS.map((p, i) => (
+            <div
+              key={p.name}
+              className="rounded-xl border border-white/[0.08] bg-white/[0.03] px-2 pb-3 pt-2 backdrop-blur-[24px]"
+              style={{ boxShadow: '0 0 18px rgba(62,207,173,0.06)' }}
+            >
+              <div className="mb-2 flex items-start gap-1.5">
+                <div
+                  className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-white/10 font-mono text-[9px] font-bold text-white/85"
+                  style={{ background: `${p.posColor}22` }}
+                >
+                  {p.name
+                    .split(' ')
+                    .map((w) => w[0])
+                    .join('')
+                    .slice(0, 2)}
+                </div>
+                <div className="min-w-0 leading-tight">
+                  <div className="truncate text-[10px] font-semibold text-white" style={{ fontFamily: 'var(--font-body)' }}>
+                    {p.name}
+                  </div>
+                  <div className="truncate font-mono text-[9px] text-white/45">{p.line}</div>
+                </div>
               </div>
+              <MiniPentagon vals={[...p.vals]} stroke={p.posColor} visible={chartOn[i] ?? false} />
+              <div className="mt-1 text-center font-mono text-[15px] font-semibold tabular-nums text-white">{p.score}</div>
             </div>
           ))}
         </div>
       </div>
-    </div>
-  );
-}
-
-function MockPortfolio() {
-  return (
-    <div className="grid md:grid-cols-2 gap-4">
-      <div className="card-sm p-4 border border-[var(--border)]">
-        <p className="text-xs font-bold text-[var(--text-secondary)] mb-3">Portfolio exposure</p>
-        <div className="space-y-3 text-sm">
-          <div>
-            <div className="flex justify-between text-[11px] mb-1">
-              <span className="text-white">Bijan Robinson</span>
-              <span className="text-red-400">4/6 leagues</span>
-            </div>
-            <div className="h-1.5 rounded-full bg-[var(--bg-surface)]">
-              <div className="h-full rounded-full bg-red-500/60" style={{ width: '80%' }} />
-            </div>
-          </div>
-          <div>
-            <div className="flex justify-between text-[11px] mb-1">
-              <span className="text-white">CeeDee Lamb</span>
-              <span className="text-amber-400">3/6 leagues</span>
-            </div>
-            <div className="h-1.5 rounded-full bg-[var(--bg-surface)]">
-              <div className="h-full w-[55%] rounded-full bg-amber-500/50" />
-            </div>
-          </div>
-          <p className="text-[11px] text-amber-400 border border-amber-500/30 rounded px-2 py-1 inline-block">
-            ⚠ High concentration risk
-          </p>
-        </div>
-      </div>
-      <div className="card-sm p-4 border border-[var(--border)]">
-        <p className="text-xs font-bold text-[var(--indigo)] mb-2 flex items-center gap-1">
-          <span>✦</span> Dynasty Analyst
-        </p>
-        <div className="space-y-2 text-[11px]">
-          <div className="bg-[var(--indigo)] rounded-lg px-3 py-2 text-white rounded-tr-sm max-w-[92%] ml-auto">
-            Should I sell Bijan?
-          </div>
-          <div className="bg-[var(--bg-surface)] border border-[var(--border)] rounded-lg px-3 py-2 text-[var(--text-secondary)] rounded-tl-sm">
-            Yes — you&apos;re rebuilding and he&apos;s concentrated across 4/6 leagues. Sell into win-now contenders.
-          </div>
-          <div className="flex gap-1 pl-2 pt-1">
-            <span className="w-1.5 h-1.5 rounded-full bg-[var(--text-muted)] animate-bounce" style={{ animationDelay: '0ms' }} />
-            <span className="w-1.5 h-1.5 rounded-full bg-[var(--text-muted)] animate-bounce" style={{ animationDelay: '120ms' }} />
-            <span className="w-1.5 h-1.5 rounded-full bg-[var(--text-muted)] animate-bounce" style={{ animationDelay: '240ms' }} />
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-const DEMO_IDS = ['4046', '6794', '7564'] as const;
-
-function MockRankings() {
-  return (
-    <div className="text-[11px]">
-      <div className="grid grid-cols-[1fr_32px_40px_52px_48px_56px] gap-2 text-[var(--text-muted)] uppercase tracking-wide text-[9px] mb-2 border-b border-[var(--border)] pb-2">
-        <span>Player</span>
-        <span>Age</span>
-        <span>PPG</span>
-        <span>BBV</span>
-        <span>KTC</span>
-        <span>Signal</span>
-      </div>
-      {[
-        { id: DEMO_IDS[0], name: 'D. Adams', pos: 'WR', age: 32, ppg: 14.2, v: 4200 },
-        { id: DEMO_IDS[1], name: 'J. Jefferson', pos: 'WR', age: 26, ppg: 17.8, v: 8900 },
-        { id: DEMO_IDS[2], name: 'C. Lamb', pos: 'WR', age: 26, ppg: 16.4, v: 7200 },
-      ].map((r) => (
-        <div
-          key={r.id}
-          className="grid grid-cols-[1fr_32px_40px_52px_48px_56px] gap-2 items-center py-2 border-b border-[var(--border)]"
-        >
-          <div className="flex items-center gap-2 min-w-0">
-            <Image
-              src={`https://sleepercdn.com/content/nfl/players/${r.id}.jpg`}
-              width={28}
-              height={28}
-              alt=""
-              className="rounded-full object-cover border border-[var(--border)]"
-              unoptimized
-            />
-            <span className="text-white truncate font-medium">{r.name}</span>
-            <span className="text-[9px] px-1 rounded bg-blue-500/15 text-blue-300 shrink-0">{r.pos}</span>
-          </div>
-          <span>{r.age}</span>
-          <span>{r.ppg}</span>
-          <span className="text-cyan-300">{r.v}</span>
-          <span className="text-[var(--text-muted)]">–</span>
-          <span className="text-[10px] font-bold text-green-400 border border-green-500/30 rounded px-1.5 py-0.5 text-center">
-            HOLD
-          </span>
-        </div>
-      ))}
     </div>
   );
 }

@@ -81,8 +81,10 @@ export async function GET() {
     supabase.from('leagues').select('id, name, total_rosters, scoring_settings').eq('user_id', user.id).limit(10),
   ]);
 
-  const pref = (profile?.preference_data ?? {}) as Record<string, unknown>;
-  const tier = (pref.subscription_tier as string) ?? (profile?.is_paid ? 'pro' : 'free');
+  const rawTier = (profile as { subscription_tier?: string } | null)?.subscription_tier;
+  const tier = rawTier === 'all_pro_terminal' || rawTier === 'elite' || rawTier === 'pro'
+    ? rawTier
+    : profile?.is_paid ? 'pro' : 'free';
   const tierMeta = TIER_INFO[tier] ?? TIER_INFO.free;
 
   // Build league connections
@@ -102,6 +104,8 @@ export async function GET() {
 
   const totalChampionships = leagueRows.reduce((s, l) => s + l.championships, 0);
   const totalPlayers = (leagues ?? []).length * 40;
+
+  const pref = (profile?.preference_data && typeof profile.preference_data === 'object' ? profile.preference_data : {}) as Record<string, unknown>;
 
   // Usage — based on tier
   const usageMax = tier === 'elite' ? { players: 1000, trades: 100, ai: 500, reports: 50 }

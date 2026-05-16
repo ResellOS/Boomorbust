@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useEffect, useState } from 'react';
 
@@ -50,18 +50,18 @@ export default function WaitlistStatRow() {
   }, []);
 
   if (count === null) {
-    return <StatPair num="—" label="MANAGERS ON WAITLIST" numColor="#A78BFA" />;
+    return <StatPair num="—" label="MANAGERS ON WAITLIST" numColor="#8B5CF6" />;
   }
 
   if (count < 10) {
-    return <StatPair num="EARLY ACCESS" label="MANAGERS ON WAITLIST" numColor="#A78BFA" numClassName="text-[clamp(22px,4vw,52px)]" />;
+    return <StatPair num="EARLY ACCESS" label="MANAGERS ON WAITLIST" numColor="#8B5CF6" numClassName="text-[clamp(22px,4vw,52px)]" />;
   }
 
   return (
     <StatPair
       num={`${count.toLocaleString()} ON WAITLIST`}
       label="MANAGERS ON WAITLIST"
-      numColor="#A78BFA"
+      numColor="#8B5CF6"
       numClassName="text-[clamp(22px,4vw,52px)]"
     />
   );

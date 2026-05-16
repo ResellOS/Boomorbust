@@ -218,8 +218,20 @@ export default function PlayerHubCard({ player, verdict, className }: PlayerHubC
         boxShadow: vs.shadow,
       }}
     >
+      {/* ── Avatar ───────────────────────────────────────────────── */}
+      <div className="flex justify-center mb-2">
+        <PlayerAvatar
+          playerId={player.playerId}
+          playerName={player.name}
+          position={player.position}
+          size={48}
+          thumb
+          style={{ border: `2px solid ${posColor}40`, boxShadow: `0 0 10px ${posColor}20` }}
+        />
+      </div>
+
       {/* ── Header: name + pos·team ───────────────────────────────── */}
-      <div className="mb-2 min-w-0">
+      <div className="mb-2 min-w-0 text-center">
         <p
           className="truncate font-semibold leading-tight text-white"
           style={{

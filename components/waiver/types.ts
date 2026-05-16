@@ -1,6 +1,6 @@
 export type WaiverPosition = 'ALL' | 'QB' | 'RB' | 'WR' | 'TE' | 'FLEX' | 'DST' | 'K';
 export type WaiverScoring  = 'PPR' | '0.5PPR' | 'Standard';
-export type WaiverTabId    = 'wire' | 'trending' | 'gaps' | 'needs';
+export type WaiverTabId    = 'wire' | 'trending' | 'gaps' | 'needs' | 'handcuffs';
 export type Priority       = 'HIGH' | 'MEDIUM' | 'LOW';
 export type NeedLevel      = 'High' | 'Medium' | 'Low';
 
