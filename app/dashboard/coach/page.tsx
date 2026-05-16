@@ -172,7 +172,7 @@ async function fetchKtcByName(): Promise<Map<string, number>> {
 
 export default function CoachPage() {
   const [userId, setUserId] = useState<string | null>(null);
-  const [tier, setTier] = useState<'free' | 'pro' | 'elite'>('free');
+  const [tier, setTier] = useState<'free' | 'pro' | 'elite' | 'all_pro_terminal'>('free');
   const [sessions, setSessions] = useState<CoachSession[]>([]);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -216,14 +216,16 @@ export default function CoachPage() {
       setUserId(user.id);
 
       const [{ data: profile }, lgRes] = await Promise.all([
-        supabase.from('profiles').select('preference_data, is_paid').eq('id', user.id).single(),
+        supabase.from('profiles').select('subscription_tier, is_paid').eq('id', user.id).single(),
         supabase.from('leagues').select('id, name'),
       ]);
 
-      let t: 'free' | 'pro' | 'elite' = 'free';
-      const pref = profile?.preference_data as Record<string, unknown> | undefined;
-      if (pref?.subscription_tier === 'elite') t = 'elite';
-      else if (profile?.is_paid) t = 'pro';
+      const r = ((profile as { subscription_tier?: string } | null)?.subscription_tier ?? '').toLowerCase();
+      const t: 'free' | 'pro' | 'elite' | 'all_pro_terminal' =
+        r === 'all_pro_terminal' || r === 'all_pro' ? 'all_pro_terminal'
+        : r === 'elite' || r === 'veteran' ? 'elite'
+        : r === 'pro' || r === 'rookie' || profile?.is_paid ? 'pro'
+        : 'free';
       setTier(t);
 
       const lgs = (lgRes.data ?? []).map((l) => ({ id: l.id, name: l.name }));

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { normalizeTier } from '@/lib/access/gates';
 
 export const dynamic = 'force-dynamic';
 
@@ -82,9 +83,7 @@ export async function GET() {
   ]);
 
   const rawTier = (profile as { subscription_tier?: string } | null)?.subscription_tier;
-  const tier = rawTier === 'all_pro_terminal' || rawTier === 'elite' || rawTier === 'pro'
-    ? rawTier
-    : profile?.is_paid ? 'pro' : 'free';
+  const tier = normalizeTier(rawTier, profile?.is_paid);
   const tierMeta = TIER_INFO[tier] ?? TIER_INFO.free;
 
   // Build league connections

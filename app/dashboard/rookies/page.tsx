@@ -283,9 +283,11 @@ function sortProspects(rows: Prospect[]): Prospect[] {
   });
 }
 
-function tierFromProfile(pref: Record<string, unknown> | undefined, isPaid: boolean): Tier {
-  if (pref?.subscription_tier === 'elite') return 'elite';
-  if (isPaid) return 'pro';
+function tierFromProfile(rawTier: string | undefined | null, isPaid: boolean): Tier {
+  const r = (rawTier ?? '').toLowerCase();
+  if (r === 'all_pro_terminal' || r === 'all_pro') return 'elite';
+  if (r === 'elite' || r === 'veteran') return 'elite';
+  if (r === 'pro' || r === 'rookie' || isPaid) return 'pro';
   return 'free';
 }
 
@@ -337,10 +339,10 @@ export default function RookiesPage() {
       if (!user) return;
       const { data } = await supabase
         .from('profiles')
-        .select('preference_data, is_paid')
+        .select('subscription_tier, is_paid')
         .eq('id', user.id)
         .single();
-      const t = tierFromProfile(data?.preference_data as Record<string, unknown> | undefined, data?.is_paid ?? false);
+      const t = tierFromProfile((data as { subscription_tier?: string } | null)?.subscription_tier, data?.is_paid ?? false);
       setTier(t);
       setYearKey(defaultYearKey(t));
     }

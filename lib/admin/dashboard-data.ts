@@ -73,9 +73,10 @@ async function fetchAllAuthUsers(db: ReturnType<typeof createAdminClient>) {
 }
 
 function tierFromProfile(isPaid: boolean, subscriptionTier?: string | null): 'free' | 'pro' | 'elite' | 'all_pro_terminal' {
-  if (subscriptionTier === 'all_pro_terminal') return 'all_pro_terminal';
-  if (subscriptionTier === 'elite') return 'elite';
-  if (subscriptionTier === 'pro' || isPaid) return 'pro';
+  const r = (subscriptionTier ?? '').toLowerCase();
+  if (r === 'all_pro_terminal' || r === 'all_pro') return 'all_pro_terminal';
+  if (r === 'elite' || r === 'veteran') return 'elite';
+  if (r === 'pro' || r === 'rookie' || isPaid) return 'pro';
   return 'free';
 }
 

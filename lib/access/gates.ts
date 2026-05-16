@@ -20,6 +20,24 @@ import { NextResponse } from 'next/server';
 
 export type SubscriptionTier = 'free' | 'pro' | 'elite' | 'all_pro_terminal';
 
+/**
+ * Normalizes any DB subscription_tier value to the canonical internal tier.
+ * Handles both old Stripe-written format ('pro','elite','all_pro_terminal')
+ * and manually-set uppercase format ('ROOKIE','VETERAN','ALL_PRO').
+ */
+export function normalizeTier(
+  raw: string | null | undefined,
+  isPaidFallback?: boolean,
+): SubscriptionTier {
+  if (raw) {
+    const r = raw.toLowerCase();
+    if (r === 'all_pro_terminal' || r === 'all_pro') return 'all_pro_terminal';
+    if (r === 'elite' || r === 'veteran') return 'elite';
+    if (r === 'pro' || r === 'rookie') return 'pro';
+  }
+  return isPaidFallback ? 'pro' : 'free';
+}
+
 export type GatedFeature =
   | 'smart_counter'
   | 'blueprint'
@@ -68,10 +86,7 @@ export async function getUserTier(userId: string): Promise<SubscriptionTier> {
     .maybeSingle();
 
   const raw = (data as { subscription_tier?: string } | null)?.subscription_tier;
-  if (raw === 'pro' || raw === 'elite' || raw === 'all_pro_terminal') {
-    return raw as SubscriptionTier;
-  }
-  return 'free';
+  return normalizeTier(raw);
 }
 
 // ─── requireFeature ──────────────────────────────────────────────────────────

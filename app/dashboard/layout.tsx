@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
+import { normalizeTier } from '@/lib/access/gates';
 import { getEmpireTicker } from '@/lib/dashboard/empireTicker';
 import NavBar from '@/components/NavBar';
 
@@ -24,7 +25,7 @@ export default async function DashboardLayout({
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('username, is_paid, preference_data, sleeper_user_id')
+    .select('username, is_paid, subscription_tier, preference_data, sleeper_user_id')
     .eq('id', user.id)
     .maybeSingle();
 
@@ -32,14 +33,8 @@ export default async function DashboardLayout({
 
   const empireTicker = await getEmpireTicker(supabase, user.id);
 
-  const pref =
-    profile?.preference_data && typeof profile.preference_data === 'object' && profile.preference_data !== null
-      ? (profile.preference_data as Record<string, unknown>)
-      : {};
-
-  let tier: 'free' | 'pro' | 'elite' = 'free';
-  if (pref.subscription_tier === 'elite') tier = 'elite';
-  else if (profile?.is_paid) tier = 'pro';
+  const rawTier = (profile as { subscription_tier?: string } | null)?.subscription_tier;
+  const tier = normalizeTier(rawTier, profile?.is_paid);
 
   return (
     <div className="min-h-screen relative" style={{ background: 'var(--bg-primary)' }}>

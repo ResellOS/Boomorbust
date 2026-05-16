@@ -340,9 +340,13 @@ export default function SettingsPage() {
       setSleeperSaved(profile.username ?? profile.sleeper_user_id ?? '');
       setSleeperDraft(profile.username ?? profile.sleeper_user_id ?? '');
 
-      let t: typeof effectiveTier = 'free';
-      if (pd.subscription_tier === 'elite') t = 'elite';
-      else if (profile.is_paid) t = 'pro';
+      const rawT = (profile as { subscription_tier?: string }).subscription_tier ?? '';
+      const r = rawT.toLowerCase();
+      const t: typeof effectiveTier =
+        r === 'all_pro_terminal' || r === 'all_pro' ? 'elite'
+        : r === 'elite' || r === 'veteran' ? 'elite'
+        : r === 'pro' || r === 'rookie' || profile.is_paid ? 'pro'
+        : 'free';
       setEffectiveTier(t);
 
       await loadBilling();

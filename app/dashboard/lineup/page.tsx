@@ -283,7 +283,7 @@ export default function LineupPage() {
   const [oppPts, setOppPts] = useState<number | null>(null);
   const [userPts, setUserPts] = useState<number | null>(null);
   const [benchLeft, setBenchLeft] = useState<number | null>(null);
-  const [tier, setTier] = useState<'free' | 'pro' | 'elite'>('free');
+  const [tier, setTier] = useState<'free' | 'pro' | 'elite' | 'all_pro_terminal'>('free');
   const [weeklyUses, setWeeklyUses] = useState(0);
   const [userId, setUserId] = useState('');
   const cardRef = useRef<HTMLDivElement>(null);
@@ -299,15 +299,16 @@ export default function LineupPage() {
     supabase.auth.getSession().then(({ data }) => data.session?.user?.id && setUserId(data.session.user.id));
     supabase
       .from('profiles')
-      .select('preference_data,is_paid')
+      .select('subscription_tier,is_paid')
       .single()
       .then(({ data: d }) => {
         if (!d) return;
-        const pref =
-          (d.preference_data && typeof d.preference_data === 'object' ? d.preference_data : {}) as Record<string, unknown>;
-        let t: typeof tier = 'free';
-        if (pref.subscription_tier === 'elite') t = 'elite';
-        else if (d.is_paid) t = 'pro';
+        const r = ((d as { subscription_tier?: string }).subscription_tier ?? '').toLowerCase();
+        const t: typeof tier =
+          r === 'all_pro_terminal' || r === 'all_pro' ? 'all_pro_terminal'
+          : r === 'elite' || r === 'veteran' ? 'elite'
+          : r === 'pro' || r === 'rookie' || d.is_paid ? 'pro'
+          : 'free';
         setTier(t);
       }, () => {});
     supabase.from('leagues').select('id, name, scoring_settings').then(({ data }) => {

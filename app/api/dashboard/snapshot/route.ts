@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { Redis } from '@upstash/redis';
 import { createClient } from '@/lib/supabase/server';
+import { normalizeTier } from '@/lib/access/gates';
 import {
   fetchNflState,
   fetchLeagueMatchups,
@@ -537,11 +538,8 @@ export async function GET() {
   const ownerSid = profile?.sleeper_user_id ? String(profile.sleeper_user_id) : null;
   const leagues = leagueRows ?? [];
 
-  let userTier: 'free' | 'pro' | 'elite' | 'all_pro_terminal' = 'free';
   const rawTier = (profile as { subscription_tier?: string } | null)?.subscription_tier;
-  if (rawTier === 'all_pro_terminal') userTier = 'all_pro_terminal';
-  else if (rawTier === 'elite') userTier = 'elite';
-  else if (rawTier === 'pro' || profile?.is_paid) userTier = 'pro';
+  const userTier = normalizeTier(rawTier, profile?.is_paid);
 
   if (!leagues.length) {
     return NextResponse.json({

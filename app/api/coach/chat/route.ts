@@ -2,6 +2,7 @@ import { NextRequest } from 'next/server';
 import Anthropic from '@anthropic-ai/sdk';
 import { Redis } from '@upstash/redis';
 import { createClient } from '@/lib/supabase/server';
+import { normalizeTier } from '@/lib/access/gates';
 import { buildSystemPrompt, buildCoachPortfolioContext } from '@/lib/coach/context';
 import { checkAIRateLimit, rateLimitExceededResponse } from '@/lib/rateLimit/ai';
 import { checkBudget, trackSpend, estimateCost } from '@/lib/ai/budget';
@@ -61,11 +62,7 @@ export async function POST(request: NextRequest) {
     .single();
 
   const rawTier = (profile as { subscription_tier?: string } | null)?.subscription_tier;
-  const tier: Tier =
-    rawTier === 'all_pro_terminal' ? 'all_pro_terminal'
-    : rawTier === 'elite' ? 'elite'
-    : rawTier === 'pro' || profile?.is_paid ? 'pro'
-    : 'free';
+  const tier: Tier = normalizeTier(rawTier, profile?.is_paid);
 
   if (tier === 'free') {
     return new Response(

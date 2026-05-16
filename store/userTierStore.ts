@@ -41,5 +41,7 @@ export const useUserTierStore = create<UserTierState>((set, get) => ({
 
 /** True when the user is on any paid subscription tier. */
 export function isPaidTier(tier: SubscriptionTier | null): boolean {
-  return tier === 'pro' || tier === 'elite' || tier === 'all_pro_terminal';
+  if (!tier) return false;
+  const r = tier.toLowerCase();
+  return r === 'pro' || r === 'rookie' || r === 'elite' || r === 'veteran' || r === 'all_pro_terminal' || r === 'all_pro';
 }

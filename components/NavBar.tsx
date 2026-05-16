@@ -54,14 +54,15 @@ const MORE_SECTIONS: Array<{ title: string; links: Array<{ href: string; label: 
 
 const MOBILE_BOTTOM_HREFS = ['/dashboard', '/lineup', '/trade-hub', '/rookies'] as const;
 
-function TierBadge({ tier }: { tier: 'free' | 'pro' | 'elite' }) {
+function TierBadge({ tier }: { tier: 'free' | 'pro' | 'elite' | 'all_pro_terminal' }) {
+  const isElite = tier === 'elite' || tier === 'all_pro_terminal';
   const styles =
-    tier === 'elite'
+    isElite
       ? 'bg-[#FBBF24]/12 border-[#FBBF24]/35 text-[#FBBF24]'
       : tier === 'pro'
         ? 'bg-[#22D3EE]/12 border-[#22D3EE]/35 text-[#22D3EE]'
         : 'bg-white/5 border-white/10 text-[var(--text-muted)]';
-  const label = tier === 'elite' ? 'Elite ✦' : tier === 'pro' ? 'Pro' : 'Free';
+  const label = isElite ? 'All-Pro ✦' : tier === 'pro' ? 'Pro' : 'Free';
   return (
     <span
       className={clsx(
@@ -100,7 +101,7 @@ export interface EmpireTickerProps {
 interface NavBarProps {
   email: string;
   username?: string | null;
-  tier: 'free' | 'pro' | 'elite';
+  tier: 'free' | 'pro' | 'elite' | 'all_pro_terminal';
   /** Live Sleeper week / winning ratio for dashboard home chrome. */
   empireTicker?: EmpireTickerResult | null;
 }
