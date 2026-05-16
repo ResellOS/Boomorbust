@@ -71,15 +71,15 @@ export default function LandingNav() {
   const linkStyle = { fontFamily: 'var(--font-body)' } as const;
 
   return (
-    <header className="sticky top-0 z-[100] h-[72px] bg-[#0a0d14]/90 backdrop-blur-xl border-b border-white/[0.06]">
+    <header className="sticky top-0 z-[100] h-[72px] lg:h-[120px] bg-[#0a0d14]/90 backdrop-blur-xl border-b border-white/[0.06]">
       <div className="relative z-[110] mx-auto flex h-full w-full max-w-[1400px] items-center justify-between gap-3 px-4 sm:px-6 lg:px-10">
         <Link href="/" className="flex items-center shrink-0">
           <Image
             src="/images/logo-full2.png"
             alt="Boom or Bust"
-            width={260}
-            height={70}
-            className="h-[54px] w-auto object-contain"
+            width={480}
+            height={170}
+            className="h-[54px] lg:h-[100px] w-auto object-contain"
             priority
           />
         </Link>
