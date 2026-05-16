@@ -34,30 +34,12 @@ export default function LandingHeroSection() {
           {/* Line 1 */}
           <span className="block" style={{ fontSize: 'clamp(36px, 5vw, 80px)', whiteSpace: 'nowrap' }}>
             <span className="text-white">DRAFT THE </span>
-            <span
-              style={{
-                background: 'linear-gradient(90deg, #36E7A1 0%, #7c3aed 100%)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                backgroundClip: 'text',
-              }}
-            >
-              BOOM
-            </span>
+            <span style={{ color: '#36E7A1' }}>BOOM</span>
           </span>
           {/* Line 2 */}
           <span className="block" style={{ fontSize: 'clamp(36px, 5vw, 80px)', whiteSpace: 'nowrap' }}>
             <span className="text-white">DODGE THE </span>
-            <span
-              style={{
-                background: 'linear-gradient(90deg, #7c3aed 0%, #A78BFA 100%)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                backgroundClip: 'text',
-              }}
-            >
-              BUST
-            </span>
+            <span style={{ color: '#A78BFA' }}>BUST</span>
           </span>
           {/* Line 3 — tagline */}
           <span
