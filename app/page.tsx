@@ -12,19 +12,6 @@ const CYAN = '#22D3EE';
 const AMBER = '#FBBF24';
 const RED = '#EF4444';
 
-function MiniSparkline({ stroke }: { stroke: string }) {
-  return (
-    <svg className="mt-2 h-10 w-full" viewBox="0 0 100 40" fill="none" aria-hidden>
-      <polyline
-        points="0,28 14,22 28,26 42,14 56,18 70,10 84,12 100,4"
-        stroke={stroke}
-        strokeWidth="2"
-        fill="none"
-      />
-    </svg>
-  );
-}
-
 function UpSparkline({ stroke }: { stroke: string }) {
   return (
     <svg className="my-4 h-12 w-full" viewBox="0 0 120 48" fill="none" aria-hidden>
@@ -115,6 +102,161 @@ function PlayerMockCard({ p }: { p: MockPlayer }) {
   );
 }
 
+/** Static snapshot of `(dashboard)/dashboard/page` layout for the landing mockup (no auth / hooks). */
+function LandingDashboardMock() {
+  const BOOM_LOCAL = '#36E7A1';
+  const INACTIVE = '#94A3B8';
+  const BORDER = 'rgba(255,255,255,0.06)';
+  const sparkPts = [62, 65, 68, 72, 76, 79, 82.5]
+    .map((v, i, a) => {
+      const x = (i / Math.max(1, a.length - 1)) * 52;
+      const y = 20 - ((v - 62) / (82.5 - 62)) * 16;
+      return `${x},${y}`;
+    })
+    .join(' ');
+
+  return (
+    <div className="flex min-h-[420px]" style={{ background: '#0a0d14' }}>
+      <aside
+        className="hidden w-[200px] shrink-0 flex-col overflow-y-auto lg:flex"
+        style={{ borderRight: `1px solid ${BORDER}` }}
+        aria-hidden
+      >
+        <div className="flex flex-col gap-0.5 px-3 py-4">
+          {(['All Leagues', 'Dynasty Sharks SF', 'The War Room', 'FF Empire 12'] as const).map((label) => {
+            const active = label === 'All Leagues';
+            return (
+              <div
+                key={label}
+                className="w-full truncate rounded-r-lg px-3 py-2 text-left leading-tight"
+                style={{
+                  fontFamily: 'var(--font-body), Inter, sans-serif',
+                  fontSize: 14,
+                  color: active ? BOOM_LOCAL : INACTIVE,
+                  background: active ? 'rgba(6,78,59,0.25)' : 'transparent',
+                  borderLeft: active ? `2px solid ${BOOM_LOCAL}` : '2px solid transparent',
+                }}
+              >
+                {label}
+              </div>
+            );
+          })}
+        </div>
+      </aside>
+
+      <div className="flex min-w-0 flex-1 flex-col">
+        <div className="flex flex-1 flex-col gap-4 px-4 py-4 pb-6 md:px-6">
+          <header className="flex flex-col justify-between gap-3 sm:flex-row sm:items-start">
+            <div>
+              <h2
+                className="leading-none text-white"
+                style={{
+                  fontFamily: 'var(--font-display), "Bebas Neue", sans-serif',
+                  fontSize: 32,
+                  letterSpacing: '0.02em',
+                }}
+              >
+                Dashboard
+              </h2>
+              <p className="mt-1 text-[14px] text-[#64748B]" style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}>
+                Your command center. All leagues. All signals. One edge.
+              </p>
+            </div>
+            <div
+              className="flex shrink-0 items-center gap-2 rounded-lg border border-white/[0.08] bg-white/[0.03] px-3 py-1.5 backdrop-blur-[24px]"
+              style={{ boxShadow: '0 0 18px rgba(54,231,161,0.12)' }}
+            >
+              <div className="flex min-w-0 flex-col gap-0.5">
+                <span
+                  className="text-[10px] uppercase leading-none tracking-widest text-[#64748B]"
+                  style={{ fontFamily: 'var(--font-mono), JetBrains Mono, monospace' }}
+                >
+                  DYNASTY POWER RATING
+                </span>
+                <span
+                  className="text-[24px] font-bold leading-none tabular-nums text-[#36E7A1]"
+                  style={{ fontFamily: 'var(--font-mono), JetBrains Mono, monospace' }}
+                >
+                  52.4
+                </span>
+                <div className="flex items-center gap-1.5">
+                  <span
+                    className="inline-flex items-center rounded-full border border-emerald-500/35 bg-emerald-950/50 px-2 py-0.5 text-[10px] font-semibold text-emerald-400"
+                    style={{ fontFamily: 'var(--font-mono), JetBrains Mono, monospace' }}
+                  >
+                    Elite
+                  </span>
+                  <span className="text-[11px] text-[#64748B]" style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}>
+                    Top 8%
+                  </span>
+                </div>
+              </div>
+              <svg width={52} height={22} viewBox="0 0 52 22" className="shrink-0" aria-hidden>
+                <polyline
+                  points={sparkPts}
+                  fill="none"
+                  stroke={BOOM_LOCAL}
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </div>
+          </header>
+
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+            {[
+              { value: '52.4%', label: 'Start Accuracy', sub: '+8.7% vs last 30 days', color: GREEN },
+              { value: '+18.4', label: 'Trade Edge', sub: 'Value generated', color: AMBER },
+              { value: '73%', label: 'Win Probability', sub: 'Make playoffs', color: CYAN },
+            ].map((c) => (
+              <div
+                key={c.label}
+                className="flex min-w-0 flex-1 flex-col gap-1 rounded-xl px-5 py-4"
+                style={{
+                  background: 'rgba(255,255,255,0.03)',
+                  border: '1px solid rgba(255,255,255,0.08)',
+                }}
+              >
+                <span
+                  className="leading-none font-bold tabular-nums"
+                  style={{
+                    fontFamily: 'var(--font-mono), JetBrains Mono, monospace',
+                    fontSize: 24,
+                    color: c.color,
+                  }}
+                >
+                  {c.value}
+                </span>
+                <span
+                  className="leading-none text-[12px] text-[#64748B]"
+                  style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}
+                >
+                  {c.label}
+                </span>
+                <span
+                  className="leading-none text-[11px] text-[#475569]"
+                  style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}
+                >
+                  {c.sub}
+                </span>
+              </div>
+            ))}
+          </div>
+
+          <hr className="border-0" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }} />
+
+          <div className="grid grid-cols-2 gap-2 lg:grid-cols-4">
+            {MOCK_PLAYERS.map((p) => (
+              <PlayerMockCard key={p.name} p={p} />
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function Home() {
   const [scrolled, setScrolled] = useState(false);
   const navRef = useRef<HTMLElement>(null);
@@ -154,11 +296,11 @@ export default function Home() {
         <div className="mx-auto flex h-full max-w-[1400px] items-center justify-between px-6 lg:px-10">
           <Link href="/" className="shrink-0">
             <Image
-              src="/logo-full2.png"
+              src="/images/logo-full.png"
               alt="Boom or Bust"
-              width={160}
-              height={44}
-              className="h-10 w-auto object-contain"
+              width={280}
+              height={72}
+              className="h-11 w-auto object-contain object-left sm:h-12"
               priority
             />
           </Link>
@@ -221,24 +363,8 @@ export default function Home() {
         {/* HERO */}
         <section className="relative flex min-h-screen flex-col items-center px-6 pb-20 pt-16 text-center">
           <div className="mx-auto flex max-w-[1100px] flex-col items-center px-0 py-20">
-            <div
-              className="landing-fade-up landing-fade-delay-0 mb-10 inline-flex items-center gap-2 rounded-full border px-4 py-1.5"
-              style={{
-                background: 'rgba(54,231,161,0.08)',
-                borderColor: 'rgba(54,231,161,0.18)',
-              }}
-            >
-              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[#36E7A1]" />
-              <span
-                className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#36E7A1]"
-                style={{ fontFamily: 'var(--font-body)' }}
-              >
-                ⚡ 17 PROPRIETARY ENGINES · REAL-TIME SLEEPER SYNC
-              </span>
-            </div>
-
             <h1
-              className="landing-fade-up landing-fade-delay-100 mb-5"
+              className="landing-fade-up landing-fade-delay-0 mb-5"
               style={{ fontFamily: 'var(--font-display)', textAlign: 'center' }}
             >
               <span
@@ -267,14 +393,14 @@ export default function Home() {
             </h1>
 
             <p
-              className="landing-fade-up landing-fade-delay-200 mx-auto mb-10 mt-4 max-w-[560px] text-[16px] leading-[1.7] text-white/[0.52]"
+              className="landing-fade-up landing-fade-delay-100 mx-auto mb-10 mt-4 max-w-[560px] text-[16px] leading-[1.7] text-white/[0.52]"
               style={{ fontFamily: 'var(--font-body)' }}
             >
-              Connect your Sleeper leagues and let 17 proprietary engines analyze every roster gap, trade
-              opportunity, waiver target, and matchup advantage — built specifically for your teams.
+              Connect your Sleeper leagues and let 17 proprietary engines find every roster gap, trade opportunity,
+              waiver target, and matchup edge — specific to your teams.
             </p>
 
-            <div className="landing-fade-up landing-fade-delay-300 mb-8 flex flex-wrap justify-center gap-4">
+            <div className="landing-fade-up landing-fade-delay-200 mb-8 flex flex-wrap justify-center gap-4">
               <Link
                 href="/auth/signup"
                 className="rounded-xl px-8 py-4 text-[15px] font-black text-black transition hover:-translate-y-0.5"
@@ -296,26 +422,30 @@ export default function Home() {
             </div>
 
             <div
-              className="landing-fade-up landing-fade-delay-400 mb-16 flex flex-wrap justify-center gap-x-4 gap-y-2 text-[13px] text-white/[0.38]"
+              className="landing-fade-up landing-fade-delay-300 mb-16 flex flex-wrap justify-center gap-x-4 gap-y-2 text-[13px] text-white/[0.38]"
               style={{ fontFamily: 'var(--font-body)' }}
             >
               <span>
                 <span style={{ color: GREEN }}>✓</span> Free to Start
               </span>
               <span className="text-white/[0.15]">·</span>
-              <span>No Credit Card</span>
+              <span>
+                <span style={{ color: GREEN }}>✓</span> No Credit Card
+              </span>
               <span className="hidden text-white/[0.15] sm:inline">·</span>
               <span>
                 <span style={{ color: GREEN }}>✓</span> Secure with Sleeper
               </span>
               <span className="text-white/[0.15]">·</span>
-              <span>17 Proprietary Engines</span>
+              <span>
+                <span style={{ color: GREEN }}>✓</span> 17 Proprietary Engines
+              </span>
             </div>
 
             {/* Mockup */}
             <div
               id="mockup"
-              className="landing-fade-up landing-fade-delay-500 relative mx-auto w-[90%] max-w-[1100px]"
+              className="landing-fade-up landing-fade-delay-400 relative mx-auto w-[90%] max-w-[1100px]"
               style={{ perspective: '1200px' }}
             >
               <div className="landing-mockup-float">
@@ -345,95 +475,15 @@ export default function Home() {
                     </span>
                   </div>
 
-                  <div className="flex">
-                    <aside className="hidden w-[160px] shrink-0 border-r border-white/[0.06] bg-black/30 py-4 lg:block">
-                      <div className="px-4 py-3">
-                        <span className="text-[12px] font-bold text-[#36E7A1]" style={{ fontFamily: 'var(--font-mono)' }}>
-                          B/B
-                        </span>
-                      </div>
-                      <nav className="text-[11px]" style={{ fontFamily: 'var(--font-body)' }}>
-                        {[
-                          ['📊', 'Dashboard', true],
-                          ['🏆', 'My Portfolio', false],
-                          ['🏈', 'Leagues', false],
-                          ['👤', 'Players', false],
-                          ['⇄', 'Trade Analyzer', false],
-                          ['⚡', 'Waiver Wire', false],
-                          ['≡', 'Rankings', false],
-                          ['📄', 'Reports', false],
-                          ['🔔', 'Alerts', false],
-                          ['⚙️', 'Settings', false],
-                        ].map(([icon, label, active]) => (
-                          <div
-                            key={String(label)}
-                            className={`flex h-8 cursor-default items-center px-4 ${active ? 'border-l-2 border-[#36E7A1] bg-[rgba(54,231,161,0.1)] text-[#36E7A1]' : 'border-l-2 border-transparent text-white/45 hover:text-white'}`}
-                          >
-                            <span className="mr-2">{icon}</span>
-                            {label}
-                          </div>
-                        ))}
-                      </nav>
-                    </aside>
-
-                    <div className="min-w-0 flex-1 p-3 sm:p-4">
-                      <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
-                        <div>
-                          <p className="text-[14px] font-semibold text-white" style={{ fontFamily: 'var(--font-body)' }}>
-                            Good Morning, Champ! 🏆
-                          </p>
-                          <p className="text-[11px] text-white/40" style={{ fontFamily: 'var(--font-body)' }}>
-                            Dynasty Power Rating:{' '}
-                            <span style={{ fontFamily: 'var(--font-mono)' }}>52.4</span>
-                          </p>
-                        </div>
-                        <div className="flex items-center gap-2 text-[11px] text-white/40" style={{ fontFamily: 'var(--font-body)' }}>
-                          <span>All Leagues ▾</span>
-                          <span aria-hidden>⟳</span>
-                        </div>
-                      </div>
-
-                      <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
-                        {[
-                          {
-                            label: 'START ACCURACY',
-                            value: '52.4%',
-                            sub: '+8.7% vs last 30 days',
-                            color: GREEN,
-                          },
-                          {
-                            label: 'TRADE EDGE',
-                            value: '+18.4',
-                            sub: 'Value Generated',
-                            color: AMBER,
-                          },
-                          {
-                            label: 'WIN PROBABILITY',
-                            value: '73%',
-                            sub: 'Make Playoffs',
-                            color: CYAN,
-                          },
-                        ].map((c) => (
-                          <div
-                            key={c.label}
-                            className="rounded-xl border border-white/[0.06] p-3"
-                            style={{ background: 'rgba(255,255,255,0.03)' }}
-                          >
-                            <p className="text-[9px] uppercase tracking-wide text-white/35">{c.label}</p>
-                            <p className="text-[24px] font-bold leading-tight" style={{ fontFamily: 'var(--font-mono)', color: c.color }}>
-                              {c.value}
-                            </p>
-                            <p className="text-[9px] text-white/30">{c.sub}</p>
-                            <MiniSparkline stroke={c.color} />
-                          </div>
-                        ))}
-                      </div>
-
-                      <div className="mt-4 grid grid-cols-2 gap-2 lg:grid-cols-4">
-                        {MOCK_PLAYERS.map((p) => (
-                          <PlayerMockCard key={p.name} p={p} />
-                        ))}
-                      </div>
+                  <div className="overflow-hidden" style={{ height: 420 }}>
+                    <div
+                      style={{
+                        transform: 'scale(0.65)',
+                        transformOrigin: 'top left',
+                        width: 'calc(100% / 0.65)',
+                      }}
+                    >
+                      <LandingDashboardMock />
                     </div>
                   </div>
                 </div>
@@ -465,15 +515,15 @@ export default function Home() {
               <div className="hidden h-9 w-px shrink-0 bg-white/[0.08] lg:block" aria-hidden />
 
               {[
-                ['84%', 'DMS ACCURACY'],
+                ['84%', 'ENGINE ACCURACY'],
                 ['17', 'PROPRIETARY ENGINES'],
                 ['42-18-2', 'VERIFIED RECORD'],
                 ['5.3 WEEKS', 'MARKET LEAD TIME'],
-                ['★★★★★', 'TRUSTED BY DYNASTY MANAGERS'],
+                ['★★★★★', 'TRUSTED BY MANAGERS'],
               ].map(([val, lab], i) => (
                 <React.Fragment key={lab}>
                   <div
-                    className={`flex min-w-[100px] flex-col items-center gap-1 ${i === 3 ? 'hidden sm:flex' : ''} ${i === 4 ? 'hidden md:flex' : ''} ${i === 5 ? 'hidden lg:flex' : ''}`}
+                    className={`flex min-w-[100px] flex-col items-center gap-1 ${i === 3 ? 'hidden sm:flex' : ''} ${i === 4 ? 'hidden md:flex' : ''}`}
                   >
                     <span className="text-[20px] font-bold text-[#36E7A1]" style={{ fontFamily: 'var(--font-mono)' }}>
                       {val}
@@ -576,7 +626,7 @@ export default function Home() {
                     n: '2',
                     icon: '🧠',
                     title: '17 Engines Analyze Everything',
-                    body: 'Rosters, projections, trade history, age curves, momentum, matchups — processed instantly.',
+                    body: '17 proprietary engines process your rosters, trade history, age curves, momentum, and matchups — instantly.',
                   },
                   {
                     n: '3',
@@ -633,15 +683,69 @@ export default function Home() {
               >
                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
                   {[
-                    { icon: '▦', title: 'Import Dashboard', body: 'All leagues, one view', ac: 'rgba(167,139,250,0.12)', tc: PURPLE },
-                    { icon: '◎', title: 'Start/Sit Optimizer', body: 'AI lineup decisions', ac: 'rgba(54,231,161,0.12)', tc: GREEN },
-                    { icon: '⇄', title: 'Trade Analyzer', body: 'Know who wins every trade', ac: 'rgba(34,211,238,0.12)', tc: CYAN },
-                    { icon: '⚡', title: 'Waiver Wire Targets', body: 'Find value before others', ac: 'rgba(251,191,36,0.12)', tc: AMBER },
-                    { icon: '🔭', title: 'Dynasty Strategy Engine', body: 'Contend or rebuild intel', ac: 'rgba(167,139,250,0.12)', tc: PURPLE },
-                    { icon: '★', title: 'Rookie Pick Intelligence', body: 'Scout and predict breakouts', ac: 'rgba(251,191,36,0.12)', tc: AMBER },
-                    { icon: '≡', title: 'Smart Rankings', body: 'Form + matchup + injury', ac: 'rgba(54,231,161,0.12)', tc: GREEN },
-                    { icon: '📊', title: 'Advanced Analytics', body: 'Visual trends + heatmaps', ac: 'rgba(34,211,238,0.12)', tc: CYAN },
-                    { icon: '🏥', title: 'Injury Tracker', body: 'Real-time impact alerts', ac: 'rgba(239,68,68,0.12)', tc: RED },
+                    {
+                      icon: '▦',
+                      title: 'Import Dashboard',
+                      body: 'Sync all your Sleeper leagues and see everything in one live dashboard.',
+                      ac: 'rgba(167,139,250,0.12)',
+                      tc: PURPLE,
+                    },
+                    {
+                      icon: '◎',
+                      title: 'Start/Sit Optimizer',
+                      body: 'Engine-powered lineup decisions based on projections, matchups, and trends.',
+                      ac: 'rgba(54,231,161,0.12)',
+                      tc: GREEN,
+                    },
+                    {
+                      icon: '⇄',
+                      title: 'Trade Analyzer',
+                      body: 'Know who wins every trade before you send it — with full grade and reasoning.',
+                      ac: 'rgba(34,211,238,0.12)',
+                      tc: CYAN,
+                    },
+                    {
+                      icon: '⚡',
+                      title: 'Waiver Wire Targets',
+                      body: 'Find undervalued players before your league mates do.',
+                      ac: 'rgba(251,191,36,0.12)',
+                      tc: AMBER,
+                    },
+                    {
+                      icon: '🔭',
+                      title: 'Dynasty Strategy Engine',
+                      body: 'Long-term planning, contention windows, and rebuild paths.',
+                      ac: 'rgba(167,139,250,0.12)',
+                      tc: PURPLE,
+                    },
+                    {
+                      icon: '★',
+                      title: 'Rookie Pick Intelligence',
+                      body: 'Draft picks, rookie grades, and future projections.',
+                      ac: 'rgba(251,191,36,0.12)',
+                      tc: AMBER,
+                    },
+                    {
+                      icon: '≡',
+                      title: 'Smart Rankings',
+                      body: 'Dynasty rankings that actually win leagues.',
+                      ac: 'rgba(54,231,161,0.12)',
+                      tc: GREEN,
+                    },
+                    {
+                      icon: '📊',
+                      title: 'Advanced Analytics',
+                      body: 'Deep insights, trends, and market inefficiencies.',
+                      ac: 'rgba(34,211,238,0.12)',
+                      tc: CYAN,
+                    },
+                    {
+                      icon: '🏥',
+                      title: 'Injury Tracker',
+                      body: 'Monitor injuries, recovery timelines, and impact.',
+                      ac: 'rgba(239,68,68,0.12)',
+                      tc: RED,
+                    },
                   ].map((f) => (
                     <div
                       key={f.title}
@@ -764,7 +868,7 @@ export default function Home() {
               </p>
               {[
                 'Personalized for YOUR teams and leagues',
-                'AI-powered trade negotiation',
+                'Smart trade negotiation',
                 'Contention window analysis',
                 'Dynasty momentum tracking',
                 'Market inefficiency detection',
@@ -808,7 +912,7 @@ export default function Home() {
               </div>
               {[
                 'Multi-league portfolio',
-                'AI trade negotiation',
+                'Smart trade negotiation',
                 'Contention window',
                 'Momentum tracking',
                 'Personalized decisions',
@@ -999,7 +1103,8 @@ export default function Home() {
                   name: 'Brandon',
                   handle: '@DynastyBuilder',
                   initial: 'B',
-                  quote: 'The AI trade counters are next level. I always know my leverage on every deal.',
+                  quote:
+                    'The smart trade counters are next level. I always know my leverage on every deal.',
                 },
               ].map((t) => (
                 <div
@@ -1068,7 +1173,13 @@ export default function Home() {
                   Forever
                 </p>
                 <ul className="mb-6 flex-1 space-y-2" style={{ fontFamily: 'var(--font-body)' }}>
-                  {['AI Features', 'Media Features', 'Basic Analytics', '1 League', 'Basic Projections'].map((x) => (
+                  {[
+                    '1 league sync',
+                    'Weekly verdict scores',
+                    'Basic trade analyzer',
+                    'Sit/start basics',
+                    'Waiver suggestions',
+                  ].map((x) => (
                     <li key={x} className="flex items-start gap-2 text-[13px] text-white/55">
                       <span className="text-[13px] text-[#36E7A1]">✓</span>
                       {x}
@@ -1100,7 +1211,13 @@ export default function Home() {
                   Billed monthly
                 </p>
                 <ul className="mb-6 flex-1 space-y-2" style={{ fontFamily: 'var(--font-body)' }}>
-                  {['Basic features', 'Trade Analyzer', 'Start/Sit Optimizer', 'Waiver Tools', 'Dynasty Basics'].map((x) => (
+                  {[
+                    'Up to 3 leagues',
+                    'Full verdict scores',
+                    'Trade analyzer + grade',
+                    'Start/sit optimizer',
+                    'Waiver wire targets',
+                  ].map((x) => (
                     <li key={x} className="flex items-start gap-2 text-[13px] text-white/55">
                       <span className="text-[13px] text-[#36E7A1]">✓</span>
                       {x}
@@ -1132,7 +1249,13 @@ export default function Home() {
                   Billed monthly
                 </p>
                 <ul className="mb-6 flex-1 space-y-2" style={{ fontFamily: 'var(--font-body)' }}>
-                  {['All Rookie features', 'Dynasty Engine', 'Advanced Analytics', 'Injury Tracker', 'Full Trost Factor'].map((x) => (
+                  {[
+                    'Up to 10 leagues',
+                    'Breakout meter alerts',
+                    'Dynasty strategy engine',
+                    'Sell window tracker',
+                    'Playoff outlook scores',
+                  ].map((x) => (
                     <li key={x} className="flex items-start gap-2 text-[13px] text-white/55">
                       <span className="text-[13px] text-[#36E7A1]">✓</span>
                       {x}
@@ -1175,12 +1298,12 @@ export default function Home() {
                 </p>
                 <ul className="mb-6 flex-1 space-y-2" style={{ fontFamily: 'var(--font-body)' }}>
                   {[
-                    'All Veteran features',
                     'Unlimited leagues',
-                    'AI trade negotiation',
-                    'Dynasty strategy engine',
-                    'Portfolio Manager',
-                    'Priority Support',
+                    'All 17 engines unlocked',
+                    'Smart trade negotiation',
+                    'Dynasty power rating',
+                    'Portfolio manager',
+                    'Priority support',
                   ].map((x) => (
                     <li key={x} className="flex items-start gap-2 text-[13px] text-white/55">
                       <span className="text-[13px] text-[#36E7A1]">✓</span>
@@ -1220,7 +1343,7 @@ export default function Home() {
               <span style={{ color: GREEN }}>START WINNING.</span>
             </h2>
             <p className="mb-10 text-[16px] text-white/45" style={{ fontFamily: 'var(--font-body)' }}>
-              Don&apos;t overthink it. Use the data. Win more.
+              Stop guessing. Connect your leagues. Let the engines do the work.
             </p>
             <Link
               href="/auth/signup"
@@ -1241,7 +1364,13 @@ export default function Home() {
           <div className="mx-auto max-w-[1400px]">
             <div className="mb-12 grid grid-cols-2 gap-10 lg:grid-cols-5">
               <div className="col-span-2 lg:col-span-1">
-                <Image src="/logo-full2.png" alt="Boom or Bust" width={160} height={44} className="h-9 w-auto object-contain" />
+                <Image
+                  src="/images/logo-full.png"
+                  alt="Boom or Bust"
+                  width={280}
+                  height={72}
+                  className="h-11 w-auto max-w-full object-contain object-left sm:h-12"
+                />
                 <p className="mt-3 max-w-xs text-[13px] leading-relaxed text-white/35" style={{ fontFamily: 'var(--font-body)' }}>
                   The smartest scout in your fantasy league.
                 </p>
