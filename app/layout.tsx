@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next';
-import { Bebas_Neue, Inter, JetBrains_Mono } from 'next/font/google';
+import { Bebas_Neue, Figtree, Inter, JetBrains_Mono } from 'next/font/google';
 import { Toaster } from 'sonner';
 import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/next';
@@ -19,8 +19,16 @@ const inter = Inter({
   display: 'swap',
 });
 
+const figtree = Figtree({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700', '800'],
+  variable: '--font-figtree',
+  display: 'swap',
+});
+
 const jetbrainsMono = JetBrains_Mono({
   subsets: ['latin'],
+  weight: ['400', '700'],
   variable: '--font-mono',
   display: 'swap',
 });
@@ -70,7 +78,11 @@ export default function RootLayout({
      * style on <html> prevents white flash before CSS loads.
      * The value is inlined so it applies before any stylesheet parse.
      */
-    <html lang="en" style={{ background: '#0a0d14' }}>
+    <html
+      lang="en"
+      className={`${figtree.variable} ${jetbrainsMono.variable}`}
+      style={{ background: '#0a0d14' }}
+    >
       <head>
         {adsenseId && (
           <Script
