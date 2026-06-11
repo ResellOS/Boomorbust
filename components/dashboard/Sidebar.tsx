@@ -19,6 +19,8 @@ export interface League {
   name: string;
   league_type?: string | null;
   status?: string | null;
+  // When present (dashboard rotation mode), drives the 5-category dot + badge.
+  rotationStatus?: { key: string; label: string; color: string };
 }
 
 export interface RosterSnapshotItem {
@@ -136,9 +138,11 @@ export default function Sidebar({
       </div>
       <div className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {leagues.map((league, i) => {
+          const rs = league.rotationStatus;
           const tag = leagueTag(league, i);
-          const dotColor =
-            tag.variant === 'contender'
+          const dotColor = rs
+            ? rs.color
+            : tag.variant === 'contender'
               ? LEAGUE_DOTS[0]
               : tag.variant === 'rebuild'
                 ? LEAGUE_DOTS[1]
@@ -148,27 +152,40 @@ export default function Sidebar({
             <Link
               key={league.id}
               href={`/leagues/${league.id}`}
-              className="grid grid-cols-[7px_1fr_auto] items-center gap-x-[9px] px-[15px] py-[7px] text-inherit no-underline transition-colors hover:bg-white/[0.025]"
+              className="group grid grid-cols-[7px_1fr_auto] items-center gap-x-[9px] px-[15px] py-[7px] text-inherit no-underline transition-colors hover:bg-white/[0.025]"
             >
               <div
                 className="h-[7px] w-[7px] rounded-full"
                 style={{ background: dotColor }}
               />
-              <span className="min-w-0 truncate font-figtree text-[12.5px] font-medium">
-                {displayName}
+              <span className="flex min-w-0 items-center gap-1 font-figtree text-[12.5px] font-medium">
+                <span className="truncate">{displayName}</span>
+                <span className="shrink-0 text-boom opacity-0 transition-opacity group-hover:opacity-100">
+                  →
+                </span>
               </span>
-              <span
-                aria-label={`${displayName} ${tag.label}`}
-                className={`ml-1 shrink-0 whitespace-nowrap rounded-[3px] px-[7px] py-0.5 font-mono text-[8px] font-bold ${
-                  tag.variant === 'contender'
-                    ? 'bg-boom/10 text-boom'
-                    : tag.variant === 'rebuild'
-                      ? 'bg-bust/10 text-bust'
-                      : 'bg-muted/10 text-muted'
-                }`}
-              >
-                {tag.label}
-              </span>
+              {rs ? (
+                <span
+                  aria-label={`${displayName} ${rs.label}`}
+                  className="ml-1 shrink-0 whitespace-nowrap rounded-[3px] px-[7px] py-0.5 font-mono text-[8px] font-medium"
+                  style={{ color: rs.color, background: `${rs.color}1a` }}
+                >
+                  {rs.label}
+                </span>
+              ) : (
+                <span
+                  aria-label={`${displayName} ${tag.label}`}
+                  className={`ml-1 shrink-0 whitespace-nowrap rounded-[3px] px-[7px] py-0.5 font-mono text-[8px] font-medium ${
+                    tag.variant === 'contender'
+                      ? 'bg-boom/10 text-boom'
+                      : tag.variant === 'rebuild'
+                        ? 'bg-bust/10 text-bust'
+                        : 'bg-muted/10 text-muted'
+                  }`}
+                >
+                  {tag.label}
+                </span>
+              )}
             </Link>
           );
         })}
