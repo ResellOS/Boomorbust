@@ -1,10 +1,11 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, type RefObject } from 'react';
 import { generateBolt, renderBolt, type BoltSegment } from '@/lib/lightning';
 
 const BOOM = '#36E7A1';
 const BUST = '#A78BFA';
+const WHITE = '#ffffff';
 
 interface Channel {
   segments: BoltSegment[];
@@ -25,13 +26,16 @@ export interface LightningCanvasProps {
   /**
    * ambient — vertical strikes in the left (green) / right (purple) thirds.
    * radial  — bolts shoot outward from `origin` in 6 directions.
+   * warroom — center vertical bolt + green left / purple right branches.
    */
-  mode: 'ambient' | 'radial';
-  /** Strike origin as percentage of viewport (radial mode). */
+  mode: 'ambient' | 'radial' | 'warroom';
+  /** Strike origin as percentage of canvas (radial / warroom). */
   origin?: { xPct: number; yPct: number };
+  /** When set, canvas size tracks this element instead of the window. */
+  anchorRef?: RefObject<HTMLElement | null>;
   /** Flip true to fire the double-ended completion strike. */
   megaStrike?: boolean;
-  /** Called whenever a strike spawns — intensity 0–1 (drives screen flash). */
+  /** Called whenever a strike spawns — intensity drives screen flash (0.12 normal, 0.3 mega). */
   onStrike?: (intensity: number) => void;
   className?: string;
 }
@@ -39,6 +43,7 @@ export interface LightningCanvasProps {
 export default function LightningCanvas({
   mode,
   origin = { xPct: 50, yPct: 45 },
+  anchorRef,
   megaStrike = false,
   onStrike,
   className,
@@ -51,7 +56,6 @@ export default function LightningCanvas({
   const megaSpawnRef = useRef<(() => void) | null>(null);
   onStrikeRef.current = onStrike;
 
-  // Canvas sizing + render loop + strike scheduling
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -62,17 +66,35 @@ export default function LightningCanvas({
     let h = 0;
 
     const resize = () => {
+      const target = anchorRef?.current;
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
-      w = window.innerWidth;
-      h = window.innerHeight;
-      canvas.width = Math.round(w * dpr);
-      canvas.height = Math.round(h * dpr);
+
+      if (target) {
+        w = target.clientWidth;
+        h = target.clientHeight;
+      } else {
+        w = window.innerWidth;
+        h = window.innerHeight;
+      }
+
+      canvas.width = Math.max(1, Math.round(w * dpr));
+      canvas.height = Math.max(1, Math.round(h * dpr));
       canvas.style.width = `${w}px`;
       canvas.style.height = `${h}px`;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     };
+
     resize();
     window.addEventListener('resize', resize);
+
+    const anchor = anchorRef?.current;
+    const ro = anchor ? new ResizeObserver(resize) : null;
+    if (anchor) {
+      ro?.observe(anchor);
+      if (anchor instanceof HTMLImageElement && !anchor.complete) {
+        anchor.addEventListener('load', resize);
+      }
+    }
 
     const makeChannels = (
       x1: number,
@@ -81,20 +103,29 @@ export default function LightningCanvas({
       y2: number,
       branches: number,
       color: string,
-    ): Channel[] => [
-      { segments: generateBolt(x1, y1, x2, y2, branches), color, weight: 1 },
-      {
-        segments: generateBolt(
-          x1 + (Math.random() * 12 - 6),
-          y1,
-          x2 + (Math.random() * 12 - 6),
-          y2,
-          branches,
-        ),
+      echo = true,
+    ): Channel[] => {
+      const main: Channel = {
+        segments: generateBolt(x1, y1, x2, y2, branches),
         color,
-        weight: 0.35,
-      },
-    ];
+        weight: 1,
+      };
+      if (!echo) return [main];
+      return [
+        main,
+        {
+          segments: generateBolt(
+            x1 + (Math.random() * 12 - 6),
+            y1,
+            x2 + (Math.random() * 12 - 6),
+            y2,
+            branches,
+          ),
+          color,
+          weight: 0.35,
+        },
+      ];
+    };
 
     const spawnAmbient = () => {
       const left = Math.random() < 0.5;
@@ -104,11 +135,11 @@ export default function LightningCanvas({
       strikesRef.current.push({
         channels: makeChannels(x, -20, x + drift, endY, 6, left ? BOOM : BUST),
         bornAt: performance.now(),
-        drawInMs: 120,
-        holdMs: 60,
-        fadeMs: 420,
+        drawInMs: 80,
+        holdMs: 0,
+        fadeMs: 400,
       });
-      onStrikeRef.current?.(0.15);
+      onStrikeRef.current?.(0.12);
     };
 
     const spawnRadial = () => {
@@ -125,27 +156,49 @@ export default function LightningCanvas({
       strikesRef.current.push({
         channels,
         bornAt: performance.now(),
-        drawInMs: 110,
-        holdMs: 70,
+        drawInMs: 80,
+        holdMs: 0,
         fadeMs: 400,
       });
-      onStrikeRef.current?.(0.15);
+      onStrikeRef.current?.(0.12);
     };
 
-    // Random 2–3s scheduling so it never looks looped
+    /** Center vertical bolt + left green / right purple branches — activates logo bolt in art. */
+    const spawnWarroom = () => {
+      const cx = (w * origin.xPct) / 100;
+      const cy = (h * origin.yPct) / 100;
+      const bottom = h + 12;
+      const branchY = cy + (bottom - cy) * (0.28 + Math.random() * 0.12);
+
+      const channels: Channel[] = [
+        ...makeChannels(cx, cy - 8, cx, bottom, 8, WHITE),
+        ...makeChannels(cx, branchY, cx - w * (0.22 + Math.random() * 0.08), branchY + h * 0.18, 6, BOOM),
+        ...makeChannels(cx, branchY, cx + w * (0.22 + Math.random() * 0.08), branchY + h * 0.16, 6, BUST),
+      ];
+
+      strikesRef.current.push({
+        channels,
+        bornAt: performance.now(),
+        drawInMs: 80,
+        holdMs: 0,
+        fadeMs: 400,
+      });
+      onStrikeRef.current?.(0.12);
+    };
+
     let timer: ReturnType<typeof setTimeout>;
     let cancelled = false;
     const schedule = () => {
       timer = setTimeout(() => {
         if (cancelled) return;
         if (mode === 'ambient') spawnAmbient();
-        else spawnRadial();
+        else if (mode === 'radial') spawnRadial();
+        else spawnWarroom();
         schedule();
-      }, Math.random() * 1000 + 2000);
+      }, 2000 + Math.random() * 1000);
     };
     schedule();
 
-    // Render loop — clear every frame, redraw active strikes
     const frame = () => {
       ctx.clearRect(0, 0, w, h);
       const now = performance.now();
@@ -161,8 +214,7 @@ export default function LightningCanvas({
         } else if (t > strike.drawInMs + strike.holdMs) {
           alpha = 1 - (t - strike.drawInMs - strike.holdMs) / strike.fadeMs;
         } else {
-          // Hold phase — subtle flicker
-          alpha = 0.85 + Math.random() * 0.15;
+          alpha = 0.88 + Math.random() * 0.12;
         }
 
         if (alpha > 0) {
@@ -178,21 +230,20 @@ export default function LightningCanvas({
     };
     rafRef.current = requestAnimationFrame(frame);
 
-    // Expose mega-strike spawner for the prop effect below
     megaSpawnRef.current = () => {
       const cx = (w * origin.xPct) / 100;
       const cy = (h * origin.yPct) / 100;
       strikesRef.current.push({
         channels: [
-          ...makeChannels(cx, cy, cx, -30, 8, BOOM),
-          ...makeChannels(cx, cy, cx, h + 30, 8, BUST),
+          ...makeChannels(cx, cy, cx, -30, 8, BOOM, false),
+          ...makeChannels(cx, cy, cx, h + 30, 8, BUST, false),
         ],
         bornAt: performance.now(),
         drawInMs: 80,
-        holdMs: 260,
-        fadeMs: 460,
+        holdMs: 600,
+        fadeMs: 400,
       });
-      onStrikeRef.current?.(0.5);
+      onStrikeRef.current?.(0.3);
     };
 
     return () => {
@@ -200,7 +251,12 @@ export default function LightningCanvas({
       clearTimeout(timer);
       cancelAnimationFrame(rafRef.current);
       window.removeEventListener('resize', resize);
+      ro?.disconnect();
+      if (anchor instanceof HTMLImageElement) {
+        anchor.removeEventListener('load', resize);
+      }
       strikesRef.current = [];
+      megaSpawnRef.current = null;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mode, origin.xPct, origin.yPct]);
@@ -212,10 +268,15 @@ export default function LightningCanvas({
     }
   }, [megaStrike]);
 
+  const positioned = Boolean(anchorRef);
+
   return (
     <canvas
       ref={canvasRef}
-      className={className ?? 'pointer-events-none absolute inset-0'}
+      className={
+        className ??
+        `pointer-events-none z-10 ${positioned ? 'absolute inset-0 h-full w-full' : 'absolute inset-0'}`
+      }
       aria-hidden
     />
   );
