@@ -1,19 +1,9 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import LightningCanvas from '@/components/LightningCanvas';
 
 const LOADER_CSS = `
-@keyframes wr-bolt-strike {
-  0% { stroke-dashoffset: 100; opacity: 1; stroke: #ffffff; }
-  37% { stroke-dashoffset: 0; opacity: 1; stroke: #ffffff; }
-  60% { stroke-dashoffset: 0; opacity: 0.85; stroke: #36E7A1; }
-  100% { stroke-dashoffset: 0; opacity: 0; stroke: #36E7A1; }
-}
-@keyframes wr-branch-strike {
-  0% { stroke-dashoffset: 100; opacity: 0.4; stroke: #ffffff; }
-  50% { stroke-dashoffset: 0; opacity: 0.4; stroke: #ffffff; }
-  100% { stroke-dashoffset: 0; opacity: 0; stroke: #36E7A1; }
-}
 @keyframes wr-flash {
   0% { opacity: 0; }
   40% { opacity: var(--flash-max, 0.15); }
@@ -31,20 +21,20 @@ const LOADER_CSS = `
   0% { opacity: 0; transform: scale(0.85); }
   100% { opacity: 1; transform: scale(1); }
 }
-.wr-bolt { stroke-dasharray: 100; animation: wr-bolt-strike 800ms ease-out forwards; }
-.wr-branch { stroke-dasharray: 100; animation: wr-branch-strike 500ms ease-out 100ms forwards; opacity: 0; }
-.wr-flash { animation: wr-flash 140ms ease-out forwards; }
+@keyframes wr-logo-surge {
+  0% { opacity: 0; }
+  25% { opacity: 1; }
+  100% { opacity: 0; }
+}
+.wr-flash { animation: wr-flash var(--flash-ms, 140ms) ease-out forwards; }
 .wr-hud { animation: wr-hud-pulse 4s ease-in-out infinite; }
 .wr-shimmer { animation: wr-shimmer 1.4s ease-in-out infinite; }
 .wr-ready { animation: wr-ready-in 400ms ease-out forwards; }
+.wr-logo-surge { animation: wr-logo-surge 600ms ease-out forwards; }
 `;
 
-const MAIN_BOLT = 'M50 0 L44 24 L54 27 L42 52 L53 56 L40 82 L51 80 L45 100';
-const BRANCHES = [
-  'M44 24 L30 36 L36 38 L24 52',
-  'M53 56 L66 64 L60 67 L72 80',
-  'M42 52 L32 66 L38 68',
-];
+/** Logo center in the background art, as % of viewport. */
+const LOGO_ORIGIN = { xPct: 50, yPct: 45 };
 
 export interface WarRoomLoaderProps {
   /** 0–100. Omit or pass null for indeterminate shimmer mode. */
@@ -52,7 +42,7 @@ export interface WarRoomLoaderProps {
   status?: string;
   /** Show the large green READY. state. */
   ready?: boolean;
-  /** Fire one big mega-strike (e.g. on completion). */
+  /** Fire the double-ended completion strike. */
   mega?: boolean;
 }
 
@@ -62,30 +52,18 @@ export default function WarRoomLoader({
   ready = false,
   mega = false,
 }: WarRoomLoaderProps) {
-  const [strikeKey, setStrikeKey] = useState(0);
   const [flashKey, setFlashKey] = useState(0);
   const [flashMax, setFlashMax] = useState(0.15);
+  const [flashMs, setFlashMs] = useState(140);
+  const [logoSurge, setLogoSurge] = useState(false);
   const prevStatus = useRef(status);
   const megaFired = useRef(false);
 
-  // Natural repeating lightning strikes (2–3s apart).
-  useEffect(() => {
-    let timer: ReturnType<typeof setTimeout>;
-    let cancelled = false;
-    const schedule = () => {
-      timer = setTimeout(() => {
-        if (cancelled) return;
-        setFlashMax(0.15);
-        setStrikeKey((k) => k + 1);
-        setFlashKey((k) => k + 1);
-        schedule();
-      }, Math.random() * 1000 + 2000);
-    };
-    schedule();
-    return () => {
-      cancelled = true;
-      clearTimeout(timer);
-    };
+  // Screen flash whenever the canvas spawns a strike.
+  const handleStrike = useCallback((intensity: number) => {
+    setFlashMax(intensity);
+    setFlashMs(intensity >= 0.5 ? 200 : 140);
+    setFlashKey((k) => k + 1);
   }, []);
 
   // Small flash on status change (0.3 intensity of a normal flash).
@@ -93,17 +71,16 @@ export default function WarRoomLoader({
     if (prevStatus.current !== status) {
       prevStatus.current = status;
       setFlashMax(0.05);
+      setFlashMs(140);
       setFlashKey((k) => k + 1);
     }
   }, [status]);
 
-  // Mega strike on completion.
+  // Logo glow surge for 600ms on the final strike.
   useEffect(() => {
     if (mega && !megaFired.current) {
       megaFired.current = true;
-      setFlashMax(0.35);
-      setStrikeKey((k) => k + 1);
-      setFlashKey((k) => k + 1);
+      setLogoSurge(true);
     }
   }, [mega]);
 
@@ -120,27 +97,36 @@ export default function WarRoomLoader({
     >
       <style dangerouslySetInnerHTML={{ __html: LOADER_CSS }} />
 
+      {/* Procedural canvas lightning — radial strikes from the logo center */}
+      <LightningCanvas
+        mode="radial"
+        origin={LOGO_ORIGIN}
+        megaStrike={mega}
+        onStrike={handleStrike}
+      />
+
       {/* Lightning flash overlay */}
       <div
         key={`flash-${flashKey}`}
         className="wr-flash pointer-events-none absolute inset-0 bg-white"
-        style={{ '--flash-max': flashMax } as React.CSSProperties}
+        style={{ '--flash-max': flashMax, '--flash-ms': `${flashMs}ms` } as React.CSSProperties}
         aria-hidden
       />
 
-      {/* Lightning bolt over the logo bolt (screen center) */}
-      <svg
-        key={`bolt-${strikeKey}`}
-        viewBox="0 0 100 100"
-        className="pointer-events-none absolute left-1/2 top-[16%] h-[55vh] w-auto -translate-x-1/2"
-        style={{ filter: 'drop-shadow(0 0 10px rgba(54,231,161,0.7)) drop-shadow(0 0 24px rgba(167,139,250,0.4))' }}
-        aria-hidden
-      >
-        <path className="wr-bolt" d={MAIN_BOLT} pathLength={100} fill="none" strokeWidth={mega ? 2.2 : 1.4} strokeLinejoin="round" />
-        {BRANCHES.map((d, i) => (
-          <path key={i} className="wr-branch" d={d} pathLength={100} fill="none" strokeWidth={0.8} strokeLinejoin="round" style={{ animationDelay: `${100 + i * 60}ms` }} />
-        ))}
-      </svg>
+      {/* Logo glow surge on completion */}
+      {logoSurge ? (
+        <div
+          className="wr-logo-surge pointer-events-none absolute left-1/2 -translate-x-1/2 -translate-y-1/2"
+          style={{
+            top: `${LOGO_ORIGIN.yPct}%`,
+            width: '46vmin',
+            height: '46vmin',
+            background: 'radial-gradient(circle, rgba(54,231,161,0.55) 0%, rgba(54,231,161,0.18) 40%, transparent 70%)',
+            filter: 'blur(12px)',
+          }}
+          aria-hidden
+        />
+      ) : null}
 
       {/* HUD edge lines */}
       <div className="wr-hud pointer-events-none absolute left-5 top-1/2 hidden h-[40vh] -translate-y-1/2 flex-col justify-between md:flex" aria-hidden>

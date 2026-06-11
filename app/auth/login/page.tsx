@@ -6,29 +6,9 @@ import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { triggerAutoSync } from '@/lib/sync/autoSync';
+import LightningCanvas from '@/components/LightningCanvas';
 
 const LIGHTNING_CSS = `
-@keyframes bolt-flicker {
-  0%, 100% { opacity: 0; }
-  2% { opacity: 1; }
-  5% { opacity: 0.2; }
-  8% { opacity: 0.9; }
-  12% { opacity: 0; }
-  46% { opacity: 0; }
-  48% { opacity: 0.7; }
-  52% { opacity: 0; }
-}
-@keyframes bolt-flicker-2 {
-  0%, 100% { opacity: 0; }
-  22% { opacity: 0; }
-  24% { opacity: 1; }
-  27% { opacity: 0.15; }
-  30% { opacity: 0.8; }
-  34% { opacity: 0; }
-  72% { opacity: 0; }
-  74% { opacity: 0.6; }
-  78% { opacity: 0; }
-}
 @keyframes glow-breathe {
   0%, 100% { opacity: 0.35; transform: scale(1); }
   50% { opacity: 0.6; transform: scale(1.12); }
@@ -39,31 +19,9 @@ const LIGHTNING_CSS = `
   88% { opacity: 0.4; }
   100% { transform: translateY(-90vh) translateX(24px); opacity: 0; }
 }
-.bolt-a { animation: bolt-flicker 7s linear infinite; }
-.bolt-b { animation: bolt-flicker-2 9s linear infinite; }
-.bolt-c { animation: bolt-flicker 11s linear infinite 3s; }
-.bolt-d { animation: bolt-flicker-2 8s linear infinite 1.5s; }
 .glow-blob { animation: glow-breathe 6s ease-in-out infinite; }
 .particle { animation: particle-rise linear infinite; }
 `;
-
-function Bolt({
-  d,
-  color,
-  className,
-}: {
-  d: string;
-  color: string;
-  className: string;
-}) {
-  return (
-    <g className={className}>
-      <path d={d} fill="none" stroke={color} strokeWidth={3.5} strokeLinejoin="round" opacity={0.25} style={{ filter: `drop-shadow(0 0 14px ${color})` }} />
-      <path d={d} fill="none" stroke={color} strokeWidth={1.4} strokeLinejoin="round" style={{ filter: `drop-shadow(0 0 6px ${color})` }} />
-      <path d={d} fill="none" stroke="#ffffff" strokeWidth={0.5} strokeLinejoin="round" opacity={0.9} />
-    </g>
-  );
-}
 
 function LightningBackground() {
   const particles = [
@@ -93,17 +51,8 @@ function LightningBackground() {
         style={{ background: 'linear-gradient(to top, rgba(54,231,161,0.05) 0%, transparent 60%)' }}
       />
 
-      {/* Lightning bolts */}
-      <svg className="absolute inset-0 h-full w-full" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice">
-        {/* Green — left */}
-        <Bolt className="bolt-a" color="#36E7A1" d="M310 -20 L285 160 L340 175 L260 360 L325 372 L210 620 L290 600 L235 820" />
-        <Bolt className="bolt-c" color="#36E7A1" d="M120 -30 L160 190 L105 210 L190 430 L130 450 L215 700" />
-        <Bolt className="bolt-b" color="#36E7A1" d="M520 -10 L495 130 L545 145 L470 330 L520 345 L455 540" />
-        {/* Purple — right */}
-        <Bolt className="bolt-b" color="#A78BFA" d="M1610 -20 L1640 170 L1580 190 L1670 400 L1605 420 L1700 660 L1630 645 L1690 860" />
-        <Bolt className="bolt-d" color="#A78BFA" d="M1790 -30 L1755 150 L1810 170 L1730 380 L1790 395 L1715 600" />
-        <Bolt className="bolt-a" color="#A78BFA" d="M1420 -10 L1450 140 L1395 160 L1475 350 L1420 370 L1490 560" />
-      </svg>
+      {/* Procedural canvas lightning — green left, purple right */}
+      <LightningCanvas mode="ambient" />
 
       {/* Energy particles */}
       {particles.map((p, i) => (
