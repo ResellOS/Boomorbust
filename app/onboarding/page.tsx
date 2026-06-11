@@ -141,25 +141,15 @@ export default function OnboardingPage() {
       }
     }
 
-    setStep('syncing');
-
+    // Hand off to the full-screen War Room sync page, which runs the sync
+    // and polls progress before landing on the dashboard.
     try {
-      const res = await fetch('/api/sync', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(ids.length > 0 ? { league_ids: ids } : {}),
-      });
-      const data = (await res.json()) as { leagues_synced?: number; error?: string; success?: boolean };
-      setLeagueCount(data.leagues_synced ?? 0);
-      if (!res.ok || data.success === false) {
-        setSyncError(data.error ?? 'Sync encountered an error. You can retry from Settings.');
-      }
+      sessionStorage.setItem('bob:onboarding_league_ids', JSON.stringify(ids));
     } catch {
-      setSyncError('Sync encountered an error. You can retry from Settings.');
-    } finally {
-      setSyncLoading(false);
-      setStep('done');
+      /* sync page falls back to all-leagues sync */
     }
+    setSyncLoading(false);
+    router.push('/onboarding/syncing');
   }
 
   if (!authChecked) {

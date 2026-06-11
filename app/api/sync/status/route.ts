@@ -8,6 +8,11 @@ export interface SyncStatusResponse {
   dataReady: boolean;
   leagueCount: number;
   rosterCount: number;
+  /** Coarse sync stage derived from current data state. */
+  stage: string;
+  /** 0–100 estimate derived from current data state. */
+  progress: number;
+  playerCount: number;
 }
 
 export async function GET() {
@@ -50,10 +55,35 @@ export async function GET() {
 
   const dataReady = (leagueCount ?? 0) > 0 && rosterCount > 0;
 
+  // Player count across the user's rosters (cheap: ≤ ~15 rows).
+  let playerCount = 0;
+  if (sleeperUserId) {
+    const { data: rosterRows } = await supabase
+      .from('rosters')
+      .select('players, player_ids')
+      .eq('owner_id', sleeperUserId);
+    for (const row of (rosterRows ?? []) as { players?: string[] | null; player_ids?: string[] | null }[]) {
+      playerCount += row.players?.length ?? row.player_ids?.length ?? 0;
+    }
+  }
+
+  let stage = 'connecting';
+  let progress = 5;
+  if ((leagueCount ?? 0) > 0 && rosterCount === 0) {
+    stage = 'importing_leagues';
+    progress = 45;
+  } else if (dataReady) {
+    stage = 'complete';
+    progress = 100;
+  }
+
   return NextResponse.json({
     lastSyncedAt,
     dataReady,
     leagueCount: leagueCount ?? 0,
     rosterCount,
+    stage,
+    progress,
+    playerCount,
   } satisfies SyncStatusResponse);
 }
