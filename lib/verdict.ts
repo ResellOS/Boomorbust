@@ -20,6 +20,23 @@ export function getTradeVerdictLabel(score: number): 'BOOM' | 'HOLD' | 'BUST' {
   return 'BUST';
 }
 
+function seededUnit(seed: string, salt: number): number {
+  let h = 0x811c9dc5;
+  const s = `${seed}:${salt}`;
+  for (let i = 0; i < s.length; i++) {
+    h ^= s.charCodeAt(i);
+    h = Math.imul(h, 0x01000193);
+  }
+  return 0.35 + (((h >>> 0) % 6001) / 10000);
+}
+
+export function deriveRadarVals(playerId: string, tfoScore: number): number[] {
+  const base = tfoScore / 100;
+  return Array.from({ length: 5 }, (_, i) =>
+    Math.min(0.98, Math.max(0.15, base * seededUnit(playerId, i))),
+  );
+}
+
 export function placeholderAcquireCost(score: number): string {
   if (score >= 82) return 'Early 2nd + Flex';
   if (score >= 78) return 'Mid 2nd';

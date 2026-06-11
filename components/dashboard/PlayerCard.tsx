@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import Image from 'next/image';
-import { getTier, getVerdict } from '@/lib/verdict';
+import { deriveRadarVals, getTier, getVerdict } from '@/lib/verdict';
 
 export interface PlayerCardProps {
   playerName: string;
@@ -14,29 +14,37 @@ export interface PlayerCardProps {
   tier: string;
 }
 
-const AXIS_LABELS = ['OPPORTUNITY', 'SITUATION', 'AGE CURVE', 'IQ', 'UPSIDE'] as const;
+// Position-specific F-FIG pentagon axes (LOCKED — see CLAUDE.md formula engine).
+// Abbreviated to ≤6 chars to fit the in-card radar.
+const POSITION_AXES: Record<string, readonly string[]> = {
+  QB: ['PASS', 'RUSH', 'OLINE', 'WRQUAL', 'SCHEME'],
+  RB: ['RUSH', 'TGTS', 'OLINE', 'EXPLOS', 'RZTCH'],
+  WR: ['TGTS', 'AIRYDS', 'SEPAR', 'YAC', 'RZTGT'],
+  TE: ['TGTS', 'AIRYDS', 'SEPAR', 'YAC', 'RZTGT'],
+};
+const DEFAULT_AXES = ['OPPORT', 'SITUAT', 'AGE', 'IQ', 'UPSIDE'] as const;
+
+// Position accent colors (LOCKED design system).
+const POSITION_COLOR: Record<string, string> = {
+  WR: '#22D3EE',
+  RB: '#36E7A1',
+  QB: '#FBBF24',
+  TE: '#A78BFA',
+};
+
+function axisLabelsFor(position: string): readonly string[] {
+  return POSITION_AXES[(position ?? '').toUpperCase()] ?? DEFAULT_AXES;
+}
+
+function axisColorFor(position: string): string {
+  return POSITION_COLOR[(position ?? '').toUpperCase()] ?? '#6b7a99';
+}
+
 const N = 5;
 const CX = 98;
 const CY = 93;
 const MAX_R = 50;
 const LABEL_R = 62;
-
-function seededUnit(seed: string, salt: number): number {
-  let h = 0x811c9dc5;
-  const s = `${seed}:${salt}`;
-  for (let i = 0; i < s.length; i++) {
-    h ^= s.charCodeAt(i);
-    h = Math.imul(h, 0x01000193);
-  }
-  return 0.35 + (((h >>> 0) % 6001) / 10000);
-}
-
-export function deriveRadarVals(playerId: string, tfoScore: number): number[] {
-  const base = tfoScore / 100;
-  return Array.from({ length: N }, (_, i) =>
-    Math.min(0.98, Math.max(0.15, base * seededUnit(playerId, i))),
-  );
-}
 
 function vertexPoint(i: number, radius: number): { x: number; y: number } {
   const angle = (-Math.PI / 2) + (i * 2 * Math.PI) / N;
@@ -84,6 +92,8 @@ export default function PlayerCard({
   const [imgFailed, setImgFailed] = useState(false);
   const verdict = getVerdict(tfoScore);
   const displayTier = tier || getTier(tfoScore);
+  const axisLabels = axisLabelsFor(position);
+  const axisColor = axisColorFor(position);
 
   const radar = useMemo(() => {
     const vals = radarVals.length === N ? radarVals : deriveRadarVals(playerId, tfoScore);
@@ -104,7 +114,7 @@ export default function PlayerCard({
       const p = vertexPoint(i, MAX_R);
       return { x2: p.x, y2: p.y };
     });
-    const labels = AXIS_LABELS.map((label, i) => {
+    const labels = axisLabels.map((label, i) => {
       const p = vertexPoint(i, LABEL_R);
       return { label, x: p.x, y: p.y };
     });
@@ -113,7 +123,7 @@ export default function PlayerCard({
       return { x: p.x, y: p.y, value: Math.round(v * 100) };
     });
     return { rings, dataPts, axisLines, labels, valueLabels, vals };
-  }, [playerId, radarVals, tfoScore]);
+  }, [playerId, radarVals, tfoScore, axisLabels]);
 
   return (
     <div
@@ -222,10 +232,11 @@ export default function PlayerCard({
                 textAnchor="middle"
                 dominantBaseline="middle"
                 className="font-mono"
-                fill="#6b7a99"
+                fill={axisColor}
+                fillOpacity={0.85}
                 fontSize={7}
               >
-                {l.label.length > 10 ? `${l.label.slice(0, 9)}…` : l.label}
+                {l.label.length > 6 ? l.label.slice(0, 6) : l.label}
               </text>
             ))}
             {radar.valueLabels.map((vl, i) => (

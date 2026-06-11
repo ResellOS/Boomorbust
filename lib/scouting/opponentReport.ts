@@ -80,14 +80,18 @@ export async function generateOpponentReport(
   const playerIds = roster?.players ?? [];
 
   // Fetch TFO scores for opponent players
+  // formula_scores has no `grade` column — derive it from tfo_score.
   const { data: tfoRows } = await db
-    .from('tfo_cache')
-    .select('player_id, tfo_score, grade, verdict')
+    .from('formula_scores')
+    .select('player_id, tfo_score, verdict')
     .in('player_id', playerIds.slice(0, 50));
 
   const tfoMap = new Map<string, { tfo_score: number; grade: string; verdict: string }>();
-  for (const row of (tfoRows ?? []) as Array<{ player_id: string; tfo_score: number; grade: string; verdict: string }>) {
-    tfoMap.set(row.player_id, row);
+  for (const row of (tfoRows ?? []) as Array<{ player_id: string; tfo_score: number; verdict: string }>) {
+    const s = Number(row.tfo_score) || 0;
+    const grade =
+      s >= 88 ? 'ELITE' : s >= 75 ? 'HIGH VALUE' : s >= 60 ? 'VIABLE' : s >= 45 ? 'SPECULATIVE' : 'AVOID';
+    tfoMap.set(row.player_id, { tfo_score: s, grade, verdict: row.verdict });
   }
 
   // Fetch DMP for opponent

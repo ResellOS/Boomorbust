@@ -99,7 +99,7 @@ export async function generateBlueprint(
   // Key risks: high MRS or declining TFO
   const keyRisks: string[] = [];
   const { data: tfoRows } = await supabase
-    .from('tfo_cache')
+    .from('formula_scores')
     .select('player_id, verdict, dms_score')
     .in('player_id', playerIds)
     .order('calculated_at', { ascending: false });

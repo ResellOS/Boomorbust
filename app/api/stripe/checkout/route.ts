@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createPricingCheckoutSession } from '@/lib/stripe/pricing';
 import {
   createCheckoutSession,
   createCheckoutSessionFromPriceId,
@@ -15,14 +16,10 @@ type Body = {
   plan?: string;
   tier?: string;
   interval?: string;
+  successUrl?: string;
+  cancelUrl?: string;
 };
 
-/**
- * Landing + legacy checkout.
- * - Body `{ plan: 'rookie' | 'veteran' | 'allpro' }` resolves Stripe price from env (All-Pro falls back to canonical price id).
- * - Body `{ priceId }` allowed only if the id is in the configured allowlist (same env set).
- * - Legacy: `{ tier, interval }` or empty body → existing tier checkout.
- */
 export async function POST(request: Request) {
   const supabase = createClient();
   const {
@@ -37,27 +34,17 @@ export async function POST(request: Request) {
     body = {};
   }
 
-  const planRaw = typeof body.plan === 'string' ? body.plan.trim().toLowerCase() : '';
+  const successPath = body.successUrl ?? '/dashboard?upgraded=true';
+  const cancelPath = body.cancelUrl ?? '/pricing';
   const priceFromClient = typeof body.priceId === 'string' ? body.priceId.trim() : '';
 
-  let priceId: string | null = null;
-  if (planRaw === 'rookie' || planRaw === 'veteran' || planRaw === 'allpro') {
-    priceId = resolveLandingCheckoutPriceId(planRaw);
-    if (!priceId) {
-      return NextResponse.json({ error: 'Checkout is not configured for this plan' }, { status: 400 });
-    }
-  } else if (priceFromClient) {
-    priceId = priceFromClient;
-  }
-
-  const allowed = new Set(listLandingCheckoutPriceIds());
-  if (priceId && allowed.has(priceId)) {
-    const subscriptionTier = subscriptionTierForLandingPriceId(priceId);
-    const { url, error } = await createCheckoutSessionFromPriceId({
+  if (priceFromClient) {
+    const { url, error } = await createPricingCheckoutSession({
       userId: user.id,
       email: user.email,
-      priceId,
-      subscriptionTier,
+      priceId: priceFromClient,
+      successUrl: successPath,
+      cancelUrl: cancelPath,
     });
     if (error || !url) {
       return NextResponse.json({ error: error ?? 'Could not create session' }, { status: 400 });
@@ -65,8 +52,40 @@ export async function POST(request: Request) {
     return NextResponse.json({ url });
   }
 
-  if (priceFromClient && !allowed.has(priceFromClient)) {
-    return NextResponse.json({ error: 'Invalid price' }, { status: 400 });
+  const planRaw = typeof body.plan === 'string' ? body.plan.trim().toLowerCase() : '';
+  let priceId: string | null = null;
+  if (planRaw === 'rookie' || planRaw === 'veteran' || planRaw === 'allpro') {
+    priceId = resolveLandingCheckoutPriceId(planRaw);
+    if (!priceId) {
+      return NextResponse.json({ error: 'Checkout is not configured for this plan' }, { status: 400 });
+    }
+  }
+
+  const allowed = new Set(listLandingCheckoutPriceIds());
+  if (priceId && allowed.has(priceId)) {
+    const subscriptionTier = subscriptionTierForLandingPriceId(priceId);
+    const { url, error } = await createPricingCheckoutSession({
+      userId: user.id,
+      email: user.email,
+      priceId,
+      successUrl: successPath,
+      cancelUrl: cancelPath,
+    });
+    if (error || !url) {
+      const legacy = await createCheckoutSessionFromPriceId({
+        userId: user.id,
+        email: user.email,
+        priceId,
+        subscriptionTier,
+        successPath,
+        cancelPath,
+      });
+      if (legacy.error || !legacy.url) {
+        return NextResponse.json({ error: error ?? legacy.error ?? 'Could not create session' }, { status: 400 });
+      }
+      return NextResponse.json({ url: legacy.url });
+    }
+    return NextResponse.json({ url });
   }
 
   let tier: CheckoutTier = 'pro';
@@ -79,6 +98,8 @@ export async function POST(request: Request) {
     email: user.email,
     tier,
     interval,
+    successPath,
+    cancelPath,
   });
 
   if (error || !url) {

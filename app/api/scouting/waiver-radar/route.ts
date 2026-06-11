@@ -58,7 +58,7 @@ export async function GET(req: NextRequest) {
 
   // Pull players with TFO scores, excluding already-rostered players
   const { data: tfoRows } = await adminSupabase
-    .from('tfo_cache')
+    .from('formula_scores')
     .select('player_id, tfo_score, verdict')
     .not('tfo_score', 'is', null)
     .order('tfo_score', { ascending: false })
@@ -75,11 +75,11 @@ export async function GET(req: NextRequest) {
   const topIds = candidates.slice(0, 30).map((r) => String(r.player_id));
   const { data: playerRows } = await adminSupabase
     .from('players')
-    .select('player_id, full_name, position, team')
-    .in('player_id', topIds);
+    .select('id, full_name, position, team')
+    .in('id', topIds);
 
   const playerMap = new Map(
-    (playerRows ?? []).map((p) => [String(p.player_id), p])
+    (playerRows ?? []).map((p) => [String(p.id), p])
   );
 
   const rows: WaiverRadarRow[] = candidates

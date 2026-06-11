@@ -1,66 +1,137 @@
 import { NextResponse, type NextRequest } from 'next/server';
-import type { SmartCounterApiResponse, SmartCounterCardDto } from '@/components/trade-hub/types';
-import { requireFeature } from '@/lib/access/gates';
+import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
+import type { SmartCounterResponse } from '@/lib/trade/types';
 
 export const dynamic = 'force-dynamic';
 
-/** Placeholder TRE counter payloads until TRE engine is wired. */
-function countersForOffer(offerId: string): SmartCounterCardDto[] {
-  void offerId;
+interface CounterBody {
+  offered_players?: string[];
+  your_players?: string[];
+  league_id?: string;
+  offer_id?: string | null;
+  offer?: { id?: string };
+}
+
+async function tfoScoresForPlayers(
+  playerIds: string[],
+): Promise<Map<string, number>> {
+  const map = new Map<string, number>();
+  if (!playerIds.length) return map;
+
+  try {
+    const supabase = createAdminClient();
+    const { data, error } = await supabase
+      .from('formula_scores')
+      .select('player_id, tfo_score, calculated_at')
+      .in('player_id', playerIds)
+      .order('calculated_at', { ascending: false });
+
+    if (error) throw error;
+    for (const row of data ?? []) {
+      const pid = row.player_id as string;
+      if (!map.has(pid) && typeof row.tfo_score === 'number') {
+        map.set(pid, row.tfo_score);
+      }
+    }
+  } catch (err) {
+    console.error('[counter] tfo fetch failed:', err);
+  }
+
+  for (const pid of playerIds) {
+    if (!map.has(pid)) map.set(pid, 50);
+  }
+  return map;
+}
+
+function sumScores(ids: string[], scores: Map<string, number>): number {
+  return ids.reduce((s, id) => s + (scores.get(id) ?? 50), 0);
+}
+
+function buildCounters(
+  offered: string[],
+  yours: string[],
+  scores: Map<string, number>,
+): SmartCounterResponse[] {
+  const receiveTotal = sumScores(offered, scores);
+  const giveTotal = sumScores(yours, scores);
+  const gap = receiveTotal - giveTotal;
+
+  const aggressiveEdge = Math.round((gap + 12) * 10) / 10;
+  const balancedEdge = Math.round((gap + 4) * 10) / 10;
+  const conservativeEdge = Math.round((gap - 2) * 10) / 10;
+
+  const weakest =
+    yours.length > 0
+      ? yours.reduce((min, id) =>
+          (scores.get(id) ?? 50) < (scores.get(min) ?? 50) ? id : min,
+        yours[0])
+      : null;
+
   return [
     {
       tier: 'aggressive',
-      label: 'RESPONSE 1 · AGGRESSIVE',
       title: 'Counter with Confidence',
       description: 'Keep your stars, add value',
-      modification: '✦ Add: 2nd Round Pick',
-      treScoreDisplay: '+15.2',
+      adjustment: 'Add 2nd Round Pick',
+      adjustmentType: 'add',
+      edgeScore: aggressiveEdge,
+      copyText: `BOB Smart Counter (Aggressive): Request a 2nd round pick added to balance this deal. Target +${aggressiveEdge.toFixed(1)} dynasty edge.`,
     },
     {
       tier: 'balanced',
-      label: 'RESPONSE 2 · BALANCED',
       title: 'Fair Counter',
       description: 'Adjust value slightly',
-      modification: '✦ Remove: 2nd Round Pick',
-      treScoreDisplay: '+7.8',
+      adjustment: gap > 0 ? 'Remove 2nd Round Pick' : 'Swap equivalent pick',
+      adjustmentType: gap > 0 ? 'remove' : 'neutral',
+      edgeScore: balancedEdge,
+      copyText: `BOB Smart Counter (Balanced): Minor pick adjustment to even out value. Target +${balancedEdge.toFixed(1)} dynasty edge.`,
     },
     {
       tier: 'conservative',
-      label: 'RESPONSE 3 · CONSERVATIVE',
       title: 'Protect Assets',
       description: 'Minimize risk, maintain depth',
-      modification: '✦ Tighten picks to protect downside',
-      treScoreDisplay: '+3.1',
+      adjustment: weakest ? `Remove player ${weakest} from give side` : 'Reduce give package',
+      adjustmentType: 'remove',
+      edgeScore: conservativeEdge,
+      copyText: `BOB Smart Counter (Conservative): Trim the give side to protect core assets. Target +${conservativeEdge.toFixed(1)} dynasty edge.`,
     },
   ];
 }
 
 export async function POST(req: NextRequest) {
-  const gate = await requireFeature('smart_counter');
-  if (gate instanceof NextResponse) return gate;
+  const auth = createClient();
+  const {
+    data: { user },
+  } = await auth.auth.getUser();
+  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-  let body: unknown;
+  let body: CounterBody;
   try {
-    body = await req.json();
+    body = (await req.json()) as CounterBody;
   } catch {
     return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 });
   }
 
-  const offer = (body as { offer?: unknown }).offer;
-  if (!offer || typeof offer !== 'object') {
-    return NextResponse.json({ error: 'offer object is required' }, { status: 400 });
+  const offered = Array.isArray(body.offered_players) ? body.offered_players : [];
+  const yours = Array.isArray(body.your_players) ? body.your_players : [];
+  const leagueId = body.league_id ?? '';
+
+  if (!leagueId && !body.offer?.id && offered.length === 0 && yours.length === 0) {
+    return NextResponse.json({ error: 'league_id and players required' }, { status: 400 });
   }
 
-  const id = (offer as { id?: unknown }).id;
-  if (typeof id !== 'string' || !id.trim()) {
-    return NextResponse.json({ error: 'offer.id is required' }, { status: 400 });
+  try {
+    const scores = await tfoScoresForPlayers([...offered, ...yours]);
+    const counters = buildCounters(offered, yours, scores);
+
+    return NextResponse.json({
+      offerId: body.offer_id ?? body.offer?.id ?? null,
+      leagueId,
+      counters,
+    });
+  } catch (err) {
+    console.error('[counter] failed:', err);
+    return NextResponse.json({ error: 'Counter generation failed' }, { status: 500 });
   }
-
-  const offerId = id.trim();
-  const bodyOut: SmartCounterApiResponse = {
-    offerId,
-    responses: countersForOffer(offerId),
-  };
-
-  return NextResponse.json(bodyOut);
 }

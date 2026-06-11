@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 
 interface FooterProps {
   leagueCount: number;
-  connectedLeagues: number;
   edgeOpportunities: number;
   lastRunMinutes?: number;
 }
@@ -17,7 +16,6 @@ function formatCountdown(totalSeconds: number): string {
 
 export default function Footer({
   leagueCount,
-  connectedLeagues,
   edgeOpportunities,
   lastRunMinutes = 8,
 }: FooterProps) {
@@ -75,7 +73,7 @@ export default function Footer({
             League Sync
           </div>
           <div className="font-figtree text-sm font-bold text-boom">
-            {connectedLeagues}/{leagueCount}
+            {leagueCount}/{leagueCount}
           </div>
         </div>
         <div className="ml-1.5 flex items-center gap-[5px]">

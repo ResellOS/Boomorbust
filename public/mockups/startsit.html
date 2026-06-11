@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Boom or Bust — Start / Sit</title>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --boom:#36E7A1;--bust:#A78BFA;--hold:#FBBF24;
+  --bg:#0a0d14;--surface:#0f1420;--surface2:#141929;--card:#080d14;
+  --border:#1e2640;--text:#e8ecf4;--muted:#6b7a99;--danger:#ef4444;
+}
+html,body{height:100%;overflow:hidden;}
+body{background:var(--bg);color:var(--text);font-family:'Figtree',sans-serif;display:flex;flex-direction:column;}
+
+/* TOPBAR */
+.topbar{height:58px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;flex-shrink:0;}
+.topbar-logo{width:215px;flex-shrink:0;border-right:1px solid var(--border);display:flex;align-items:center;padding:0 12px;}
+.topbar-logo img{height:42px;width:auto;mix-blend-mode:screen;filter:brightness(1.2) saturate(1.3) contrast(1.1);transform:scale(1.08);}
+.topbar-stats{display:flex;flex:1;}
+.top-stat{display:flex;flex-direction:column;justify-content:center;padding:0 18px;border-right:1px solid var(--border);flex:1;}
+.top-stat:last-child{border-right:none;}
+.ts-label{font-size:8px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;white-space:nowrap;}
+.ts-val{font-family:'JetBrains Mono',monospace;font-size:18px;line-height:1;margin-top:1px;}
+.ts-sub{font-size:9px;color:var(--muted);margin-top:1px;}
+.c-white{color:var(--text);}.c-boom{color:var(--boom);}.c-hold{color:var(--hold);}.c-danger{color:var(--danger);}
+
+/* LAYOUT */
+.body-wrap{display:flex;flex:1;overflow:hidden;}
+
+/* SIDEBAR */
+.sidebar{width:215px;flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto;}
+.sb-section{padding:10px 12px 6px;}
+.sb-label{font-size:8px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;font-weight:500;margin-bottom:6px;}
+.nav-item{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:4px;font-size:12px;cursor:pointer;color:var(--muted);margin-bottom:1px;border-left:2px solid transparent;text-decoration:none;}
+.nav-item:hover{color:var(--text);background:rgba(255,255,255,0.03);}
+.nav-item.active{color:var(--boom);border-left-color:var(--boom);background:rgba(54,231,161,0.06);}
+.divider{height:1px;background:var(--border);margin:4px 12px;}
+.league-item{display:flex;align-items:center;padding:5px 12px;font-size:11px;gap:7px;}
+.league-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+.league-name{flex:1;color:var(--text);}
+.badge{font-size:8px;padding:2px 6px;border-radius:3px;font-weight:500;}
+.badge-c{background:rgba(54,231,161,0.1);color:var(--boom);}
+.badge-r{background:rgba(167,139,250,0.1);color:var(--bust);}
+
+/* Week context */
+.ctx-row{display:flex;justify-content:space-between;align-items:center;padding:4px 12px;font-size:10px;}
+.ctx-label{color:var(--muted);}
+.ctx-val{color:var(--text);}
+.ctx-open{color:var(--boom);}
+.ctx-deadline{color:var(--hold);}
+.ctx-low{color:var(--boom);}
+.view-matchup{display:flex;align-items:center;gap:4px;font-size:10px;color:var(--boom);padding:8px 12px;cursor:pointer;}
+
+/* AI score */
+.ai-section{padding:10px 12px;}
+.ai-circle-wrap{position:relative;width:80px;height:80px;margin:8px auto;}
+.ai-circle-wrap svg{width:80px;height:80px;}
+.ai-circle-inner{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.ai-pct{font-family:'JetBrains Mono',monospace;font-size:20px;color:var(--boom);}
+.ai-sub-label{font-size:8px;color:var(--muted);text-align:center;margin-top:2px;}
+.ai-note{font-size:9px;color:var(--muted);text-align:center;margin-top:6px;line-height:1.4;}
+
+/* MAIN */
+.main{flex:1;overflow:hidden;display:flex;flex-direction:column;min-width:0;}
+.main-header{padding:10px 18px 6px;flex-shrink:0;display:flex;align-items:flex-start;justify-content:space-between;}
+.page-title{font-size:22px;font-weight:700;letter-spacing:-0.5px;text-transform:uppercase;}
+.page-sub{font-size:11px;color:var(--muted);margin-top:2px;}
+.week-controls{display:flex;align-items:center;gap:8px;}
+.week-nav{display:flex;align-items:center;gap:0;background:var(--surface2);border:1px solid var(--border);border-radius:5px;overflow:hidden;}
+.week-btn{width:28px;height:28px;display:flex;align-items:center;justify-content:center;background:none;border:none;color:var(--muted);cursor:pointer;font-size:13px;}
+.week-btn:hover{color:var(--text);}
+.week-label{font-size:11px;color:var(--text);padding:0 10px;border-left:1px solid var(--border);border-right:1px solid var(--border);}
+.league-select{height:28px;padding:0 10px;border-radius:5px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-size:11px;font-family:'Figtree',sans-serif;cursor:pointer;}
+
+.main-scroll{flex:1;overflow-y:auto;padding:0 18px 12px;}
+
+/* Season record banner */
+.record-banner{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:12px 16px;display:flex;align-items:center;gap:0;margin-bottom:10px;}
+.record-left{flex:1;}
+.record-title{font-size:8px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px;}
+.record-nums{display:flex;align-items:center;gap:12px;}
+.record-num{font-family:'JetBrains Mono',monospace;font-size:28px;font-weight:700;}
+.record-dash{font-family:'JetBrains Mono',monospace;font-size:20px;color:var(--muted);margin:0 2px;}
+.record-num-label{font-size:9px;color:var(--muted);margin-top:2px;}
+.record-divider{width:1px;height:60px;background:var(--border);margin:0 24px;}
+.record-right{display:flex;align-items:center;gap:14px;}
+.win-rate-pct{font-family:'JetBrains Mono',monospace;font-size:36px;color:var(--boom);font-weight:700;}
+.win-rate-info{display:flex;flex-direction:column;gap:3px;}
+.win-rate-label{font-size:11px;color:var(--text);}
+.win-rate-sub{font-size:9px;color:var(--muted);}
+.win-rate-sub2{font-size:9px;color:var(--muted);}
+.shield-icon{width:36px;height:36px;border-radius:50%;background:rgba(54,231,161,0.1);border:1px solid rgba(54,231,161,0.3);display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--boom);}
+
+/* START/SIT grid */
+.ss-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}
+.ss-panel{background:var(--surface);border:1px solid var(--border);border-radius:6px;overflow:hidden;}
+.ss-panel-header{padding:8px 12px 5px;border-bottom:1px solid var(--border);}
+.ss-panel-title{font-size:10px;font-weight:600;letter-spacing:0.5px;display:flex;align-items:center;gap:5px;}
+.ss-panel-sub{font-size:9px;color:var(--muted);margin-top:1px;}
+.start-title{color:var(--boom);}
+.sit-title{color:var(--danger);}
+
+.ss-row{display:grid;grid-template-columns:26px 130px 1fr 52px 44px;align-items:center;gap:6px;padding:5px 12px;border-bottom:1px solid rgba(30,38,64,0.5);}
+.ss-row:last-child{border-bottom:none;}
+.ss-avatar{width:24px;height:24px;border-radius:50%;background:var(--surface2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:7px;color:var(--muted);flex-shrink:0;}
+.ss-player-name{font-size:11px;color:var(--text);}
+.ss-player-meta{font-size:9px;color:var(--muted);}
+.ss-matchup{font-size:9px;color:var(--muted);}
+.ss-bar-wrap{display:flex;align-items:center;gap:4px;}
+.ss-bar-track{flex:1;height:5px;background:#1e2640;border-radius:2px;overflow:hidden;}
+.ss-bar-fill{height:100%;border-radius:2px;}
+.ss-score{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:500;text-align:right;}
+.ss-proj{font-size:8px;color:var(--muted);text-align:right;}
+.ss-note{font-size:8px;color:var(--muted);line-height:1.3;grid-column:2/-1;padding-top:0;display:none;}
+
+/* Flex decisions */
+.flex-section{background:var(--surface);border:1px solid var(--border);border-radius:6px;overflow:hidden;}
+.flex-header{padding:8px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;}
+.flex-title{font-size:10px;font-weight:600;color:var(--hold);letter-spacing:0.5px;display:flex;align-items:center;gap:5px;}
+.flex-sub{font-size:9px;color:var(--muted);}
+.flex-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:0;}
+.flex-card{padding:10px 12px;border-right:1px solid var(--border);}
+.flex-card:last-child{border-right:none;}
+.flex-card-title{font-size:8px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;}
+.flex-matchup{display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:6px;}
+.flex-player{display:flex;flex-direction:column;align-items:center;gap:3px;flex:1;}
+.flex-avatar{width:28px;height:28px;border-radius:50%;background:var(--surface2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:8px;color:var(--muted);}
+.flex-pname{font-size:10px;color:var(--text);text-align:center;}
+.flex-pmeta{font-size:8px;color:var(--muted);text-align:center;}
+.flex-rating{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);}
+.flex-rating-label{font-size:8px;color:var(--muted);}
+.flex-vs{font-size:10px;color:var(--muted);font-weight:500;}
+.flex-pick{background:rgba(54,231,161,0.06);border:1px solid rgba(54,231,161,0.15);border-radius:4px;padding:6px 8px;margin-top:4px;}
+.flex-pick-label{font-size:8px;color:var(--boom);letter-spacing:0.5px;text-transform:uppercase;font-weight:600;}
+.flex-pick-name{font-size:10px;color:var(--text);margin:1px 0;}
+.flex-pick-note{font-size:8px;color:var(--muted);line-height:1.3;}
+.flex-edge{font-size:9px;color:var(--boom);font-family:'JetBrains Mono',monospace;}
+
+/* RIGHT PANEL */
+.right-panel{width:272px;flex-shrink:0;background:var(--surface);border-left:1px solid var(--border);overflow-y:auto;display:flex;flex-direction:column;}
+.rp-section{padding:12px 14px;border-bottom:1px solid var(--border);}
+.rp-label{font-size:8px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;font-weight:500;margin-bottom:8px;}
+
+/* This week record */
+.record-row{display:flex;justify-content:space-between;align-items:center;padding:3px 0;}
+.record-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.record-item-label{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text);}
+.record-item-val{font-size:11px;font-family:'JetBrains Mono',monospace;color:var(--muted);}
+.winrate-row{display:flex;justify-content:space-between;align-items:center;margin:8px 0 4px;}
+.winrate-label{font-size:10px;color:var(--muted);}
+.winrate-val{font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--boom);}
+.winrate-bar-track{height:5px;background:#1e2640;border-radius:2px;overflow:hidden;margin-bottom:4px;}
+.winrate-bar-correct{height:100%;width:80%;background:var(--boom);border-radius:2px;}
+.winrate-labels{display:flex;justify-content:space-between;}
+.wl-label{font-size:8px;color:var(--muted);}
+
+/* Sparkline season */
+.sparkline-wrap{margin:4px 0;}
+
+/* High confidence alerts */
+.alert-card{border-radius:5px;padding:8px 10px;margin-bottom:6px;}
+.alert-card:last-child{margin-bottom:0;}
+.alert-card-must-start{background:rgba(54,231,161,0.06);border:1px solid rgba(54,231,161,0.2);}
+.alert-card-must-sit{background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.2);}
+.alert-card-sleeper{background:rgba(167,139,250,0.06);border:1px solid rgba(167,139,250,0.2);}
+.alert-type{font-size:8px;font-weight:600;letter-spacing:1px;text-transform:uppercase;display:flex;align-items:center;gap:4px;margin-bottom:3px;}
+.at-start{color:var(--boom);}
+.at-sit{color:var(--danger);}
+.at-sleeper{color:var(--bust);}
+.alert-player-row{display:flex;justify-content:space-between;align-items:flex-start;}
+.alert-pname{font-size:11px;color:var(--text);}
+.alert-pmeta{font-size:9px;color:var(--muted);margin-top:1px;}
+.alert-conf{font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:500;}
+.alert-conf-label{font-size:8px;color:var(--muted);text-align:right;}
+.alert-note{font-size:9px;color:var(--muted);margin-top:3px;}
+
+/* Lineup optimizer */
+.optimizer-btn{width:100%;padding:9px 0;border-radius:5px;border:none;background:var(--boom);color:#0a0d14;font-size:12px;font-family:'Figtree',sans-serif;cursor:pointer;font-weight:700;letter-spacing:0.3px;margin-top:8px;}
+
+/* FOOTER */
+.footer{height:28px;background:var(--surface);border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 14px;flex-shrink:0;}
+.footer-item{display:flex;align-items:center;gap:4px;font-size:8px;color:var(--muted);letter-spacing:0.5px;text-transform:uppercase;white-space:nowrap;}
+.footer-dot{width:5px;height:5px;border-radius:50%;}
+.fv-boom{color:var(--boom);}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-logo"><img src="/logo.png" alt="Boom or Bust"></div>
+  <div class="topbar-stats">
+    <div class="top-stat"><div class="ts-label">Season Record</div><div class="ts-val c-white">42-18-2</div><div class="ts-sub">80% Win Rate</div></div>
+    <div class="top-stat"><div class="ts-label">Win Rate</div><div class="ts-val c-boom">80%</div><div class="ts-sub">Verified Performance</div></div>
+    <div class="top-stat"><div class="ts-label">This Week's Calls</div><div class="ts-val c-white">24</div><div class="ts-sub">High Confidence</div></div>
+    <div class="top-stat"><div class="ts-label">Confidence Level</div><div class="ts-val c-boom">High</div><div class="ts-sub">Strong Model Consensus</div></div>
+    <div class="top-stat"><div class="ts-label">Last Updated</div><div class="ts-val c-white" style="font-size:14px;">8 min ago</div><div class="ts-sub">Live Data Sync</div></div>
+  </div>
+</div>
+
+<div class="body-wrap">
+  <div class="sidebar">
+    <div class="sb-section">
+      <div class="sb-label">Navigation</div>
+      <a class="nav-item" href="#"><span>⊞</span> Dashboard</a>
+      <a class="nav-item" href="#"><span>⇄</span> Trade Hub</a>
+      <a class="nav-item" href="#"><span>◎</span> Player Hub</a>
+      <a class="nav-item active" href="#"><span>▶</span> Start / Sit</a>
+      <a class="nav-item" href="#"><span>◈</span> Exposure</a>
+      <a class="nav-item" href="#"><span>⚙</span> Settings</a>
+    </div>
+    <div class="divider"></div>
+    <div class="sb-section"><div class="sb-label">My Leagues</div></div>
+    <div class="league-item"><div class="league-dot" style="background:var(--boom);"></div><span class="league-name">Dynasty Alpha</span><span class="badge badge-c">Contender</span></div>
+    <div class="league-item"><div class="league-dot" style="background:var(--bust);"></div><span class="league-name">Kings League</span><span class="badge badge-r">Rebuild</span></div>
+    <div class="league-item"><div class="league-dot" style="background:var(--boom);"></div><span class="league-name">Empire League</span><span class="badge badge-c">Contender</span></div>
+    <div class="league-item"><div class="league-dot" style="background:var(--bust);"></div><span class="league-name">Gridiron Gods</span><span class="badge badge-r">Rebuild</span></div>
+    <div class="league-item"><div class="league-dot" style="background:var(--boom);"></div><span class="league-name">Showtime</span><span class="badge badge-c">Contender</span></div>
+    <div class="divider"></div>
+    <div class="sb-section"><div class="sb-label">Week 14 Context</div></div>
+    <div class="ctx-row"><span class="ctx-label">NFL Week</span><span class="ctx-val">14</span></div>
+    <div class="ctx-row"><span class="ctx-label">Start/Sit Window</span><span class="ctx-open">Open</span></div>
+    <div class="ctx-row"><span class="ctx-label">Lock Deadline</span><span class="ctx-deadline">Sun 1:00 PM</span></div>
+    <div class="ctx-row"><span class="ctx-label">Weather Impact</span><span class="ctx-low">Low</span></div>
+    <div class="view-matchup">View Matchup Matrix →</div>
+    <div class="divider"></div>
+    <div class="ai-section">
+      <div class="sb-label">AI Confidence Score</div>
+      <div class="ai-circle-wrap">
+        <svg viewBox="0 0 80 80">
+          <circle cx="40" cy="40" r="32" fill="none" stroke="#1e2640" stroke-width="8"/>
+          <circle cx="40" cy="40" r="32" fill="none" stroke="#36E7A1" stroke-width="8"
+            stroke-dasharray="174.5 26.0" stroke-dashoffset="50.3" stroke-linecap="round"
+            transform="rotate(-90 40 40)"/>
+        </svg>
+        <div class="ai-circle-inner">
+          <span class="ai-pct">87%</span>
+          <span style="font-size:8px;color:var(--muted);">Model</span>
+          <span style="font-size:8px;color:var(--muted);">Confidence</span>
+        </div>
+      </div>
+      <div class="ai-note">10,000+ decisions analyzed<br>Updated every 60 seconds</div>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="main-header">
+      <div>
+        <div class="page-title">Start / Sit</div>
+        <div class="page-sub">Week 14 decisions. Backed by data, not gut.</div>
+      </div>
+      <div class="week-controls">
+        <div class="week-nav">
+          <button class="week-btn">‹</button>
+          <span class="week-label">Week 14</span>
+          <button class="week-btn">›</button>
+        </div>
+        <select class="league-select"><option>All Leagues</option><option>Dynasty Alpha</option><option>Kings League</option><option>Empire League</option></select>
+      </div>
+    </div>
+
+    <div class="main-scroll">
+      <!-- Season record banner -->
+      <div class="record-banner">
+        <div class="record-left">
+          <div class="record-title">Verified Season Record</div>
+          <div class="record-nums">
+            <div><div class="record-num c-boom">42</div><div class="record-num-label">Win</div></div>
+            <div class="record-dash">-</div>
+            <div><div class="record-num c-danger">18</div><div class="record-num-label">Loss</div></div>
+            <div class="record-dash">-</div>
+            <div><div class="record-num" style="color:var(--muted);">2</div><div class="record-num-label">Push</div></div>
+          </div>
+        </div>
+        <div class="record-divider"></div>
+        <div class="record-right">
+          <div class="win-rate-pct">80%</div>
+          <div class="win-rate-info">
+            <div class="win-rate-label" style="font-weight:500;">WIN RATE</div>
+            <div class="win-rate-sub">Verified across 10,000+ lineup decisions</div>
+            <div class="win-rate-sub2">Updated after every game</div>
+          </div>
+          <div class="shield-icon">✓</div>
+        </div>
+      </div>
+
+      <!-- START / SIT panels -->
+      <div class="ss-grid">
+        <!-- START panel -->
+        <div class="ss-panel">
+          <div class="ss-panel-header">
+            <div class="ss-panel-title start-title">▲ START THESE</div>
+            <div class="ss-panel-sub">High confidence plays for Week 14</div>
+          </div>
+          <!-- rows: avatar | name+meta+matchup | bar+note | score | proj -->
+          <div class="ss-row">
+            <div class="ss-avatar">WR</div>
+            <div><div class="ss-player-name">Justin Jefferson</div><div class="ss-player-meta">WR · MIN <span style="color:var(--muted);">vs DEN</span></div><div style="font-size:8px;color:var(--muted);">Elite target share vs bottom-5 CB unit</div></div>
+            <div class="ss-bar-wrap"><div class="ss-bar-track"><div class="ss-bar-fill" style="width:94%;background:var(--boom);"></div></div><span style="font-size:9px;font-family:'JetBrains Mono',monospace;color:var(--boom);margin-left:4px;">94.7</span></div>
+            <div><div class="ss-score c-boom">94</div></div>
+            <div><div class="ss-proj">Proj:</div><div style="font-size:9px;font-family:'JetBrains Mono',monospace;color:var(--text);">26.8</div></div>
+          </div>
+          <div class="ss-row">
+            <div class="ss-avatar">QB</div>
+            <div><div class="ss-player-name">CJ Stroud</div><div class="ss-player-meta">QB · HOU <span style="color:var(--muted);">vs JAX</span></div><div style="font-size:8px;color:var(--muted);">Jacksonville allowing 28+ pts to QBs</div></div>
+            <div class="ss-bar-wrap"><div class="ss-bar-track"><div class="ss-bar-fill" style="width:91%;background:var(--boom);"></div></div><span style="font-size:9px;font-family:'JetBrains Mono',monospace;color:var(--boom);margin-left:4px;">88.1</span></div>
+            <div><div class="ss-score c-boom">91</div></div>
+            <div><div class="ss-proj">Proj:</div><div style="font-size:9px;font-family:'JetBrains Mono',monospace;color:var(--text);">31.2</div></div>
+          </div>
+          <div class="ss-row">
+            <div class="ss-avatar">RB</div>
+            <div><div class="ss-player-name">Bijan Robinson</div><div class="ss-player-meta">RB · ATL <span style="color:var(--muted);">vs CAR</span></div><div style="font-size:8px;color:var(--muted);">Carolina run D ranks 29th, Bijan volume elite</div></div>
+            <div class="ss-bar-wrap"><div class="ss-bar-track"><div class="ss-bar-fill" style="width:88%;background:var(--boom);"></div></div><span style="font-size:9px;font-family:'JetBrains Mono',monospace;color:var(--boom);margin-left:4px;">83.2</span></div>
+            <div><div class="ss-score c-boom">88</div></div>
+            <div><div class="ss-proj">Proj:</div><div style="font-size:9px;font-family:'JetBrains Mono',monospace;color:var(--text);">22.4</div></div>
+          </div>
+          <div class="ss-row">
+            <div class="ss-avatar">WR</div>
+            <div><div class="ss-player-name">Puka Nacua</div><div class="ss-player-meta">WR · LAR <span style="color:var(--muted);">vs ARI</span></div><div style="font-size:8px;color:var(--muted);">Arizona secondary missing two starters</div></div>
+            <div class="ss-bar-wrap"><div class="ss-bar-track"><div class="ss-bar-fill" style="width:85%;background:var(--boom);"></div></div><span style="font-size:9px;font-family:'JetBrains Mono',monospace;color:var(--boom);margin-left:4px;">79.4</span></div>
+            <div><div class="ss-score c-boom">85</div></div>
+            <div><div class="ss-proj">Proj:</div><div style="font-size:9px;font-family:'JetBrains Mono',monospace;color:var(--text);">21.7</div></div>
+          </div>
+          <div class="ss-row">
+            <div class="ss-avatar">WR</div>
+            <div><div class="ss-player-name">Malik Nabers</div><div class="ss-player-meta">WR · NYG <span style="color:var(--muted);">@ WAS</span></div><div style="font-size:8px;color:var(--muted);">Washington CB2 allowing 78% catch rate</div></div>
+            <div class="ss-bar-wrap"><div class="ss-bar-track"><div class="ss-bar-fill" style="width:82%;background:var(--boom);"></div></div><span style="font-size:9px;font-family:'JetBrains Mono',monospace;color:var(--boom);margin-left:4px;">82.4</span></div>
+            <div><div class="ss-score c-boom">82</div></div>
+            <div><div class="ss-proj">Proj:</div><div style="font-size:9px;font-family:'JetBrains Mono',monospace;color:var(--text);">19.8</div></div>
+          </div>
+          <div class="ss-row">
+            <div class="ss-avatar">WR</div>
+            <div><div class="ss-player-name">Ja'Marr Chase</div><div class="ss-player-meta">WR · CIN <span style="color:var(--muted);">vs PIT</span></div><div style="font-size:8px;color:var(--muted);">Pittsburgh secondary struggling vs slot</div></div>
+            <div class="ss-bar-wrap"><div class="ss-bar-track"><div class="ss-bar-fill" style="width:86%;background:var(--boom);"></div></div><span style="font-size:9px;font-family:'JetBrains Mono',monospace;color:var(--boom);margin-left:4px;">87.3</span></div>
+            <div><div class="ss-score c-boom">86</div></div>
+            <div><div class="ss-proj">Proj:</div><div style="font-size:9px;font-family:'JetBrains Mono',monospace;color:var(--text);">23.1</div></div>
+          </div>
+          <div class="ss-row">
+            <div class="ss-avatar">WR</div>
+            <div><div class="ss-player-name">Brian Thomas Jr</div><div class="ss-player-meta">WR · JAX <span style="color:var(--muted);">@ HOU</span></div><div style="font-size:8px;color:var(--muted);">Target share up 34% last 3 weeks</div></div>
+            <div class="ss-bar-wrap"><div class="ss-bar-track"><div class="ss-bar-fill" style="width:79%;background:var(--boom);"></div></div><span style="font-size:9px;font-family:'JetBrains Mono',monospace;color:var(--boom);margin-left:4px;">71.3</span></div>
+            <div><div class="ss-score c-boom">79</div></div>
+            <div><div class="ss-proj">Proj:</div><div style="font-size:9px;font-family:'JetBrains Mono',monospace;color:var(--text);">17.4</div></div>
+          </div>
+          <div class="ss-row">
+            <div class="ss-avatar">RB</div>
+            <div><div class="ss-player-name">Breece Hall</div><div class="ss-player-meta">RB · NYJ <span style="color:var(--muted);">vs MIA</span></div><div style="font-size:8px;color:var(--muted);">Miami run D allowing 5.1 YPC this season</div></div>
+            <div class="ss-bar-wrap"><div class="ss-bar-track"><div class="ss-bar-fill" style="width:76%;background:var(--boom);"></div></div><span style="font-size:9px;font-family:'JetBrains Mono',monospace;color:var(--boom);margin-left:4px;">76.3</span></div>
+            <div><div class="ss-score c-boom">76</div></div>
+            <div><div class="ss-proj">Proj:</div><div style="font-size:9px;font-family:'JetBrains Mono',monospace;color:var(--text);">18.9</div></div>
+          </div>
+        </div>
+
+        <!-- SIT panel -->
+        <div class="ss-panel">
+          <div class="ss-panel-header">
+            <div class="ss-panel-title sit-title">▼ SIT THESE</div>
+            <div class="ss-panel-sub">Fade these plays in Week 14</div>
+          </div>
+          <div class="ss-row">
+            <div class="ss-avatar">TE</div>
+            <div><div class="ss-player-name">Kyle Pitts</div><div class="ss-player-meta">TE · ATL <span style="color:var(--muted);">@ TB</span></div><div style="font-size:8px;color:var(--muted);">Tampa allowing fewest pts to TEs this season</div></div>
+            <div class="ss-bar-wrap"><div class="ss-bar-track"><div class="ss-bar-fill" style="width:88%;background:var(--danger);"></div></div><span style="font-size:9px;font-family:'JetBrains Mono',monospace;color:var(--danger);margin-left:4px;">48.7</span></div>
+            <div><div class="ss-score c-danger">88</div></div>
+            <div><div class="ss-proj">Proj:</div><div style="font-size:9px;font-family:'JetBrains Mono',monospace;color:var(--text);">6.2</div></div>
+          </div>
+          <div class="ss-row">
+            <div class="ss-avatar">WR</div>
+            <div><div class="ss-player-name">Cooper Kupp</div><div class="ss-player-meta">WR · LAR <span style="color:var(--muted);">vs ARI</span></div><div style="font-size:8px;color:var(--muted);">Kupp still limited in practice, snap count risk</div></div>
+            <div class="ss-bar-wrap"><div class="ss-bar-track"><div class="ss-bar-fill" style="width:85%;background:var(--danger);"></div></div><span style="font-size:9px;font-family:'JetBrains Mono',monospace;color:var(--danger);margin-left:4px;">38.2</span></div>
+            <div><div class="ss-score c-danger">85</div></div>
+            <div><div class="ss-proj">Proj:</div><div style="font-size:9px;font-family:'JetBrains Mono',monospace;color:var(--text);">8.4</div></div>
+          </div>
+          <div class="ss-row">
+            <div class="ss-avatar">WR</div>
+            <div><div class="ss-player-name">Drake London</div><div class="ss-player-meta">WR · ATL <span style="color:var(--muted);">@ TB</span></div><div style="font-size:8px;color:var(--muted);">Tampa CB1 shadowing London all season</div></div>
+            <div class="ss-bar-wrap"><div class="ss-bar-track"><div class="ss-bar-fill" style="width:82%;background:var(--danger);"></div></div><span style="font-size:9px;font-family:'JetBrains Mono',monospace;color:var(--danger);margin-left:4px;">91.2</span></div>
+            <div><div class="ss-score c-danger">82</div></div>
+            <div><div class="ss-proj">Proj:</div><div style="font-size:9px;font-family:'JetBrains Mono',monospace;color:var(--text);">9.1</div></div>
+          </div>
+          <div class="ss-row">
+            <div class="ss-avatar">QB</div>
+            <div><div class="ss-player-name">Dak Prescott</div><div class="ss-player-meta">QB · DAL <span style="color:var(--muted);">@ PHI</span></div><div style="font-size:8px;color:var(--muted);">Philadelphia pass rush elite, Dak under pressure</div></div>
+            <div class="ss-bar-wrap"><div class="ss-bar-track"><div class="ss-bar-fill" style="width:79%;background:var(--danger);"></div></div><span style="font-size:9px;font-family:'JetBrains Mono',monospace;color:var(--danger);margin-left:4px;">54.3</span></div>
+            <div><div class="ss-score c-danger">79</div></div>
+            <div><div class="ss-proj">Proj:</div><div style="font-size:9px;font-family:'JetBrains Mono',monospace;color:var(--text);">18.2</div></div>
+          </div>
+          <div class="ss-row">
+            <div class="ss-avatar">WR</div>
+            <div><div class="ss-player-name">CeeDee Lamb</div><div class="ss-player-meta">WR · DAL <span style="color:var(--muted);">@ PHI</span></div><div style="font-size:8px;color:var(--muted);">Eagles CB2 Darius Slay elite matchup</div></div>
+            <div class="ss-bar-wrap"><div class="ss-bar-track"><div class="ss-bar-fill" style="width:77%;background:var(--danger);"></div></div><span style="font-size:9px;font-family:'JetBrains Mono',monospace;color:var(--danger);margin-left:4px;">79.1</span></div>
+            <div><div class="ss-score c-danger">77</div></div>
+            <div><div class="ss-proj">Proj:</div><div style="font-size:9px;font-family:'JetBrains Mono',monospace;color:var(--text);">11.3</div></div>
+          </div>
+          <div class="ss-row">
+            <div class="ss-avatar">TE</div>
+            <div><div class="ss-player-name">Taysom Hill</div><div class="ss-player-meta">TE · NO <span style="color:var(--muted);">vs LAC</span></div><div style="font-size:8px;color:var(--muted);">Role unclear, snap count unpredictable</div></div>
+            <div class="ss-bar-wrap"><div class="ss-bar-track"><div class="ss-bar-fill" style="width:81%;background:var(--danger);"></div></div><span style="font-size:9px;font-family:'JetBrains Mono',monospace;color:var(--danger);margin-left:4px;">44.1</span></div>
+            <div><div class="ss-score c-danger">81</div></div>
+            <div><div class="ss-proj">Proj:</div><div style="font-size:9px;font-family:'JetBrains Mono',monospace;color:var(--text);">7.8</div></div>
+          </div>
+          <div class="ss-row">
+            <div class="ss-avatar">RB</div>
+            <div><div class="ss-player-name">Jonathan Taylor</div><div class="ss-player-meta">RB · IND <span style="color:var(--muted);">@ CLE</span></div><div style="font-size:8px;color:var(--muted);">Cleveland run D top-5, Taylor banged up</div></div>
+            <div class="ss-bar-wrap"><div class="ss-bar-track"><div class="ss-bar-fill" style="width:74%;background:var(--danger);"></div></div><span style="font-size:9px;font-family:'JetBrains Mono',monospace;color:var(--danger);margin-left:4px;">61.8</span></div>
+            <div><div class="ss-score c-danger">74</div></div>
+            <div><div class="ss-proj">Proj:</div><div style="font-size:9px;font-family:'JetBrains Mono',monospace;color:var(--text);">13.2</div></div>
+          </div>
+          <div class="ss-row">
+            <div class="ss-avatar">TE</div>
+            <div><div class="ss-player-name">Mark Andrews</div><div class="ss-player-meta">TE · BAL <span style="color:var(--muted);">vs NYG</span></div><div style="font-size:8px;color:var(--muted);">Andrews usage down 40% last 4 weeks</div></div>
+            <div class="ss-bar-wrap"><div class="ss-bar-track"><div class="ss-bar-fill" style="width:71%;background:var(--danger);"></div></div><span style="font-size:9px;font-family:'JetBrains Mono',monospace;color:var(--danger);margin-left:4px;">52.3</span></div>
+            <div><div class="ss-score c-danger">71</div></div>
+            <div><div class="ss-proj">Proj:</div><div style="font-size:9px;font-family:'JetBrains Mono',monospace;color:var(--text);">9.8</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- FLEX DECISIONS -->
+      <div class="flex-section">
+        <div class="flex-header">
+          <div class="flex-title">⚡ FLEX DECISIONS</div>
+          <div class="flex-sub">Too close to call — BOB breaks the tie</div>
+        </div>
+        <div class="flex-grid">
+          <!-- RB Flex -->
+          <div class="flex-card">
+            <div class="flex-card-title">RB Flex Matchup</div>
+            <div class="flex-matchup">
+              <div class="flex-player">
+                <div class="flex-avatar">RB</div>
+                <div class="flex-pname">Breece Hall</div>
+                <div class="flex-pmeta">RB · NYJ</div>
+                <div class="flex-rating">76.3</div>
+                <div class="flex-rating-label">Rating</div>
+              </div>
+              <div class="flex-vs">VS</div>
+              <div class="flex-player">
+                <div class="flex-avatar">RB</div>
+                <div class="flex-pname">Jonathan Taylor</div>
+                <div class="flex-pmeta">RB · IND</div>
+                <div class="flex-rating" style="color:var(--muted);">61.8</div>
+                <div class="flex-rating-label">Rating</div>
+              </div>
+            </div>
+            <div class="flex-pick">
+              <div class="flex-pick-label">BOB Pick: <span style="color:var(--boom);">Breece Hall</span></div>
+              <div class="flex-pick-note">Hall has matchup edge and higher target floor in passing game</div>
+              <div class="flex-edge">+4.2 Dynasty Edge</div>
+            </div>
+          </div>
+          <!-- WR Flex -->
+          <div class="flex-card">
+            <div class="flex-card-title">WR Flex Matchup</div>
+            <div class="flex-matchup">
+              <div class="flex-player">
+                <div class="flex-avatar">WR</div>
+                <div class="flex-pname">Drake London</div>
+                <div class="flex-pmeta">WR · ATL</div>
+                <div class="flex-rating" style="color:var(--muted);">61.2</div>
+                <div class="flex-rating-label">Rating</div>
+              </div>
+              <div class="flex-vs">VS</div>
+              <div class="flex-player">
+                <div class="flex-avatar">WR</div>
+                <div class="flex-pname">Stefon Diggs</div>
+                <div class="flex-pmeta">WR · NE</div>
+                <div class="flex-rating">71.8</div>
+                <div class="flex-rating-label">Rating</div>
+              </div>
+            </div>
+            <div class="flex-pick">
+              <div class="flex-pick-label">BOB Pick: <span style="color:var(--boom);">Stefon Diggs</span></div>
+              <div class="flex-pick-note">Diggs finding role in NE, London faces elite shadow coverage</div>
+              <div class="flex-edge">+3.1 Dynasty Edge</div>
+            </div>
+          </div>
+          <!-- TE Flex -->
+          <div class="flex-card">
+            <div class="flex-card-title">TE Flex Matchup</div>
+            <div class="flex-matchup">
+              <div class="flex-player">
+                <div class="flex-avatar">TE</div>
+                <div class="flex-pname">Kyle Pitts</div>
+                <div class="flex-pmeta">TE · ATL</div>
+                <div class="flex-rating">48.7</div>
+                <div class="flex-rating-label">Rating</div>
+              </div>
+              <div class="flex-vs">VS</div>
+              <div class="flex-player">
+                <div class="flex-avatar">TE</div>
+                <div class="flex-pname">Taysom Hill</div>
+                <div class="flex-pmeta">TE · NO</div>
+                <div class="flex-rating" style="color:var(--muted);">44.1</div>
+                <div class="flex-rating-label">Rating</div>
+              </div>
+            </div>
+            <div class="flex-pick">
+              <div class="flex-pick-label">BOB Pick: <span style="color:var(--boom);">Kyle Pitts</span></div>
+              <div class="flex-pick-note">Both bad options — Pitts has higher floor despite tough matchup</div>
+              <div class="flex-edge">+2.8 Dynasty Edge</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div class="right-panel">
+    <div class="rp-section">
+      <div class="rp-label">This Week's Record</div>
+      <div class="record-row"><div class="record-item-label"><div class="record-dot" style="background:var(--boom);"></div>Correct so far</div><div class="record-item-val">8</div></div>
+      <div class="record-row"><div class="record-item-label"><div class="record-dot" style="background:var(--danger);"></div>Incorrect</div><div class="record-item-val">2</div></div>
+      <div class="record-row"><div class="record-item-label"><div class="record-dot" style="background:var(--muted);"></div>Pending</div><div class="record-item-val">14</div></div>
+      <div class="winrate-row"><span class="winrate-label">Win rate this week</span><span class="winrate-val">80%</span></div>
+      <div class="winrate-bar-track"><div class="winrate-bar-correct"></div></div>
+      <div class="winrate-labels"><span class="wl-label">25%</span><span class="wl-label">6%</span><span class="wl-label">69%</span></div>
+    </div>
+
+    <div class="rp-section">
+      <div class="rp-label">Season Performance</div>
+      <div style="font-size:9px;color:var(--muted);margin-bottom:6px;">Consistency beats luck</div>
+      <div style="display:flex;justify-content:space-between;font-size:8px;color:var(--muted);margin-bottom:3px;"><span>100%</span></div>
+      <svg width="100%" height="60" viewBox="0 0 240 60" preserveAspectRatio="none">
+        <polyline points="0,42 17,35 34,38 51,28 68,32 85,25 102,30 119,22 136,26 153,20 170,24 187,18 204,22 221,16 240,14" fill="none" stroke="#36E7A1" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <div style="display:flex;justify-content:space-between;font-size:7px;color:var(--muted);margin-top:2px;">
+        <span>1</span><span>3</span><span>5</span><span>7</span><span>9</span><span>11</span><span>13</span><span>14</span>
+      </div>
+      <div style="font-size:8px;color:var(--muted);text-align:right;margin-top:2px;">Week</div>
+    </div>
+
+    <div class="rp-section">
+      <div class="rp-label">High Confidence Alerts</div>
+      <div class="alert-card alert-card-must-start">
+        <div class="alert-type at-start">🔥 Must Start</div>
+        <div class="alert-player-row">
+          <div><div class="alert-pname">Justin Jefferson vs DEN</div><div class="alert-pmeta">Matchup of the week — elite play</div></div>
+          <div style="text-align:right;"><div class="alert-conf c-boom">94</div><div class="alert-conf-label">Confidence</div></div>
+        </div>
+      </div>
+      <div class="alert-card alert-card-must-sit" style="margin-top:6px;">
+        <div class="alert-type at-sit">⚠ Must Sit</div>
+        <div class="alert-player-row">
+          <div><div class="alert-pname">Kyle Pitts @ TB</div><div class="alert-pmeta">Worst TE matchup of the week</div></div>
+          <div style="text-align:right;"><div class="alert-conf c-danger">88</div><div class="alert-conf-label">Confidence</div></div>
+        </div>
+      </div>
+      <div class="alert-card alert-card-sleeper" style="margin-top:6px;">
+        <div class="alert-type at-sleeper">💡 Sleeper Pick</div>
+        <div class="alert-player-row">
+          <div><div class="alert-pname">Brian Thomas Jr @ HOU</div><div class="alert-pmeta">Breakout game incoming</div></div>
+          <div style="text-align:right;"><div class="alert-conf" style="color:var(--bust);">79</div><div class="alert-conf-label">Confidence</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="rp-section" style="border-bottom:none;">
+      <div class="rp-label">My Lineup Optimizer</div>
+      <div style="font-size:10px;color:var(--muted);margin-bottom:6px;">Based on your rostered players</div>
+      <button class="optimizer-btn">Optimize My Week 14 Lineup</button>
+      <div style="font-size:9px;color:var(--muted);margin-top:6px;text-align:center;">Analyzes all 5 leagues</div>
+    </div>
+  </div>
+</div>
+
+<div class="footer">
+  <div class="footer-item"><div class="footer-dot" style="background:var(--boom);"></div>Engine Status <span class="fv-boom" style="margin-left:3px;">Optimal</span>&nbsp;· Last run: 8 min ago</div>
+  <div class="footer-item">Season Record <span class="fv-boom" style="margin-left:3px;">42-18-2</span>&nbsp;· 80% Win Rate</div>
+  <div class="footer-item">Week 14 Calls <span class="fv-boom" style="margin-left:3px;">24</span>&nbsp;· High Confidence</div>
+  <div class="footer-item">League Sync <span class="fv-boom" style="margin-left:3px;">5/5</span><div class="footer-dot" style="background:var(--boom);margin-left:5px;"></div>All Connected</div>
+</div>
+
+</body>
+</html>

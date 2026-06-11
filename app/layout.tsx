@@ -1,9 +1,9 @@
 import type { Metadata, Viewport } from 'next';
 import { Bebas_Neue, Figtree, Inter, JetBrains_Mono } from 'next/font/google';
-import { Toaster } from 'sonner';
 import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import Script from 'next/script';
+import ToasterWrapper from '@/components/ToasterWrapper';
 import './globals.css';
 
 const bebasNeue = Bebas_Neue({
@@ -83,31 +83,12 @@ export default function RootLayout({
       className={`${figtree.variable} ${jetbrainsMono.variable}`}
       style={{ background: '#0a0d14' }}
     >
-      <head>
-        {adsenseId && (
-          <Script
-            async
-            src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adsenseId}`}
-            crossOrigin="anonymous"
-            strategy="afterInteractive"
-          />
-        )}
-      </head>
+      <head>{adsenseId ? <Script async src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adsenseId}`} crossOrigin="anonymous" strategy="afterInteractive" /> : null}</head>
       <body
         className={`${bebasNeue.variable} ${inter.variable} ${jetbrainsMono.variable} antialiased`}
       >
         {children}
-        <Toaster
-          theme="dark"
-          position="bottom-right"
-          toastOptions={{
-            style: {
-              background: '#111827',
-              border: '1px solid rgba(255,255,255,0.08)',
-              color: '#F8FAFC',
-            },
-          }}
-        />
+        <ToasterWrapper />
         <Analytics />
         <SpeedInsights />
       </body>

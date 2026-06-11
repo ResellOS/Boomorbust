@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Boom or Bust — League Detail</title>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --boom:#36E7A1;--bust:#A78BFA;--hold:#FBBF24;
+  --bg:#0a0d14;--surface:#0f1420;--surface2:#141929;--card:#080d14;
+  --border:#1e2640;--text:#e8ecf4;--muted:#6b7a99;--danger:#ef4444;
+}
+html,body{height:100%;overflow:hidden;}
+body{background:var(--bg);color:var(--text);font-family:'Figtree',sans-serif;display:flex;flex-direction:column;}
+
+/* ── TOPBAR ── */
+.topbar{height:56px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 20px;flex-shrink:0;}
+.topbar-left{display:flex;align-items:center;gap:0;}
+.topbar-logo{margin-right:28px;}
+.topbar-logo img{height:36px;mix-blend-mode:screen;filter:brightness(1.2) saturate(1.3) contrast(1.1);}
+.nav-links{display:flex;align-items:stretch;height:56px;}
+.nav-link{display:flex;align-items:center;padding:0 14px;font-size:12px;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;}
+.nav-link:hover{color:var(--text);}
+.nav-link.active{color:var(--boom);border-bottom-color:var(--boom);}
+.topbar-right{display:flex;align-items:center;gap:12px;}
+.topbar-icon{width:28px;height:28px;border-radius:50%;background:var(--surface2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--muted);cursor:pointer;}
+.topbar-user{display:flex;align-items:center;gap:7px;background:var(--surface2);border:1px solid var(--border);border-radius:5px;padding:0 10px;height:30px;font-size:11px;color:var(--text);cursor:pointer;}
+.user-avatar{width:18px;height:18px;border-radius:50%;background:var(--boom);display:flex;align-items:center;justify-content:center;font-size:8px;color:#0a0d14;font-weight:700;}
+
+/* ── LAYOUT ── */
+.body-wrap{display:flex;flex:1;overflow:hidden;}
+
+/* ── SIDEBAR ── */
+.sidebar{width:210px;flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto;}
+.sb-section{padding:10px 12px 6px;}
+.sb-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+.sb-label{font-size:8px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;font-weight:500;}
+.sb-gear{font-size:12px;color:var(--muted);cursor:pointer;}
+.league-item{display:flex;align-items:center;padding:6px 12px;gap:8px;cursor:pointer;border-left:2px solid transparent;}
+.league-item.active{background:rgba(54,231,161,0.04);border-left-color:var(--boom);}
+.league-item:hover:not(.active){background:rgba(255,255,255,0.02);}
+.l-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.l-name{font-size:12px;color:var(--text);flex:1;}
+.l-badge{font-size:8px;padding:2px 6px;border-radius:3px;font-weight:500;}
+.lbc{background:rgba(54,231,161,0.1);color:var(--boom);}
+.lbr{background:rgba(167,139,250,0.1);color:var(--bust);}
+.add-league{display:flex;align-items:center;gap:6px;padding:6px 12px;font-size:11px;color:var(--muted);cursor:pointer;margin-top:2px;}
+.add-league:hover{color:var(--text);}
+.divider{height:1px;background:var(--border);margin:6px 12px;}
+.qa-section{padding:10px 12px;}
+.qa-label{font-size:8px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;font-weight:500;margin-bottom:8px;}
+.qa-item{display:flex;align-items:center;gap:8px;padding:5px 0;font-size:11px;color:var(--muted);cursor:pointer;}
+.qa-item:hover{color:var(--text);}
+.qa-icon{font-size:13px;width:16px;text-align:center;}
+.unlock-card{margin:10px 12px;background:linear-gradient(135deg,rgba(54,231,161,0.06),rgba(167,139,250,0.06));border:1px solid rgba(54,231,161,0.15);border-radius:6px;padding:12px;}
+.unlock-title{font-size:11px;font-weight:600;color:var(--text);margin-bottom:8px;}
+.unlock-feat{display:flex;align-items:center;gap:6px;font-size:10px;color:var(--muted);margin-bottom:4px;}
+.unlock-feat-check{color:var(--boom);font-size:10px;}
+.unlock-btn{width:100%;margin-top:10px;padding:8px 0;border-radius:4px;border:none;background:var(--boom);color:#0a0d14;font-size:11px;font-family:'Figtree',sans-serif;cursor:pointer;font-weight:700;box-shadow:0 0 12px rgba(54,231,161,0.3);}
+
+/* ── MAIN ── */
+.main{flex:1;overflow:hidden;display:flex;flex-direction:column;min-width:0;}
+
+/* league header bar */
+.league-header{padding:10px 18px;border-bottom:1px solid var(--border);display:grid;grid-template-columns:auto 1fr auto auto auto auto auto;align-items:center;gap:0;flex-shrink:0;}
+.lh-back{font-size:11px;color:var(--muted);cursor:pointer;display:flex;align-items:center;gap:4px;margin-right:16px;}
+.lh-back:hover{color:var(--text);}
+.lh-title{font-size:9px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;}
+.lh-league{display:flex;align-items:center;gap:10px;margin-right:20px;}
+.lh-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--boom),var(--bust));display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#0a0d14;}
+.lh-name{font-size:14px;font-weight:700;color:var(--text);}
+.lh-sub{font-size:9px;color:var(--muted);margin-top:1px;}
+.lh-badge{font-size:9px;padding:2px 8px;border-radius:3px;background:rgba(54,231,161,0.1);color:var(--boom);border:1px solid rgba(54,231,161,0.2);font-weight:500;}
+.lh-stat{display:flex;flex-direction:column;padding:0 18px;border-left:1px solid var(--border);}
+.lh-stat-label{font-size:8px;color:var(--muted);letter-spacing:0.8px;text-transform:uppercase;}
+.lh-stat-val{font-family:'JetBrains Mono',monospace;font-size:16px;color:var(--text);margin-top:1px;}
+.lh-stat-sub{font-size:9px;color:var(--muted);}
+.lh-stat-val.grade{font-size:22px;color:var(--boom);}
+.lh-stat-val.elite{color:var(--boom);}
+
+.main-scroll{flex:1;overflow-y:auto;padding:14px 18px 14px;}
+
+/* content grid */
+.content-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px;}
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:6px;overflow:hidden;}
+.panel-header{padding:10px 12px 6px;border-bottom:1px solid var(--border);}
+.panel-title{font-size:11px;font-weight:600;color:var(--text);text-transform:uppercase;letter-spacing:0.3px;}
+.panel-sub{font-size:9px;color:var(--muted);margin-top:1px;}
+.panel-body{padding:10px 12px;}
+
+/* YOUR TEAM panel */
+.team-overview{display:grid;grid-template-columns:114px 1fr;gap:14px;margin-bottom:10px;align-items:center;}
+.tfo-circle{position:relative;width:110px;height:110px;flex-shrink:0;}
+.tfo-circle svg{width:110px;height:110px;}
+.tfo-inner{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.tfo-score{font-family:'JetBrains Mono',monospace;font-size:24px;color:var(--boom);line-height:1;font-weight:500;}
+.tfo-label{font-size:8px;color:var(--muted);margin-top:3px;text-align:center;line-height:1.4;letter-spacing:0.3px;}
+.tfo-sub{font-size:8px;color:var(--muted);margin-top:3px;text-align:center;line-height:1.4;}
+.team-stats{}
+.ts-row{display:flex;justify-content:space-between;align-items:center;padding:3px 0;border-bottom:1px solid rgba(30,38,64,0.5);}
+.ts-row:last-child{border-bottom:none;}
+.ts-label{font-size:9px;color:var(--muted);}
+.ts-val{font-size:9px;font-family:'JetBrains Mono',monospace;color:var(--text);}
+.ts-val.g{color:var(--boom);}
+.ts-val.y{color:var(--hold);}
+
+.strengths-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;}
+.str-col-label{font-size:8px;font-weight:600;letter-spacing:0.5px;text-transform:uppercase;margin-bottom:4px;}
+.str-col-label.green{color:var(--boom);}
+.str-col-label.red{color:var(--danger);}
+.str-item{display:flex;align-items:center;gap:5px;font-size:9px;color:var(--muted);margin-bottom:3px;}
+.str-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0;}
+
+.top-players-label{font-size:8px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;}
+.tp-row{display:flex;align-items:center;gap:6px;padding:4px 0;border-bottom:1px solid rgba(30,38,64,0.4);}
+.tp-row:last-child{border-bottom:none;}
+.tp-avatar{width:20px;height:20px;border-radius:50%;background:var(--surface2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:7px;color:var(--muted);flex-shrink:0;}
+.tp-name{font-size:10px;color:var(--text);flex:1;}
+.tp-meta{font-size:8px;color:var(--muted);}
+.tp-score{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text);margin-right:4px;}
+.tp-verdict{font-size:7px;padding:2px 6px;border-radius:2px;font-weight:600;}
+.vb{background:rgba(54,231,161,0.1);color:var(--boom);border:1px solid rgba(54,231,161,0.2);}
+.vh{background:rgba(251,191,36,0.1);color:var(--hold);border:1px solid rgba(251,191,36,0.2);}
+.vbu{background:rgba(239,68,68,0.1);color:var(--danger);border:1px solid rgba(239,68,68,0.2);}
+.view-link{font-size:9px;color:var(--boom);cursor:pointer;padding-top:6px;display:block;}
+
+/* LEAGUE INTEL panel */
+.li-table{width:100%;border-collapse:collapse;}
+.li-table th{font-size:8px;color:var(--muted);letter-spacing:0.8px;text-transform:uppercase;padding:4px 5px;border-bottom:1px solid var(--border);text-align:left;}
+.li-table td{padding:4px 5px;border-bottom:1px solid rgba(30,38,64,0.4);font-size:9px;color:var(--text);vertical-align:middle;}
+.li-table tr:hover td{background:rgba(255,255,255,0.01);}
+.li-table tr:last-child td{border-bottom:none;}
+.manager-avatar{width:18px;height:18px;border-radius:50%;background:var(--surface2);border:1px solid var(--border);display:inline-flex;align-items:center;justify-content:center;font-size:7px;color:var(--muted);margin-right:4px;vertical-align:middle;}
+.you-badge{font-size:7px;color:var(--boom);margin-left:3px;}
+.li-score{font-family:'JetBrains Mono',monospace;font-size:10px;}
+.li-score.high{color:var(--boom);}
+.li-score.mid{color:var(--hold);}
+.li-score.low{color:var(--muted);}
+.tendency-tag{font-size:7px;padding:1px 5px;border-radius:2px;}
+.tt-active{background:rgba(54,231,161,0.08);color:var(--boom);}
+.tt-passive{background:rgba(107,122,153,0.15);color:var(--muted);}
+.tt-selective{background:rgba(251,191,36,0.08);color:var(--hold);}
+.tt-rare{background:rgba(167,139,250,0.08);color:var(--bust);}
+.agg-tag{font-size:7px;padding:1px 5px;border-radius:2px;}
+.agg-high{background:rgba(239,68,68,0.1);color:var(--danger);}
+.agg-vhigh{background:rgba(239,68,68,0.15);color:var(--danger);font-weight:600;}
+.agg-med{background:rgba(251,191,36,0.08);color:var(--hold);}
+.agg-low{background:rgba(107,122,153,0.12);color:var(--muted);}
+.overpays{font-size:8px;color:var(--muted);}
+
+/* STANDINGS panel */
+.standings-table{width:100%;border-collapse:collapse;}
+.standings-table th{font-size:8px;color:var(--muted);letter-spacing:0.8px;text-transform:uppercase;padding:4px 5px;border-bottom:1px solid var(--border);text-align:left;}
+.standings-table td{padding:4px 5px;border-bottom:1px solid rgba(30,38,64,0.4);font-size:9px;color:var(--text);}
+.standings-table tr.you td{background:rgba(54,231,161,0.03);}
+.standings-table tr:hover td{background:rgba(255,255,255,0.01);}
+.rank-num{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);}
+.rank-num.top{color:var(--boom);}
+.team-name-cell{display:flex;align-items:center;gap:5px;}
+.t-avatar{width:16px;height:16px;border-radius:50%;background:var(--surface2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:6px;color:var(--muted);flex-shrink:0;}
+.record-val{font-family:'JetBrains Mono',monospace;font-size:9px;}
+.pf-val{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted);}
+.proj-val{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted);}
+.odds-val{font-family:'JetBrains Mono',monospace;font-size:9px;}
+.odds-high{color:var(--boom);}
+.odds-mid{color:var(--hold);}
+.odds-low{color:var(--muted);}
+
+/* bottom row */
+.bottom-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
+
+/* TRADE OPPORTUNITIES */
+.trade-opp-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.trade-opp-col-label{font-size:8px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;}
+.target-row{display:flex;align-items:center;gap:6px;padding:4px 0;border-bottom:1px solid rgba(30,38,64,0.4);}
+.target-row:last-child{border-bottom:none;}
+.target-avatar{width:20px;height:20px;border-radius:50%;background:var(--surface2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:7px;color:var(--muted);flex-shrink:0;}
+.target-name{font-size:9px;color:var(--text);flex:1;}
+.target-meta{font-size:7px;color:var(--muted);}
+.target-score{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--boom);}
+.manager-target{display:flex;align-items:flex-start;gap:6px;padding:4px 0;border-bottom:1px solid rgba(30,38,64,0.4);}
+.manager-target:last-child{border-bottom:none;}
+.mt-avatar{width:20px;height:20px;border-radius:50%;background:var(--surface2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:7px;color:var(--muted);flex-shrink:0;}
+.mt-name{font-size:9px;color:var(--text);}
+.mt-note{font-size:8px;color:var(--muted);line-height:1.3;margin-top:1px;}
+.mt-li{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--boom);margin-left:auto;flex-shrink:0;}
+
+/* LEAGUE SIGNALS */
+.signal-item{display:flex;align-items:flex-start;gap:8px;padding:6px 0;border-bottom:1px solid rgba(30,38,64,0.4);}
+.signal-item:last-child{border-bottom:none;}
+.signal-icon{font-size:14px;flex-shrink:0;margin-top:1px;}
+.signal-name{font-size:10px;color:var(--text);font-weight:500;margin-bottom:1px;}
+.signal-desc{font-size:9px;color:var(--muted);line-height:1.4;}
+
+/* LEAGUE SETTINGS */
+.settings-row{display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid rgba(30,38,64,0.4);}
+.settings-row:last-child{border-bottom:none;}
+.settings-key{font-size:9px;color:var(--muted);}
+.settings-val{font-size:9px;color:var(--text);text-align:right;max-width:180px;}
+.edit-settings-link{font-size:9px;color:var(--boom);cursor:pointer;margin-top:8px;display:block;}
+
+/* ── FOOTER ── */
+.footer{height:52px;background:var(--surface);border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-around;flex-shrink:0;padding:0 18px;}
+.footer-item{display:flex;align-items:center;gap:8px;}
+.footer-icon{font-size:16px;}
+.footer-val{font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--boom);font-weight:500;}
+.footer-val.white{color:var(--text);}
+.footer-label{font-size:8px;color:var(--muted);}
+.footer-sub{font-size:8px;color:var(--muted);}
+.footer-divider{width:1px;height:24px;background:var(--border);}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="topbar-left">
+    <div class="topbar-logo"><img src="/logo.png" alt="Boom or Bust" onerror="this.style.display='none';this.nextSibling.style.display='flex'"><div style="display:none;align-items:center;gap:4px;"><span style='color:#36E7A1;font-size:16px;font-weight:800;'>BOOM</span><span style='color:#6b7a99;font-size:14px;'>⚡</span><span style='color:#A78BFA;font-size:16px;font-weight:800;'>BUST</span></div></div>
+    <div class="nav-links">
+      <div class="nav-link">Dashboard</div>
+      <div class="nav-link">Trade Hub</div>
+      <div class="nav-link">Player Hub</div>
+      <div class="nav-link">Start / Sit</div>
+      <div class="nav-link active">League Detail</div>
+      <div class="nav-link">Draft Room</div>
+      <div class="nav-link">More ▾</div>
+    </div>
+  </div>
+  <div class="topbar-right">
+    <div class="topbar-icon">🔔</div>
+    <div class="topbar-icon">?</div>
+    <div class="topbar-user"><div class="user-avatar">D</div>@DynastyChampion ▾</div>
+  </div>
+</div>
+
+<div class="body-wrap">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sb-section">
+      <div class="sb-header">
+        <div class="sb-label">My Leagues</div>
+        <span class="sb-gear">⚙</span>
+      </div>
+    </div>
+    <div class="league-item active"><div class="l-dot" style="background:var(--boom);"></div><span class="l-name">Dynasty Alpha</span><span class="l-badge lbc">Contender</span></div>
+    <div class="league-item"><div class="l-dot" style="background:var(--bust);"></div><span class="l-name">Kings League</span><span class="l-badge lbr">Rebuild</span></div>
+    <div class="league-item"><div class="l-dot" style="background:var(--boom);"></div><span class="l-name">Empire League</span><span class="l-badge lbc">Contender</span></div>
+    <div class="league-item"><div class="l-dot" style="background:var(--bust);"></div><span class="l-name">Gridiron Gods</span><span class="l-badge lbr">Rebuild</span></div>
+    <div class="league-item"><div class="l-dot" style="background:var(--boom);"></div><span class="l-name">Showtime</span><span class="l-badge lbc">Contender</span></div>
+    <div class="add-league">＋ Add League</div>
+    <div class="divider"></div>
+    <div class="qa-section">
+      <div class="qa-label">Quick Actions</div>
+      <div class="qa-item"><span class="qa-icon">🔍</span>Trade Finder</div>
+      <div class="qa-item"><span class="qa-icon">📋</span>Waiver Wire</div>
+      <div class="qa-item"><span class="qa-icon">⚖</span>Trade Analyzer</div>
+      <div class="qa-item"><span class="qa-icon">▶</span>Start / Sit Optimizer</div>
+      <div class="qa-item"><span class="qa-icon">📝</span>Mock Draft</div>
+      <div class="qa-item"><span class="qa-icon">💬</span>AI Chat</div>
+    </div>
+    <div class="divider"></div>
+    <div class="unlock-card">
+      <div class="unlock-title">Unlock Full Power</div>
+      <div class="unlock-feat"><span class="unlock-feat-check">✓</span>Advanced Trade Finder</div>
+      <div class="unlock-feat"><span class="unlock-feat-check">✓</span>Full Player Profiles</div>
+      <div class="unlock-feat"><span class="unlock-feat-check">✓</span>Deep Analytics Suite</div>
+      <div class="unlock-feat"><span class="unlock-feat-check">✓</span>Priority Support</div>
+      <div class="unlock-feat"><span class="unlock-feat-check">✓</span>Unlimited Leagues</div>
+      <button class="unlock-btn">Upgrade Now</button>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <!-- LEAGUE HEADER -->
+    <div class="league-header">
+      <div class="lh-back">← LEAGUE DETAIL</div>
+      <div class="lh-league">
+        <div class="lh-avatar">DA</div>
+        <div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <div class="lh-name">Dynasty Alpha</div>
+            <div class="lh-badge">Contender</div>
+          </div>
+          <div class="lh-sub">12 Teams · Superflex · PPR · Start 10 · 2024 Season</div>
+        </div>
+      </div>
+      <div class="lh-stat">
+        <div class="lh-stat-label">Team Grade</div>
+        <div class="lh-stat-val grade">A-</div>
+        <div class="lh-stat-sub">82.4</div>
+      </div>
+      <div class="lh-stat">
+        <div class="lh-stat-label">TFO Team Score</div>
+        <div class="lh-stat-val" style="color:var(--boom);">85.7</div>
+        <div class="lh-stat-sub">Top 12%</div>
+      </div>
+      <div class="lh-stat">
+        <div class="lh-stat-label">Contender Score</div>
+        <div class="lh-stat-val" style="color:var(--boom);">92%</div>
+        <div class="lh-stat-sub">Strong</div>
+      </div>
+      <div class="lh-stat">
+        <div class="lh-stat-label">Roster Construction</div>
+        <div class="lh-stat-val elite">Elite</div>
+        <div class="lh-stat-sub">Top 18%</div>
+      </div>
+      <div class="lh-stat" style="border-right:none;">
+        <div class="lh-stat-label">Last Updated</div>
+        <div class="lh-stat-val" style="font-size:14px;">8:43 PM</div>
+        <div class="lh-stat-sub">Live Sync</div>
+      </div>
+    </div>
+
+    <div class="main-scroll">
+      <!-- TOP ROW -->
+      <div class="content-grid">
+
+        <!-- YOUR TEAM -->
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">Your Team</div>
+            <div class="panel-sub">Roster overview with TFO scores and analysis</div>
+          </div>
+          <div class="panel-body">
+            <div class="team-overview">
+              <div class="tfo-circle">
+                <svg viewBox="0 0 110 110">
+                  <circle cx="55" cy="55" r="42" fill="none" stroke="#1e2640" stroke-width="6"/>
+                  <circle cx="55" cy="55" r="42" fill="none" stroke="#36E7A1" stroke-width="6"
+                    stroke-dasharray="226 38" stroke-dashoffset="66" stroke-linecap="round"
+                    transform="rotate(-90 55 55)"/>
+                </svg>
+                <div class="tfo-inner">
+                  <div class="tfo-score">85.7</div>
+                  <div class="tfo-label">TFO TEAM<br>SCORE</div>
+                </div>
+              </div>
+              <div class="team-stats">
+                <div class="ts-row"><span class="ts-label">Record</span><span class="ts-val g">8-3</span></div>
+                <div class="ts-row"><span class="ts-label">Points For</span><span class="ts-val g">1,412.6</span></div>
+                <div class="ts-row"><span class="ts-label">Projected Finish</span><span class="ts-val g">1.8</span></div>
+                <div class="ts-row"><span class="ts-label">Playoff Odds</span><span class="ts-val g">94%</span></div>
+                <div class="ts-row"><span class="ts-label">Championship Odds</span><span class="ts-val y">28%</span></div>
+              </div>
+            </div>
+            <div class="strengths-row">
+              <div>
+                <div class="str-col-label green">Roster Strengths</div>
+                <div class="str-item"><div class="str-dot" style="background:var(--boom);"></div>Elite WR Core</div>
+                <div class="str-item"><div class="str-dot" style="background:var(--boom);"></div>Top 5 QB Room</div>
+                <div class="str-item"><div class="str-dot" style="background:var(--boom);"></div>Strong RB Depth</div>
+              </div>
+              <div>
+                <div class="str-col-label red">Needs Attention</div>
+                <div class="str-item"><div class="str-dot" style="background:var(--danger);"></div>TE Depth</div>
+                <div class="str-item"><div class="str-dot" style="background:var(--danger);"></div>2026 1st Round Pick</div>
+              </div>
+            </div>
+            <div class="top-players-label">Top Players by TFO Score</div>
+            <div class="tp-row"><div class="tp-avatar">WR</div><div><div class="tp-name">Justin Jefferson</div><div class="tp-meta">WR · MIN</div></div><div class="tp-score">94.7</div><div class="tp-verdict vb">STRONG BOOM</div></div>
+            <div class="tp-row"><div class="tp-avatar">WR</div><div><div class="tp-name">CeeDee Lamb</div><div class="tp-meta">WR · DAL</div></div><div class="tp-score">89.1</div><div class="tp-verdict vb">BOOM</div></div>
+            <div class="tp-row"><div class="tp-avatar">RB</div><div><div class="tp-name">Breece Hall</div><div class="tp-meta">RB · NYJ</div></div><div class="tp-score">76.3</div><div class="tp-verdict vh">HOLD</div></div>
+            <div class="tp-row"><div class="tp-avatar">RB</div><div><div class="tp-name">Bijan Robinson</div><div class="tp-meta">RB · ATL</div></div><div class="tp-score">71.3</div><div class="tp-verdict vh">HOLD</div></div>
+            <div class="tp-row"><div class="tp-avatar">TE</div><div><div class="tp-name">Kyle Pitts</div><div class="tp-meta">TE · ATL</div></div><div class="tp-score">48.7</div><div class="tp-verdict vbu">STRONG BUST</div></div>
+            <span class="view-link">View Full Roster →</span>
+          </div>
+        </div>
+
+        <!-- LEAGUE INTEL -->
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">League Intel (LI)</div>
+            <div class="panel-sub">Know your league. Know your opponents.</div>
+          </div>
+          <div class="panel-body" style="padding:8px;">
+            <table class="li-table">
+              <thead>
+                <tr>
+                  <th>Manager</th>
+                  <th>LI</th>
+                  <th>Trade</th>
+                  <th>Draft</th>
+                  <th>Agg</th>
+                  <th>Overpays For</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td><span class="manager-avatar">D</span>@DynastyChampion<span class="you-badge">(You)</span></td><td><span class="li-score high">87</span></td><td><span class="tendency-tag tt-active">Active</span></td><td style="font-size:8px;color:var(--muted);">Balanced</td><td><span class="agg-tag agg-high">High</span></td><td class="overpays">RBs, Rookie Hype</td></tr>
+                <tr><td><span class="manager-avatar">G</span>@GridironGuru</td><td><span class="li-score high">72</span></td><td><span class="tendency-tag tt-active">Active</span></td><td style="font-size:8px;color:var(--muted);">Predictable</td><td><span class="agg-tag agg-high">High</span></td><td class="overpays">Big Names</td></tr>
+                <tr><td><span class="manager-avatar">T</span>@TradeAddict</td><td><span class="li-score mid">65</span></td><td><span class="tendency-tag tt-active" style="background:rgba(239,68,68,0.08);color:var(--danger);">Very Active</span></td><td style="font-size:8px;color:var(--muted);">Aggressive</td><td><span class="agg-tag agg-vhigh">Very High</span></td><td class="overpays">WRs, Pick Upside</td></tr>
+                <tr><td><span class="manager-avatar">R</span>@TheRebuilder</td><td><span class="li-score low">48</span></td><td><span class="tendency-tag tt-passive">Passive</span></td><td style="font-size:8px;color:var(--muted);">Patient</td><td><span class="agg-tag agg-low">Low</span></td><td class="overpays">Future Picks</td></tr>
+                <tr><td><span class="manager-avatar">M</span>@Mr.Consistent</td><td><span class="li-score mid">54</span></td><td><span class="tendency-tag tt-selective">Selective</span></td><td style="font-size:8px;color:var(--muted);">Balanced</td><td><span class="agg-tag agg-med">Medium</span></td><td class="overpays">QBs</td></tr>
+                <tr><td><span class="manager-avatar">V</span>@ValueHunter</td><td><span class="li-score high">62</span></td><td><span class="tendency-tag tt-active">Active</span></td><td style="font-size:8px;color:var(--muted);">Analytical</td><td><span class="agg-tag agg-med">Medium</span></td><td class="overpays">Young RBs</td></tr>
+                <tr><td><span class="manager-avatar">G</span>@TheGambler</td><td><span class="li-score low">41</span></td><td><span class="tendency-tag tt-rare">Rare</span></td><td style="font-size:8px;color:var(--muted);">Boom/Bust</td><td><span class="agg-tag agg-low">Very Low</span></td><td class="overpays">Lottery Tickets</td></tr>
+                <tr><td><span class="manager-avatar">S</span>@SleeperKing</td><td><span class="li-score mid">59</span></td><td><span class="tendency-tag tt-active">Active</span></td><td style="font-size:8px;color:var(--muted);">Balanced</td><td><span class="agg-tag agg-med">Medium</span></td><td class="overpays">TEs</td></tr>
+                <tr><td><span class="manager-avatar">P</span>@PointMachine</td><td><span class="li-score high">66</span></td><td><span class="tendency-tag tt-active">Active</span></td><td style="font-size:8px;color:var(--muted);">Aggressive</td><td><span class="agg-tag agg-high">High</span></td><td class="overpays">WRs</td></tr>
+                <tr><td><span class="manager-avatar">O</span>@OldSchoolFF</td><td><span class="li-score low">36</span></td><td><span class="tendency-tag tt-passive">Passive</span></td><td style="font-size:8px;color:var(--muted);">Traditional</td><td><span class="agg-tag agg-low">Low</span></td><td class="overpays">Veterans</td></tr>
+                <tr><td><span class="manager-avatar">D</span>@DynastyDan</td><td><span class="li-score mid">50</span></td><td><span class="tendency-tag tt-selective">Selective</span></td><td style="font-size:8px;color:var(--muted);">Patient</td><td><span class="agg-tag agg-med">Medium</span></td><td class="overpays">Defense/Depth</td></tr>
+                <tr><td><span class="manager-avatar">R</span>@RookieRecycler</td><td><span class="li-score low">44</span></td><td><span class="tendency-tag tt-rare">Rare</span></td><td style="font-size:8px;color:var(--muted);">Patient</td><td><span class="agg-tag agg-low">Low</span></td><td class="overpays">Rookies</td></tr>
+              </tbody>
+            </table>
+            <span class="view-link">View Full League Intel →</span>
+          </div>
+        </div>
+
+        <!-- STANDINGS -->
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">Standings &amp; Projections</div>
+          </div>
+          <div class="panel-body" style="padding:8px;">
+            <table class="standings-table">
+              <thead>
+                <tr>
+                  <th>#</th><th>Team</th><th>Record</th><th>PF</th><th>Proj</th><th>Odds</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="you"><td><span class="rank-num top">1</span></td><td><div class="team-name-cell"><div class="t-avatar">D</div>@DynastyChampion (You)</div></td><td><span class="record-val">8-3</span></td><td><span class="pf-val">1412.6</span></td><td><span class="proj-val">1.8</span></td><td><span class="odds-val odds-high">94%</span></td></tr>
+                <tr><td><span class="rank-num top">2</span></td><td><div class="team-name-cell"><div class="t-avatar">G</div>@GridironGuru</div></td><td><span class="record-val">7-4</span></td><td><span class="pf-val">1388.1</span></td><td><span class="proj-val">2.6</span></td><td><span class="odds-val odds-high">82%</span></td></tr>
+                <tr><td><span class="rank-num">3</span></td><td><div class="team-name-cell"><div class="t-avatar">T</div>@TradeAddict</div></td><td><span class="record-val">7-4</span></td><td><span class="pf-val">1345.7</span></td><td><span class="proj-val">3.3</span></td><td><span class="odds-val odds-mid">74%</span></td></tr>
+                <tr><td><span class="rank-num">4</span></td><td><div class="team-name-cell"><div class="t-avatar">P</div>@PointMachine</div></td><td><span class="record-val">6-5</span></td><td><span class="pf-val">1322.4</span></td><td><span class="proj-val">4.9</span></td><td><span class="odds-val odds-mid">58%</span></td></tr>
+                <tr><td><span class="rank-num">5</span></td><td><div class="team-name-cell"><div class="t-avatar">S</div>@SleeperKing</div></td><td><span class="record-val">6-5</span></td><td><span class="pf-val">1288.9</span></td><td><span class="proj-val">5.6</span></td><td><span class="odds-val odds-mid">46%</span></td></tr>
+                <tr><td><span class="rank-num">6</span></td><td><div class="team-name-cell"><div class="t-avatar">V</div>@ValueHunter</div></td><td><span class="record-val">5-6</span></td><td><span class="pf-val">1267.3</span></td><td><span class="proj-val">6.8</span></td><td><span class="odds-val odds-low">28%</span></td></tr>
+                <tr><td><span class="rank-num">7</span></td><td><div class="team-name-cell"><div class="t-avatar">M</div>@Mr.Consistent</div></td><td><span class="record-val">5-6</span></td><td><span class="pf-val">1233.6</span></td><td><span class="proj-val">7.2</span></td><td><span class="odds-val odds-low">24%</span></td></tr>
+                <tr><td><span class="rank-num">8</span></td><td><div class="team-name-cell"><div class="t-avatar">R</div>@TheRebuilder</div></td><td><span class="record-val">4-7</span></td><td><span class="pf-val">1188.7</span></td><td><span class="proj-val">8.6</span></td><td><span class="odds-val odds-low">14%</span></td></tr>
+                <tr><td><span class="rank-num">9</span></td><td><div class="team-name-cell"><div class="t-avatar">O</div>@OldSchoolFF</div></td><td><span class="record-val">4-7</span></td><td><span class="pf-val">1176.4</span></td><td><span class="proj-val">9.1</span></td><td><span class="odds-val odds-low">9%</span></td></tr>
+                <tr><td><span class="rank-num">10</span></td><td><div class="team-name-cell"><div class="t-avatar">D</div>@DynastyDan</div></td><td><span class="record-val">3-8</span></td><td><span class="pf-val">1140.2</span></td><td><span class="proj-val">10.3</span></td><td><span class="odds-val odds-low">5%</span></td></tr>
+                <tr><td><span class="rank-num">11</span></td><td><div class="team-name-cell"><div class="t-avatar">G</div>@TheGambler</div></td><td><span class="record-val">2-9</span></td><td><span class="pf-val">1102.1</span></td><td><span class="proj-val">11.4</span></td><td><span class="odds-val odds-low">2%</span></td></tr>
+                <tr><td><span class="rank-num">12</span></td><td><div class="team-name-cell"><div class="t-avatar">R</div>@RookieRecycler</div></td><td><span class="record-val">1-10</span></td><td><span class="pf-val">1056.8</span></td><td><span class="proj-val">12.0</span></td><td><span class="odds-val odds-low">&lt;1%</span></td></tr>
+              </tbody>
+            </table>
+            <span class="view-link">View Full Standings →</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- BOTTOM ROW -->
+      <div class="bottom-grid">
+
+        <!-- TRADE OPPORTUNITIES -->
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">Trade Opportunities</div>
+            <div class="panel-sub">Target these players. Approach these managers.</div>
+          </div>
+          <div class="panel-body">
+            <div class="trade-opp-grid">
+              <div>
+                <div class="trade-opp-col-label">Best Players to Target</div>
+                <div class="target-row"><div class="target-avatar">WR</div><div><div class="target-name">Amon-Ra St Brown</div><div class="target-meta">WR · DET · @GridironGuru</div></div><div class="target-score">84.2</div></div>
+                <div class="target-row"><div class="target-avatar">WR</div><div><div class="target-name">Garrett Wilson</div><div class="target-meta">WR · NYJ · @Mr.Consistent</div></div><div class="target-score">78.6</div></div>
+                <div class="target-row"><div class="target-avatar">WR</div><div><div class="target-name">Drake London</div><div class="target-meta">WR · ATL · @PointMachine</div></div><div class="target-score">76.1</div></div>
+                <div class="target-row"><div class="target-avatar">RB</div><div><div class="target-name">Travis Etienne</div><div class="target-meta">RB · JAX · @TheRebuilder</div></div><div class="target-score">72.8</div></div>
+                <div class="target-row"><div class="target-avatar">TE</div><div><div class="target-name">Trey McBride</div><div class="target-meta">TE · ARI · @ValueHunter</div></div><div class="target-score">69.3</div></div>
+                <span class="view-link">View All Targets →</span>
+              </div>
+              <div>
+                <div class="trade-opp-col-label">Managers to Approach <span style="color:var(--boom);font-size:8px;">LI</span></div>
+                <div class="manager-target"><div class="mt-avatar">R</div><div><div class="mt-name">@TheRebuilder</div><div class="mt-note">Low league activity. Open to selling.</div></div><div class="mt-li">48</div></div>
+                <div class="manager-target"><div class="mt-avatar">O</div><div><div class="mt-name">@OldSchoolFF</div><div class="mt-note">Veteran heavy roster. Rebuilding.</div></div><div class="mt-li">36</div></div>
+                <div class="manager-target"><div class="mt-avatar">R</div><div><div class="mt-name">@RookieRecycler</div><div class="mt-note">Young team. Needs win-now pieces.</div></div><div class="mt-li">44</div></div>
+                <span class="view-link">Trade Finder →</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- LEAGUE SIGNALS -->
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">League-Specific Signals</div>
+            <div class="panel-sub">Insights tailored to your league settings.</div>
+          </div>
+          <div class="panel-body">
+            <div class="signal-item"><span class="signal-icon">⭐</span><div><div class="signal-name">Scoring Format Impact</div><div class="signal-desc">PPR + Superflex boosts QB/WR value</div></div></div>
+            <div class="signal-item"><span class="signal-icon">🏗</span><div><div class="signal-name">Roster Construction</div><div class="signal-desc">Most teams weak at TE and RB depth</div></div></div>
+            <div class="signal-item"><span class="signal-icon">💎</span><div><div class="signal-name">Premium Positions</div><div class="signal-desc">WR, QB, Elite TE have biggest edge</div></div></div>
+            <div class="signal-item"><span class="signal-icon">📈</span><div><div class="signal-name">League Trends</div><div class="signal-desc">Rookie overpaying is up 34% this year</div></div></div>
+            <div class="signal-item"><span class="signal-icon">📉</span><div><div class="signal-name">Buy Low Window</div><div class="signal-desc">Week 12-14 historically best time</div></div></div>
+            <span class="view-link">View All Signals →</span>
+          </div>
+        </div>
+
+        <!-- LEAGUE SETTINGS -->
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">League Settings</div>
+          </div>
+          <div class="panel-body">
+            <div class="settings-row"><span class="settings-key">League Name</span><span class="settings-val">Dynasty Alpha</span></div>
+            <div class="settings-row"><span class="settings-key">Players</span><span class="settings-val">12</span></div>
+            <div class="settings-row"><span class="settings-key">Roster Size</span><span class="settings-val">Start 10 (1 QB, 2 RB, 3 WR, 1 TE, 1 FLEX, 1 SF)</span></div>
+            <div class="settings-row"><span class="settings-key">Points Per</span><span class="settings-val">PPR (1.0)</span></div>
+            <div class="settings-row"><span class="settings-key">TE Premium</span><span class="settings-val">1.5 PPR</span></div>
+            <div class="settings-row"><span class="settings-key">Rookie Draft</span><span class="settings-val">4 Rounds</span></div>
+            <div class="settings-row"><span class="settings-key">Trade Deadline</span><span class="settings-val">Week 14</span></div>
+            <div class="settings-row"><span class="settings-key">Playoff Weeks</span><span class="settings-val">15, 16, 17</span></div>
+            <div class="settings-row"><span class="settings-key">Max PF</span><span class="settings-val">None</span></div>
+            <span class="edit-settings-link">Edit League Settings</span>
+          </div>
+        </div>
+
+      </div>
+    </div><!-- /main-scroll -->
+
+    <!-- FOOTER -->
+    <div class="footer">
+      <div class="footer-item">
+        <div style="width:28px;height:28px;border-radius:50%;background:rgba(54,231,161,0.1);border:1px solid rgba(54,231,161,0.2);display:flex;align-items:center;justify-content:center;font-size:13px;">👥</div>
+        <div><div class="footer-val">4,211</div><div class="footer-label">Players Tracked</div><div class="footer-sub">Across All Leagues</div></div>
+      </div>
+      <div class="footer-divider"></div>
+      <div class="footer-item">
+        <div style="width:28px;height:28px;border-radius:50%;background:rgba(54,231,161,0.1);border:1px solid rgba(54,231,161,0.2);display:flex;align-items:center;justify-content:center;font-size:13px;">⚡</div>
+        <div><div class="footer-val">98</div><div class="footer-label">Boom Players</div><div class="footer-sub">Top 23.2%</div></div>
+      </div>
+      <div class="footer-divider"></div>
+      <div class="footer-item">
+        <div style="width:28px;height:28px;border-radius:50%;background:rgba(167,139,250,0.1);border:1px solid rgba(167,139,250,0.2);display:flex;align-items:center;justify-content:center;font-size:13px;">📉</div>
+        <div><div class="footer-val" style="color:var(--danger);">77</div><div class="footer-label">Bust Players</div><div class="footer-sub">Bottom 18.3%</div></div>
+      </div>
+      <div class="footer-divider"></div>
+      <div class="footer-item">
+        <div style="width:28px;height:28px;border-radius:50%;background:rgba(251,191,36,0.1);border:1px solid rgba(251,191,36,0.2);display:flex;align-items:center;justify-content:center;font-size:13px;">📊</div>
+        <div><div class="footer-val white">64.3</div><div class="footer-label">Avg Dynasty Rating</div><div class="footer-sub">vs League Avg 50.1</div></div>
+      </div>
+      <div class="footer-divider"></div>
+      <div class="footer-item">
+        <div style="width:28px;height:28px;border-radius:50%;background:rgba(107,122,153,0.1);border:1px solid rgba(107,122,153,0.2);display:flex;align-items:center;justify-content:center;font-size:13px;">🕐</div>
+        <div><div class="footer-val white">8 min ago</div><div class="footer-label">Last Updated</div><div class="footer-sub">Next update in 21:41</div></div>
+      </div>
+      <div class="footer-divider"></div>
+      <div class="footer-item">
+        <div style="width:28px;height:28px;border-radius:50%;background:rgba(54,231,161,0.1);border:1px solid rgba(54,231,161,0.2);display:flex;align-items:center;justify-content:center;font-size:13px;">✓</div>
+        <div><div class="footer-val">99.2%</div><div class="footer-label">Data Accuracy</div></div>
+      </div>
+      <div class="footer-divider"></div>
+      <div class="footer-item">
+        <div style="width:28px;height:28px;border-radius:50%;background:rgba(54,231,161,0.1);border:1px solid rgba(54,231,161,0.2);display:flex;align-items:center;justify-content:center;">
+          <div style="width:8px;height:8px;border-radius:50%;background:var(--boom);box-shadow:0 0 6px var(--boom);"></div>
+        </div>
+        <div><div class="footer-val">5/5</div><div class="footer-label">League Sync</div><div class="footer-sub">All Connected</div></div>
+      </div>
+    </div>
+
+  </div><!-- /main -->
+</div><!-- /body-wrap -->
+
+</body>
+</html>

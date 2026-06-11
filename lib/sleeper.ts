@@ -88,6 +88,13 @@ export async function fetchTransactions(
   return sleeperFetch<SleeperTransaction[]>(`/league/${leagueId}/transactions/${week}`);
 }
 
+/** Pending and proposed trades for a league. */
+export async function fetchLeagueTrades(
+  leagueId: string,
+): Promise<SleeperTransaction[] | null> {
+  return sleeperFetch<SleeperTransaction[]>(`/league/${leagueId}/trades`);
+}
+
 export interface TradedPick {
   season: string;
   round: number;

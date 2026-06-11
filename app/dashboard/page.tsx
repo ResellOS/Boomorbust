@@ -2,10 +2,10 @@ import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { getTier, getVerdict } from '@/lib/verdict';
+import { deriveRadarVals, getTier, getVerdict } from '@/lib/verdict';
 import TopBar from '@/components/dashboard/TopBar';
-import Sidebar from '@/components/dashboard/Sidebar';
-import PlayerCard, { deriveRadarVals } from '@/components/dashboard/PlayerCard';
+import Sidebar, { type League } from '@/components/dashboard/Sidebar';
+import PlayerCard from '@/components/dashboard/PlayerCard';
 import RightPanel from '@/components/dashboard/RightPanel';
 import TradeTargetsTable from '@/components/dashboard/TradeTargetsTable';
 import DynastyNewsFeed from '@/components/dashboard/DynastyNewsFeed';
@@ -18,12 +18,12 @@ type PlayerRow = {
   full_name: string | null;
   position: string | null;
   team: string | null;
-  depth_chart_position?: string | null;
+  age?: number | null;
 };
 
 type TfoRow = {
   player_id: string;
-  tfo_score: number;
+  tfo_score: number | null;
   calculated_at?: string | null;
   players: PlayerRow | PlayerRow[] | null;
 };
@@ -32,6 +32,27 @@ function unwrapPlayer(p: TfoRow['players']): PlayerRow | null {
   if (!p) return null;
   if (Array.isArray(p)) return p[0] ?? null;
   return p;
+}
+
+function safeScore(score: number | null | undefined): number {
+  return typeof score === 'number' && Number.isFinite(score) ? score : 0;
+}
+
+// This is a dynasty product, so prefer dynasty scores — but fall back to redraft
+// until the engine's dynasty prescore has been run (formula_scores starts
+// redraft-only), so the dashboard never blanks out.
+async function resolveScoringContext(
+  supabase: ReturnType<typeof createAdminClient>,
+): Promise<'dynasty' | 'redraft'> {
+  try {
+    const { count } = await supabase
+      .from('formula_scores')
+      .select('id', { count: 'exact', head: true })
+      .eq('scoring_context', 'dynasty');
+    return (count ?? 0) > 0 ? 'dynasty' : 'redraft';
+  } catch {
+    return 'redraft';
+  }
 }
 
 const PLACEHOLDER_TRADES: IncomingTrade[] = [
@@ -68,122 +89,228 @@ const PLACEHOLDER_TRADES: IncomingTrade[] = [
 ];
 
 export default async function DashboardPage() {
-  const authClient = createClient();
-  const {
-    data: { user },
-  } = await authClient.auth.getUser();
+  let userId: string | null = null;
 
-  if (!user) redirect('/auth/login');
+  try {
+    const authClient = createClient();
+    const { data, error } = await authClient.auth.getUser();
+    if (error) console.error('[dashboard] getUser error:', error);
+    userId = data?.user?.id ?? null;
+  } catch (err) {
+    console.error('[dashboard] getUser failed:', err);
+  }
 
-  const supabase = createAdminClient();
+  if (!userId) redirect('/login');
 
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('sleeper_user_id')
-    .eq('id', user.id)
-    .single();
+  let sleeperUserId: string | null = null;
+  let needsOnboarding = false;
 
-  if (!profile?.sleeper_user_id) redirect('/onboarding');
+  try {
+    const supabase = createAdminClient();
+    const { data: profile, error } = await supabase
+      .from('profiles')
+      .select('sleeper_user_id')
+      .eq('id', userId)
+      .maybeSingle();
 
-  const sleeperUserId = profile.sleeper_user_id;
+    if (error) {
+      console.error('[dashboard] profile query error:', error);
+    } else if (!profile) {
+      console.error('[dashboard] no profile found for user:', userId);
+    } else if (!profile.sleeper_user_id) {
+      needsOnboarding = true;
+    } else {
+      sleeperUserId = profile.sleeper_user_id;
+    }
+  } catch (err) {
+    console.error('[dashboard] profile fetch failed:', err);
+  }
 
-  const { data: leagues } = await supabase
-    .from('leagues')
-    .select('id, name, league_type, status')
-    .eq('owner_id', sleeperUserId);
+  if (needsOnboarding) redirect('/onboarding');
+  if (!sleeperUserId) redirect('/login');
 
-  const leagueList = leagues ?? [];
-
-  const { data: rosterRows } = await supabase
-    .from('rosters')
-    .select('player_id')
-    .eq('owner_id', sleeperUserId);
-
-  const playerIds = Array.from(
-    new Set((rosterRows ?? []).map((r) => r.player_id).filter(Boolean)),
-  );
-
+  let leagueList: League[] = [];
+  let playerIds: string[] = [];
   let myPlayers: TfoRow[] = [];
-  if (playerIds.length > 0) {
-    const { data } = await supabase
-      .from('tfo_cache')
-      .select(
-        'player_id, tfo_score, calculated_at, players(full_name, position, team, depth_chart_position)',
-      )
-      .in('player_id', playerIds)
-      .order('tfo_score', { ascending: false })
-      .limit(5);
-    myPlayers = (data ?? []) as TfoRow[];
-  }
-
   let targets: TfoRow[] = [];
-  let targetsQuery = supabase
-    .from('tfo_cache')
-    .select('player_id, tfo_score, players(full_name, position, team)')
-    .order('tfo_score', { ascending: false })
-    .limit(8);
-
-  if (playerIds.length > 0) {
-    targetsQuery = targetsQuery.not('player_id', 'in', `(${playerIds.join(',')})`);
-  }
-
-  const { data: targetRows } = await targetsQuery;
-  targets = (targetRows ?? []) as TfoRow[];
-
   let overvalued: TfoRow[] = [];
-  if (playerIds.length > 0) {
-    const { data } = await supabase
-      .from('tfo_cache')
-      .select('player_id, tfo_score, players(full_name, position, team)')
-      .in('player_id', playerIds)
-      .order('tfo_score', { ascending: true })
-      .limit(5);
-    overvalued = (data ?? []) as TfoRow[];
-  }
+  let allRosterTfo: { tfo_score: number | null }[] = [];
 
-  let allRosterTfo: { tfo_score: number }[] = [];
-  if (playerIds.length > 0) {
-    const { data } = await supabase
-      .from('tfo_cache')
-      .select('tfo_score')
-      .in('player_id', playerIds);
-    allRosterTfo = data ?? [];
+  try {
+    const supabase = createAdminClient();
+    const scoringContext = await resolveScoringContext(supabase);
+
+    try {
+      // leagues are keyed by the Supabase auth uid (user_id). The table has no
+      // owner_id or league_type columns — selecting/filtering them errors out.
+      const { data, error } = await supabase
+        .from('leagues')
+        .select('id, name, status')
+        .eq('user_id', userId);
+      if (error) throw error;
+      leagueList = (data ?? []) as League[];
+    } catch (err) {
+      console.error('[dashboard] leagues fetch failed:', err);
+      leagueList = [];
+    }
+
+    try {
+      // rosters.owner_id stores the Sleeper user id (NOT the Supabase auth uid),
+      // and players is a text[] of player_ids — flatten every roster's array.
+      const { data, error } = await supabase
+        .from('rosters')
+        .select('players')
+        .eq('owner_id', sleeperUserId);
+      if (error) throw error;
+      const ids = new Set<string>();
+      for (const r of data ?? []) {
+        for (const pid of (r.players as string[] | null) ?? []) {
+          if (pid) ids.add(String(pid));
+        }
+      }
+      playerIds = Array.from(ids);
+    } catch (err) {
+      console.error('[dashboard] rosters fetch failed:', err);
+      playerIds = [];
+    }
+
+    if (playerIds.length > 0) {
+      try {
+        // Scores live in formula_scores (the engine's serving table); player
+        // metadata lives in players (PK = id). No FK for PostgREST embedding,
+        // so fetch both and join in JS. Real rostered players, deduped, TFO desc.
+        const [tfoRes, playerRes] = await Promise.all([
+          supabase
+            .from('formula_scores')
+            .select('player_id, tfo_score, calculated_at')
+            .eq('scoring_context', scoringContext)
+            .in('player_id', playerIds)
+            .order('tfo_score', { ascending: false }),
+          supabase
+            .from('players')
+            .select('id, full_name, position, team, age')
+            .in('id', playerIds),
+        ]);
+        if (tfoRes.error) throw tfoRes.error;
+        if (playerRes.error) throw playerRes.error;
+
+        const metaMap = new Map<string, PlayerRow>();
+        for (const p of playerRes.data ?? []) {
+          metaMap.set(String(p.id), {
+            full_name: p.full_name,
+            position: p.position,
+            team: p.team,
+            age: p.age,
+          });
+        }
+
+        const seen = new Set<string>();
+        myPlayers = [];
+        for (const t of tfoRes.data ?? []) {
+          const pid = String(t.player_id);
+          if (seen.has(pid)) continue;
+          seen.add(pid);
+          myPlayers.push({
+            player_id: pid,
+            tfo_score: t.tfo_score,
+            calculated_at: t.calculated_at,
+            players: metaMap.get(pid) ?? null,
+          });
+        }
+      } catch (err) {
+        console.error('[dashboard] myPlayers fetch failed:', err);
+        myPlayers = [];
+      }
+    }
+
+    try {
+      // Trade targets: top league-wide scores the user does NOT already roster.
+      // formula_scores has no players FK, so join metadata in JS.
+      let targetsQuery = supabase
+        .from('formula_scores')
+        .select('player_id, tfo_score')
+        .eq('scoring_context', scoringContext)
+        .order('tfo_score', { ascending: false })
+        .limit(8);
+
+      if (playerIds.length > 0) {
+        targetsQuery = targetsQuery.not('player_id', 'in', `(${playerIds.join(',')})`);
+      }
+
+      const { data, error } = await targetsQuery;
+      if (error) throw error;
+
+      const targetIds = (data ?? []).map((r) => String(r.player_id));
+      const metaById = new Map<string, PlayerRow>();
+      if (targetIds.length > 0) {
+        const { data: meta } = await supabase
+          .from('players')
+          .select('id, full_name, position, team')
+          .in('id', targetIds);
+        for (const p of meta ?? []) {
+          metaById.set(String(p.id), { full_name: p.full_name, position: p.position, team: p.team });
+        }
+      }
+      targets = (data ?? []).map((r) => ({
+        player_id: String(r.player_id),
+        tfo_score: r.tfo_score,
+        players: metaById.get(String(r.player_id)) ?? null,
+      }));
+    } catch (err) {
+      console.error('[dashboard] trade targets fetch failed:', err);
+      targets = [];
+    }
+
+    // Overvalued + signal counts derive from the already-fetched roster scores
+    // (myPlayers is deduped and sorted by TFO desc) — no extra queries needed.
+    overvalued = myPlayers.slice(-5).reverse();
+    allRosterTfo = myPlayers.map((p) => ({ tfo_score: p.tfo_score }));
+  } catch (err) {
+    console.error('[dashboard] createAdminClient or data load failed:', err);
   }
 
   const signalCounts = { boom: 0, hold: 0, bust: 0, total: allRosterTfo.length };
   for (const row of allRosterTfo) {
-    const v = getVerdict(row.tfo_score);
+    const score = safeScore(row.tfo_score);
+    if (score <= 0) continue;
+    const v = getVerdict(score);
     if (v.class === 'boom') signalCounts.boom += 1;
     else if (v.class === 'hold') signalCounts.hold += 1;
     else signalCounts.bust += 1;
   }
 
+  const validScores = allRosterTfo
+    .map((r) => safeScore(r.tfo_score))
+    .filter((s) => s > 0);
+
   const avgTfo =
-    allRosterTfo.length > 0
-      ? allRosterTfo.reduce((s, r) => s + r.tfo_score, 0) / allRosterTfo.length
+    validScores.length > 0
+      ? validScores.reduce((s, r) => s + r, 0) / validScores.length
       : 72;
 
   const tradeTargets = targets.map((row, i) => {
     const p = unwrapPlayer(row.players);
     const league = leagueList[i % Math.max(leagueList.length, 1)];
+    const score = safeScore(row.tfo_score);
     return {
-      playerId: row.player_id,
+      playerId: row.player_id ?? `target-${i}`,
       playerName: p?.full_name ?? 'Unknown Player',
       position: p?.position ?? '—',
       team: p?.team ?? '—',
       leagueName: league?.name ?? 'League',
-      tfoScore: row.tfo_score,
+      tfoScore: score > 0 ? score : 50,
     };
   });
 
-  const overvaluedAssets = overvalued.map((row) => {
+  const overvaluedAssets = overvalued.map((row, i) => {
     const p = unwrapPlayer(row.players);
+    const score = safeScore(row.tfo_score);
     return {
-      playerId: row.player_id,
+      playerId: row.player_id ?? `overvalued-${i}`,
       playerName: p?.full_name ?? 'Unknown Player',
       position: p?.position ?? '—',
       team: p?.team ?? '—',
-      delta: -Math.max(1, (70 - row.tfo_score) * 0.35),
+      delta: -Math.max(1, (70 - score) * 0.35),
     };
   });
 
@@ -200,7 +327,7 @@ export default async function DashboardPage() {
         playersRostered={playerIds.length}
         tradeOffers={3}
         dynastyEdge={Math.max(0, avgTfo - 70)}
-        empireRating={Math.min(99, Math.max(40, avgTfo + 8))}
+        empireRating={Math.round(Math.min(99, Math.max(40, avgTfo + 8)) * 10) / 10}
       />
 
       <Sidebar leagues={leagueList} />
@@ -219,73 +346,33 @@ export default async function DashboardPage() {
                 View All Players →
               </Link>
             </div>
-            <div className="grid grid-cols-5 gap-2">
-              {myPlayers.length > 0 ? (
-                myPlayers.map((row) => {
+            {myPlayers.length > 0 ? (
+              <div
+                className="flex gap-2 overflow-x-auto overflow-y-hidden pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+              >
+                {myPlayers.map((row) => {
                   const p = unwrapPlayer(row.players);
+                  const score = safeScore(row.tfo_score);
                   return (
-                    <PlayerCard
-                      key={row.player_id}
-                      playerId={row.player_id}
-                      playerName={p?.full_name ?? 'Unknown Player'}
-                      position={p?.position ?? '—'}
-                      team={p?.team ?? '—'}
-                      tfoScore={row.tfo_score}
-                      radarVals={deriveRadarVals(row.player_id, row.tfo_score)}
-                      tier={getTier(row.tfo_score)}
-                    />
+                    <div key={row.player_id} className="w-[185px] shrink-0">
+                      <PlayerCard
+                        playerId={row.player_id}
+                        playerName={p?.full_name ?? 'Unknown Player'}
+                        position={p?.position ?? '—'}
+                        team={p?.team ?? '—'}
+                        tfoScore={score > 0 ? score : 50}
+                        radarVals={deriveRadarVals(row.player_id, score > 0 ? score : 50)}
+                        tier={getTier(score > 0 ? score : 50)}
+                      />
+                    </div>
                   );
-                })
-              ) : (
-                <>
-                  <PlayerCard
-                    playerId="6794"
-                    playerName="Justin Jefferson"
-                    position="WR"
-                    team="MIN"
-                    tfoScore={94.7}
-                    radarVals={deriveRadarVals('6794', 94.7)}
-                    tier="Elite Tier"
-                  />
-                  <PlayerCard
-                    playerId="9228"
-                    playerName="CJ Stroud"
-                    position="QB"
-                    team="HOU"
-                    tfoScore={88.1}
-                    radarVals={deriveRadarVals('9228', 88.1)}
-                    tier="Elite Tier"
-                  />
-                  <PlayerCard
-                    playerId="9493"
-                    playerName="Breece Hall"
-                    position="RB"
-                    team="NYJ"
-                    tfoScore={76.3}
-                    radarVals={deriveRadarVals('9493', 76.3)}
-                    tier="Solid Tier"
-                  />
-                  <PlayerCard
-                    playerId="9990"
-                    playerName="Drake London"
-                    position="WR"
-                    team="ATL"
-                    tfoScore={61.2}
-                    radarVals={deriveRadarVals('9990', 61.2)}
-                    tier="Weak Tier"
-                  />
-                  <PlayerCard
-                    playerId="8154"
-                    playerName="Sam LaPorta"
-                    position="TE"
-                    team="DET"
-                    tfoScore={54.8}
-                    radarVals={deriveRadarVals('8154', 54.8)}
-                    tier="Avoid Tier"
-                  />
-                </>
-              )}
-            </div>
+                })}
+              </div>
+            ) : (
+              <div className="flex h-[120px] items-center justify-center rounded-[9px] border border-border bg-surface font-mono text-[11px] text-muted">
+                No rostered players synced yet — run a league sync to populate your board.
+              </div>
+            )}
           </div>
 
           <div
@@ -308,8 +395,7 @@ export default async function DashboardPage() {
       </div>
 
       <Footer
-        leagueCount={Math.max(leagueList.length, 1)}
-        connectedLeagues={leagueList.length}
+        leagueCount={leagueList.length}
         edgeOpportunities={tradeTargets.length > 0 ? tradeTargets.length + 19 : 27}
       />
     </div>

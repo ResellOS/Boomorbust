@@ -80,7 +80,7 @@ export async function getContentionWindow(
 
   // Load DMS average from tfo_cache
   const { data: dmsRows } = await supabase
-    .from('tfo_cache')
+    .from('formula_scores')
     .select('dms_score')
     .in('player_id', playerIds)
     .order('calculated_at', { ascending: false })

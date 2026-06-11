@@ -14,20 +14,43 @@ export default async function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const supabase = createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  let userId: string | null = null;
+  let hasSleeper = false;
+  let needsOnboarding = false;
 
-  if (!user) redirect('/auth/login');
+  try {
+    const supabase = createClient();
+    const { data, error } = await supabase.auth.getUser();
 
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('sleeper_user_id')
-    .eq('id', user.id)
-    .maybeSingle();
+    if (error) {
+      console.error('[dashboard/layout] getUser error:', error);
+    } else {
+      userId = data?.user?.id ?? null;
+    }
 
-  if (!profile?.sleeper_user_id) redirect('/onboarding');
+    if (userId) {
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('sleeper_user_id')
+        .eq('id', userId)
+        .maybeSingle();
+
+      if (profileError) {
+        console.error('[dashboard/layout] profile query error:', profileError);
+      } else if (!profile) {
+        console.error('[dashboard/layout] no profile found for user:', userId);
+      } else if (!profile.sleeper_user_id) {
+        needsOnboarding = true;
+      } else {
+        hasSleeper = true;
+      }
+    }
+  } catch (err) {
+    console.error('[dashboard/layout] auth check failed:', err);
+  }
+
+  if (needsOnboarding) redirect('/onboarding');
+  if (!userId || !hasSleeper) redirect('/login');
 
   return (
     <>

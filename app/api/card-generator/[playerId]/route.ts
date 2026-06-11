@@ -107,9 +107,11 @@ export async function GET(
   // TFO score from tfo_cache if available, else derive from KTC tier
   const supabase = createAdminClient();
   const { data: tfoCache } = await supabase
-    .from('tfo_cache')
+    .from('formula_scores')
     .select('tfo_score, dms_score')
     .eq('player_id', playerId)
+    .order('calculated_at', { ascending: false })
+    .limit(1)
     .maybeSingle();
 
   const tfoScore: number = (tfoCache as { tfo_score?: number } | null)?.tfo_score

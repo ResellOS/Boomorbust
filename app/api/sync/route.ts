@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { fetchUserLeagues, fetchLeagueFull, fetchLeagueRosters, type SleeperLeague, type SleeperLeagueFull } from '@/lib/sleeper';
+import { fetchUserLeagues, fetchLeagueFull, fetchLeagueRosters, fetchNflState, type SleeperLeague, type SleeperLeagueFull } from '@/lib/sleeper';
 import { mergeSleeperRosterSettings } from '@/lib/sleeper/leagueCardLogo';
 
 export async function POST(req: Request) {
@@ -33,7 +33,10 @@ export async function POST(req: Request) {
     );
   }
 
-  const season = '2025';
+  // Derive the active season from Sleeper's NFL state rather than hardcoding,
+  // so dynasty leagues for the current season sync during the offseason too.
+  const nflState = await fetchNflState();
+  const season = nflState?.season ?? new Date().getFullYear().toString();
 
   let leagues: SleeperLeague[] | null;
   if (leagueIds.length > 0) {

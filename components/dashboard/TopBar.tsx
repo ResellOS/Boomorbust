@@ -36,7 +36,10 @@ export default function TopBar({
       className="col-span-2 grid border-b border-border bg-bg"
       style={{ gridTemplateColumns: '215px 1fr', height: 66 }}
     >
-      <div className="flex items-center justify-center overflow-hidden border-r border-border bg-bg px-1.5 py-1">
+      <div
+        className="flex items-center justify-center overflow-hidden bg-bg px-1.5 py-1"
+        style={{ borderRight: '1px solid #1e2640' }}
+      >
         <Image
           src="/logo.png"
           alt="Boom or Bust"
@@ -47,16 +50,20 @@ export default function TopBar({
           style={{
             mixBlendMode: 'screen',
             filter: 'brightness(1.2) saturate(1.3) contrast(1.1)',
+            transform: 'scale(1.08)',
+            transformOrigin: 'center',
           }}
         />
       </div>
       <div className="grid grid-cols-5">
         {STATS.map((stat) => {
           const raw = values[stat.key];
+          // Integers render clean; any fractional value (e.g. Empire Rating) rounds to 1 decimal.
+          const formatted = Number.isInteger(raw) ? String(raw) : raw.toFixed(1);
           const display =
             'prefix' in stat && stat.prefix
-              ? `${stat.prefix}${raw.toFixed(1)}`
-              : String(raw);
+              ? `${stat.prefix}${formatted}`
+              : formatted;
           return (
             <div
               key={stat.key}

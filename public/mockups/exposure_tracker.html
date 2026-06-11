@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Boom or Bust — Exposure Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --boom: #36E7A1;
+    --bust: #A78BFA;
+    --hold: #FBBF24;
+    --bg: #0a0d14;
+    --surface: #0f1420;
+    --surface2: #141929;
+    --card: #080d14;
+    --border: #1e2640;
+    --text: #e8ecf4;
+    --muted: #6b7a99;
+    --danger: #ef4444;
+  }
+  html, body { height: 100%; overflow: hidden; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Figtree', sans-serif;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+
+  /* ═══════════════════════════════
+     TOPBAR
+  ═══════════════════════════════ */
+  .topbar {
+    height: 58px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    flex-shrink: 0;
+  }
+  .topbar-logo {
+    width: 215px;
+    flex-shrink: 0;
+    border-right: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    padding: 0 14px;
+  }
+  .topbar-logo img {
+    height: 42px;
+    width: auto;
+    mix-blend-mode: screen;
+    filter: brightness(1.2) saturate(1.3) contrast(1.1);
+    transform: scale(1.08);
+    transform-origin: center;
+  }
+  .topbar-stats {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+  }
+
+  .top-stat {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 0 22px;
+    border-right: 1px solid var(--border);
+    flex: 1;
+  }
+  .top-stat-label {
+    font-size: 8px;
+    color: var(--muted);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .top-stat-val {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 18px;
+    margin-top: 1px;
+    line-height: 1;
+  }
+  .top-stat-sub { font-size: 10px; color: var(--muted); margin-top: 2px; }
+  .c-white  { color: var(--text); }
+  .c-boom   { color: var(--boom); }
+  .c-hold   { color: var(--hold); }
+  .c-danger { color: var(--danger); }
+
+  /* ═══════════════════════════════
+     BODY LAYOUT
+  ═══════════════════════════════ */
+  .body-wrap {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+  }
+
+
+  /* ═══════════════════════════════
+     SIDEBAR
+  ═══════════════════════════════ */
+  .sidebar {
+    width: 215px;
+    flex-shrink: 0;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+  }
+  .sb-section { padding: 10px 12px 6px; }
+  .sb-label {
+    font-size: 9px;
+    color: var(--muted);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    font-weight: 500;
+    margin-bottom: 8px;
+  }
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 7px 10px;
+    border-radius: 5px;
+    font-size: 13px;
+    cursor: pointer;
+    color: var(--muted);
+    margin-bottom: 2px;
+    border-left: 2px solid transparent;
+    text-decoration: none;
+  }
+  .nav-item:hover { color: var(--text); background: rgba(255,255,255,0.03); }
+  .nav-item.active {
+    color: var(--boom);
+    border-left-color: var(--boom);
+    background: rgba(54,231,161,0.06);
+  }
+  .nav-icon { width: 16px; text-align: center; font-size: 13px; }
+  .divider { height: 1px; background: var(--border); margin: 6px 14px; }
+
+  .league-item {
+    display: flex;
+    align-items: center;
+    padding: 4px 12px;
+    font-size: 12px;
+    gap: 8px;
+  }
+  .league-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+  .league-name { flex: 1; color: var(--text); }
+  .badge {
+    font-size: 9px;
+    padding: 2px 7px;
+    border-radius: 3px;
+    font-weight: 500;
+    letter-spacing: 0.4px;
+  }
+  .badge-c { background: rgba(54,231,161,0.1); color: var(--boom); }
+  .badge-r { background: rgba(167,139,250,0.1); color: var(--bust); }
+
+  .overview-grid { display: grid; gap: 7px; padding: 0 14px 10px; }
+  .ov-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 9px 11px;
+  }
+  .ov-label { font-size: 9px; color: var(--muted); letter-spacing: 0.8px; text-transform: uppercase; margin-bottom: 3px; }
+  .ov-val { font-family: 'JetBrains Mono', monospace; font-size: 15px; color: var(--text); }
+  .ov-val span { font-size: 10px; color: var(--muted); font-family: 'Figtree', sans-serif; }
+
+  .health-wrap { padding: 0 14px 14px; }
+  .health-status { font-size: 12px; font-weight: 500; color: var(--hold); margin-bottom: 7px; }
+  .health-track {
+    height: 6px;
+    background: var(--border);
+    border-radius: 3px;
+    overflow: visible;
+    position: relative;
+    margin-bottom: 6px;
+  }
+  .health-fill {
+    height: 100%;
+    width: 62%;
+    border-radius: 3px;
+    background: linear-gradient(90deg, var(--boom) 0%, var(--hold) 55%, var(--danger) 100%);
+  }
+  .health-indicator {
+    position: absolute;
+    top: -4px;
+    left: 62%;
+    width: 2px;
+    height: 14px;
+    background: var(--text);
+    border-radius: 1px;
+    transform: translateX(-50%);
+  }
+  .health-sub { font-size: 10px; color: var(--muted); }
+
+  /* ═══════════════════════════════
+     MAIN CONTENT
+  ═══════════════════════════════ */
+  .main {
+    flex: 1;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  .main-header { padding: 10px 20px 4px; }
+  .page-title {
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    text-transform: uppercase;
+  }
+  .page-sub { font-size: 12px; color: var(--muted); margin-top: 3px; }
+
+  .search-filter-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 20px 8px;
+    flex-wrap: wrap;
+  }
+  .search-box {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 0 12px;
+    height: 28px;
+    flex: 1;
+    min-width: 160px;
+  }
+  .search-box input {
+    background: none;
+    border: none;
+    outline: none;
+    color: var(--text);
+    font-size: 12px;
+    font-family: 'Figtree', sans-serif;
+    width: 100%;
+  }
+  .search-box input::placeholder { color: var(--muted); }
+  .filter-btn {
+    height: 28px;
+    padding: 0 10px;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+    background: var(--surface2);
+    color: var(--muted);
+    font-size: 10px;
+    font-family: 'Figtree', sans-serif;
+    cursor: pointer;
+    font-weight: 500;
+  }
+  .filter-btn:hover { color: var(--text); }
+  .f-boom { background: rgba(54,231,161,0.1); border-color: var(--boom); color: var(--boom); }
+  .f-hold { background: rgba(251,191,36,0.1); border-color: var(--hold); color: var(--hold); }
+  .f-bust { background: rgba(167,139,250,0.1); border-color: var(--bust); color: var(--bust); }
+  .sort-wrap {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 0 10px;
+    height: 28px;
+    cursor: pointer;
+  }
+  .sort-label { font-size: 10px; color: var(--muted); }
+  .sort-val { font-size: 10px; color: var(--text); }
+
+  /* Section header */
+  .section-hdr {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 0 20px 5px;
+    border-bottom: 1px solid var(--border);
+  }
+  .section-title {
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+
+  /* Exposure by player table */
+  .exp-table { padding: 0 20px; }
+  .col-heads {
+    display: grid;
+    grid-template-columns: 220px 1fr 90px 110px;
+    padding: 8px 0 6px;
+    border-bottom: 1px solid var(--border);
+  }
+  .col-head { font-size: 9px; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; }
+  .exp-row {
+    display: grid;
+    grid-template-columns: 220px 1fr 90px 110px;
+    align-items: center;
+    padding: 5px 0;
+    border-bottom: 1px solid rgba(30,38,64,0.7);
+  }
+  .exp-row:hover { background: rgba(255,255,255,0.015); }
+  .exp-player { display: flex; align-items: center; gap: 9px; }
+  .avatar {
+    width: 28px; height: 28px; border-radius: 50%;
+    background: var(--surface2); border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 9px; color: var(--muted);
+    font-family: 'JetBrains Mono', monospace; flex-shrink: 0;
+  }
+  .p-name { font-size: 12px; color: var(--text); }
+  .p-meta { font-size: 10px; color: var(--muted); margin-top: 1px; }
+  .bar-area { display: flex; align-items: center; gap: 8px; padding-right: 10px; }
+  .bar-track { flex: 1; height: 9px; background: #1e2640; border-radius: 2px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 2px; }
+  .bar-pct { font-size: 10px; color: var(--muted); font-family: 'JetBrains Mono', monospace; width: 34px; text-align: right; flex-shrink: 0; }
+  .leagues-val { font-size: 12px; color: var(--text); font-family: 'JetBrains Mono', monospace; text-align: center; }
+  .risk-cell { display: flex; justify-content: center; }
+  .risk-badge { font-size: 9px; padding: 3px 10px; border-radius: 3px; font-weight: 500; letter-spacing: 0.8px; min-width: 70px; text-align: center; }
+  .r-danger  { background: rgba(239,68,68,0.1);  color: var(--danger); border: 1px solid rgba(239,68,68,0.3); }
+  .r-caution { background: rgba(251,191,36,0.1); color: var(--hold);   border: 1px solid rgba(251,191,36,0.3); }
+  .r-safe    { background: rgba(54,231,161,0.1); color: var(--boom);   border: 1px solid rgba(54,231,161,0.3); }
+
+  /* Details table */
+  .details-hdr {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 20px 5px;
+    border-bottom: 1px solid var(--border);
+    margin-top: 4px;
+  }
+  .live-badge { display: flex; align-items: center; gap: 4px; font-size: 9px; color: var(--boom); font-weight: 500; }
+  .live-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--boom); }
+  .live-sub { font-size: 9px; color: var(--muted); }
+
+  .det-table { padding: 0 20px 8px; }
+  .det-heads {
+    display: grid;
+    grid-template-columns: 155px 38px 52px 88px 72px 100px 58px 80px 76px;
+    gap: 4px;
+    padding: 7px 0 6px;
+    border-bottom: 1px solid var(--border);
+  }
+  .det-col { font-size: 9px; color: var(--muted); letter-spacing: 0.8px; text-transform: uppercase; }
+  .det-row {
+    display: grid;
+    grid-template-columns: 155px 38px 52px 88px 72px 100px 58px 80px 76px;
+    gap: 4px;
+    align-items: center;
+    padding: 7px 0;
+    border-bottom: 1px solid rgba(30,38,64,0.5);
+  }
+  .det-row:hover { background: rgba(255,255,255,0.015); }
+  .det-player { display: flex; align-items: center; gap: 7px; }
+  .det-avatar {
+    width: 24px; height: 24px; border-radius: 50%;
+    background: var(--surface2); border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 8px; color: var(--muted); flex-shrink: 0;
+  }
+  .det-name { font-size: 11px; color: var(--text); }
+  .det-val { font-size: 11px; color: var(--text); font-family: 'JetBrains Mono', monospace; }
+  .det-muted { font-size: 10px; color: var(--muted); }
+  .det-pts-main { font-size: 10px; }
+  .det-pts-proj { font-size: 9px; color: var(--muted); margin-top: 1px; }
+  .action-btn {
+    font-size: 9px; padding: 3px 8px; border-radius: 3px;
+    border: none; cursor: pointer; font-family: 'Figtree', sans-serif; font-weight: 500;
+  }
+  .btn-reduce  { background: rgba(239,68,68,0.1);  color: var(--danger); border: 1px solid rgba(239,68,68,0.25); }
+  .btn-monitor { background: rgba(251,191,36,0.1); color: var(--hold);   border: 1px solid rgba(251,191,36,0.25); }
+  .btn-add     { background: rgba(54,231,161,0.1); color: var(--boom);   border: 1px solid rgba(54,231,161,0.25); }
+
+  /* ═══════════════════════════════
+     RIGHT PANEL
+  ═══════════════════════════════ */
+  .right-panel {
+    width: 285px;
+    flex-shrink: 0;
+    background: var(--surface);
+    border-left: 1px solid var(--border);
+    overflow-y: auto;
+  }
+  .rp-section { padding: 11px 13px; border-bottom: 1px solid var(--border); }
+  .rp-label {
+    font-size: 9px; color: var(--muted); letter-spacing: 1.5px;
+    text-transform: uppercase; font-weight: 500; margin-bottom: 14px;
+    display: flex; align-items: center; gap: 5px;
+  }
+
+  /* Risk score */
+  .risk-score-row { display: flex; align-items: center; gap: 14px; }
+  .risk-circle-wrap { position: relative; width: 72px; height: 72px; flex-shrink: 0; }
+  .risk-circle-wrap svg { width: 72px; height: 72px; }
+  .risk-circle-inner {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+  }
+  .risk-num { font-family: 'JetBrains Mono', monospace; font-size: 22px; line-height: 1; }
+  .risk-denom { font-size: 9px; color: var(--muted); }
+  .risk-title { font-size: 14px; font-weight: 500; color: var(--hold); margin-bottom: 8px; }
+  .risk-row { display: flex; justify-content: space-between; align-items: center; padding: 3px 0; }
+  .risk-row-label { font-size: 10px; color: var(--muted); }
+  .risk-row-val { font-size: 10px; font-family: 'JetBrains Mono', monospace; }
+  .rv-high   { color: var(--danger); }
+  .rv-medium { color: var(--hold); }
+  .rv-low    { color: var(--boom); }
+
+  /* Alert */
+  .alert-card {
+    background: rgba(239,68,68,0.06);
+    border: 1px solid rgba(239,68,68,0.22);
+    border-radius: 6px; padding: 12px;
+  }
+  .alert-header { display: flex; align-items: center; gap: 7px; margin-bottom: 4px; }
+  .alert-title { font-size: 10px; font-weight: 500; color: var(--danger); letter-spacing: 1px; text-transform: uppercase; }
+  .alert-sub { font-size: 10px; color: var(--muted); margin-bottom: 12px; }
+  .alert-player { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
+  .alert-player-left { display: flex; align-items: center; gap: 7px; }
+  .alert-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .alert-name { font-size: 12px; color: var(--text); }
+  .alert-note-small { font-size: 10px; color: var(--muted); margin-top: 1px; }
+  .alert-leagues { font-size: 11px; font-family: 'JetBrains Mono', monospace; color: var(--muted); }
+  .alert-consider { font-size: 10px; color: var(--muted); margin: 10px 0; }
+  .view-btn {
+    width: 100%; padding: 7px 0; border-radius: 4px;
+    border: 1px solid rgba(239,68,68,0.3); background: transparent;
+    color: var(--danger); font-size: 11px; font-family: 'Figtree', sans-serif;
+    cursor: pointer; font-weight: 500;
+  }
+  .view-btn:hover { background: rgba(239,68,68,0.06); }
+
+  /* Donut */
+  .donut-row { display: flex; align-items: center; gap: 16px; margin-bottom: 10px; }
+  .donut-legend { display: flex; flex-direction: column; gap: 6px; flex: 1; }
+  .legend-row { display: flex; justify-content: space-between; align-items: center; }
+  .legend-left { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--text); }
+  .legend-dot { width: 8px; height: 8px; border-radius: 50%; }
+  .legend-pct { font-size: 11px; font-family: 'JetBrains Mono', monospace; color: var(--muted); }
+  .donut-note { font-size: 10px; color: var(--bust); }
+
+  /* Weekly */
+  .weekly-row { display: flex; justify-content: space-between; align-items: center; padding: 5px 0; }
+  .weekly-left { display: flex; align-items: center; gap: 8px; font-size: 11px; color: var(--text); }
+  .weekly-arrow { font-size: 13px; width: 14px; text-align: center; }
+  .weekly-val { font-size: 11px; font-family: 'JetBrains Mono', monospace; color: var(--muted); }
+  .w-divider { height: 1px; background: var(--border); margin: 8px 0; }
+  .total-row { display: flex; justify-content: space-between; padding: 3px 0; }
+  .total-label { font-size: 11px; color: var(--muted); }
+  .total-val { font-size: 11px; font-family: 'JetBrains Mono', monospace; color: var(--text); }
+
+  /* ═══════════════════════════════
+     FOOTER
+  ═══════════════════════════════ */
+  .footer {
+    height: 28px;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px;
+    flex-shrink: 0;
+  }
+  .footer-item { display: flex; align-items: center; gap: 5px; font-size: 9px; color: var(--muted); letter-spacing: 0.5px; text-transform: uppercase; }
+  .footer-dot { width: 5px; height: 5px; border-radius: 50%; }
+  .fv-boom   { color: var(--boom); }
+  .fv-danger { color: var(--danger); }
+</style>
+</head>
+<body>
+
+<!-- ═══ TOPBAR ═══ -->
+<div class="topbar">
+  <div class="topbar-logo">
+    <img src="/logo.png" alt="Boom or Bust">
+  </div>
+  <div class="topbar-stats">
+    <div class="top-stat">
+      <div class="top-stat-label">Total Players Tracked</div>
+      <div class="top-stat-val c-white">47</div>
+      <div class="top-stat-sub">Across All Leagues</div>
+    </div>
+    <div class="top-stat">
+      <div class="top-stat-label">High Exposure (3+ Leagues)</div>
+      <div class="top-stat-val c-boom">8</div>
+      <div class="top-stat-sub">17.0% of Portfolio</div>
+    </div>
+    <div class="top-stat">
+      <div class="top-stat-label">Danger Zone (5+ Leagues)</div>
+      <div class="top-stat-val c-danger">2</div>
+      <div class="top-stat-sub">4.3% of Portfolio</div>
+    </div>
+    <div class="top-stat">
+      <div class="top-stat-label">Portfolio Concentration</div>
+      <div class="top-stat-val c-hold">34%</div>
+      <div class="top-stat-sub">Moderate</div>
+    </div>
+    <div class="top-stat" style="border-right:none;">
+      <div class="top-stat-label">Leagues Analyzed</div>
+      <div class="top-stat-val c-white">5</div>
+      <div class="top-stat-sub">All Connected</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ BODY ═══ -->
+<div class="body-wrap">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sb-section">
+      <div class="sb-label">Navigation</div>
+      <a class="nav-item" href="#"><span class="nav-icon">⊞</span> Dashboard</a>
+      <a class="nav-item" href="#"><span class="nav-icon">⇄</span> Trade Hub</a>
+      <a class="nav-item" href="#"><span class="nav-icon">◎</span> Player Hub</a>
+      <a class="nav-item active" href="#"><span class="nav-icon">◈</span> Exposure</a>
+      <a class="nav-item" href="#"><span class="nav-icon">⚙</span> Settings</a>
+    </div>
+    <div class="divider"></div>
+    <div class="sb-section">
+      <div class="sb-label">My Leagues</div>
+    </div>
+    <div class="league-item"><div class="league-dot" style="background:var(--boom);"></div><span class="league-name">Dynasty Alpha</span><span class="badge badge-c">Contender</span></div>
+    <div class="league-item"><div class="league-dot" style="background:var(--bust);"></div><span class="league-name">Kings League</span><span class="badge badge-r">Rebuild</span></div>
+    <div class="league-item"><div class="league-dot" style="background:var(--boom);"></div><span class="league-name">Empire League</span><span class="badge badge-c">Contender</span></div>
+    <div class="league-item"><div class="league-dot" style="background:var(--bust);"></div><span class="league-name">Gridiron Gods</span><span class="badge badge-r">Rebuild</span></div>
+    <div class="league-item"><div class="league-dot" style="background:var(--boom);"></div><span class="league-name">Showtime</span><span class="badge badge-c">Contender</span></div>
+    <div class="divider"></div>
+    <div class="sb-section" style="padding-bottom:4px;"><div class="sb-label">Portfolio Overview</div></div>
+    <div class="overview-grid">
+      <div class="ov-card">
+        <div class="ov-label">Total Assets</div>
+        <div class="ov-val">47 <span>players</span></div>
+      </div>
+      <div class="ov-card">
+        <div class="ov-label">Avg Dynasty Rating</div>
+        <div class="ov-val" style="color:var(--boom);">71.4</div>
+      </div>
+      <div class="ov-card">
+        <div class="ov-label">Boom Rate</div>
+        <div class="ov-val" style="color:var(--boom);">68.1%</div>
+      </div>
+    </div>
+    <div class="divider"></div>
+    <div class="sb-section" style="padding-bottom:4px;"><div class="sb-label">Exposure Health</div></div>
+    <div class="health-wrap">
+      <div class="health-status">Moderate Risk</div>
+      <div class="health-track">
+        <div class="health-fill"></div>
+        <div class="health-indicator"></div>
+      </div>
+      <div class="health-sub">Monitor closely</div>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div style="flex:1;overflow-y:auto;display:flex;flex-direction:column;">
+    <div class="main-header">
+      <div class="page-title">Exposure Tracker</div>
+      <div class="page-sub">Know your risk. Own your portfolio.</div>
+    </div>
+
+    <div class="search-filter-row">
+      <div class="search-box">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input type="text" placeholder="Search any player...">
+      </div>
+      <button class="filter-btn">ALL</button>
+      <button class="filter-btn f-boom">BOOM</button>
+      <button class="filter-btn f-hold">HOLD</button>
+      <button class="filter-btn f-bust">BUST</button>
+      <button class="filter-btn">QB</button>
+      <button class="filter-btn">RB</button>
+      <button class="filter-btn">WR</button>
+      <button class="filter-btn">TE</button>
+      <div class="sort-wrap">
+        <span class="sort-label">Sort by:</span>&nbsp;<span class="sort-val">Exposure %</span>
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2.5" stroke-linecap="round" style="margin-left:4px;"><path d="m6 9 6 6 6-6"/></svg>
+      </div>
+    </div>
+
+    <div class="section-hdr">
+      <span class="section-title">Portfolio Exposure — By Player</span>
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+    </div>
+
+    <div class="exp-table">
+      <div class="col-heads">
+        <div class="col-head">Player</div>
+        <div class="col-head" style="padding-left:4px;">Exposure %</div>
+        <div class="col-head" style="text-align:center;">Leagues</div>
+        <div class="col-head" style="text-align:center;">Risk Level</div>
+      </div>
+
+      <div class="exp-row">
+        <div class="exp-player"><div class="avatar">WR</div><div><div class="p-name">Ja'Marr Chase</div><div class="p-meta">WR · CIN</div></div></div>
+        <div class="bar-area"><div class="bar-track"><div class="bar-fill" style="width:100%;background:#ef4444;"></div></div><span class="bar-pct">100%</span></div>
+        <div class="leagues-val">5 / 5</div>
+        <div class="risk-cell"><div class="risk-badge r-danger">DANGER</div></div>
+      </div>
+      <div class="exp-row">
+        <div class="exp-player"><div class="avatar">WR</div><div><div class="p-name">Justin Jefferson</div><div class="p-meta">WR · MIN</div></div></div>
+        <div class="bar-area"><div class="bar-track"><div class="bar-fill" style="width:80%;background:#FBBF24;"></div></div><span class="bar-pct">80%</span></div>
+        <div class="leagues-val">4 / 5</div>
+        <div class="risk-cell"><div class="risk-badge r-caution">CAUTION</div></div>
+      </div>
+      <div class="exp-row">
+        <div class="exp-player"><div class="avatar">WR</div><div><div class="p-name">CeeDee Lamb</div><div class="p-meta">WR · DAL</div></div></div>
+        <div class="bar-area"><div class="bar-track"><div class="bar-fill" style="width:80%;background:#FBBF24;"></div></div><span class="bar-pct">80%</span></div>
+        <div class="leagues-val">4 / 5</div>
+        <div class="risk-cell"><div class="risk-badge r-caution">CAUTION</div></div>
+      </div>
+      <div class="exp-row">
+        <div class="exp-player"><div class="avatar">RB</div><div><div class="p-name">Bijan Robinson</div><div class="p-meta">RB · ATL</div></div></div>
+        <div class="bar-area"><div class="bar-track"><div class="bar-fill" style="width:60%;background:#FBBF24;"></div></div><span class="bar-pct">60%</span></div>
+        <div class="leagues-val">3 / 5</div>
+        <div class="risk-cell"><div class="risk-badge r-caution">CAUTION</div></div>
+      </div>
+      <div class="exp-row">
+        <div class="exp-player"><div class="avatar">RB</div><div><div class="p-name">Breece Hall</div><div class="p-meta">RB · NYJ</div></div></div>
+        <div class="bar-area"><div class="bar-track"><div class="bar-fill" style="width:60%;background:#FBBF24;"></div></div><span class="bar-pct">60%</span></div>
+        <div class="leagues-val">3 / 5</div>
+        <div class="risk-cell"><div class="risk-badge r-caution">CAUTION</div></div>
+      </div>
+      <div class="exp-row">
+        <div class="exp-player"><div class="avatar">WR</div><div><div class="p-name">Puka Nacua</div><div class="p-meta">WR · LAR</div></div></div>
+        <div class="bar-area"><div class="bar-track"><div class="bar-fill" style="width:40%;background:#36E7A1;"></div></div><span class="bar-pct">40%</span></div>
+        <div class="leagues-val">2 / 5</div>
+        <div class="risk-cell"><div class="risk-badge r-safe">SAFE</div></div>
+      </div>
+      <div class="exp-row">
+        <div class="exp-player"><div class="avatar">WR</div><div><div class="p-name">Malik Nabers</div><div class="p-meta">WR · NYG</div></div></div>
+        <div class="bar-area"><div class="bar-track"><div class="bar-fill" style="width:40%;background:#36E7A1;"></div></div><span class="bar-pct">40%</span></div>
+        <div class="leagues-val">2 / 5</div>
+        <div class="risk-cell"><div class="risk-badge r-safe">SAFE</div></div>
+      </div>
+      <div class="exp-row">
+        <div class="exp-player"><div class="avatar">QB</div><div><div class="p-name">CJ Stroud</div><div class="p-meta">QB · HOU</div></div></div>
+        <div class="bar-area"><div class="bar-track"><div class="bar-fill" style="width:20%;background:#36E7A1;"></div></div><span class="bar-pct">20%</span></div>
+        <div class="leagues-val">1 / 5</div>
+        <div class="risk-cell"><div class="risk-badge r-safe">SAFE</div></div>
+      </div>
+      <div class="exp-row">
+        <div class="exp-player"><div class="avatar">WR</div><div><div class="p-name">Amon-Ra St Brown</div><div class="p-meta">WR · DET</div></div></div>
+        <div class="bar-area"><div class="bar-track"><div class="bar-fill" style="width:20%;background:#36E7A1;"></div></div><span class="bar-pct">20%</span></div>
+        <div class="leagues-val">1 / 5</div>
+        <div class="risk-cell"><div class="risk-badge r-safe">SAFE</div></div>
+      </div>
+      <div class="exp-row">
+        <div class="exp-player"><div class="avatar">WR</div><div><div class="p-name">Drake London</div><div class="p-meta">WR · ATL</div></div></div>
+        <div class="bar-area"><div class="bar-track"><div class="bar-fill" style="width:20%;background:#36E7A1;"></div></div><span class="bar-pct">20%</span></div>
+        <div class="leagues-val">1 / 5</div>
+        <div class="risk-cell"><div class="risk-badge r-safe">SAFE</div></div>
+      </div>
+    </div>
+
+    <!-- Details table -->
+    <div class="details-hdr">
+      <span class="section-title">Player Exposure Details</span>
+      <div class="live-badge"><div class="live-dot"></div>LIVE</div>
+      <span class="live-sub">Updates every 60 seconds during game days</span>
+    </div>
+
+    <div class="det-table">
+      <div class="det-heads">
+        <div class="det-col">Player</div>
+        <div class="det-col">POS</div>
+        <div class="det-col">Shares</div>
+        <div class="det-col">Leagues</div>
+        <div class="det-col">Dyn. Rtg</div>
+        <div class="det-col">Weekly Pts</div>
+        <div class="det-col">7-Day</div>
+        <div class="det-col">Risk</div>
+        <div class="det-col">Action</div>
+      </div>
+
+      <!-- rows -->
+      <div class="det-row">
+        <div class="det-player"><div class="det-avatar">WR</div><span class="det-name">Ja'Marr Chase</span></div>
+        <div class="det-muted">WR</div><div class="det-val">5/5</div><div class="det-muted">All 5 Leagues</div>
+        <div class="det-val">87.3</div>
+        <div><div class="det-pts-main" style="color:#ef4444;">31.2 pts</div><div class="det-pts-proj">Proj: 24.8</div></div>
+        <svg width="52" height="22" viewBox="0 0 52 22"><polyline points="0,18 8,10 18,14 26,4 34,8 42,2 52,6" fill="none" stroke="#ef4444" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <div class="risk-cell" style="justify-content:flex-start;"><div class="risk-badge r-danger">DANGER</div></div>
+        <div><button class="action-btn btn-reduce">Reduce</button></div>
+      </div>
+
+      <div class="det-row">
+        <div class="det-player"><div class="det-avatar">WR</div><span class="det-name">Justin Jefferson</span></div>
+        <div class="det-muted">WR</div><div class="det-val">4/5</div><div class="det-muted">4 Leagues</div>
+        <div class="det-val">94.7</div>
+        <div><div class="det-pts-main" style="color:#FBBF24;">28.4 pts</div><div class="det-pts-proj">Proj: 26.1</div></div>
+        <svg width="52" height="22" viewBox="0 0 52 22"><polyline points="0,14 8,8 18,12 26,6 34,10 42,4 52,8" fill="none" stroke="#FBBF24" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <div class="risk-cell" style="justify-content:flex-start;"><div class="risk-badge r-caution">CAUTION</div></div>
+        <div><button class="action-btn btn-monitor">Monitor</button></div>
+      </div>
+
+      <div class="det-row">
+        <div class="det-player"><div class="det-avatar">WR</div><span class="det-name">CeeDee Lamb</span></div>
+        <div class="det-muted">WR</div><div class="det-val">4/5</div><div class="det-muted">4 Leagues</div>
+        <div class="det-val">79.1</div>
+        <div><div class="det-pts-main" style="color:#FBBF24;">19.3 pts</div><div class="det-pts-proj">Proj: 27.4</div></div>
+        <svg width="52" height="22" viewBox="0 0 52 22"><polyline points="0,6 8,12 18,8 26,16 34,10 42,18 52,14" fill="none" stroke="#FBBF24" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <div class="risk-cell" style="justify-content:flex-start;"><div class="risk-badge r-caution">CAUTION</div></div>
+        <div><button class="action-btn btn-monitor">Monitor</button></div>
+      </div>
+
+      <div class="det-row">
+        <div class="det-player"><div class="det-avatar">RB</div><span class="det-name">Bijan Robinson</span></div>
+        <div class="det-muted">RB</div><div class="det-val">3/5</div><div class="det-muted">3 Leagues</div>
+        <div class="det-val">83.2</div>
+        <div><div class="det-pts-main" style="color:#FBBF24;">22.7 pts</div><div class="det-pts-proj">Proj: 21.9</div></div>
+        <svg width="52" height="22" viewBox="0 0 52 22"><polyline points="0,16 8,10 18,12 26,6 34,9 42,4 52,7" fill="none" stroke="#FBBF24" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <div class="risk-cell" style="justify-content:flex-start;"><div class="risk-badge r-caution">CAUTION</div></div>
+        <div><button class="action-btn btn-monitor">Monitor</button></div>
+      </div>
+
+      <div class="det-row">
+        <div class="det-player"><div class="det-avatar">RB</div><span class="det-name">Breece Hall</span></div>
+        <div class="det-muted">RB</div><div class="det-val">3/5</div><div class="det-muted">3 Leagues</div>
+        <div class="det-val">76.3</div>
+        <div><div class="det-pts-main" style="color:#FBBF24;">17.1 pts</div><div class="det-pts-proj">Proj: 22.3</div></div>
+        <svg width="52" height="22" viewBox="0 0 52 22"><polyline points="0,8 8,14 18,10 26,18 34,12 42,16 52,14" fill="none" stroke="#FBBF24" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <div class="risk-cell" style="justify-content:flex-start;"><div class="risk-badge r-caution">CAUTION</div></div>
+        <div><button class="action-btn btn-monitor">Monitor</button></div>
+      </div>
+
+      <div class="det-row">
+        <div class="det-player"><div class="det-avatar">WR</div><span class="det-name">Puka Nacua</span></div>
+        <div class="det-muted">WR</div><div class="det-val">2/5</div><div class="det-muted">2 Leagues</div>
+        <div class="det-val">79.4</div>
+        <div><div class="det-pts-main" style="color:#36E7A1;">24.8 pts</div><div class="det-pts-proj">Proj: 20.1</div></div>
+        <svg width="52" height="22" viewBox="0 0 52 22"><polyline points="0,16 8,12 18,10 26,8 34,6 42,8 52,4" fill="none" stroke="#36E7A1" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <div class="risk-cell" style="justify-content:flex-start;"><div class="risk-badge r-safe">SAFE</div></div>
+        <div><button class="action-btn btn-add">Add More</button></div>
+      </div>
+
+      <div class="det-row">
+        <div class="det-player"><div class="det-avatar">WR</div><span class="det-name">Malik Nabers</span></div>
+        <div class="det-muted">WR</div><div class="det-val">2/5</div><div class="det-muted">2 Leagues</div>
+        <div class="det-val">82.4</div>
+        <div><div class="det-pts-main" style="color:#36E7A1;">21.3 pts</div><div class="det-pts-proj">Proj: 19.8</div></div>
+        <svg width="52" height="22" viewBox="0 0 52 22"><polyline points="0,18 8,14 18,10 26,8 34,5 42,6 52,3" fill="none" stroke="#36E7A1" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <div class="risk-cell" style="justify-content:flex-start;"><div class="risk-badge r-safe">SAFE</div></div>
+        <div><button class="action-btn btn-add">Add More</button></div>
+      </div>
+
+      <div class="det-row">
+        <div class="det-player"><div class="det-avatar">QB</div><span class="det-name">CJ Stroud</span></div>
+        <div class="det-muted">QB</div><div class="det-val">1/5</div><div class="det-muted">1 League</div>
+        <div class="det-val">88.1</div>
+        <div><div class="det-pts-main" style="color:#36E7A1;">33.7 pts</div><div class="det-pts-proj">Proj: 29.4</div></div>
+        <svg width="52" height="22" viewBox="0 0 52 22"><polyline points="0,14 8,10 18,8 26,6 34,4 42,6 52,2" fill="none" stroke="#36E7A1" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <div class="risk-cell" style="justify-content:flex-start;"><div class="risk-badge r-safe">SAFE</div></div>
+        <div><button class="action-btn btn-add">Add More</button></div>
+      </div>
+
+      <div class="det-row">
+        <div class="det-player"><div class="det-avatar">WR</div><span class="det-name">Amon-Ra St Brown</span></div>
+        <div class="det-muted">WR</div><div class="det-val">1/5</div><div class="det-muted">1 League</div>
+        <div class="det-val">71.8</div>
+        <div><div class="det-pts-main" style="color:#36E7A1;">18.9 pts</div><div class="det-pts-proj">Proj: 20.2</div></div>
+        <svg width="52" height="22" viewBox="0 0 52 22"><polyline points="0,12 8,14 18,10 26,12 34,8 42,10 52,8" fill="none" stroke="#36E7A1" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <div class="risk-cell" style="justify-content:flex-start;"><div class="risk-badge r-safe">SAFE</div></div>
+        <div><button class="action-btn btn-add">Add More</button></div>
+      </div>
+
+      <div class="det-row">
+        <div class="det-player"><div class="det-avatar">WR</div><span class="det-name">Drake London</span></div>
+        <div class="det-muted">WR</div><div class="det-val">1/5</div><div class="det-muted">1 League</div>
+        <div class="det-val">61.2</div>
+        <div><div class="det-pts-main" style="color:#36E7A1;">14.2 pts</div><div class="det-pts-proj">Proj: 18.7</div></div>
+        <svg width="52" height="22" viewBox="0 0 52 22"><polyline points="0,14 8,16 18,12 26,14 34,10 42,12 52,10" fill="none" stroke="#36E7A1" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <div class="risk-cell" style="justify-content:flex-start;"><div class="risk-badge r-safe">SAFE</div></div>
+        <div><button class="action-btn btn-add">Add More</button></div>
+      </div>
+    </div>
+  </div>
+    </div>
+
+  <!-- RIGHT PANEL -->
+  <div class="right-panel">
+
+    <div class="rp-section">
+      <div class="rp-label">Portfolio Risk Score
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+      </div>
+      <div class="risk-score-row">
+        <div class="risk-circle-wrap">
+          <svg viewBox="0 0 72 72">
+            <circle cx="36" cy="36" r="28" fill="none" stroke="#1e2640" stroke-width="8"/>
+            <circle cx="36" cy="36" r="28" fill="none" stroke="#FBBF24" stroke-width="8"
+              stroke-dasharray="117.9 175.9" stroke-dashoffset="44" stroke-linecap="round"
+              transform="rotate(-90 36 36)"/>
+          </svg>
+          <div class="risk-circle-inner">
+            <span class="risk-num">67</span>
+            <span class="risk-denom">/100</span>
+          </div>
+        </div>
+        <div>
+          <div class="risk-title">Moderate Risk</div>
+          <div class="risk-row"><span class="risk-row-label">Concentration Risk</span><span class="risk-row-val rv-high">72% High</span></div>
+          <div class="risk-row"><span class="risk-row-label">Position Diversity</span><span class="risk-row-val rv-medium">58% Medium</span></div>
+          <div class="risk-row"><span class="risk-row-label">Age Curve Risk</span><span class="risk-row-val rv-low">43% Low</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="rp-section">
+      <div class="alert-card">
+        <div class="alert-header">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round"><path d="m10.29 3.86-8.3 14.35A1 1 0 0 0 2.83 20h16.34a1 1 0 0 0 .86-1.52L11.71 3.86a1 1 0 0 0-1.72 0z"/><path d="M12 9v4M12 17h.01"/></svg>
+          <span class="alert-title">Danger Zone Alert</span>
+        </div>
+        <div class="alert-sub">2 players at maximum exposure</div>
+        <div class="alert-player">
+          <div class="alert-player-left"><div class="alert-dot" style="background:#ef4444;"></div><span class="alert-name">Ja'Marr Chase</span></div>
+          <span class="alert-leagues">5/5 leagues</span>
+        </div>
+        <div class="alert-player">
+          <div class="alert-player-left">
+            <div class="alert-dot" style="background:#FBBF24;"></div>
+            <div><div class="alert-name">Justin Jefferson</div><div class="alert-note-small">(approaching)</div></div>
+          </div>
+          <span class="alert-leagues">4/5 leagues</span>
+        </div>
+        <div class="alert-consider">Consider reducing before Week 15</div>
+        <button class="view-btn">View Reduction Targets</button>
+      </div>
+    </div>
+
+    <div class="rp-section">
+      <div class="rp-label">Position Breakdown</div>
+      <div class="donut-row">
+        <svg width="80" height="80" viewBox="0 0 80 80">
+          <circle cx="40" cy="40" r="30" fill="none" stroke="#1e2640" stroke-width="12"/>
+          <circle cx="40" cy="40" r="30" fill="none" stroke="#A78BFA" stroke-width="12"
+            stroke-dasharray="128.2 60.3" stroke-dashoffset="47.1" transform="rotate(-90 40 40)"/>
+          <circle cx="40" cy="40" r="30" fill="none" stroke="#36E7A1" stroke-width="12"
+            stroke-dasharray="45.2 143.3" stroke-dashoffset="-81.1" transform="rotate(-90 40 40)"/>
+          <circle cx="40" cy="40" r="30" fill="none" stroke="#FBBF24" stroke-width="12"
+            stroke-dasharray="15.1 173.4" stroke-dashoffset="-126.3" transform="rotate(-90 40 40)"/>
+        </svg>
+        <div class="donut-legend">
+          <div class="legend-row"><div class="legend-left"><div class="legend-dot" style="background:#A78BFA;"></div>WR</div><span class="legend-pct">68%</span></div>
+          <div class="legend-row"><div class="legend-left"><div class="legend-dot" style="background:#36E7A1;"></div>RB</div><span class="legend-pct">24%</span></div>
+          <div class="legend-row"><div class="legend-left"><div class="legend-dot" style="background:#FBBF24;"></div>QB</div><span class="legend-pct">8%</span></div>
+          <div class="legend-row"><div class="legend-left"><div class="legend-dot" style="background:#6b7a99;"></div>TE</div><span class="legend-pct">0%</span></div>
+        </div>
+      </div>
+      <div class="donut-note">WR Heavy — consider RB exposure</div>
+    </div>
+
+    <div class="rp-section" style="border-bottom:none;">
+      <div class="rp-label">Weekly Performance</div>
+      <div class="weekly-row"><div class="weekly-left"><span class="weekly-arrow" style="color:var(--boom);">↑</span>Beating Projection</div><span class="weekly-val">4 players</span></div>
+      <div class="weekly-row"><div class="weekly-left"><span class="weekly-arrow" style="color:var(--muted);">→</span>On Track</div><span class="weekly-val">3 players</span></div>
+      <div class="weekly-row"><div class="weekly-left"><span class="weekly-arrow" style="color:var(--danger);">↓</span>Below Projection</div><span class="weekly-val">3 players</span></div>
+      <div class="w-divider"></div>
+      <div class="total-row"><span class="total-label">Total Points</span><span class="total-val">211.6</span></div>
+      <div class="total-row"><span class="total-label">Projected</span><span class="total-val">204.3</span></div>
+      <div class="total-row"><span class="total-label">Delta</span><span class="total-val" style="color:var(--boom);">+7.3</span></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+  <div class="footer-item"><div class="footer-dot" style="background:var(--boom);"></div>Engine Status <span class="fv-boom" style="margin-left:4px;">Optimal</span>&nbsp;· Last run: 8 min ago</div>
+  <div class="footer-item">Data Accuracy <span class="fv-boom" style="margin-left:4px;">99.2%</span>&nbsp;· Live Sleeper sync</div>
+  <div class="footer-item">Exposure Alerts <span class="fv-danger" style="margin-left:4px;">2</span>&nbsp;· Action Required</div>
+  <div class="footer-item">League Sync <span class="fv-boom" style="margin-left:4px;">5/5</span><div class="footer-dot" style="background:var(--boom);margin-left:6px;"></div>All Connected</div>
+</div>
+
+</body>
+</html>

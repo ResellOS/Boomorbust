@@ -70,7 +70,7 @@ export async function GET() {
 
     if (playerIds.size > 0) {
       const { data: tfoRows } = await supabase
-        .from('tfo_cache')
+        .from('formula_scores')
         .select('tfo_score')
         .in('player_id', Array.from(playerIds))
         .not('tfo_score', 'is', null);

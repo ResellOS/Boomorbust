@@ -32,8 +32,8 @@ export function normalizeTier(
   if (raw) {
     const r = raw.toLowerCase();
     if (r === 'all_pro_terminal' || r === 'all_pro') return 'all_pro_terminal';
-    if (r === 'elite' || r === 'veteran') return 'elite';
-    if (r === 'pro' || r === 'rookie') return 'pro';
+    if (r === 'elite' || r === 'veteran' || r === 'general_manager') return 'elite';
+    if (r === 'pro' || r === 'rookie' || r === 'league_analyst') return 'pro';
   }
   return isPaidFallback ? 'pro' : 'free';
 }

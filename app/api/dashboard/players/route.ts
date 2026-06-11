@@ -259,8 +259,8 @@ export async function GET(req: Request) {
 
   // Step 5: tfo_cache WHERE player_id IN allPlayerIds — ppr scoring, no league_id filter
   const { data: tfoRows } = await db
-    .from('tfo_cache')
-    .select('player_id, tfo_score, grade, verdict')
+    .from('formula_scores')
+    .select('player_id, tfo_score, verdict')
     .in('player_id', allPlayerIds)
     .eq('scoring_type', 'ppr')
     .order('tfo_score', { ascending: false })
@@ -269,8 +269,8 @@ export async function GET(req: Request) {
   // Step 6: players WHERE player_id IN allPlayerIds → names, position, team
   const { data: playerRows } = await db
     .from('players')
-    .select('player_id, full_name, position, team')
-    .in('player_id', allPlayerIds);
+    .select('id, full_name, position, team')
+    .in('id', allPlayerIds);
 
   // Step 7: join and return
   const tfoScores = new Map<string, { tfo_score: number; verdict: string | null }>();
@@ -280,8 +280,8 @@ export async function GET(req: Request) {
 
   const nameMap = new Map<string, { full_name: string; position: string; team: string }>();
   for (const p of playerRows ?? []) {
-    nameMap.set(String(p.player_id), {
-      full_name: String(p.full_name ?? `Player ${String(p.player_id).slice(-4)}`),
+    nameMap.set(String(p.id), {
+      full_name: String(p.full_name ?? `Player ${String(p.id).slice(-4)}`),
       position:  String(p.position ?? 'WR'),
       team:      String(p.team ?? '—'),
     });

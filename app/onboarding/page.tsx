@@ -351,7 +351,7 @@ export default function OnboardingPage() {
                 <div>
                   <h2 className="text-white text-2xl mb-2">Syncing your leagues</h2>
                   <p className="text-[var(--text-secondary)] text-sm">
-                    Importing rosters, draft picks, and trade history from Sleeper…
+                    Importing leagues and rosters…
                   </p>
                 </div>
                 <div className="flex justify-center gap-1.5">

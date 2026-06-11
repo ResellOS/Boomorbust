@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Player Hub Preview</title>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --boom:#36E7A1;--bust:#A78BFA;--hold:#FBBF24;
+  --bg:#0a0d14;--surface:#0f1420;--surface2:#141929;--card:#080d14;
+  --border:#1e2640;--text:#e8ecf4;--muted:#6b7a99;--danger:#ef4444;
+}
+body{background:#1a1f2e;font-family:'Figtree',sans-serif;padding:24px;display:flex;align-items:flex-start;justify-content:center;}
+
+.hub{
+  width:660px;background:var(--surface);
+  border:1px solid var(--border);border-radius:8px;
+  overflow:hidden;
+  box-shadow:0 0 40px rgba(54,231,161,0.06),0 0 80px rgba(167,139,250,0.04);
+}
+
+/* TOPBAR */
+.hub-topbar{
+  background:var(--card);border-bottom:1px solid var(--border);
+  display:grid;grid-template-columns:80px 1fr;height:48px;
+}
+.hub-logo{
+  border-right:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;padding:0 8px;
+}
+.hub-logo img{height:26px;mix-blend-mode:screen;filter:brightness(1.2) saturate(1.3) contrast(1.1);}
+.hub-top-stats{display:flex;align-items:stretch;overflow:hidden;}
+.hts{
+  display:flex;flex-direction:column;justify-content:center;
+  padding:0 10px;border-right:1px solid var(--border);min-width:0;
+}
+.hts:last-child{border-right:none;}
+.hts-label{font-size:7px;color:var(--muted);letter-spacing:0.5px;text-transform:uppercase;white-space:nowrap;}
+.hts-val{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text);margin-top:1px;white-space:nowrap;}
+.hts-val.g{color:var(--boom);}
+.hts-val.r{color:var(--danger);}
+.hts-sub{font-size:8px;color:var(--muted);white-space:nowrap;}
+
+/* BODY */
+.hub-body{display:grid;grid-template-columns:96px 1fr 186px;height:316px;}
+
+/* SIDEBAR */
+.hub-sb{border-right:1px solid var(--border);overflow:hidden;display:flex;flex-direction:column;}
+.sb-top{padding:6px 8px;border-bottom:1px solid var(--border);}
+.sb-label{font-size:7px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;}
+.league-row{display:flex;align-items:center;gap:4px;padding:3px 0;cursor:pointer;}
+.l-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0;}
+.l-name{color:var(--text);font-size:8px;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.l-badge{font-size:6px;padding:1px 3px;border-radius:2px;flex-shrink:0;}
+.lbc{background:rgba(54,231,161,0.1);color:var(--boom);}
+.lbr{background:rgba(167,139,250,0.1);color:var(--bust);}
+.sb-bottom{padding:6px 8px;flex:1;overflow:hidden;}
+.quick-action{background:var(--card);border:1px solid var(--border);border-radius:3px;padding:6px;}
+.qa-tag{font-size:7px;color:var(--muted);margin-bottom:2px;}
+.qa-text{font-size:8px;color:var(--text);line-height:1.4;margin-bottom:2px;}
+.qa-val{font-size:8px;color:var(--boom);font-family:'JetBrains Mono',monospace;margin-bottom:4px;}
+.qa-btn{width:100%;margin-top:2px;padding:3px 0;border-radius:2px;font-size:7px;font-family:'Figtree',sans-serif;cursor:pointer;font-weight:700;border:none;}
+.qa-accept{background:var(--boom);color:#0a0d14;}
+.qa-counter{background:transparent;color:var(--muted);border:1px solid var(--border) !important;border:none;}
+.qa-decline{background:transparent;color:var(--danger);border:1px solid rgba(239,68,68,0.3) !important;border:none;}
+
+/* MAIN LIST */
+.hub-main{overflow:hidden;display:flex;flex-direction:column;}
+.main-hdr{padding:6px 8px 4px;border-bottom:1px solid var(--border);flex-shrink:0;}
+.main-title{font-size:10px;font-weight:600;color:var(--text);}
+.main-sub{font-size:8px;color:var(--muted);}
+.filter-row{display:flex;gap:2px;padding:4px 6px;border-bottom:1px solid var(--border);flex-shrink:0;align-items:center;}
+.fb{font-size:7px;padding:2px 5px;border-radius:2px;border:1px solid var(--border);background:var(--surface2);color:var(--muted);cursor:pointer;}
+.fb.ab{border-color:var(--boom);color:var(--boom);background:rgba(54,231,161,0.08);}
+.fb.ah{border-color:var(--hold);color:var(--hold);background:rgba(251,191,36,0.08);}
+.fb.abu{border-color:var(--bust);color:var(--bust);background:rgba(167,139,250,0.08);}
+.sort-sm{font-size:7px;color:var(--muted);margin-left:auto;white-space:nowrap;}
+.player-list{flex:1;overflow:hidden;}
+.pl-row{
+  display:grid;grid-template-columns:18px 1fr 32px 56px 30px;
+  align-items:center;gap:3px;padding:4px 6px;
+  border-bottom:1px solid rgba(30,38,64,0.5);cursor:pointer;
+}
+.pl-row:hover{background:rgba(255,255,255,0.02);}
+.pl-row.sel{background:rgba(54,231,161,0.04);border-left:2px solid var(--boom);padding-left:4px;}
+.pl-av{width:16px;height:16px;border-radius:50%;background:var(--surface2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:5px;color:var(--muted);flex-shrink:0;}
+.pl-name{font-size:9px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.pl-meta{font-size:7px;color:var(--muted);}
+.pl-score{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text);text-align:right;}
+.pl-v{font-size:6px;padding:1px 3px;border-radius:2px;font-weight:600;text-align:center;white-space:nowrap;}
+.vb{background:rgba(54,231,161,0.1);color:var(--boom);border:1px solid rgba(54,231,161,0.2);}
+.vh{background:rgba(251,191,36,0.1);color:var(--hold);border:1px solid rgba(251,191,36,0.2);}
+.vbu{background:rgba(239,68,68,0.1);color:var(--danger);border:1px solid rgba(239,68,68,0.2);}
+.pl-spark{width:26px;height:12px;}
+.list-foot{padding:3px 6px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-shrink:0;}
+.lf-txt{font-size:7px;color:var(--muted);}
+.lf-pages{display:flex;gap:2px;}
+.lf-pg{width:13px;height:13px;border-radius:2px;border:1px solid var(--border);background:transparent;font-size:7px;color:var(--muted);display:flex;align-items:center;justify-content:center;cursor:pointer;}
+.lf-pg.on{background:var(--boom);color:#0a0d14;border-color:var(--boom);}
+
+/* DETAIL */
+.hub-detail{border-left:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;}
+.detail-top{
+  background:linear-gradient(180deg,rgba(54,231,161,0.08) 0%,rgba(10,13,20,0.0) 100%);
+  padding:8px 8px 4px;border-bottom:1px solid var(--border);
+  display:flex;align-items:flex-start;justify-content:space-between;flex-shrink:0;
+}
+.detail-info{}
+.d-name{font-size:11px;font-weight:600;color:var(--text);}
+.d-meta{font-size:8px;color:var(--muted);margin-bottom:3px;}
+.d-rtg-label{font-size:7px;color:var(--muted);letter-spacing:0.5px;text-transform:uppercase;}
+.d-score{font-family:'JetBrains Mono',monospace;font-size:26px;color:var(--boom);line-height:1;}
+.d-tier{font-size:8px;color:var(--muted);}
+.d-vbadge{font-size:7px;padding:2px 7px;border-radius:3px;font-weight:700;display:inline-block;margin-top:4px;background:rgba(54,231,161,0.1);color:var(--boom);border:1px solid rgba(54,231,161,0.25);}
+
+.detail-scroll{flex:1;overflow-y:auto;padding:6px 8px;}
+
+/* radar */
+.radar-wrap{display:flex;justify-content:center;margin-bottom:6px;}
+
+/* signal */
+.sig-section{margin-bottom:6px;}
+.sig-label{font-size:7px;color:var(--muted);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:3px;}
+.sig-row{display:flex;align-items:center;gap:4px;margin-bottom:3px;}
+.sig-name{font-size:7px;color:var(--muted);width:54px;flex-shrink:0;}
+.sig-track{flex:1;height:3px;background:#1e2640;border-radius:1px;overflow:hidden;}
+.sig-fill{height:100%;border-radius:1px;}
+.sig-val{font-size:7px;font-family:'JetBrains Mono',monospace;color:var(--text);width:18px;text-align:right;flex-shrink:0;}
+
+/* league presence */
+.lp-section{margin-bottom:6px;}
+.lp-label{font-size:7px;color:var(--muted);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:3px;}
+.lp-row{display:flex;align-items:center;gap:4px;margin-bottom:2px;}
+.lp-dot{width:4px;height:4px;border-radius:50%;background:var(--boom);flex-shrink:0;}
+.lp-name{font-size:7px;color:var(--muted);line-height:1.3;}
+
+/* verdict */
+.verdict-box{background:rgba(54,231,161,0.04);border:1px solid rgba(54,231,161,0.12);border-radius:3px;padding:6px;}
+.vb-label{font-size:7px;color:var(--boom);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:2px;}
+.vb-text{font-size:8px;color:var(--muted);line-height:1.5;}
+
+/* action row */
+.action-row{display:flex;gap:4px;padding:6px 8px;border-top:1px solid var(--border);flex-shrink:0;}
+.act-btn{flex:1;padding:5px 0;border-radius:3px;font-size:8px;font-family:'Figtree',sans-serif;cursor:pointer;font-weight:700;border:none;text-align:center;}
+.abt{background:var(--boom);color:#0a0d14;}
+.aba{background:rgba(239,68,68,0.1);color:var(--danger);border:1px solid rgba(239,68,68,0.2);}
+.abw{background:var(--surface2);color:var(--muted);border:1px solid var(--border);}
+
+/* FOOTER */
+.hub-footer{background:var(--card);border-top:1px solid var(--border);display:grid;grid-template-columns:repeat(5,1fr);}
+.hf{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:6px 4px;border-right:1px solid var(--border);text-align:center;}
+.hf:last-child{border-right:none;}
+.hf-val{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text);}
+.hf-val.g{color:var(--boom);}.hf-val.r{color:var(--danger);}
+.hf-label{font-size:7px;color:var(--muted);margin-top:1px;}
+</style>
+</head>
+<body>
+<div class="hub">
+
+  <!-- TOPBAR -->
+  <div class="hub-topbar">
+    <div class="hub-logo"><img src="/logo.png" alt="Boom or Bust"></div>
+    <div class="hub-top-stats">
+      <div class="hts" style="flex:1.2;">
+        <div class="hts-label">Players Tracked</div>
+        <div class="hts-val">4,211</div>
+      </div>
+      <div class="hts" style="flex:1.4;">
+        <div class="hts-label">Boom Players</div>
+        <div class="hts-val g">98 · <span style="font-size:9px;">Top 23.2%</span></div>
+      </div>
+      <div class="hts" style="flex:1.4;">
+        <div class="hts-label">Bust Players</div>
+        <div class="hts-val r">77 · <span style="font-size:9px;">Bottom 18.3%</span></div>
+      </div>
+      <div class="hts" style="flex:1.6;">
+        <div class="hts-label">Avg Dynasty Rtg</div>
+        <div class="hts-val">64.3</div>
+        <div class="hts-sub">vs League Avg 60.1</div>
+      </div>
+      <div class="hts" style="flex:1.6;">
+        <div class="hts-label">Last Updated</div>
+        <div class="hts-val">8 min ago</div>
+        <div class="hts-sub">Next update in 21:41</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BODY -->
+  <div class="hub-body">
+
+    <!-- SIDEBAR -->
+    <div class="hub-sb">
+      <div class="sb-top">
+        <div class="sb-label">My Leagues</div>
+        <div class="league-row"><div class="l-dot" style="background:var(--boom);"></div><span class="l-name">Dynasty Alp...</span><span class="l-badge lbc">C</span></div>
+        <div class="league-row"><div class="l-dot" style="background:var(--bust);"></div><span class="l-name">Kings League</span><span class="l-badge lbr">R</span></div>
+        <div class="league-row"><div class="l-dot" style="background:var(--boom);"></div><span class="l-name">Empire Leag...</span><span class="l-badge lbc">C</span></div>
+        <div class="league-row"><div class="l-dot" style="background:var(--bust);"></div><span class="l-name">Gridiron Go...</span><span class="l-badge lbr">R</span></div>
+        <div class="league-row"><div class="l-dot" style="background:var(--boom);"></div><span class="l-name">Showtime</span><span class="l-badge lbc">C</span></div>
+      </div>
+      <div class="sb-bottom">
+        <div class="sb-label" style="margin-bottom:4px;">Quick Action</div>
+        <div class="quick-action">
+          <div class="qa-tag">Incoming Trade Offer</div>
+          <div class="qa-text">You get: Amon-Ra St Brown<br>You give: +16.4 Edge</div>
+          <div class="qa-val">Dynasty IQ: +13%</div>
+          <button class="qa-btn qa-accept">ACCEPT</button>
+          <button class="qa-btn qa-counter" style="background:transparent;color:var(--muted);border:1px solid var(--border);margin-top:2px;">COUNTER</button>
+          <button class="qa-btn qa-decline" style="background:transparent;color:var(--danger);border:1px solid rgba(239,68,68,0.3);margin-top:2px;">DECLINE</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PLAYER LIST -->
+    <div class="hub-main">
+      <div class="main-hdr">
+        <div class="main-title">Player Hub</div>
+        <div class="main-sub">Your players. Every signal. Every week.</div>
+      </div>
+      <div class="filter-row">
+        <button class="fb">ALL</button>
+        <button class="fb ab">BOOM</button>
+        <button class="fb ah">HOLD</button>
+        <button class="fb abu">BUST</button>
+        <button class="fb">QB</button><button class="fb">RB</button><button class="fb">WR</button><button class="fb">TE</button>
+        <div class="sort-sm">Sort by: Dynasty Rating ↓</div>
+      </div>
+      <div class="player-list">
+        <div class="pl-row sel">
+          <div class="pl-av">WR</div>
+          <div><div class="pl-name">Justin Jefferson</div><div class="pl-meta">WR · MIN</div></div>
+          <div class="pl-score">94.7</div>
+          <div class="pl-v vb">STRONG BOOM</div>
+          <svg class="pl-spark" viewBox="0 0 26 12"><polyline points="0,10 4,7 9,8 14,3 19,5 23,1 26,2" fill="none" stroke="#36E7A1" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </div>
+        <div class="pl-row">
+          <div class="pl-av">QB</div>
+          <div><div class="pl-name">CJ Stroud</div><div class="pl-meta">QB · HOU</div></div>
+          <div class="pl-score">88.1</div>
+          <div class="pl-v vb">BOOM</div>
+          <svg class="pl-spark" viewBox="0 0 26 12"><polyline points="0,9 4,6 9,7 14,4 19,6 23,2 26,3" fill="none" stroke="#36E7A1" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </div>
+        <div class="pl-row">
+          <div class="pl-av">WR</div>
+          <div><div class="pl-name">Malik Nabers</div><div class="pl-meta">WR · NYG</div></div>
+          <div class="pl-score">82.4</div>
+          <div class="pl-v vh">HOLD</div>
+          <svg class="pl-spark" viewBox="0 0 26 12"><polyline points="0,6 4,8 9,6 14,8 19,6 23,7 26,6" fill="none" stroke="#FBBF24" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </div>
+        <div class="pl-row">
+          <div class="pl-av">RB</div>
+          <div><div class="pl-name">Breece Hall</div><div class="pl-meta">RB · NYJ</div></div>
+          <div class="pl-score">76.3</div>
+          <div class="pl-v vh">HOLD</div>
+          <svg class="pl-spark" viewBox="0 0 26 12"><polyline points="0,5 4,7 9,6 14,8 19,7 23,9 26,9" fill="none" stroke="#FBBF24" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </div>
+        <div class="pl-row">
+          <div class="pl-av">WR</div>
+          <div><div class="pl-name">Drake London</div><div class="pl-meta">WR · ATL</div></div>
+          <div class="pl-score">61.2</div>
+          <div class="pl-v vbu">BUST</div>
+          <svg class="pl-spark" viewBox="0 0 26 12"><polyline points="0,2 4,4 9,6 14,8 19,10 23,11 26,12" fill="none" stroke="#ef4444" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </div>
+        <div class="pl-row">
+          <div class="pl-av">TE</div>
+          <div><div class="pl-name">Kyle Pitts</div><div class="pl-meta">TE · ATL</div></div>
+          <div class="pl-score">48.7</div>
+          <div class="pl-v vbu">STRONG BUST</div>
+          <svg class="pl-spark" viewBox="0 0 26 12"><polyline points="0,1 4,3 9,6 14,9 19,10 23,11 26,12" fill="none" stroke="#ef4444" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </div>
+        <div class="pl-row">
+          <div class="pl-av">WR</div>
+          <div><div class="pl-name">Jalen McMillan</div><div class="pl-meta">WR · TB</div></div>
+          <div class="pl-score">30.2</div>
+          <div class="pl-v vbu">STRONG BUST</div>
+          <svg class="pl-spark" viewBox="0 0 26 12"><polyline points="0,1 4,3 9,6 14,9 19,11 23,12 26,12" fill="none" stroke="#ef4444" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </div>
+      </div>
+      <div class="list-foot">
+        <div class="lf-txt">Showing 1–8 of 215 players</div>
+        <div class="lf-pages">
+          <div class="lf-pg on">1</div><div class="lf-pg">2</div><div class="lf-pg">3</div><div class="lf-pg">›</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DETAIL PANEL -->
+    <div class="hub-detail">
+      <div class="detail-top">
+        <div class="detail-info">
+          <div class="d-name">Justin Jefferson</div>
+          <div class="d-meta">WR · MIN</div>
+          <div class="d-rtg-label">Dynasty Rating</div>
+          <div class="d-score">94.7</div>
+          <div class="d-tier">Elite Tier</div>
+          <div class="d-vbadge">STRONG BOOM</div>
+        </div>
+      </div>
+
+      <div class="detail-scroll">
+        <!-- asymmetric radar -->
+        <div class="radar-wrap">
+          <svg viewBox="0 0 100 100" width="100" height="100">
+            <!-- grid rings -->
+            <polygon points="50,8 92,32 92,68 50,92 8,68 8,32" fill="none" stroke="#1e2640" stroke-width="0.8"/>
+            <polygon points="50,20 80,35 80,62 50,80 20,62 20,35" fill="none" stroke="#1e2640" stroke-width="0.5" stroke-dasharray="2,2"/>
+            <polygon points="50,32 68,40 68,56 50,68 32,56 32,40" fill="none" stroke="#1e2640" stroke-width="0.5" stroke-dasharray="2,2"/>
+            <!-- asymmetric filled shape — high YPRR, RZ, SEP; moderate TGT, QB, AGE -->
+            <polygon points="50,10 88,30 85,65 50,84 16,60 14,34"
+              fill="rgba(54,231,161,0.12)" stroke="#36E7A1" stroke-width="1.5"/>
+            <!-- axis labels -->
+            <text x="50" y="6" text-anchor="middle" font-size="5.5" fill="#6b7a99" font-family="Figtree,sans-serif">YPRR</text>
+            <text x="95" y="32" text-anchor="start" font-size="5.5" fill="#6b7a99" font-family="Figtree,sans-serif">RZ</text>
+            <text x="95" y="68" text-anchor="start" font-size="5.5" fill="#6b7a99" font-family="Figtree,sans-serif">SEP</text>
+            <text x="50" y="98" text-anchor="middle" font-size="5.5" fill="#6b7a99" font-family="Figtree,sans-serif">TGT</text>
+            <text x="5" y="68" text-anchor="end" font-size="5.5" fill="#6b7a99" font-family="Figtree,sans-serif">QB</text>
+            <text x="5" y="32" text-anchor="end" font-size="5.5" fill="#6b7a99" font-family="Figtree,sans-serif">AGE</text>
+          </svg>
+        </div>
+
+        <!-- signal breakdown -->
+        <div class="sig-section">
+          <div class="sig-label">Signal Breakdown</div>
+          <div class="sig-row"><span class="sig-name">OPPORTUNITY</span><div class="sig-track"><div class="sig-fill" style="width:95%;background:var(--boom);"></div></div><span class="sig-val">95</span></div>
+          <div class="sig-row"><span class="sig-name">SITUATION</span><div class="sig-track"><div class="sig-fill" style="width:88%;background:var(--boom);"></div></div><span class="sig-val">88</span></div>
+          <div class="sig-row"><span class="sig-name">AGE CURVE</span><div class="sig-track"><div class="sig-fill" style="width:85%;background:var(--boom);"></div></div><span class="sig-val">85</span></div>
+          <div class="sig-row"><span class="sig-name">IQ</span><div class="sig-track"><div class="sig-fill" style="width:90%;background:var(--boom);"></div></div><span class="sig-val">90</span></div>
+          <div class="sig-row"><span class="sig-name">UPSIDE</span><div class="sig-track"><div class="sig-fill" style="width:92%;background:var(--boom);"></div></div><span class="sig-val">92</span></div>
+        </div>
+
+        <!-- league presence -->
+        <div class="lp-section">
+          <div class="lp-label">League Presence</div>
+          <div class="lp-row"><div class="lp-dot"></div><span class="lp-name">On your roster in 1 of 5 leagues</span></div>
+          <div class="lp-row"><div class="lp-dot"></div><span class="lp-name">2 of 5 leagues rostered</span></div>
+        </div>
+
+        <!-- bob verdict -->
+        <div class="verdict-box">
+          <div class="vb-label">BOB Verdict</div>
+          <div class="vb-text">Elite target share, proven efficiency, prime age window. Strong dynasty hold.</div>
+        </div>
+      </div>
+
+      <div class="action-row">
+        <button class="act-btn abt">TRADE FOR</button>
+        <button class="act-btn aba">TRADE AWAY</button>
+        <button class="act-btn abw">WATCH</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- FOOTER -->
+  <div class="hub-footer">
+    <div class="hf"><div class="hf-val g">4,211</div><div class="hf-label">Players Tracked</div></div>
+    <div class="hf"><div class="hf-val g">98</div><div class="hf-label">Boom Players</div></div>
+    <div class="hf"><div class="hf-val r">77</div><div class="hf-label">Bust Players</div></div>
+    <div class="hf"><div class="hf-val">64.3</div><div class="hf-label">Avg Dynasty Rtg</div></div>
+    <div class="hf"><div class="hf-val">8 min ago</div><div class="hf-label">Last Updated</div></div>
+  </div>
+
+</div>
+</body>
+</html>

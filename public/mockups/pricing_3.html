@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Boom or Bust — Pricing</title>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --boom:#36E7A1;--bust:#A78BFA;--hold:#FBBF24;
+  --bg:#0a0d14;--surface:#0f1420;--surface2:#141929;--card:#080d14;
+  --border:#1e2640;--text:#e8ecf4;--muted:#6b7a99;--danger:#ef4444;
+}
+body{background:var(--bg);color:var(--text);font-family:'Figtree',sans-serif;}
+
+/* NAV */
+.nav{height:52px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 36px;position:sticky;top:0;z-index:100;}
+.nav-logo img{height:34px;mix-blend-mode:screen;filter:brightness(1.2) saturate(1.3) contrast(1.1);}
+.nav-links{display:flex;align-items:center;gap:26px;}
+.nav-link{font-size:12px;color:var(--muted);text-decoration:none;cursor:pointer;}
+.nav-link:hover{color:var(--text);}
+.nav-link.active{color:var(--boom);}
+.nav-actions{display:flex;align-items:center;gap:8px;}
+.btn-login{height:30px;padding:0 14px;border-radius:4px;border:1px solid var(--border);background:transparent;color:var(--text);font-size:11px;font-family:'Figtree',sans-serif;cursor:pointer;}
+.btn-import{height:30px;padding:0 14px;border-radius:4px;border:none;background:var(--boom);color:#0a0d14;font-size:11px;font-family:'Figtree',sans-serif;cursor:pointer;font-weight:700;}
+
+/* HERO SECTION */
+.hero-section{display:grid;grid-template-columns:1fr 420px;gap:32px;padding:44px 36px 32px;align-items:center;}
+.hero-title{font-size:56px;font-weight:800;line-height:1.0;letter-spacing:-1.5px;margin-bottom:12px;}
+.hero-title .t1{color:var(--text);}
+.hero-title .t2{color:var(--boom);}
+.hero-desc{font-size:14px;color:var(--muted);line-height:1.5;margin-bottom:20px;}
+.hero-desc span{color:var(--boom);font-weight:500;}
+
+/* EARLY ACCESS BOX */
+.early-box{background:var(--card);border:1px solid rgba(54,231,161,0.3);border-radius:8px;padding:20px 22px;}
+.early-label-row{display:flex;align-items:center;gap:7px;margin-bottom:4px;}
+.early-trophy{font-size:16px;}
+.early-label{font-size:9px;color:var(--boom);letter-spacing:2px;text-transform:uppercase;}
+.early-date{font-family:'JetBrains Mono',monospace;font-size:28px;color:var(--boom);font-weight:700;margin-bottom:16px;letter-spacing:-0.5px;}
+.early-tiers{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;margin-bottom:14px;}
+.early-tier{background:var(--surface2);border:1px solid var(--border);border-radius:5px;padding:10px;text-align:center;}
+.et-range{font-size:8px;color:var(--muted);letter-spacing:0.5px;text-transform:uppercase;margin-bottom:4px;}
+.et-discount{font-family:'JetBrains Mono',monospace;font-size:17px;font-weight:700;line-height:1;}
+.et-discount.founding{color:var(--hold);}
+.et-discount.early-d{color:var(--hold);}
+.et-discount.full{color:var(--muted);}
+.et-sub{font-size:8px;color:var(--muted);margin:2px 0 6px;}
+.et-btn{width:100%;padding:4px 0;border-radius:3px;border:none;font-size:8px;font-family:'Figtree',sans-serif;cursor:pointer;font-weight:700;letter-spacing:1px;text-transform:uppercase;}
+.et-btn.founding{background:rgba(251,191,36,0.15);color:var(--hold);border:1px solid rgba(251,191,36,0.3);}
+.et-btn.early-b{background:rgba(251,191,36,0.1);color:var(--hold);border:1px solid rgba(251,191,36,0.2);}
+.et-btn.launch{background:transparent;color:var(--muted);border:1px solid var(--border);}
+.spots-row{text-align:center;font-size:11px;color:var(--muted);}
+.spots-row span{color:var(--boom);font-weight:500;}
+
+/* TRUST BAR */
+.trust-bar{display:flex;align-items:center;justify-content:center;gap:36px;padding:14px 36px;border-top:1px solid var(--border);border-bottom:1px solid var(--border);background:var(--surface);}
+.trust-item{display:flex;align-items:center;gap:7px;font-size:11px;color:var(--muted);}
+.trust-icon{font-size:14px;}
+
+/* PRICING CARDS */
+.pricing-wrap{padding:32px 36px 0;}
+.billing-toggle{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:28px;}
+.tog{height:30px;padding:0 18px;border-radius:4px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:11px;font-family:'Figtree',sans-serif;cursor:pointer;font-weight:500;}
+.tog.active{background:rgba(54,231,161,0.08);border-color:var(--boom);color:var(--boom);}
+.tog-save{font-size:11px;color:var(--muted);}
+.tog-save span{color:var(--hold);}
+
+.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:36px;}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:22px 18px;display:flex;flex-direction:column;}
+.card.popular{border:2px solid var(--bust);position:relative;background:var(--card);}
+.pop-badge{position:absolute;top:-11px;left:50%;transform:translateX(-50%);background:var(--bust);color:#0a0d14;font-size:8px;font-weight:800;padding:3px 12px;border-radius:10px;letter-spacing:1px;white-space:nowrap;}
+.c-tier{font-size:8px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;}
+.c-tier.analyst{color:var(--boom);}
+.c-tier.gm{color:var(--hold);}
+.c-tier.allpro{color:var(--bust);}
+.c-price{font-family:'JetBrains Mono',monospace;font-size:38px;font-weight:700;line-height:1;color:var(--text);}
+.c-price.allpro-price{color:var(--boom);}
+.c-price sup{font-size:18px;vertical-align:super;line-height:0;}
+.c-price-mo{font-size:12px;color:var(--muted);font-family:'Figtree',sans-serif;font-weight:400;}
+.c-billing{font-size:8px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin:3px 0 10px;}
+.c-tagline{font-size:11px;color:var(--muted);line-height:1.5;margin-bottom:10px;}
+.c-div{height:1px;background:var(--border);margin:10px 0;}
+.c-unlocks{font-size:8px;color:var(--boom);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px;}
+.c-feat{display:flex;align-items:flex-start;gap:6px;font-size:11px;color:var(--text);margin-bottom:5px;line-height:1.3;}
+.c-feat .x{color:var(--danger);}
+.c-feat .v{color:var(--boom);}
+.c-feat .dim{color:var(--muted);}
+.engine-box{background:rgba(54,231,161,0.05);border:1px solid rgba(54,231,161,0.15);border-radius:5px;padding:9px 10px;margin-bottom:10px;}
+.engine-box-title{font-size:8px;color:var(--boom);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:7px;}
+.engine-tags{display:grid;grid-template-columns:repeat(5,1fr);gap:3px;}
+.etag{background:rgba(54,231,161,0.08);border:1px solid rgba(54,231,161,0.12);border-radius:3px;font-size:7px;color:var(--boom);text-align:center;padding:3px 1px;font-family:'JetBrains Mono',monospace;}
+.engine-more{font-size:8px;color:var(--muted);text-align:center;margin-top:4px;}
+.c-cta{margin-top:auto;padding-top:14px;}
+.cta-btn{width:100%;padding:10px 0;border-radius:5px;font-size:12px;font-family:'Figtree',sans-serif;cursor:pointer;font-weight:700;letter-spacing:0.3px;}
+.cta-free{border:1px solid var(--border);background:transparent;color:var(--text);}
+.cta-trial{border:1px solid var(--hold);background:transparent;color:var(--hold);}
+.cta-allpro{border:none;background:var(--boom);color:#0a0d14;}
+.cta-note{font-size:9px;color:var(--muted);text-align:center;margin-top:5px;}
+
+/* FEATURE TABLE */
+.table-section{padding:0 36px 36px;}
+.table-title{font-size:10px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:14px;}
+table.ft{width:100%;border-collapse:collapse;font-size:11px;}
+table.ft th{font-size:9px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;padding:8px 14px;border-bottom:2px solid var(--border);text-align:center;background:var(--surface);}
+table.ft th:first-child{text-align:left;width:200px;}
+table.ft th.allpro-h{color:var(--boom);}
+table.ft td{padding:5px 14px;border-bottom:1px solid rgba(30,38,64,0.5);color:var(--text);text-align:center;vertical-align:middle;}
+table.ft td:first-child{text-align:left;color:var(--muted);font-size:10px;}
+table.ft tr:hover td{background:rgba(255,255,255,0.012);}
+.cat-hdr{background:var(--surface2)!important;}
+.cat-hdr td{padding:6px 14px!important;font-size:8px!important;color:var(--muted)!important;letter-spacing:1.2px!important;text-transform:uppercase!important;}
+.cat-label{display:flex;align-items:center;gap:8px;}
+.cat-ico{font-size:13px;}
+.cat-txt-core{color:#60a5fa!important;}
+.cat-txt-market{color:#f472b6!important;}
+.cat-txt-league{color:var(--hold)!important;}
+.cat-txt-proj{color:var(--bust)!important;}
+.cat-txt-elite{color:var(--boom)!important;}
+.ck{color:var(--boom);}
+.cx{color:var(--danger);}
+.cp{color:var(--muted);}
+
+/* VS + STATS */
+.vs-section{display:grid;grid-template-columns:1fr 1fr;gap:24px;padding:0 36px 36px;align-items:start;}
+.vs-left{}
+.vs-headline{font-size:22px;font-weight:700;line-height:1.2;margin-bottom:16px;}
+.vs-headline .vl1{color:var(--muted);}
+.vs-headline .vl2{color:var(--text);}
+.vs-headline .vl3{color:var(--boom);}
+.vs-table-wrap{background:var(--surface);border:1px solid var(--border);border-radius:7px;overflow:hidden;}
+table.vt{width:100%;border-collapse:collapse;font-size:11px;}
+table.vt th{font-size:9px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;padding:8px 14px;border-bottom:1px solid var(--border);text-align:center;background:var(--surface2);}
+table.vt th:first-child{text-align:left;}
+table.vt th.bob-h{color:var(--boom);}
+table.vt td{padding:7px 14px;border-bottom:1px solid rgba(30,38,64,0.4);text-align:center;color:var(--muted);}
+table.vt td:first-child{text-align:left;color:var(--text);}
+table.vt tr:last-child td{border-bottom:none;font-weight:500;}
+.bob-v{color:var(--boom)!important;}
+.stats-right{}
+.stats-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:16px 12px;text-align:center;}
+.stat-val{font-family:'JetBrains Mono',monospace;font-size:22px;color:var(--boom);font-weight:700;}
+.stat-val.white{color:var(--text);}
+.stat-lbl{font-size:8px;color:var(--muted);margin-top:4px;letter-spacing:0.8px;text-transform:uppercase;}
+
+/* FAQ */
+.faq-section{padding:0 36px 36px;}
+.faq-title{font-size:10px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;text-align:center;margin-bottom:18px;}
+.faq-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
+.faq-item{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:13px 14px;}
+.faq-q{font-size:12px;color:var(--text);font-weight:500;margin-bottom:5px;display:flex;align-items:flex-start;gap:5px;}
+.faq-q-icon{color:var(--boom);font-size:12px;flex-shrink:0;margin-top:1px;}
+.faq-a{font-size:10px;color:var(--muted);line-height:1.5;}
+
+/* BOTTOM CTA */
+.bottom-cta{background:var(--surface);border-top:1px solid var(--border);padding:40px 36px;display:grid;grid-template-columns:auto 1fr auto;gap:32px;align-items:center;}
+.bottom-logo-wrap{width:80px;height:80px;border-radius:50%;background:rgba(167,139,250,0.08);border:1px solid rgba(167,139,250,0.2);display:flex;align-items:center;justify-content:center;font-size:32px;}
+.bottom-text{}
+.bottom-headline{font-size:26px;font-weight:800;line-height:1.1;letter-spacing:-0.5px;}
+.bh1{color:var(--muted);}
+.bh2{color:var(--boom);}
+.bh3{color:var(--bust);}
+.bottom-sub{font-size:12px;color:var(--muted);margin-top:6px;line-height:1.5;}
+.bottom-actions{display:flex;flex-direction:column;gap:8px;min-width:190px;}
+.btn-big-free{padding:12px 20px;border-radius:5px;border:none;background:var(--boom);color:#0a0d14;font-size:13px;font-family:'Figtree',sans-serif;cursor:pointer;font-weight:700;text-align:center;}
+.btn-big-import{padding:12px 20px;border-radius:5px;border:1px solid var(--border);background:transparent;color:var(--text);font-size:13px;font-family:'Figtree',sans-serif;cursor:pointer;font-weight:500;text-align:center;}
+.bottom-note{font-size:9px;color:var(--muted);text-align:center;}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-logo"><img src="/logo.png" alt="Boom or Bust"></div>
+  <div class="nav-links">
+    <a class="nav-link" href="#">Features</a>
+    <a class="nav-link active" href="#">Pricing</a>
+    <a class="nav-link" href="#">Proof</a>
+    <a class="nav-link" href="#">About</a>
+    <a class="nav-link" href="#">Blog</a>
+  </div>
+  <div class="nav-actions">
+    <button class="btn-login">Log In</button>
+    <button class="btn-import">Import My Leagues</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero-section">
+  <div>
+    <div class="hero-title"><div class="t1">START FREE.</div><div class="t2">DOMINATE <span style="color:var(--bust);">LATER.</span></div></div>
+    <div class="hero-desc">Most fantasy managers buy rankings.<br>BoB gives you <span>data-backed recommendations.</span></div>
+  </div>
+  <div class="early-box">
+    <div class="early-label-row"><span class="early-trophy">🏆</span><span class="early-label">Early Access Opens</span></div>
+    <div class="early-date">JULY 1ST, 2026</div>
+    <div class="early-tiers">
+      <div class="early-tier">
+        <div class="et-range">First 100 Signups</div>
+        <div class="et-discount founding">50% OFF</div>
+        <div class="et-sub">First 3 Months</div>
+        <button class="et-btn founding">Founding</button>
+      </div>
+      <div class="early-tier">
+        <div class="et-range">Signups 101–500</div>
+        <div class="et-discount early-d">25% OFF</div>
+        <div class="et-sub">First 3 Months</div>
+        <button class="et-btn early-b">Early</button>
+      </div>
+      <div class="early-tier">
+        <div class="et-range">500+ Signups</div>
+        <div class="et-discount full">Full Price</div>
+        <div class="et-sub">&nbsp;</div>
+        <button class="et-btn launch">Launch</button>
+      </div>
+    </div>
+    <div class="spots-row">👥 <span>73 Founding Spots Remaining</span></div>
+  </div>
+</div>
+
+<!-- TRUST BAR -->
+<div class="trust-bar">
+  <div class="trust-item"><span class="trust-icon">💳</span>No credit card required</div>
+  <div class="trust-item"><span class="trust-icon">🛡</span>7-day money back guarantee</div>
+  <div class="trust-item"><span class="trust-icon">🏈</span>Used across 68+ leagues</div>
+  <div class="trust-item"><span class="trust-icon">✓</span>42-18-2 verified record</div>
+</div>
+
+<!-- PRICING CARDS -->
+<div class="pricing-wrap">
+  <div class="billing-toggle">
+    <button class="tog active">Monthly</button>
+    <button class="tog">Annual</button>
+    <span class="tog-save">← <span>Save up to 2 months</span></span>
+  </div>
+  <div class="cards">
+
+    <!-- FREE -->
+    <div class="card">
+      <div class="c-tier">Rookie Scout</div>
+      <div class="c-price"><sup>$</sup>0<span class="c-price-mo">/mo</span></div>
+      <div class="c-billing">Forever</div>
+      <div class="c-tagline">Track one league. Learn the system. Decide if BOB is for you.</div>
+      <div class="c-div"></div>
+      <div class="c-feat"><span class="v">✓</span>1 league synced</div>
+      <div class="c-feat"><span class="v">✓</span>Weekly BOOM/BUST verdicts</div>
+      <div class="c-feat"><span class="v">✓</span>Sit/start recommendations</div>
+      <div class="c-feat"><span class="v">✓</span>Team health score</div>
+      <div class="c-feat"><span class="v">✓</span>Trade grader (1/day)</div>
+      <div class="c-feat"><span class="v">✓</span>Smart counter (1/day)</div>
+      <div class="c-feat"><span class="x">✗</span><span class="dim">Buy/sell ticker</span></div>
+      <div class="c-feat"><span class="x">✗</span><span class="dim">Ads shown</span></div>
+      <div class="c-cta"><button class="cta-btn cta-free">Get Started</button></div>
+    </div>
+
+    <!-- LEAGUE ANALYST -->
+    <div class="card">
+      <div class="c-tier analyst">League Analyst</div>
+      <div class="c-price"><sup>$</sup>5<span class="c-price-mo">/mo</span></div>
+      <div class="c-billing">Billed Monthly</div>
+      <div class="c-tagline">Stop guessing. Start exploiting market mistakes.</div>
+      <div class="c-div"></div>
+      <div class="c-unlocks">Unlocks</div>
+      <div class="c-feat"><span class="v">✓</span>Edge Score (BVI)</div>
+      <div class="c-feat"><span class="v">✓</span>Momentum Score (DMS)</div>
+      <div class="c-feat"><span class="v">✓</span>Sell Window (DAC)</div>
+      <div class="c-feat"><span class="v">✓</span>Full Player Breakdown</div>
+      <div class="c-feat"><span class="v">✓</span>Unlimited Trade Grading</div>
+      <div class="c-feat"><span class="v">✓</span>Trade History Graded</div>
+      <div class="c-cta">
+        <button class="cta-btn cta-trial">Start Free Trial</button>
+        <div class="cta-note">7 Days Free</div>
+      </div>
+    </div>
+
+    <!-- GENERAL MANAGER -->
+    <div class="card">
+      <div class="c-tier gm">General Manager</div>
+      <div class="c-price"><sup>$</sup>15<span class="c-price-mo">/mo</span></div>
+      <div class="c-billing">Billed Monthly</div>
+      <div class="c-tagline">See your league the way professionals do.</div>
+      <div class="c-div"></div>
+      <div class="c-unlocks">Unlocks</div>
+      <div class="c-feat"><span class="v">✓</span>Trade Finder</div>
+      <div class="c-feat"><span class="v">✓</span>League Intelligence (LI)</div>
+      <div class="c-feat"><span class="v">✓</span>Scout Their Team</div>
+      <div class="c-feat"><span class="v">✓</span>Dynasty 3-Year Outlook</div>
+      <div class="c-feat"><span class="v">✓</span>Breakout Meter Alerts (BPS)</div>
+      <div class="c-feat"><span class="v">✓</span>Playoff Outlook (SOSPP)</div>
+      <div class="c-feat"><span class="v">✓</span>Luck Factor / Regression (RI)</div>
+      <div class="c-feat"><span class="v">✓</span>Rookie Grade (RTS)</div>
+      <div class="c-feat"><span class="v">✓</span>Rejection Predictor</div>
+      <div class="c-cta">
+        <button class="cta-btn cta-trial">Start Free Trial</button>
+        <div class="cta-note">7 Days Free</div>
+      </div>
+    </div>
+
+    <!-- ALL-PRO -->
+    <div class="card popular">
+      <div class="pop-badge">★ Most Popular</div>
+      <div class="c-tier allpro">All-Pro Terminal</div>
+      <div class="c-price allpro-price"><sup>$</sup>35<span class="c-price-mo">/mo</span></div>
+      <div class="c-billing">Billed Monthly</div>
+      <div class="c-tagline" style="color:var(--text);">Every engine.<br>Every edge.<br>Every signal.</div>
+      <div class="engine-box">
+        <div class="engine-box-title">17 Engine Network</div>
+        <div class="engine-tags">
+          <div class="etag">TFO</div><div class="etag">DMS</div><div class="etag">BPS</div><div class="etag">RTS</div><div class="etag">DAC</div>
+          <div class="etag">RI</div><div class="etag">SOSPP</div><div class="etag">F-FIG</div><div class="etag">OPS</div><div class="etag">SFS</div>
+          <div class="etag">SASSP</div><div class="etag">DPM</div><div class="etag">BBE</div><div class="etag">YOYSI</div><div class="etag">CIM</div>
+        </div>
+        <div class="engine-more">+2 More</div>
+      </div>
+      <div class="c-feat"><span class="v">✓</span>Startup Draft Tracking (1 free/yr)</div>
+      <div class="c-feat"><span class="v">✓</span>All 17 Engines Unlocked</div>
+      <div class="c-feat"><span class="v">✓</span>Market Verdict (vs Consensus)</div>
+      <div class="c-feat"><span class="v">✓</span>Dynasty Power Rating (Empire)</div>
+      <div class="c-feat"><span class="v">✓</span>Portfolio Manager</div>
+      <div class="c-feat"><span class="v">✓</span>Priority Support</div>
+      <div class="c-feat"><span class="v">✓</span>Content Export</div>
+      <div class="c-cta">
+        <button class="cta-btn cta-allpro">Get All-Pro</button>
+        <div class="cta-note">3 Days Free</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FEATURE TABLE -->
+<div class="table-section">
+  <div class="table-title">Feature Comparison</div>
+  <table class="ft">
+    <thead>
+      <tr>
+        <th></th>
+        <th>Free<br><span style="color:var(--text);font-size:10px;font-family:'JetBrains Mono',monospace;font-weight:400;">$0/mo</span></th>
+        <th>Rookie<br><span style="color:var(--text);font-size:10px;font-family:'JetBrains Mono',monospace;font-weight:400;">$5/mo</span></th>
+        <th>Veteran<br><span style="color:var(--text);font-size:10px;font-family:'JetBrains Mono',monospace;font-weight:400;">$15/mo</span></th>
+        <th class="allpro-h">All-Pro<br><span style="font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:400;">$35/mo</span></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="cat-hdr"><td colspan="5"><div class="cat-label"><span class="cat-ico">🔧</span><span class="cat-txt-core">Core Tools</span></div></td></tr>
+      <tr><td>Leagues synced</td><td>1</td><td>5</td><td>10</td><td style="color:var(--boom);">Unlimited</td></tr>
+      <tr><td>Sit/start recommendations</td><td><span class="ck">✓</span></td><td><span class="ck">✓</span></td><td><span class="ck">✓</span></td><td><span class="ck">✓</span></td></tr>
+      <tr><td>Weekly BOOM/BUST verdicts</td><td><span class="ck">✓</span></td><td><span class="ck">✓</span></td><td><span class="ck">✓</span></td><td><span class="ck">✓</span></td></tr>
+      <tr><td>Bust alert</td><td><span class="ck">✓</span></td><td><span class="ck">✓</span></td><td><span class="ck">✓</span></td><td><span class="ck">✓</span></td></tr>
+      <tr><td>Trade grader</td><td><span class="cp">1/day</span></td><td><span class="ck">✓</span></td><td><span class="ck">✓</span></td><td><span class="ck">✓</span></td></tr>
+      <tr><td>Smart counter</td><td><span class="cp">1/day</span></td><td><span class="ck">✓</span></td><td><span class="ck">✓</span></td><td><span class="ck">✓</span></td></tr>
+      <tr><td>Buy/sell ticker</td><td><span class="cx">✗</span></td><td><span class="ck">✓</span></td><td><span class="ck">✓</span></td><td><span class="ck">✓</span></td></tr>
+      <tr><td>Ads shown</td><td><span style="color:var(--hold);">Yes</span></td><td><span class="ck">No</span></td><td><span class="ck">No</span></td><td><span class="ck">No</span></td></tr>
+      <tr class="cat-hdr"><td colspan="5"><div class="cat-label"><span class="cat-ico">📈</span><span class="cat-txt-market">Market Intelligence</span></div></td></tr>
+      <tr><td>Edge Score (BVI) vs KTC</td><td><span class="cx">✗</span></td><td><span class="ck">✓</span></td><td><span class="ck">✓</span></td><td><span class="ck">✓</span></td></tr>
+      <tr><td>Momentum score (DMS)</td><td><span class="cx">✗</span></td><td><span class="ck">✓</span></td><td><span class="ck">✓</span></td><td><span class="ck">✓</span></td></tr>
+      <tr><td>Sell window (DAC)</td><td><span class="cx">✗</span></td><td><span class="ck">✓</span></td><td><span class="ck">✓</span></td><td><span class="ck">✓</span></td></tr>
+      <tr><td>Full player component breakdown</td><td><span class="cx">✗</span></td><td><span class="ck">✓</span></td><td><span class="ck">✓</span></td><td><span class="ck">✓</span></td></tr>
+      <tr><td>Trade history graded</td><td><span class="cx">✗</span></td><td><span class="ck">✓</span></td><td><span class="ck">✓</span></td><td><span class="ck">✓</span></td></tr>
+      <tr class="cat-hdr"><td colspan="5"><div class="cat-label"><span class="cat-ico">🏆</span><span class="cat-txt-league">League Intelligence</span></div></td></tr>
+      <tr><td>Trade finder</td><td><span class="cx">✗</span></td><td><span class="cx">✗</span></td><td><span class="ck">✓</span></td><td><span class="ck">✓</span></td></tr>
+      <tr><td>League Intelligence (LI)</td><td><span class="cx">✗</span></td><td><span class="cx">✗</span></td><td><span class="ck">✓</span></td><td><span class="ck">✓</span></td></tr>
+      <tr><td>Scout Their Team</td><td><span class="cx">✗</span></td><td><span class="cx">✗</span></td><td><span class="ck">✓</span></td><td><span class="ck">✓</span></td></tr>
+      <tr><td>Dynasty 3-year outlook</td><td><span class="cx">✗</span></td><td><span class="cx">✗</span></td><td><span class="ck">✓</span></td><td><span class="ck">✓</span></td></tr>
+      <tr class="cat-hdr"><td colspan="5"><div class="cat-label"><span class="cat-ico">🔬</span><span class="cat-txt-proj">Projection Engines</span></div></td></tr>
+      <tr><td>Breakout meter alerts (BPS)</td><td><span class="cx">✗</span></td><td><span class="cx">✗</span></td><td><span class="ck">✓</span></td><td><span class="ck">✓</span></td></tr>
+      <tr><td>Playoff outlook (SOSPP)</td><td><span class="cx">✗</span></td><td><span class="cx">✗</span></td><td><span class="ck">✓</span></td><td><span class="ck">✓</span></td></tr>
+      <tr><td>Luck factor / regression (RI)</td><td><span class="cx">✗</span></td><td><span class="cx">✗</span></td><td><span class="ck">✓</span></td><td><span class="ck">✓</span></td></tr>
+      <tr><td>Rookie grade (RTS)</td><td><span class="cx">✗</span></td><td><span class="cx">✗</span></td><td><span class="ck">✓</span></td><td><span class="ck">✓</span></td></tr>
+      <tr><td>Rejection predictor</td><td><span class="cx">✗</span></td><td><span class="cx">✗</span></td><td><span class="ck">✓</span></td><td><span class="ck">✓</span></td></tr>
+      <tr class="cat-hdr"><td colspan="5"><div class="cat-label"><span class="cat-ico">⚡</span><span class="cat-txt-elite">Elite Tools</span></div></td></tr>
+      <tr><td>Startup draft tracking</td><td><span class="cx">✗</span></td><td><span class="cx">✗</span></td><td><span class="cx">✗</span></td><td><span style="color:var(--boom);">1 free/yr</span></td></tr>
+      <tr><td>All 17 engines unlocked</td><td><span class="cx">✗</span></td><td><span class="cx">✗</span></td><td><span class="cx">✗</span></td><td><span class="ck">✓</span></td></tr>
+      <tr><td>Market verdict (vs consensus)</td><td><span class="cx">✗</span></td><td><span class="cx">✗</span></td><td><span class="cx">✗</span></td><td><span class="ck">✓</span></td></tr>
+      <tr><td>Dynasty power rating (Empire)</td><td><span class="cx">✗</span></td><td><span class="cx">✗</span></td><td><span class="cx">✗</span></td><td><span class="ck">✓</span></td></tr>
+      <tr><td>Portfolio manager</td><td><span class="cx">✗</span></td><td><span class="cx">✗</span></td><td><span class="cx">✗</span></td><td><span class="ck">✓</span></td></tr>
+      <tr><td>Priority support</td><td><span class="cx">✗</span></td><td><span class="cx">✗</span></td><td><span class="cx">✗</span></td><td><span class="ck">✓</span></td></tr>
+      <tr><td>Content export</td><td><span class="cx">✗</span></td><td><span class="cx">✗</span></td><td><span class="cx">✗</span></td><td><span class="ck">✓</span></td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- VS SECTION -->
+<div class="vs-section">
+  <div class="vs-left">
+    <div class="vs-headline">
+      <div class="vl1">Most tools give you rankings.</div>
+      <div class="vl2">BoB gives you</div>
+      <div class="vl3">the edge.</div>
+    </div>
+    <div class="vs-table-wrap">
+      <table class="vt">
+        <thead>
+          <tr><th></th><th>KTC</th><th>Dynasty Nerds</th><th class="bob-h">BoB</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Trade grades</td><td><span class="cx">✗</span></td><td><span class="cx">✗</span></td><td><span class="ck bob-v">✓</span></td></tr>
+          <tr><td>Smart counter</td><td><span class="cx">✗</span></td><td><span class="cx">✗</span></td><td><span class="ck bob-v">✓</span></td></tr>
+          <tr><td>League Intel</td><td><span class="cx">✗</span></td><td><span class="cx">✗</span></td><td><span class="ck bob-v">✓</span></td></tr>
+          <tr><td>Bust alerts</td><td><span class="cx">✗</span></td><td><span class="cx">✗</span></td><td><span class="ck bob-v">✓</span></td></tr>
+          <tr><td>3-yr outlook</td><td><span class="cx">✗</span></td><td><span class="cx">✗</span></td><td><span class="ck bob-v">✓</span></td></tr>
+          <tr><td>Dynasty only</td><td><span class="cx">✗</span></td><td><span class="cx">✗</span></td><td><span class="ck bob-v">✓</span></td></tr>
+          <tr><td>Price</td><td>Free</td><td>Free</td><td class="bob-v">$0–$35/mo</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="stats-right">
+    <div class="stats-grid">
+      <div class="stat-card"><div class="stat-val">68+</div><div class="stat-lbl">Active Leagues</div></div>
+      <div class="stat-card"><div class="stat-val white">42-18-2*</div><div class="stat-lbl">Verified Record</div></div>
+      <div class="stat-card"><div class="stat-val">99.2%</div><div class="stat-lbl">Data Accuracy</div></div>
+      <div class="stat-card"><div class="stat-val">4,211</div><div class="stat-lbl">Players Tracked</div></div>
+      <div class="stat-card"><div class="stat-val">17</div><div class="stat-lbl">Proprietary Engines</div></div>
+      <div class="stat-card"><div class="stat-val">24/7</div><div class="stat-lbl">Data Monitoring</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- FAQ -->
+<div class="faq-section">
+  <div class="faq-title">Frequently Asked Questions</div>
+  <div class="faq-grid">
+    <div class="faq-item"><div class="faq-q"><span class="faq-q-icon">Q</span>Can I change plans anytime?</div><div class="faq-a">Yes. Upgrade instantly, downgrade at end of billing period.</div></div>
+    <div class="faq-item"><div class="faq-q"><span class="faq-q-icon">Q</span>Is there a free trial on paid plans?</div><div class="faq-a">Yes — 7 days free on Rookie and Veteran. All-Pro has a 3-day trial.</div></div>
+    <div class="faq-item"><div class="faq-q"><span class="faq-q-icon">Q</span>Does BOB send trades for me?</div><div class="faq-a">No. BoB builds the offer and explains the strategy. You copy it and send on Sleeper yourself.</div></div>
+    <div class="faq-item"><div class="faq-q"><span class="faq-q-icon">Q</span>What happens if I hit my league limit on free?</div><div class="faq-a">Your existing league stays active. Link more leagues by upgrading.</div></div>
+    <div class="faq-item"><div class="faq-q"><span class="faq-q-icon">Q</span>What happens if I cancel?</div><div class="faq-a">You keep access until the end of your billing period. Always. No immediate cutoff.</div></div>
+    <div class="faq-item"><div class="faq-q"><span class="faq-q-icon">Q</span>Does this work for all league formats?</div><div class="faq-a">Yes. BoB auto-detects your league settings — PPR, half PPR, superflex, TE premium — and adjusts every score accordingly.</div></div>
+    <div class="faq-item"><div class="faq-q"><span class="faq-q-icon">Q</span>Do you offer refunds?</div><div class="faq-a">Yes, within 7 days of any charge. No questions asked.</div></div>
+    <div class="faq-item"><div class="faq-q"><span class="faq-q-icon">Q</span>What is League Intelligence?</div><div class="faq-a">BoB analyzes every manager in your league — their trade history, draft behavior, tendencies — and tells you exactly how to approach each one.</div></div>
+    <div class="faq-item"><div class="faq-q"><span class="faq-q-icon">Q</span>Will my data be used for ads?</div><div class="faq-a">Never. Your league data is private. Ads on free tier are programmatic only — we never sell or share your data.</div></div>
+  </div>
+</div>
+
+<!-- BOTTOM CTA -->
+<div class="bottom-cta">
+  <div class="bottom-logo-wrap">🏈</div>
+  <div class="bottom-text">
+    <div class="bottom-headline">
+      <div class="bh1">STOP MANAGING PLAYERS.</div>
+      <div class="bh2">START MANAGING</div>
+      <div class="bh3">A PORTFOLIO.</div>
+    </div>
+    <div class="bottom-sub">Join the next generation of dynasty managers using<br>data to create unfair advantages.</div>
+  </div>
+  <div class="bottom-actions">
+    <button class="btn-big-free">Get Started Free</button>
+    <button class="btn-big-import">Import My Leagues</button>
+    <div class="bottom-note">No credit card required.</div>
+  </div>
+</div>
+
+<!-- DISCLAIMER -->
+<div style="padding:16px 36px;border-top:1px solid var(--border);background:var(--card);">
+  <p style="font-size:9px;color:var(--muted);line-height:1.6;text-align:center;max-width:800px;margin:0 auto;">
+    *42-18-2 record based on tracked lineup recommendations across connected leagues. Past performance does not guarantee future results. BoB provides data-backed recommendations for informational and entertainment purposes only. All lineup and trade decisions are made solely by the user. Boom or Bust and SaaSylum LLC are not responsible for fantasy team outcomes resulting from the use of this platform.
+  </p>
+</div>
+
+</body>
+</html>
