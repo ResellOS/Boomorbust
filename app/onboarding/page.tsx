@@ -37,7 +37,6 @@ export default function OnboardingPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [syncLoading, setSyncLoading] = useState(false);
-  const [leagueCount, setLeagueCount] = useState(0);
   const [syncError, setSyncError] = useState('');
   const [termsAccepted, setTermsAccepted] = useState(false);
 
@@ -329,84 +328,7 @@ export default function OnboardingPage() {
             </div>
           )}
 
-          {/* ── Step 3: Syncing ── */}
-          {step === 'syncing' && (
-            <div className="animate-fade-up text-center">
-              <div className="card p-10 space-y-6">
-                <div className="w-14 h-14 mx-auto rounded-full bg-[var(--indigo)]/15 border border-[var(--indigo)]/30 flex items-center justify-center">
-                  <span className="text-2xl animate-spin inline-block" style={{ animationDuration: '1.2s' }}>
-                    ⚙️
-                  </span>
-                </div>
-                <div>
-                  <h2 className="text-white text-2xl mb-2">Syncing your leagues</h2>
-                  <p className="text-[var(--text-secondary)] text-sm">
-                    Importing leagues and rosters…
-                  </p>
-                </div>
-                <div className="flex justify-center gap-1.5">
-                  {[0, 1, 2].map((i) => (
-                    <span
-                      key={i}
-                      className="w-2 h-2 rounded-full bg-[var(--indigo)] animate-pulse-dot-custom"
-                      style={{ animationDelay: `${i * 200}ms` }}
-                    />
-                  ))}
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* ── Step 4: Done ── */}
-          {step === 'done' && (
-            <div className="animate-fade-up text-center space-y-6">
-              <div className="card p-8 space-y-5">
-                <div className="w-16 h-16 mx-auto rounded-full bg-green-500/15 border border-green-500/30 flex items-center justify-center text-3xl">
-                  ✅
-                </div>
-                <div>
-                  <h2 className="text-white mb-2">You&apos;re set up!</h2>
-                  {leagueCount > 0 ? (
-                    <p className="text-[var(--text-secondary)] text-sm">
-                      <span className="text-white font-semibold">
-                        {leagueCount} league{leagueCount !== 1 ? 's' : ''}
-                      </span>{' '}
-                      synced and ready. Your roster intel, trade grades, and injury alerts are live.
-                    </p>
-                  ) : syncError ? (
-                    <p className="text-amber-400 text-sm">{syncError}</p>
-                  ) : (
-                    <p className="text-[var(--text-secondary)] text-sm">
-                      Your account is connected. Leagues will sync automatically.
-                    </p>
-                  )}
-                </div>
-
-                <div className="grid grid-cols-3 gap-3 pt-2">
-                  {[
-                    { icon: '📊', label: 'Trade Grades' },
-                    { icon: '🏥', label: 'Injury Alerts' },
-                    { icon: '🤖', label: 'Dynasty Analyst' },
-                  ].map(({ icon, label }) => (
-                    <div
-                      key={label}
-                      className="bg-[var(--bg-secondary)] rounded-xl p-3 text-center border border-white/5"
-                    >
-                      <span className="text-xl block mb-1">{icon}</span>
-                      <span className="text-xs text-[var(--text-muted)]">{label}</span>
-                    </div>
-                  ))}
-                </div>
-
-                <button
-                  onClick={() => router.push('/dashboard')}
-                  className="w-full bg-[var(--indigo)] hover:bg-[var(--indigo)]/90 text-white font-bold py-3 rounded-xl transition shadow-[0_0_30px_rgba(99,102,241,0.3)]"
-                >
-                  Go to Dashboard →
-                </button>
-              </div>
-            </div>
-          )}
+          {/* Steps 3–4 (syncing/done) now live at /onboarding/syncing */}
         </div>
       </div>
     </AppBackground>
