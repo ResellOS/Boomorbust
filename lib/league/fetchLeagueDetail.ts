@@ -91,19 +91,14 @@ export async function fetchLeagueDetail(
 
   let allLeagues: LeagueRow[] = [];
   try {
+    // leagues are keyed by the Supabase auth uid (user_id). The table has no
+    // owner_id or league_type columns — selecting/filtering them errors out.
     const { data, error } = await supabase
       .from('leagues')
-      .select('id, name, status, league_type, total_rosters, season')
-      .eq('owner_id', sleeperUserId);
+      .select('id, name, status, total_rosters, season')
+      .eq('user_id', userId);
     if (error) throw error;
     allLeagues = (data ?? []) as LeagueRow[];
-    if (!allLeagues.length) {
-      const { data: fb } = await supabase
-        .from('leagues')
-        .select('id, name, status, league_type, total_rosters, season')
-        .eq('user_id', userId);
-      allLeagues = (fb ?? []) as LeagueRow[];
-    }
   } catch (err) {
     console.error('[league] all leagues fetch failed:', err);
   }

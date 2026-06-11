@@ -146,28 +146,25 @@ export async function fetchStartSitData(
 
   let leagueList: StartSitPageData['leagues'] = [];
   try {
+    // leagues are keyed by the Supabase auth uid (user_id). The table has no
+    // owner_id or league_type columns — selecting/filtering them errors out.
     const { data, error } = await supabase
       .from('leagues')
-      .select('id, name, status, league_type')
-      .eq('owner_id', sleeperUserId);
+      .select('id, name, status')
+      .eq('user_id', userId);
     if (error) throw error;
     leagueList = data ?? [];
-    if (leagueList.length === 0) {
-      const { data: fb } = await supabase
-        .from('leagues')
-        .select('id, name, status, league_type')
-        .eq('user_id', userId);
-      if (fb?.length) leagueList = fb;
-    }
   } catch (err) {
     console.error('[startsit] leagues fetch failed:', err);
   }
 
   const playerLeagues = new Map<string, string[]>();
   try {
+    // rosters.owner_id stores the Sleeper user id; players (text[]) is the only
+    // player column — player_id/player_ids don't exist and error the query.
     let query = supabase
       .from('rosters')
-      .select('league_id, player_id, player_ids, players')
+      .select('league_id, players')
       .eq('owner_id', sleeperUserId);
     if (selectedLeagueId && selectedLeagueId !== 'all') {
       query = query.eq('league_id', selectedLeagueId);

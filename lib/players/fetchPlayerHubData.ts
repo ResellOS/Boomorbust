@@ -82,20 +82,14 @@ export async function fetchPlayerHubData(
 
   let leagueList: PlayerHubData['leagues'] = [];
   try {
+    // leagues are keyed by the Supabase auth uid (user_id). The table has no
+    // owner_id or league_type columns — selecting/filtering them errors out.
     const { data, error } = await supabase
       .from('leagues')
-      .select('id, name, status, league_type')
-      .eq('owner_id', sleeperUserId);
+      .select('id, name, status')
+      .eq('user_id', userId);
     if (error) throw error;
     leagueList = data ?? [];
-
-    if (leagueList.length === 0) {
-      const { data: fallback, error: fbErr } = await supabase
-        .from('leagues')
-        .select('id, name, status, league_type')
-        .eq('user_id', userId);
-      if (!fbErr && fallback?.length) leagueList = fallback;
-    }
   } catch (err) {
     console.error('[players] leagues fetch failed:', err);
     leagueList = [];
@@ -107,9 +101,11 @@ export async function fetchPlayerHubData(
   const leaguePresence: Record<string, string[]> = {};
 
   try {
+    // rosters.owner_id stores the Sleeper user id; the only player column is
+    // players (text[]) — player_id/player_ids don't exist and error the query.
     const { data, error } = await supabase
       .from('rosters')
-      .select('league_id, player_id, player_ids, players')
+      .select('league_id, roster_id, players')
       .eq('owner_id', sleeperUserId);
     if (error) throw error;
 
