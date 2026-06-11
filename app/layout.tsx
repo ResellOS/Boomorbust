@@ -4,6 +4,7 @@ import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import Script from 'next/script';
 import ToasterWrapper from '@/components/ToasterWrapper';
+import LoadingScreen from '@/components/LoadingScreen';
 import './globals.css';
 
 const bebasNeue = Bebas_Neue({
@@ -87,6 +88,7 @@ export default function RootLayout({
       <body
         className={`${bebasNeue.variable} ${inter.variable} ${jetbrainsMono.variable} antialiased`}
       >
+        <LoadingScreen />
         {children}
         <ToasterWrapper />
         <Analytics />
