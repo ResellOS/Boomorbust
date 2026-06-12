@@ -26,7 +26,7 @@ export interface LightningCanvasProps {
   /**
    * ambient — vertical strikes in the left (green) / right (purple) thirds.
    * radial  — bolts shoot outward from `origin` in 6 directions.
-   * warroom — center vertical bolt + green left / purple right branches.
+   * warroom — center-origin: green left/up, purple right/up, straight up/down.
    */
   mode: 'ambient' | 'radial' | 'warroom';
   /** Strike origin as percentage of canvas (radial / warroom). */
@@ -42,7 +42,7 @@ export interface LightningCanvasProps {
 
 export default function LightningCanvas({
   mode,
-  origin = { xPct: 50, yPct: 45 },
+  origin = { xPct: 50, yPct: 50 },
   anchorRef,
   megaStrike = false,
   onStrike,
@@ -163,17 +163,25 @@ export default function LightningCanvas({
       onStrikeRef.current?.(0.12);
     };
 
-    /** Center vertical bolt + left green / right purple branches — activates logo bolt in art. */
+    /** Bolts from screen center — green left/up, purple right/up, straight up/down. */
     const spawnWarroom = () => {
       const cx = (w * origin.xPct) / 100;
       const cy = (h * origin.yPct) / 100;
-      const bottom = h + 12;
-      const branchY = cy + (bottom - cy) * (0.28 + Math.random() * 0.12);
+      const pad = 24;
 
       const channels: Channel[] = [
-        ...makeChannels(cx, cy - 8, cx, bottom, 8, WHITE),
-        ...makeChannels(cx, branchY, cx - w * (0.22 + Math.random() * 0.08), branchY + h * 0.18, 6, BOOM),
-        ...makeChannels(cx, branchY, cx + w * (0.22 + Math.random() * 0.08), branchY + h * 0.16, 6, BUST),
+        // Green — left
+        ...makeChannels(cx, cy, -pad, cy - h * 0.06, 7, BOOM),
+        // Green — upward (slight left bias)
+        ...makeChannels(cx, cy, cx - w * 0.1, -pad, 7, BOOM),
+        // Purple — right
+        ...makeChannels(cx, cy, w + pad, cy - h * 0.06, 7, BUST),
+        // Purple — upward (slight right bias)
+        ...makeChannels(cx, cy, cx + w * 0.1, -pad, 7, BUST),
+        // Straight up
+        ...makeChannels(cx, cy, cx, -pad, 8, WHITE),
+        // Straight down
+        ...makeChannels(cx, cy, cx, h + pad, 8, WHITE),
       ];
 
       strikesRef.current.push({
