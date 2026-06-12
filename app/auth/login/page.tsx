@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { triggerAutoSync } from '@/lib/sync/autoSync';
-import LightningCanvas from '@/components/LightningCanvas';
+import { useLightning } from '@/lib/hooks/useLightning';
 
 const LIGHTNING_CSS = `
 @keyframes glow-breathe {
@@ -24,6 +24,8 @@ const LIGHTNING_CSS = `
 `;
 
 function LightningBackground() {
+  const { canvasRef } = useLightning({ mode: 'ambient' });
+
   const particles = [
     { left: '8%', size: 3, dur: 14, delay: 0, color: '#36E7A1' },
     { left: '16%', size: 2, dur: 18, delay: 4, color: '#36E7A1' },
@@ -52,7 +54,7 @@ function LightningBackground() {
       />
 
       {/* Procedural canvas lightning — green left, purple right */}
-      <LightningCanvas mode="ambient" />
+      <canvas ref={canvasRef} className="pointer-events-none absolute inset-0 z-10" aria-hidden />
 
       {/* Energy particles */}
       {particles.map((p, i) => (

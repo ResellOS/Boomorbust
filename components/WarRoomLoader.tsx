@@ -1,7 +1,7 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
-import LightningCanvas from '@/components/LightningCanvas';
+import { useCallback, useEffect, useRef, useState, type MutableRefObject } from 'react';
+import { useLightning } from '@/lib/hooks/useLightning';
 
 const LOADER_CSS = `
 @keyframes wr-flash {
@@ -22,8 +22,13 @@ const LOADER_CSS = `
 .wr-ready { animation: wr-ready-in 400ms ease-out forwards; }
 `;
 
-/** Logo sits at screen center — lightning origin. */
-const LOGO_ORIGIN = { xPct: 50, yPct: 50 };
+export interface LightningDebugInfo {
+  progress: number | null;
+  status: string;
+  canvasWidth: number;
+  canvasHeight: number;
+  strikeCount: number;
+}
 
 export interface WarRoomLoaderProps {
   /** 0–100. Omit or pass null for indeterminate shimmer mode. */
@@ -33,6 +38,10 @@ export interface WarRoomLoaderProps {
   ready?: boolean;
   /** Fire the double-ended completion strike. */
   mega?: boolean;
+  /** Optional debug callback (test page only). */
+  onDebugUpdate?: (info: LightningDebugInfo) => void;
+  /** Optional ref to expose forceMegaStrike for debug controls. */
+  forceMegaRef?: MutableRefObject<(() => void) | null>;
 }
 
 export default function WarRoomLoader({
@@ -40,6 +49,8 @@ export default function WarRoomLoader({
   status = 'LOADING THE WAR ROOM...',
   ready = false,
   mega = false,
+  onDebugUpdate,
+  forceMegaRef,
 }: WarRoomLoaderProps) {
   const [flashKey, setFlashKey] = useState(0);
   const [flashMax, setFlashMax] = useState(0.12);
@@ -51,6 +62,29 @@ export default function WarRoomLoader({
     setFlashMs(150);
     setFlashKey((k) => k + 1);
   }, []);
+
+  const { canvasRef, canvasWidth, canvasHeight, strikeCount, forceMegaStrike } = useLightning({
+    mode: 'ambient',
+    megaStrike: mega,
+    onStrike: handleStrike,
+  });
+
+  useEffect(() => {
+    if (forceMegaRef) forceMegaRef.current = forceMegaStrike;
+    return () => {
+      if (forceMegaRef) forceMegaRef.current = null;
+    };
+  }, [forceMegaRef, forceMegaStrike]);
+
+  useEffect(() => {
+    onDebugUpdate?.({
+      progress: progress == null ? null : Math.max(0, Math.min(100, progress)),
+      status,
+      canvasWidth,
+      canvasHeight,
+      strikeCount,
+    });
+  }, [progress, status, canvasWidth, canvasHeight, strikeCount, onDebugUpdate]);
 
   useEffect(() => {
     if (prevStatus.current !== status) {
@@ -67,25 +101,23 @@ export default function WarRoomLoader({
     <div className="fixed inset-0 z-[9990] flex flex-col items-center justify-center overflow-hidden bg-[#0a0d14]">
       <style dangerouslySetInnerHTML={{ __html: LOADER_CSS }} />
 
-      {/* Full-screen procedural lightning — behind content */}
-      <LightningCanvas
-        mode="warroom"
-        origin={LOGO_ORIGIN}
-        megaStrike={mega}
-        onStrike={handleStrike}
-        className="pointer-events-none absolute inset-0 z-0"
+      {/* Same ambient canvas lightning as login page */}
+      <canvas
+        ref={canvasRef}
+        className="pointer-events-none absolute inset-0 z-10"
+        aria-hidden
       />
 
       {/* Full-screen white flash on each strike */}
       <div
         key={`flash-${flashKey}`}
-        className="wr-flash pointer-events-none absolute inset-0 z-[5] bg-white"
+        className="wr-flash pointer-events-none absolute inset-0 z-[15] bg-white"
         style={{ '--flash-max': flashMax, '--flash-ms': `${flashMs}ms` } as React.CSSProperties}
         aria-hidden
       />
 
       {/* Logo + progress + status */}
-      <div className="relative z-10 flex flex-col items-center px-4">
+      <div className="relative z-20 flex flex-col items-center px-4">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src="/logo.png"
