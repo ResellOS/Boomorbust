@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState, type MutableRefObject } from 'react';
+import LoaderLogo from '@/components/LoaderLogo';
 import { useLightning } from '@/lib/hooks/useLightning';
 
 const LOADER_CSS = `
@@ -116,22 +117,9 @@ export default function WarRoomLoader({
         aria-hidden
       />
 
-      {/* Logo + progress + status */}
-      <div className="relative z-20 flex flex-col items-center px-4">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="/logo.png"
-          alt="Boom or Bust"
-          width={320}
-          height={320}
-          className="h-auto w-[320px]"
-          style={{
-            mixBlendMode: 'screen',
-            filter:
-              'drop-shadow(0 0 40px rgba(54,231,161,0.5)) drop-shadow(0 0 80px rgba(167,139,250,0.3))',
-          }}
-          draggable={false}
-        />
+      {/* Logo + progress + status — no halo/glow container, logo floats on #0a0d14 */}
+      <div className="relative z-20 flex flex-col items-center bg-transparent px-4">
+        <LoaderLogo />
 
         <div className="mt-10 flex flex-col items-center">
           <div
