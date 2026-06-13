@@ -9,6 +9,7 @@ import LeagueConnections from '@/components/settings/LeagueConnections';
 import SubscriptionCard from '@/components/settings/SubscriptionCard';
 import UsageDonuts from '@/components/settings/UsageDonuts';
 import NotificationToggles from '@/components/settings/NotificationToggles';
+import BobEngineCard from '@/components/settings/BobEngineCard';
 import type { ProfileData } from '@/app/api/settings/profile/route';
 
 // ─── Placeholder sections ────────────────────────────────────────────────────
@@ -245,6 +246,9 @@ export default function SettingsPage() {
           </div>
         );
 
+      case 'bob-engine':
+        return <BobEngineCard />;
+
       case 'api-access':
         return (
           <div
@@ -285,6 +289,7 @@ export default function SettingsPage() {
     'export-data':        'Settings / Export My Data',
     'integrations':       'Settings / Integrations',
     'api-access':         'Settings / API Access',
+    'bob-engine':         'Settings / BOB Engine',
   };
 
   return (
