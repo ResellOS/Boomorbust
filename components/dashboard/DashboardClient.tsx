@@ -50,7 +50,10 @@ export default function DashboardClient({ data }: { data: DashboardRotationData 
     return leagues.find((l) => l.id === effectiveMode) ?? null;
   }, [isAll, effectiveMode, leagues, rotIndex]);
 
-  const players = isAll ? portfolio.players : currentLeague?.players ?? [];
+  const players = useMemo(
+    () => (isAll ? portfolio.players : currentLeague?.players ?? []),
+    [isAll, portfolio.players, currentLeague?.players],
+  );
   const teamTfo = isAll ? portfolio.teamTfo : currentLeague?.teamTfo ?? 0;
   const signals = isAll ? portfolio.signalCounts : currentLeague?.signalCounts ?? EMPTY_SIGNALS;
   const playersRostered = isAll ? portfolio.playersRostered : players.length;

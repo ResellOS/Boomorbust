@@ -46,8 +46,7 @@ export async function GET() {
     const formatted = events.map((ev) => {
       const comp = ev.competitions?.[0];
       const teams = comp?.competitors ?? [];
-      const a = teams[0];
-      const b = teams[1];
+
       const status = ev.status?.type;
       const isFinal = status?.completed === true || status?.state === 'post';
       const isLive = status?.state === 'in';
