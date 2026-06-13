@@ -128,7 +128,7 @@ export default function Sidebar({
               style={{ borderLeft: `2px solid ${active ? '#36E7A1' : 'transparent'}` }}
             >
               <Icon className="h-4 w-4 shrink-0" strokeWidth={2} />
-              <span className="font-figtree text-[12px] font-medium">{item.label}</span>
+              <span className="font-figtree text-[13px] font-medium">{item.label}</span>
             </Link>
           );
         })}

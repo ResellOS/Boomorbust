@@ -3,7 +3,7 @@
 import { LEAGUE_STATUS, type LeagueBundle } from '@/lib/dashboard/rotation';
 
 interface LeagueRotationHeaderProps {
-  league: LeagueBundle | null; // null = ALL mode
+  league: LeagueBundle | null;
   mode: 'rotate' | 'all' | string;
   secondsLeft: number;
   leagueCount: number;
@@ -19,15 +19,15 @@ export default function LeagueRotationHeader({
 }: LeagueRotationHeaderProps) {
   if (!league) {
     return (
-      <div className="flex items-center gap-2.5 rounded-[8px] border border-border bg-surface px-3.5 py-2">
+      <div className="flex w-full items-center gap-2.5 rounded-[8px] border border-border bg-surface px-3.5 py-2">
         <span className="h-2 w-2 rounded-full bg-muted" />
-        <span className="font-figtree text-[13px] font-semibold tracking-[0.5px] text-text">
+        <span className="font-figtree text-[14px] font-semibold tracking-[0.5px] text-text">
           ALL LEAGUES
         </span>
         <span className="text-muted">•</span>
-        <span className="font-figtree text-[11px] text-muted">Portfolio</span>
+        <span className="font-figtree text-[12px] text-muted">Portfolio</span>
         <span className="text-muted">•</span>
-        <span className="font-mono text-[11px] text-muted">{leagueCount} leagues</span>
+        <span className="font-mono text-[12px] text-muted">{leagueCount} leagues</span>
       </div>
     );
   }
@@ -37,39 +37,39 @@ export default function LeagueRotationHeader({
   const pct = Math.max(0, Math.min(100, (secondsLeft / ROTATE_SECONDS) * 100));
 
   return (
-    <div className="flex items-center gap-2.5 rounded-[8px] border border-border bg-surface px-3.5 py-2">
+    <div className="flex w-full items-center gap-2.5 rounded-[8px] border border-border bg-surface px-3.5 py-2">
       <span
         className="h-2 w-2 shrink-0 rounded-full"
         style={{ background: meta.color, boxShadow: `0 0 8px ${meta.color}` }}
       />
-      <span className="font-figtree text-[13px] font-semibold uppercase tracking-[0.5px] text-text">
+      <span className="font-figtree text-[14px] font-semibold uppercase tracking-[0.5px] text-text">
         {league.name}
       </span>
       <span className="text-muted">•</span>
       <span
-        className="font-figtree text-[11px] font-medium uppercase tracking-[1px]"
+        className="font-figtree text-[12px] font-medium uppercase tracking-[1px]"
         style={{ color: meta.color }}
       >
         {meta.label}
       </span>
       <span className="text-muted">•</span>
       {league.standingRank > 0 ? (
-        <span className="font-mono text-[11px] text-muted">
+        <span className="font-mono text-[12px] text-muted">
           {league.record} · #{league.standingRank}/{league.totalTeams}
         </span>
       ) : (
-        <span className="font-mono text-[11px] text-muted">{league.record}</span>
+        <span className="font-mono text-[12px] text-muted">{league.record}</span>
       )}
 
       {isRotating && (
-        <div className="ml-auto flex items-center gap-2">
-          <div className="relative h-1.5 w-[120px] overflow-hidden rounded-full bg-border">
+        <div className="ml-auto flex shrink-0 items-center gap-2.5">
+          <div className="relative h-1.5 w-[140px] overflow-hidden rounded-full bg-border">
             <div
               className="h-full rounded-full bg-boom transition-[width] duration-1000 ease-linear"
               style={{ width: `${pct}%`, boxShadow: '0 0 8px rgba(54,231,161,0.6)' }}
             />
           </div>
-          <span className="w-8 text-right font-mono text-[12px] tabular-nums text-boom">
+          <span className="w-9 text-right font-mono text-[13px] tabular-nums text-boom">
             {secondsLeft}s
           </span>
         </div>

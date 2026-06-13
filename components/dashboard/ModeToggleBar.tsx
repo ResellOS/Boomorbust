@@ -13,7 +13,7 @@ interface ModeToggleBarProps {
 
 export default function ModeToggleBar({ leagues, mode, onSelect }: ModeToggleBarProps) {
   const baseBtn =
-    'shrink-0 rounded-[6px] border px-3 py-1.5 font-figtree text-[11px] transition-colors';
+    'shrink-0 rounded-[6px] border px-3 py-1.5 font-figtree text-[12px] transition-colors';
 
   return (
     <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">

@@ -204,33 +204,39 @@ export default function RightPanel({ signals, exposureWarnings, overvalued }: Ri
 
       <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-lg border border-border bg-surface">
         <div className="shrink-0 border-b border-border bg-bg px-[13px] py-2">
-          <span className="font-figtree text-[9.5px] font-bold uppercase tracking-[1.5px] text-text">
+          <span className="font-figtree text-[10px] font-bold uppercase tracking-[1.5px] text-text">
             Overvalued Assets
           </span>
         </div>
         <div className="flex min-h-0 flex-1 flex-col overflow-hidden px-[13px] py-2">
-          {overvalued.map((asset) => (
-            <div
-              key={asset.playerId}
-              className="flex items-center gap-[9px] border-b border-border/35 py-1.5 last:border-b-0"
-            >
-              <PlayerThumb playerId={asset.playerId} playerName={asset.playerName} />
-              <div className="min-w-0 flex-1">
-                <div className="font-figtree text-[11px] font-semibold text-text">
-                  {asset.playerName}
+          {overvalued.length === 0 ? (
+            <p className="py-3 font-mono text-[11px] text-muted">
+              No meaningful overvalue signals yet — market comparison data syncing.
+            </p>
+          ) : (
+            overvalued.map((asset) => (
+              <div
+                key={asset.playerId}
+                className="flex items-center gap-[9px] border-b border-border/35 py-1.5 last:border-b-0"
+              >
+                <PlayerThumb playerId={asset.playerId} playerName={asset.playerName} />
+                <div className="min-w-0 flex-1">
+                  <div className="font-figtree text-[12px] font-semibold text-text">
+                    {asset.playerName}
+                  </div>
+                  <div className="font-mono text-[10px] text-muted">
+                    {asset.position} · {asset.team}
+                  </div>
                 </div>
-                <div className="font-mono text-[8.5px] text-muted">
-                  {asset.position} · {asset.team}
+                <div className="shrink-0 text-right">
+                  <div className="font-mono text-[12px] font-bold text-[#ef4444]">
+                    +{asset.delta.toFixed(1)}
+                  </div>
+                  <div className="font-mono text-[8px] tracking-wide text-[#ef4444]">OVERVALUE</div>
                 </div>
               </div>
-              <div className="shrink-0 text-right">
-                <div className="font-mono text-xs font-bold text-[#ef4444]">
-                  {asset.delta.toFixed(1)}
-                </div>
-                <div className="font-mono text-[7px] tracking-wide text-[#ef4444]">OVERVALUE</div>
-              </div>
-            </div>
-          ))}
+            ))
+          )}
           <Link
             href="/players?sort=overvalued"
             className="mt-2 block font-mono text-[9px] text-boom no-underline hover:underline"

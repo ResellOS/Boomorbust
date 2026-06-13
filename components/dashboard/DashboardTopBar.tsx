@@ -6,9 +6,9 @@ export interface DashboardTopBarProps {
   leagueCount: number;
   playersRostered: number;
   tradeOffers: number;
-  dynastyEdge: number; // hidden when <= 0
+  dynastyEdge: number;
   empireRating: number;
-  contextLabel: string; // e.g. "All Leagues" or the active league name
+  contextLabel: string;
 }
 
 const GLOW = { textShadow: '0 0 9px rgba(54,231,161,0.45)' } as const;
@@ -48,13 +48,18 @@ export default function DashboardTopBar({
       </div>
 
       <div className="flex items-stretch">
-        <Stat label="Context" value={contextLabel} text />
+        <div className="flex min-w-0 flex-col justify-center border-r border-border px-[18px] py-1.5">
+          <div
+            className="truncate font-figtree text-[16px] font-semibold leading-tight text-text"
+            title={contextLabel}
+          >
+            {contextLabel}
+          </div>
+        </div>
         <Stat label="Leagues" value={String(leagueCount)} accent />
         <Stat label="Players Rostered" value={String(playersRostered)} />
         <Stat label="Trade Offers" value={String(tradeOffers)} hold />
-        {showEdge && (
-          <Stat label="Dynasty Edge" value={`+${dynastyEdge.toFixed(1)}`} accent />
-        )}
+        {showEdge && <Stat label="Dynasty Edge" value={`+${dynastyEdge.toFixed(1)}`} accent />}
         <Stat
           label="Empire Rating"
           value={empireRating.toFixed(1)}
@@ -71,33 +76,26 @@ function Stat({
   value,
   accent,
   hold,
-  text,
   tooltip,
 }: {
   label: string;
   value: string;
   accent?: boolean;
   hold?: boolean;
-  text?: boolean;
   tooltip?: string;
 }) {
   const color = accent ? 'text-boom' : hold ? 'text-hold' : 'text-text';
   return (
     <div className="group relative flex flex-col justify-center border-r border-border px-[18px] py-1.5 last:border-r-0">
-      <div className="mb-[3px] font-figtree text-[9px] uppercase tracking-[1.2px] text-muted">
-        {label}
-        {tooltip && <span className="ml-1 text-muted/60">ⓘ</span>}
-      </div>
+      <div className="mb-[3px] font-figtree text-[10px] uppercase tracking-[1.2px] text-muted">{label}</div>
       <div
-        className={`font-mono text-[22px] font-semibold leading-none tracking-[-0.5px] ${color} ${
-          text ? 'truncate font-figtree text-[15px]' : ''
-        }`}
+        className={`font-mono text-[22px] font-semibold leading-none tracking-[-0.5px] ${color}`}
         style={accent ? GLOW : undefined}
       >
         {value}
       </div>
       {tooltip && (
-        <div className="pointer-events-none absolute left-2 top-[58px] z-50 hidden w-[230px] rounded-[7px] border border-border bg-surface px-3 py-2 font-figtree text-[10px] leading-snug text-muted shadow-lg group-hover:block">
+        <div className="pointer-events-none absolute left-2 top-[58px] z-50 hidden w-[230px] rounded-[7px] border border-border bg-surface px-3 py-2 font-figtree text-[11px] leading-snug text-muted shadow-lg group-hover:block">
           {tooltip}
         </div>
       )}

@@ -7,10 +7,29 @@ export function getVerdict(score: number) {
 }
 
 export function getTier(score: number) {
-  if (score >= 80) return 'Elite Tier';
+  if (score >= 90) return 'Elite Tier';
+  if (score >= 80) return 'Strong Tier';
   if (score >= 70) return 'Solid Tier';
-  if (score >= 60) return 'Weak Tier';
+  if (score >= 60) return 'Average Tier';
+  if (score >= 50) return 'Weak Tier';
   return 'Avoid Tier';
+}
+
+export function getCardBorderStyle(label: string): { border: string; boxShadow?: string } {
+  switch (label) {
+    case 'STRONG BOOM':
+      return { border: '2px solid #36E7A1', boxShadow: '0 0 12px rgba(54,231,161,0.3)' };
+    case 'BOOM':
+      return { border: '1px solid #36E7A1' };
+    case 'HOLD':
+      return { border: '1px solid #FBBF24' };
+    case 'BUST':
+      return { border: '1px solid #A78BFA' };
+    case 'STRONG BUST':
+      return { border: '2px solid #A78BFA', boxShadow: '0 0 12px rgba(167,139,250,0.3)' };
+    default:
+      return { border: '1px solid rgba(255,255,255,0.1)' };
+  }
 }
 
 export function getTradeVerdictLabel(score: number): 'BOOM' | 'HOLD' | 'BUST' {
@@ -37,13 +56,26 @@ export function deriveRadarVals(playerId: string, tfoScore: number): number[] {
   );
 }
 
+/** Validated acquire cost — never underprices elite assets. */
+export function acquireCostForScore(score: number): string {
+  if (score > 80) return '1st + more';
+  if (score >= 70) return '1st round pick';
+  if (score >= 60) return '2nd round pick';
+  if (score >= 50) return '3rd or later';
+  return '3rd or later';
+}
+
 export function placeholderAcquireCost(score: number): string {
-  if (score >= 82) return 'Early 2nd + Flex';
-  if (score >= 78) return 'Mid 2nd';
-  if (score >= 76) return 'Late 2nd';
-  if (score >= 71) return 'Late 2nd + 3rd';
-  if (score >= 69) return '2nd + 3rd';
-  if (score >= 64) return '3rd';
-  if (score >= 59) return 'Late 3rd';
-  return '3rd + 4th';
+  return acquireCostForScore(score);
+}
+
+export function generateTradeReason(tfoScore: number, verdictLabel: string): string {
+  if (tfoScore > 80) return 'Elite dynasty value, years from peak';
+  if (tfoScore > 75 && (verdictLabel === 'BOOM' || verdictLabel === 'STRONG BOOM')) {
+    return `BOB scores ${tfoScore.toFixed(1)} — strong buy window`;
+  }
+  if (tfoScore > 70) return 'Usage trending up, buy before market';
+  if (tfoScore > 65) return 'Improving situation, ascending value';
+  if (tfoScore > 60) return 'Solid floor with room to grow';
+  return 'Speculative upside at current cost';
 }

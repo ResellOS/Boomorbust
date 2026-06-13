@@ -18,12 +18,27 @@ const TABS: { id: TabId; label: string }[] = [
 
 interface TradeHubClientProps {
   data: TradePageData;
+  initialTargetPlayerId?: string;
+  initialLeagueId?: string;
+  initialOfferId?: string;
 }
 
-export default function TradeHubClient({ data }: TradeHubClientProps) {
+export default function TradeHubClient({
+  data,
+  initialTargetPlayerId,
+  initialLeagueId,
+  initialOfferId,
+}: TradeHubClientProps) {
   const [tab, setTab] = useState<TabId>('incoming');
   const [selectedId, setSelectedId] = useState<string | null>(
-    data.incomingOffers[0]?.id ?? null,
+    initialOfferId ??
+      data.incomingOffers.find((o) =>
+        initialTargetPlayerId
+          ? o.offeredPlayerIds?.includes(initialTargetPlayerId)
+          : false,
+      )?.id ??
+      data.incomingOffers[0]?.id ??
+      null,
   );
 
   const tabOffers = useMemo((): TradeOffer[] => {
@@ -114,9 +129,13 @@ export default function TradeHubClient({ data }: TradeHubClientProps) {
       </div>
 
       <SmartCounterPanel
-        offeredPlayerIds={selected?.offeredPlayerIds ?? data.selectedOfferDefaults?.offeredPlayerIds ?? []}
+        offeredPlayerIds={
+          initialTargetPlayerId
+            ? [initialTargetPlayerId]
+            : selected?.offeredPlayerIds ?? data.selectedOfferDefaults?.offeredPlayerIds ?? []
+        }
         yourPlayerIds={selected?.yourPlayerIds ?? data.selectedOfferDefaults?.yourPlayerIds ?? []}
-        leagueId={selected?.leagueId ?? data.selectedOfferDefaults?.leagueId ?? ''}
+        leagueId={initialLeagueId ?? selected?.leagueId ?? data.selectedOfferDefaults?.leagueId ?? ''}
         offerId={selected?.id ?? null}
       />
     </div>

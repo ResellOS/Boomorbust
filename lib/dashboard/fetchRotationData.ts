@@ -1,8 +1,24 @@
 import { createAdminClient } from '@/lib/supabase/admin';
-import { fetchLeagueRosters, type SleeperRoster } from '@/lib/sleeper';
-import { getVerdict } from '@/lib/verdict';
+import {
+  fetchLeagueRosters,
+  fetchLeagueUsers,
+  fetchLeagueTrades,
+  fetchNflState,
+  type SleeperRoster,
+  type SleeperTransaction,
+  type SleeperUser,
+} from '@/lib/sleeper';
+import { fetchAllPlayers } from '@/lib/sleeper/players';
+import {
+  acquireCostForScore,
+  generateTradeReason,
+  getVerdict,
+  getTradeVerdictLabel,
+} from '@/lib/verdict';
+import { fetchDashboardNews } from './fetchDashboardNews';
 import {
   deriveLeagueStatus,
+  type DashboardIncomingTrade,
   type DashboardRotationData,
   type LeagueBundle,
   type OvervaluedItem,
@@ -37,15 +53,112 @@ function avgTfo(players: RotationPlayer[]): number {
   return Math.round((valid.reduce((a, b) => a + b, 0) / valid.length) * 10) / 10;
 }
 
+function playerName(db: Record<string, { full_name?: string }>, pid: string): string {
+  return db[pid]?.full_name ?? 'Unknown Player';
+}
+
+function pickLabel(
+  round: number,
+  season: string,
+  rosterId: number,
+  rosters: SleeperRoster[],
+  users: SleeperUser[],
+): string {
+  const roster = rosters.find((r) => r.roster_id === rosterId);
+  const user = users.find((u) => u.user_id === roster?.owner_id);
+  const team = user?.display_name ?? user?.username ?? `Team ${rosterId}`;
+  const rd = round === 1 ? '1st' : round === 2 ? '2nd' : round === 3 ? '3rd' : `${round}th`;
+  return `${season} ${rd} (${team})`;
+}
+
+function parsePendingTrade(
+  tx: SleeperTransaction,
+  leagueId: string,
+  leagueName: string,
+  myRosterId: number,
+  rosters: SleeperRoster[],
+  users: SleeperUser[],
+  playerDb: Record<string, { full_name?: string }>,
+  tfoMap: Map<string, number>,
+): DashboardIncomingTrade | null {
+  let primaryPlayerId = '';
+  let primaryPlayerName = '';
+  const askingParts: string[] = [];
+
+  for (const [pid, toRoster] of Object.entries(tx.adds ?? {})) {
+    const name = playerName(playerDb, pid);
+    if (toRoster === myRosterId) {
+      primaryPlayerId = pid;
+      primaryPlayerName = name;
+    } else {
+      askingParts.push(name);
+    }
+  }
+
+  for (const [pid, fromRoster] of Object.entries(tx.drops ?? {})) {
+    if (fromRoster === myRosterId) askingParts.push(playerName(playerDb, pid));
+  }
+
+  for (const pick of tx.draft_picks ?? []) {
+    const label = pickLabel(pick.round, pick.season, pick.roster_id, rosters, users);
+    if (pick.owner_id === myRosterId && !primaryPlayerName) {
+      primaryPlayerName = label;
+    } else if (pick.owner_id !== myRosterId) {
+      askingParts.push(label);
+    }
+  }
+
+  if (!primaryPlayerName) return null;
+
+  const opponentRosterId = tx.roster_ids?.find((r) => r !== myRosterId);
+  const oppRoster = rosters.find((r) => r.roster_id === opponentRosterId);
+  const oppUser = users.find((u) => u.user_id === oppRoster?.owner_id);
+  const managerName = oppUser?.username ? `@${oppUser.username}` : '@Manager';
+
+  const receiveScore = primaryPlayerId ? tfoMap.get(primaryPlayerId) ?? 70 : 70;
+  const giveScore = askingParts.length * 12;
+  const dynastyEdge = Math.round((receiveScore - giveScore * 0.3) * 0.15 * 10) / 10;
+
+  const created = tx.created ?? Date.now();
+  const isNew = Date.now() - created < 3_600_000;
+
+  return {
+    id: tx.transaction_id ?? `${leagueId}-${created}`,
+    playerId: primaryPlayerId || '0',
+    playerName: primaryPlayerName,
+    leagueId,
+    leagueName,
+    managerName,
+    askingFor: askingParts.length > 0 ? askingParts.join(' · ') : 'Open to counter',
+    dynastyEdge: Math.max(1, dynastyEdge),
+    status: isNew ? 'NEW' : 'PENDING',
+    tfoScore: receiveScore,
+  };
+}
+
 export async function fetchRotationData(
   userId: string,
   sleeperUserId: string,
 ): Promise<DashboardRotationData> {
+  const nflStateRaw = await fetchNflState().catch(() => null);
+  const nflSeason = {
+    week: nflStateRaw?.week ?? 0,
+    seasonType: nflStateRaw?.season_type ?? ('off' as const),
+    inSeason:
+      nflStateRaw != null &&
+      nflStateRaw.season_type === 'regular' &&
+      nflStateRaw.week >= 1 &&
+      nflStateRaw.week <= 18,
+  };
+
   const empty: DashboardRotationData = {
     leagues: [],
     portfolio: { players: [], teamTfo: 0, signalCounts: emptySignals(), playersRostered: 0 },
     tradeTargets: [],
     overvalued: [],
+    incomingTrades: [],
+    newsItems: [],
+    nflSeason,
     scoringContext: 'dynasty',
   };
 
@@ -57,7 +170,6 @@ export async function fetchRotationData(
     return empty;
   }
 
-  // Prefer dynasty scores; fall back to redraft if the dynasty prescore is empty.
   let scoringContext: 'dynasty' | 'redraft' = 'dynasty';
   try {
     const { count } = await supabase
@@ -69,7 +181,6 @@ export async function fetchRotationData(
     scoringContext = 'redraft';
   }
 
-  // Leagues (keyed by auth uid). Rosters (keyed by Sleeper user id).
   let leaguesRaw: { id: string; name: string; status: string | null; total_rosters: number | null }[] = [];
   try {
     const { data, error } = await supabase
@@ -104,8 +215,8 @@ export async function fetchRotationData(
 
   const idList = Array.from(allPlayerIds);
 
-  // Dynasty scores for every rostered player.
   const tfoByPlayer = new Map<string, { score: number; verdictClass: 'boom' | 'hold' | 'bust' }>();
+  const tfoMap = new Map<string, number>();
   if (idList.length > 0) {
     try {
       const { data, error } = await supabase
@@ -120,14 +231,14 @@ export async function fetchRotationData(
         if (tfoByPlayer.has(pid)) continue;
         const score = safeScore(row.tfo_score);
         tfoByPlayer.set(pid, { score, verdictClass: getVerdict(score).class as 'boom' | 'hold' | 'bust' });
+        tfoMap.set(pid, score);
       }
     } catch (err) {
       console.error('[dashboard] scores fetch failed:', err);
     }
   }
 
-  // Player metadata.
-  const metaByPlayer = new Map<string, { name: string; position: string; team: string }>();
+  const metaByPlayer = new Map<string, { name: string; position: string; team: string; tfoScore: number }>();
   if (idList.length > 0) {
     try {
       const batch = 200;
@@ -139,10 +250,12 @@ export async function fetchRotationData(
           .in('id', slice);
         if (error) throw error;
         for (const p of data ?? []) {
-          metaByPlayer.set(String(p.id), {
+          const pid = String(p.id);
+          metaByPlayer.set(pid, {
             name: p.full_name ?? 'Unknown Player',
             position: (p.position ?? '—').toUpperCase(),
             team: p.team ?? '—',
+            tfoScore: tfoMap.get(pid) ?? 0,
           });
         }
       }
@@ -151,7 +264,6 @@ export async function fetchRotationData(
     }
   }
 
-  // Sleeper standings/records for every league, fetched in parallel (one initial load).
   const sleeperByLeague = new Map<string, SleeperRoster[]>();
   await Promise.all(
     leaguesRaw.map(async (l) => {
@@ -189,7 +301,6 @@ export async function fetchRotationData(
     const teamTfo = avgTfo(players);
     const signalCounts = tallySignals(players);
 
-    // Standings + record from Sleeper.
     const sleeperRosters = sleeperByLeague.get(l.id) ?? [];
     const totalTeams = l.total_rosters ?? sleeperRosters.length ?? 0;
     let wins = 0;
@@ -240,7 +351,6 @@ export async function fetchRotationData(
     };
   });
 
-  // Portfolio (ALL mode): every unique rostered player across leagues.
   const portfolioPlayers = idList
     .map(toRotationPlayer)
     .filter((p): p is RotationPlayer => p !== null)
@@ -252,7 +362,6 @@ export async function fetchRotationData(
     playersRostered: portfolioPlayers.length,
   };
 
-  // Trade targets: top league-wide scores the user does not roster.
   const tradeTargets: TradeTargetItem[] = [];
   try {
     let q = supabase
@@ -260,10 +369,10 @@ export async function fetchRotationData(
       .select('player_id, tfo_score')
       .eq('scoring_context', scoringContext)
       .order('tfo_score', { ascending: false })
-      .limit(8);
+      .limit(12);
     if (idList.length > 0) q = q.not('player_id', 'in', `(${idList.join(',')})`);
     const { data } = await q;
-    const targetIds = (data ?? []).map((r) => String(r.player_id));
+    const targetIds = (data ?? []).slice(0, 4).map((r) => String(r.player_id));
     if (targetIds.length > 0) {
       const { data: meta } = await supabase
         .from('players')
@@ -272,15 +381,21 @@ export async function fetchRotationData(
       const m = new Map(
         (meta ?? []).map((p) => [String(p.id), p as { full_name: string; position: string; team: string }]),
       );
-      (data ?? []).forEach((r, i) => {
+      (data ?? []).slice(0, 4).forEach((r, i) => {
         const p = m.get(String(r.player_id));
+        const score = safeScore(r.tfo_score) || 50;
+        const verdictLabel = getTradeVerdictLabel(score);
+        const lg = leagues[i % Math.max(leagues.length, 1)];
         tradeTargets.push({
           playerId: String(r.player_id),
           playerName: p?.full_name ?? 'Unknown Player',
           position: (p?.position ?? '—').toUpperCase(),
           team: p?.team ?? '—',
-          leagueName: leagues[i % Math.max(leagues.length, 1)]?.name ?? 'League',
-          tfoScore: safeScore(r.tfo_score) || 50,
+          leagueName: lg?.name ?? 'League',
+          leagueId: lg?.id ?? '',
+          tfoScore: score,
+          reason: generateTradeReason(score, verdictLabel),
+          acquireCost: acquireCostForScore(score),
         });
       });
     }
@@ -288,17 +403,69 @@ export async function fetchRotationData(
     console.error('[dashboard] trade targets fetch failed:', err);
   }
 
-  // Overvalued: the user's lowest-scoring rostered assets.
-  const overvalued: OvervaluedItem[] = portfolioPlayers
-    .slice(-5)
-    .reverse()
-    .map((p) => ({
-      playerId: p.playerId,
-      playerName: p.name,
-      position: p.position,
-      team: p.team,
-      delta: -Math.max(1, (70 - p.tfoScore) * 0.35),
-    }));
+  // Overvalued: hide unless we have meaningful market comparison data.
+  const overvalued: OvervaluedItem[] = [];
 
-  return { leagues, portfolio, tradeTargets, overvalued, scoringContext };
+  let playerDb: Record<string, { full_name?: string }> = {};
+  try {
+    playerDb = ((await fetchAllPlayers()) ?? {}) as Record<string, { full_name?: string }>;
+  } catch {
+    /* optional */
+  }
+
+  const incomingTrades: DashboardIncomingTrade[] = [];
+  await Promise.all(
+    leaguesRaw.slice(0, 15).map(async (lg) => {
+      const roster = rosterByLeague.get(lg.id);
+      if (!roster?.rosterId) return;
+
+      let users: SleeperUser[] = [];
+      let rosters: SleeperRoster[] = [];
+      try {
+        users = (await fetchLeagueUsers(lg.id)) ?? [];
+        rosters = (await fetchLeagueRosters(lg.id)) ?? [];
+      } catch {
+        return;
+      }
+
+      try {
+        const pending = (await fetchLeagueTrades(lg.id)) ?? [];
+        for (const tx of pending) {
+          if (!tx.roster_ids?.includes(roster.rosterId)) continue;
+          if (tx.status && !['pending', 'proposed'].includes(tx.status)) continue;
+          const parsed = parsePendingTrade(
+            tx,
+            lg.id,
+            lg.name,
+            roster.rosterId,
+            rosters,
+            users,
+            playerDb,
+            tfoMap,
+          );
+          if (parsed) incomingTrades.push(parsed);
+        }
+      } catch {
+        /* skip */
+      }
+    }),
+  );
+
+  let newsItems: DashboardRotationData['newsItems'] = [];
+  try {
+    newsItems = await fetchDashboardNews(metaByPlayer, allPlayerIds, true);
+  } catch (err) {
+    console.error('[dashboard] news fetch failed:', err);
+  }
+
+  return {
+    leagues,
+    portfolio,
+    tradeTargets,
+    overvalued,
+    incomingTrades,
+    newsItems,
+    nflSeason,
+    scoringContext,
+  };
 }

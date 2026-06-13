@@ -46,7 +46,13 @@ export function deriveLeagueStatus(a: DeriveStatusArgs): LeagueStatusKey {
   if (a.teamTfo < 60 || (hasRecord && a.winRate < 40)) return 'REBUILD';
   if ((hasRecord && a.winRate > 50) || playoff) return 'CONTENDER';
   if (hasRecord && a.winRate >= 40 && a.winRate <= 50) return 'TRANSITION';
-  return hasRecord ? 'TRANSITION' : 'CONTENDER';
+
+  // Offseason / no record yet — derive from team TFO only.
+  if (a.teamTfo > 75) return 'CHAMPIONSHIP';
+  if (a.teamTfo > 68) return 'CONTENDER';
+  if (a.teamTfo > 60) return 'TRANSITION';
+  if (a.teamTfo > 50) return 'REBUILD';
+  return 'ORPHAN';
 }
 
 export type VerdictClass = 'boom' | 'hold' | 'bust';
@@ -93,7 +99,40 @@ export interface TradeTargetItem {
   position: string;
   team: string;
   leagueName: string;
+  leagueId: string;
   tfoScore: number;
+  reason: string;
+  acquireCost: string;
+}
+
+export interface DashboardNewsItem {
+  id: string;
+  playerId?: string;
+  playerHighlight: string;
+  highlightColor: string;
+  headline: string;
+  source: string;
+  url: string;
+  publishedAt: number;
+}
+
+export interface DashboardIncomingTrade {
+  id: string;
+  playerId: string;
+  playerName: string;
+  leagueId: string;
+  leagueName: string;
+  managerName: string;
+  askingFor: string;
+  dynastyEdge: number;
+  status: 'NEW' | 'PENDING' | 'COUNTERED';
+  tfoScore?: number;
+}
+
+export interface NflSeasonInfo {
+  week: number;
+  seasonType: 'pre' | 'regular' | 'post' | 'off';
+  inSeason: boolean;
 }
 
 export interface OvervaluedItem {
@@ -109,6 +148,9 @@ export interface DashboardRotationData {
   portfolio: PortfolioBundle;
   tradeTargets: TradeTargetItem[];
   overvalued: OvervaluedItem[];
+  incomingTrades: DashboardIncomingTrade[];
+  newsItems: DashboardNewsItem[];
+  nflSeason: NflSeasonInfo;
   scoringContext: 'dynasty' | 'redraft';
 }
 

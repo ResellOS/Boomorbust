@@ -9,7 +9,11 @@ import TradeFooter from '@/components/trade/TradeFooter';
 
 export const dynamic = 'force-dynamic';
 
-export default async function TradePage() {
+export default async function TradePage({
+  searchParams,
+}: {
+  searchParams: { target?: string; league?: string; offer?: string };
+}) {
   let userId: string | null = null;
 
   try {
@@ -35,7 +39,12 @@ export default async function TradePage() {
     >
       <TradeTopBar stats={data.stats} />
       <Sidebar leagues={data.leagues} />
-      <TradeHubClient data={data} />
+      <TradeHubClient
+        data={data}
+        initialTargetPlayerId={searchParams.target}
+        initialLeagueId={searchParams.league}
+        initialOfferId={searchParams.offer}
+      />
       <TradeFooter footer={data.footer} />
     </div>
   );
