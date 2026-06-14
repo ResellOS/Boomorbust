@@ -62,7 +62,7 @@ export default function UsageDonuts({ usage, renewsLabel }: Props) {
   const items = [
     { label: 'Players Tracked',  ...usage.playersTracked },
     { label: 'Trade Analyses',   ...usage.tradeAnalyses },
-    { label: 'AI Queries',       ...usage.aiQueries },
+    { label: 'BOB Engine Queries', ...usage.aiQueries },
     { label: 'Reports Exported', ...usage.reportsExported },
   ];
 

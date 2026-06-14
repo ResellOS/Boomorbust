@@ -70,8 +70,8 @@ function KeyIcon() {
 function LogoutIcon() {
   return <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M9 2H4a1 1 0 00-1 1v9a1 1 0 001 1h5M10 5l3 2.5L10 10M13 7.5H6" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"/></svg>;
 }
-function EngineIcon() {
-  return <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><rect x="3.5" y="3.5" width="8" height="8" rx="1.5" stroke="currentColor" strokeWidth="1.3"/><path d="M6 1.5v2M9 1.5v2M6 11.5v2M9 11.5v2M1.5 6h2M1.5 9h2M11.5 6h2M11.5 9h2" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/></svg>;
+function BoltIcon() {
+  return <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M8 1.5L3 8.5h3.5L7 13.5l5-7H8.5L8 1.5z" stroke="currentColor" strokeWidth="1.3" strokeLinejoin="round"/></svg>;
 }
 
 const NAV_GROUPS: NavGroup[] = [
@@ -107,12 +107,7 @@ const NAV_GROUPS: NavGroup[] = [
     items: [
       { id: 'integrations', label: 'Integrations', icon: <PuzzleIcon /> },
       { id: 'api-access',   label: 'API Access',   icon: <KeyIcon /> },
-    ],
-  },
-  {
-    heading: 'ENGINE',
-    items: [
-      { id: 'bob-engine', label: 'BOB Engine', icon: <EngineIcon /> },
+      { id: 'bob-engine',   label: 'BOB Engine',   icon: <BoltIcon /> },
     ],
   },
 ];

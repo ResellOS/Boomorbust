@@ -137,10 +137,10 @@ export function rateLimitExceededResponse(result: RateLimitResult, tier: string)
     tier === 'all_pro_terminal'
       ? undefined
       : tier === 'veteran' || tier === 'elite'
-      ? 'Upgrade to All-Pro for 200 daily AI queries'
+      ? 'Upgrade to All-Pro for 200 daily BOB Engine queries'
       : tier === 'rookie' || tier === 'pro'
-      ? 'Upgrade to Veteran for 50 daily AI queries'
-      : 'Upgrade to Rookie for 15 daily AI queries';
+      ? 'Upgrade to Veteran for 50 daily BOB Engine queries'
+      : 'Upgrade to Rookie for 15 daily BOB Engine queries';
 
   return {
     error: 'Daily AI limit reached',

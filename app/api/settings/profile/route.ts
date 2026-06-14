@@ -58,12 +58,12 @@ const TIER_INFO: Record<string, { label: string; price: string; features: string
   elite: {
     label: 'All-Pro Terminal',
     price: '$20 /mo',
-    features: ['All Features', 'Advanced Analytics', 'AI Dynasty Coach', 'Trade Analyzer', 'Premium Support', 'Export Reports'],
+    features: ['All Features', 'Advanced Analytics', 'Dynasty Coach', 'Trade Analyzer', 'Premium Support', 'Export Reports'],
   },
   pro: {
     label: 'Veteran',
     price: '$10 /mo',
-    features: ['All Features', 'Trade Analyzer', 'AI Dynasty Coach (limited)', 'Email Reports'],
+    features: ['All Features', 'Trade Analyzer', 'Dynasty Coach (limited)', 'Email Reports'],
   },
   free: {
     label: 'Rookie (Free)',
@@ -77,9 +77,11 @@ export async function GET() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-  const [{ data: profile }, { data: leagues }] = await Promise.all([
+  const [{ data: profile }, { data: leagues }, { count: champCount }] = await Promise.all([
     supabase.from('profiles').select('*').eq('id', user.id).maybeSingle(),
-    supabase.from('leagues').select('id, name, total_rosters, scoring_settings').eq('user_id', user.id).limit(10),
+    supabase.from('leagues').select('id, name, total_rosters, scoring_settings, status').eq('user_id', user.id).limit(10),
+    // Championships = completed league seasons (Sleeper marks finished seasons 'complete'). 0 when none.
+    supabase.from('leagues').select('id', { count: 'exact', head: true }).eq('user_id', user.id).eq('status', 'complete'),
   ]);
 
   const rawTier = (profile as { subscription_tier?: string } | null)?.subscription_tier;
@@ -89,7 +91,6 @@ export async function GET() {
   // Build league connections
   const ROLES = ['Commissioner', 'Co-Owner', 'Owner', 'Owner'];
   const leagueRows: LeagueConnectionRow[] = (leagues ?? []).map((l, i) => {
-    const s = seeded(l.id);
     const ppType = (l.scoring_settings as Record<string, number> | null)?.rec === 1 ? 'PPR' : (l.scoring_settings as Record<string, number> | null)?.rec === 0.5 ? '0.5PPR' : 'SF PPR';
     return {
       id:            l.id,
@@ -97,11 +98,11 @@ export async function GET() {
       format:        `${l.total_rosters ?? 12}-Team ${ppType}`,
       role:          ROLES[i % ROLES.length],
       since:         `Since ${2019 + i}`,
-      championships: Math.floor(s * 3.5),
+      championships: (l as { status?: string | null }).status === 'complete' ? 1 : 0,
     };
   });
 
-  const totalChampionships = leagueRows.reduce((s, l) => s + l.championships, 0);
+  const totalChampionships = champCount ?? 0;
   const totalPlayers = (leagues ?? []).length * 40;
 
   const pref = (profile?.preference_data && typeof profile.preference_data === 'object' ? profile.preference_data : {}) as Record<string, unknown>;
@@ -122,13 +123,17 @@ export async function GET() {
   const notifPref = (pref.notifications ?? {}) as Record<string, boolean>;
   const empireScore = 75 + Math.round(seeded(user.id) * 20);
 
+  // Display name: prefer the user's set team name, then their Sleeper username.
+  const profileRec = (profile ?? {}) as Record<string, unknown>;
+  const usernameDisplay = (profileRec.username ?? profileRec.sleeper_username) as string | undefined;
+
   const renews = new Date();
   renews.setDate(renews.getDate() + 15);
   const renewsLabel = `Renews ${renews.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}`;
 
   const data: ProfileData = {
     userId:          user.id,
-    teamName:        (pref.team_name as string) ?? profile?.full_name ?? user.email?.split('@')[0] ?? 'Dynasty Empire',
+    teamName:        (pref.team_name as string) ?? usernameDisplay ?? profile?.full_name ?? user.email?.split('@')[0] ?? 'Manager',
     bio:             (pref.bio as string) ?? 'Building dynasties. Crushing leagues. Elevating the edge.',
     dynastyTitle:    (pref.dynasty_title as string) ?? 'DYNASTY GOAT',
     memberSince:     'Dynasty Manager Since 2019',
@@ -136,7 +141,7 @@ export async function GET() {
     championships:   totalChampionships,
     empireScore,
     playersRostered: usageCurrent.players,
-    trophies:        totalChampionships + Math.round(seeded(user.id + 'trophy') * 10),
+    trophies:        totalChampionships,
     leagues:         leagueRows,
     subscription: {
       tier,
