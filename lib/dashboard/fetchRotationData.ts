@@ -22,6 +22,7 @@ import {
   type DashboardRotationData,
   type LeagueBundle,
   type OvervaluedItem,
+  type PlayerComponents,
   type RotationPlayer,
   type SignalCounts,
   type TradeTargetItem,
@@ -53,8 +54,15 @@ function avgTfo(players: RotationPlayer[]): number {
   return Math.round((valid.reduce((a, b) => a + b, 0) / valid.length) * 10) / 10;
 }
 
+// Treat null AND empty/whitespace names as missing so no UI (ticker, cards)
+// ever renders a blank label.
+function cleanName(name: string | null | undefined): string {
+  const n = (name ?? '').trim();
+  return n.length > 0 ? n : 'Unknown Player';
+}
+
 function playerName(db: Record<string, { full_name?: string }>, pid: string): string {
-  return db[pid]?.full_name ?? 'Unknown Player';
+  return cleanName(db[pid]?.full_name);
 }
 
 function pickLabel(
@@ -217,21 +225,68 @@ export async function fetchRotationData(
 
   const tfoByPlayer = new Map<string, { score: number; verdictClass: 'boom' | 'hold' | 'bust' }>();
   const tfoMap = new Map<string, number>();
+  // Real engine component scores per player → radar axes (no more uniform pentagon).
+  const componentsByPlayer = new Map<string, PlayerComponents>();
   if (idList.length > 0) {
-    try {
-      const { data, error } = await supabase
-        .from('formula_scores')
-        .select('player_id, tfo_score, calculated_at')
-        .eq('scoring_context', scoringContext)
-        .in('player_id', idList)
-        .order('calculated_at', { ascending: false });
-      if (error) throw error;
-      for (const row of data ?? []) {
+    type ScoreRow = {
+      player_id: string | number;
+      tfo_score: number | null;
+      ops_score: number | null;
+      sfs_score: number | null;
+      yoysi_score: number | null;
+      sit_score: number | null;
+      projected_ppg: number | null;
+    };
+    const ingestScoreRows = (rows: ScoreRow[] | null) => {
+      for (const row of rows ?? []) {
         const pid = String(row.player_id);
         if (tfoByPlayer.has(pid)) continue;
         const score = safeScore(row.tfo_score);
-        tfoByPlayer.set(pid, { score, verdictClass: getVerdict(score).class as 'boom' | 'hold' | 'bust' });
+        if (score <= 0) continue;
+        tfoByPlayer.set(pid, {
+          score,
+          verdictClass: getVerdict(score).class as 'boom' | 'hold' | 'bust',
+        });
         tfoMap.set(pid, score);
+        componentsByPlayer.set(pid, {
+          ops: safeScore(row.ops_score),
+          sfs: safeScore(row.sfs_score),
+          yoysi: safeScore(row.yoysi_score),
+          sit: safeScore(row.sit_score),
+          projectedPpg: safeScore(row.projected_ppg),
+        });
+      }
+    };
+
+    const cols = 'player_id, tfo_score, ops_score, sfs_score, yoysi_score, sit_score, projected_ppg, calculated_at';
+    const batch = 150;
+    try {
+      for (let i = 0; i < idList.length; i += batch) {
+        const slice = idList.slice(i, i + batch);
+        const { data, error } = await supabase
+          .from('formula_scores')
+          .select(cols)
+          .eq('scoring_context', scoringContext)
+          .in('player_id', slice)
+          .order('calculated_at', { ascending: false });
+        if (error) throw error;
+        ingestScoreRows(data as ScoreRow[] | null);
+      }
+
+      const missing = idList.filter((id) => !tfoByPlayer.has(id));
+      if (missing.length > 0) {
+        const altContext = scoringContext === 'dynasty' ? 'redraft' : 'dynasty';
+        for (let i = 0; i < missing.length; i += batch) {
+          const slice = missing.slice(i, i + batch);
+          const { data, error } = await supabase
+            .from('formula_scores')
+            .select(cols)
+            .eq('scoring_context', altContext)
+            .in('player_id', slice)
+            .order('calculated_at', { ascending: false });
+          if (error) throw error;
+          ingestScoreRows(data as ScoreRow[] | null);
+        }
       }
     } catch (err) {
       console.error('[dashboard] scores fetch failed:', err);
@@ -252,7 +307,7 @@ export async function fetchRotationData(
         for (const p of data ?? []) {
           const pid = String(p.id);
           metaByPlayer.set(pid, {
-            name: p.full_name ?? 'Unknown Player',
+            name: cleanName(p.full_name),
             position: (p.position ?? '—').toUpperCase(),
             team: p.team ?? '—',
             tfoScore: tfoMap.get(pid) ?? 0,
@@ -288,6 +343,7 @@ export async function fetchRotationData(
       team: meta.team,
       tfoScore: score,
       verdictClass: tfo?.verdictClass ?? 'hold',
+      components: componentsByPlayer.get(pid) ?? null,
     };
   };
 
@@ -328,14 +384,15 @@ export async function fetchRotationData(
     const winRate = wins + losses > 0 ? Math.round((wins / (wins + losses)) * 1000) / 10 : 0;
     const record = ties > 0 ? `${wins}-${losses}-${ties}` : `${wins}-${losses}`;
 
-    const status = deriveLeagueStatus({
-      winRate,
-      teamTfo,
-      standingRank,
-      totalTeams,
-      gamesPlayed,
-      rosterSize: players.length,
-    });
+    const isOffseason = nflSeason.week === 0 || nflSeason.seasonType !== 'regular';
+    const status =
+      players.length === 0
+        ? 'ORPHAN'
+        : deriveLeagueStatus(
+            gamesPlayed > 0 ? winRate / 100 : 0,
+            teamTfo,
+            isOffseason,
+          );
 
     return {
       id: l.id,

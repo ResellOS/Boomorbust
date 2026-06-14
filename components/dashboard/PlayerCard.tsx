@@ -12,13 +12,15 @@ export interface PlayerCardProps {
   tfoScore: number;
   radarVals: number[];
   tier: string;
+  /** Override the position-default radar labels (used for real component axes). */
+  axisLabels?: readonly string[];
 }
 
 const POSITION_AXES: Record<string, readonly string[]> = {
-  QB: ['PASS', 'RUSH', 'OLINE', 'WRQUAL', 'SCHEME'],
-  RB: ['RUSH', 'TGTS', 'OLINE', 'EXPLOS', 'RZTCH'],
-  WR: ['TGTS', 'AIRYDS', 'SEPAR', 'YAC', 'RZTGT'],
-  TE: ['TGTS', 'AIRYDS', 'SEPAR', 'YAC', 'RZTGT'],
+  QB: ['SCHEME', 'RUSH', 'MRQUAL', 'OLINE', 'PASS'],
+  WR: ['RZTGT', 'TGTS', 'YAC', 'AIRYDS', 'SEPAR'],
+  RB: ['RZTGT', 'TGTS', 'EXPLOS', 'OLINE', 'YAC'],
+  TE: ['RZTGT', 'TGTS', 'YAC', 'AIRYDS', 'SEPAR'],
 };
 const DEFAULT_AXES = ['OPPORT', 'SITUAT', 'AGE', 'IQ', 'UPSIDE'] as const;
 
@@ -29,6 +31,8 @@ const POSITION_COLOR: Record<string, string> = {
   TE: '#A78BFA',
 };
 
+const GRID_STROKE = 'rgba(30,38,64,0.8)';
+
 function axisLabelsFor(position: string): readonly string[] {
   return POSITION_AXES[(position ?? '').toUpperCase()] ?? DEFAULT_AXES;
 }
@@ -37,11 +41,22 @@ function axisColorFor(position: string): string {
   return POSITION_COLOR[(position ?? '').toUpperCase()] ?? '#6b7a99';
 }
 
+function radarColors(verdictLabel: string): { fill: string; stroke: string } {
+  if (verdictLabel.includes('BOOM')) {
+    return { fill: 'rgba(54,231,161,0.25)', stroke: 'rgba(54,231,161,0.8)' };
+  }
+  if (verdictLabel === 'HOLD') {
+    return { fill: 'rgba(251,191,36,0.25)', stroke: 'rgba(251,191,36,0.8)' };
+  }
+  return { fill: 'rgba(167,139,250,0.25)', stroke: 'rgba(167,139,250,0.8)' };
+}
+
 const N = 5;
-const CX = 98;
-const CY = 96;
-const MAX_R = 46;
-const LABEL_R = 68;
+const VB = 200;
+const CX = 100;
+const CY = 100;
+const MAX_R = 58;
+const LABEL_R = 82;
 
 function vertexPoint(i: number, radius: number): { x: number; y: number } {
   const angle = -Math.PI / 2 + (i * 2 * Math.PI) / N;
@@ -70,13 +85,15 @@ export default function PlayerCard({
   tfoScore,
   radarVals,
   tier,
+  axisLabels: axisLabelsProp,
 }: PlayerCardProps) {
   const [imgFailed, setImgFailed] = useState(false);
   const verdict = getVerdict(tfoScore);
   const displayTier = tier || getTier(tfoScore);
-  const axisLabels = axisLabelsFor(position);
+  const axisLabels = axisLabelsProp ?? axisLabelsFor(position);
   const axisColor = axisColorFor(position);
   const borderStyle = getCardBorderStyle(verdict.label);
+  const radarStyle = radarColors(verdict.label);
 
   const radar = useMemo(() => {
     const vals = radarVals.length === N ? radarVals : deriveRadarVals(playerId, tfoScore);
@@ -106,20 +123,20 @@ export default function PlayerCard({
 
   return (
     <div
-      className="flex flex-col overflow-hidden rounded-[9px] bg-surface transition-transform duration-100 hover:-translate-y-px"
+      className="flex h-full min-h-[280px] flex-col overflow-visible rounded-[9px] bg-surface transition-transform duration-100 hover:-translate-y-px"
       style={borderStyle}
     >
-      <div className="flex items-stretch px-2.5 pb-2 pt-2.5">
+      <div className="flex items-stretch px-3 pb-3 pt-3">
         <div
-          className="relative w-[60px] shrink-0 overflow-hidden rounded-[7px] border border-border/60 bg-surface2"
-          style={{ minHeight: 72 }}
+          className="relative w-[64px] shrink-0 overflow-hidden rounded-[7px] border border-border/60 bg-surface2"
+          style={{ minHeight: 78 }}
         >
           {!imgFailed ? (
             <Image
               src={`https://sleepercdn.com/content/nfl/players/thumb/${playerId}.jpg`}
               alt={playerName}
-              width={60}
-              height={72}
+              width={64}
+              height={78}
               unoptimized
               className="block h-full w-full object-cover object-top"
               onError={() => setImgFailed(true)}
@@ -133,11 +150,11 @@ export default function PlayerCard({
             </div>
           )}
         </div>
-        <div className="flex min-w-0 flex-1 flex-col justify-center pl-[9px]">
-          <div className="mb-0.5 font-figtree text-[13px] font-bold leading-tight text-text">
+        <div className="flex min-w-0 flex-1 flex-col justify-center pl-2.5">
+          <div className="mb-1 font-figtree text-[13px] font-bold leading-tight text-text">
             {playerName}
           </div>
-          <div className="mb-1.5 font-mono text-[12px] text-muted">
+          <div className="mb-2 font-mono text-[12px] text-muted">
             {position} · {team}
           </div>
           <div
@@ -146,19 +163,30 @@ export default function PlayerCard({
           >
             {tfoScore.toFixed(1)}
           </div>
-          <div className="mt-0.5 font-mono text-[10px] text-muted">{displayTier}</div>
+          <div className="mt-1.5 font-mono text-[10px] text-muted">{displayTier}</div>
         </div>
       </div>
       <div
-        className={`mx-2.5 mb-1.5 rounded-[5px] py-[5px] text-center font-figtree text-[11px] font-semibold tracking-wide ${BADGE_CLASS[verdict.label] ?? BADGE_CLASS.BOOM}`}
+        className={`mx-3 mb-2.5 rounded-[5px] py-2 text-center font-figtree text-[11px] font-semibold tracking-wide ${BADGE_CLASS[verdict.label] ?? BADGE_CLASS.BOOM}`}
       >
         {verdict.label}
       </div>
-      <div className="px-1 pb-2 pt-0.5">
-        <svg viewBox="0 0 196 200" className="block w-full" xmlns="http://www.w3.org/2000/svg">
+      <div className="flex flex-1 items-center justify-center px-1 pb-3 pt-1">
+        <svg
+          viewBox={`0 0 ${VB} ${VB}`}
+          className="block w-full"
+          style={{ minHeight: 140, maxHeight: 160 }}
+          xmlns="http://www.w3.org/2000/svg"
+        >
           <g transform={`translate(${CX},${CY})`}>
             {radar.rings.map((pts) => (
-              <polygon key={pts} points={pts} fill="none" stroke="rgba(255,255,255,0.07)" strokeWidth={1} />
+              <polygon
+                key={pts}
+                points={pts}
+                fill="none"
+                stroke={GRID_STROKE}
+                strokeWidth={1}
+              />
             ))}
             {radar.axisLines.map((line, i) => (
               <line
@@ -167,17 +195,15 @@ export default function PlayerCard({
                 y1={0}
                 x2={line.x2}
                 y2={line.y2}
-                stroke="rgba(255,255,255,0.05)"
+                stroke={GRID_STROKE}
                 strokeWidth={1}
               />
             ))}
             <polygon
               points={radar.dataPts}
-              fill={verdict.color}
-              fillOpacity={0.18}
-              stroke={verdict.color}
-              strokeWidth={1.5}
-              strokeOpacity={0.55}
+              fill={radarStyle.fill}
+              stroke={radarStyle.stroke}
+              strokeWidth={2}
             />
             {radar.labels.map((l) => (
               <text
@@ -188,8 +214,8 @@ export default function PlayerCard({
                 dominantBaseline="middle"
                 className="font-mono"
                 fill={axisColor}
-                fillOpacity={0.9}
-                fontSize={8}
+                fillOpacity={0.95}
+                fontSize={9}
               >
                 {l.label}
               </text>

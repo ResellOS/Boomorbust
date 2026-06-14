@@ -22,40 +22,37 @@ export const LEAGUE_STATUS: Record<LeagueStatusKey, LeagueStatusMeta> = {
   ORPHAN: { key: 'ORPHAN', label: 'Orphan', color: '#6b7a99' },
 };
 
-export interface DeriveStatusArgs {
-  winRate: number; // 0..100 (only meaningful when gamesPlayed > 0)
-  teamTfo: number; // avg dynasty TFO of the roster
-  standingRank: number; // 1-based; 0 = unknown
-  totalTeams: number;
-  gamesPlayed: number;
-  rosterSize: number;
-}
-
-// Order: an empty roster is an orphan; otherwise championship → rebuild
-// (low win% or weak roster TFO) → contender → transition.
-export function deriveLeagueStatus(a: DeriveStatusArgs): LeagueStatusKey {
-  if (a.rosterSize === 0) return 'ORPHAN';
-
-  const hasRecord = a.gamesPlayed > 0;
-  const playoff =
-    a.standingRank > 0 && a.standingRank <= Math.ceil(a.totalTeams / 2);
-
-  if (hasRecord && a.winRate > 65 && a.standingRank > 0 && a.standingRank <= 3) {
-    return 'CHAMPIONSHIP';
+/** winPct is 0–1 (e.g. 0.65 = 65%). During offseason, status derives from teamTfo only. */
+export function deriveLeagueStatus(
+  winPct: number,
+  teamTfo: number,
+  isOffseason: boolean,
+): LeagueStatusKey {
+  if (isOffseason || winPct === 0) {
+    if (teamTfo >= 75) return 'CHAMPIONSHIP';
+    if (teamTfo >= 68) return 'CONTENDER';
+    if (teamTfo >= 60) return 'TRANSITION';
+    if (teamTfo >= 50) return 'REBUILD';
+    return 'ORPHAN';
   }
-  if (a.teamTfo < 60 || (hasRecord && a.winRate < 40)) return 'REBUILD';
-  if ((hasRecord && a.winRate > 50) || playoff) return 'CONTENDER';
-  if (hasRecord && a.winRate >= 40 && a.winRate <= 50) return 'TRANSITION';
 
-  // Offseason / no record yet — derive from team TFO only.
-  if (a.teamTfo > 75) return 'CHAMPIONSHIP';
-  if (a.teamTfo > 68) return 'CONTENDER';
-  if (a.teamTfo > 60) return 'TRANSITION';
-  if (a.teamTfo > 50) return 'REBUILD';
+  if (winPct > 0.65) return 'CHAMPIONSHIP';
+  if (winPct > 0.5) return 'CONTENDER';
+  if (winPct >= 0.4) return 'TRANSITION';
+  if (winPct > 0) return 'REBUILD';
   return 'ORPHAN';
 }
 
 export type VerdictClass = 'boom' | 'hold' | 'bust';
+
+/** Real engine component scores (0–100) for the radar; null when unscored. */
+export interface PlayerComponents {
+  ops: number;
+  sfs: number;
+  yoysi: number;
+  sit: number;
+  projectedPpg: number;
+}
 
 export interface RotationPlayer {
   playerId: string;
@@ -64,6 +61,8 @@ export interface RotationPlayer {
   team: string;
   tfoScore: number;
   verdictClass: VerdictClass;
+  /** Real engine component scores for the radar; null when not scored. */
+  components: PlayerComponents | null;
 }
 
 export interface SignalCounts {

@@ -39,21 +39,52 @@ export function getTradeVerdictLabel(score: number): 'BOOM' | 'HOLD' | 'BUST' {
   return 'BUST';
 }
 
-function seededUnit(seed: string, salt: number): number {
-  let h = 0x811c9dc5;
-  const s = `${seed}:${salt}`;
-  for (let i = 0; i < s.length; i++) {
-    h ^= s.charCodeAt(i);
-    h = Math.imul(h, 0x01000193);
-  }
-  return 0.35 + (((h >>> 0) % 6001) / 10000);
+/** Radar axis fallbacks (0–100 scale) when sub-scores are unavailable. */
+const RADAR_AXIS_WEIGHTS = [0.9, 0.85, 0.95, 0.8, 0.85] as const;
+
+function radarFraction(score100: number): number {
+  return Math.min(0.98, Math.max(0.15, score100 / 100));
 }
 
-export function deriveRadarVals(playerId: string, tfoScore: number): number[] {
-  const base = tfoScore / 100;
-  return Array.from({ length: 5 }, (_, i) =>
-    Math.min(0.98, Math.max(0.15, base * seededUnit(playerId, i))),
-  );
+export function deriveRadarVals(_playerId: string, tfoScore: number): number[] {
+  const tfo =
+    typeof tfoScore === 'number' && Number.isFinite(tfoScore) && tfoScore > 0 ? tfoScore : 50;
+  return RADAR_AXIS_WEIGHTS.map((w) => radarFraction(tfo * w));
+}
+
+/** Honest axis labels for the real engine component radar (≤6 chars each). */
+export const COMPONENT_AXIS_LABELS = ['OPS', 'SFS', 'YOY', 'SIT', 'PPG'] as const;
+
+/**
+ * Real radar from the engine's stored component scores — replaces the uniform
+ * tfo-derived fallback. Inputs are the raw 0–100 component scores plus
+ * projected PPG; PPG is normalised onto the same 0–100 scale (28 PPG ≈ max).
+ * Returns 5 fractions (0.15–0.98) in COMPONENT_AXIS_LABELS order.
+ */
+export function radarValsFromComponents(c: {
+  ops: number;
+  sfs: number;
+  yoysi: number;
+  sit: number;
+  projectedPpg: number;
+}): number[] {
+  return [
+    radarFraction(c.ops),
+    radarFraction(c.sfs),
+    radarFraction(c.yoysi),
+    radarFraction(c.sit),
+    radarFraction((c.projectedPpg / 28) * 100),
+  ];
+}
+
+/** True when at least one component is present — guards against an all-zero row. */
+export function hasRealComponents(c: {
+  ops: number;
+  sfs: number;
+  yoysi: number;
+  sit: number;
+}): boolean {
+  return c.ops > 0 || c.sfs > 0 || c.yoysi > 0 || c.sit > 0;
 }
 
 /** Validated acquire cost — never underprices elite assets. */

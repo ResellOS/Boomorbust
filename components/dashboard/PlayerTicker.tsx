@@ -15,14 +15,16 @@ const VERDICT_COLOR: Record<string, string> = {
 };
 
 function TickerItem({ p }: { p: RotationPlayer }) {
-  const color = VERDICT_COLOR[p.verdictClass] ?? '#6b7a99';
+  const scoreColor = VERDICT_COLOR[p.verdictClass] ?? '#6b7a99';
   const score = p.tfoScore > 0 ? p.tfoScore.toFixed(1) : '—';
+  // Guard against a blank name so the ticker never shows a leading bare score.
+  const name = p.name?.trim() ? p.name : 'Unknown Player';
+
   return (
-    <span className="mx-4 inline-flex shrink-0 items-center gap-2">
-      <span className="h-1.5 w-1.5 rounded-full" style={{ background: color }} />
-      <span className="font-figtree text-[12px] text-text">{p.name}</span>
-      <span className="font-mono text-[10px] text-muted">{p.position}</span>
-      <span className="font-mono text-[12px] tabular-nums" style={{ color }}>
+    <span className="mx-4 inline-flex shrink-0 items-center gap-1.5">
+      <span className="font-figtree text-[12px] text-text">{name}</span>
+      <span className="font-mono text-[11px] text-muted">≡</span>
+      <span className="font-mono text-[12px] tabular-nums" style={{ color: scoreColor }}>
         {score}
       </span>
     </span>

@@ -1,8 +1,14 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
-import { deriveRadarVals, getTier } from '@/lib/verdict';
+import {
+  COMPONENT_AXIS_LABELS,
+  deriveRadarVals,
+  getTier,
+  hasRealComponents,
+  radarValsFromComponents,
+} from '@/lib/verdict';
 import type { RotationPlayer } from '@/lib/dashboard/rotation';
 import PlayerCard from './PlayerCard';
 
@@ -20,7 +26,16 @@ export default function PlayerCardCarousel({ players, staticMode = false }: Play
   const [paused, setPaused] = useState(false);
   const [sliding, setSliding] = useState(false);
 
-  const sorted = players;
+  const sorted = useMemo(
+    () =>
+      [...players].sort((a, b) => {
+        const scoreA = a.tfoScore > 0 ? a.tfoScore : 0;
+        const scoreB = b.tfoScore > 0 ? b.tfoScore : 0;
+        if (scoreB !== scoreA) return scoreB - scoreA;
+        return a.name.localeCompare(b.name);
+      }),
+    [players],
+  );
   const canRotate = !staticMode && sorted.length > VISIBLE;
 
   useEffect(() => {
@@ -48,7 +63,7 @@ export default function PlayerCardCarousel({ players, staticMode = false }: Play
     : Array.from({ length: Math.min(VISIBLE, sorted.length) }, (_, i) => sorted[(offset + i) % sorted.length]);
 
   return (
-    <div>
+    <div className="w-full">
       <div className="mb-2 flex items-center justify-between">
         <span className="font-figtree text-[12px] font-semibold uppercase tracking-[1.5px] text-text">
           {staticMode ? 'Portfolio Boom/Bust Players' : 'League Boom/Bust Players'}
@@ -58,24 +73,34 @@ export default function PlayerCardCarousel({ players, staticMode = false }: Play
         </Link>
       </div>
       <div
-        className="flex gap-2 overflow-hidden pb-1 transition-transform duration-300 ease-out"
-        style={{ transform: sliding ? 'translateX(-8px)' : 'translateX(0)' }}
+        className="flex w-full gap-2 transition-transform duration-300 ease-out"
+        style={{ transform: sliding ? 'translateX(-4px)' : 'translateX(0)' }}
         onMouseEnter={() => setPaused(true)}
         onMouseLeave={() => setPaused(false)}
       >
-        {visible.map((p) => (
-          <div key={`${p.playerId}-${offset}`} className="w-[185px] shrink-0">
-            <PlayerCard
-              playerId={p.playerId}
-              playerName={p.name}
-              position={p.position}
-              team={p.team}
-              tfoScore={p.tfoScore > 0 ? p.tfoScore : 50}
-              radarVals={deriveRadarVals(p.playerId, p.tfoScore > 0 ? p.tfoScore : 50)}
-              tier={getTier(p.tfoScore > 0 ? p.tfoScore : 50)}
-            />
-          </div>
-        ))}
+        {visible.map((p) => {
+          // Prefer the engine's real component scores (OPS/SFS/YOY/SIT/PPG) for
+          // genuine radar variation; fall back to the tfo-derived shape only when
+          // a player has no scored components.
+          const useReal = p.components != null && hasRealComponents(p.components);
+          const radarVals = useReal
+            ? radarValsFromComponents(p.components!)
+            : deriveRadarVals(p.playerId, p.tfoScore > 0 ? p.tfoScore : 50);
+          return (
+            <div key={`${p.playerId}-${offset}`} className="min-w-[160px] flex-[1_1_0]">
+              <PlayerCard
+                playerId={p.playerId}
+                playerName={p.name}
+                position={p.position}
+                team={p.team}
+                tfoScore={p.tfoScore > 0 ? p.tfoScore : 50}
+                radarVals={radarVals}
+                tier={getTier(p.tfoScore > 0 ? p.tfoScore : 50)}
+                axisLabels={useReal ? COMPONENT_AXIS_LABELS : undefined}
+              />
+            </div>
+          );
+        })}
       </div>
     </div>
   );
