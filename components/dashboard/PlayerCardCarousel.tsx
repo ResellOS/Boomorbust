@@ -97,6 +97,7 @@ export default function PlayerCardCarousel({ players, staticMode = false }: Play
                 radarVals={radarVals}
                 tier={getTier(p.tfoScore > 0 ? p.tfoScore : 50)}
                 axisLabels={useReal ? COMPONENT_AXIS_LABELS : undefined}
+                marketVerdict={p.marketVerdict}
               />
             </div>
           );

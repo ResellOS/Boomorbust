@@ -14,6 +14,13 @@ export interface PlayerCardProps {
   tier: string;
   /** Override the position-default radar labels (used for real component axes). */
   axisLabels?: readonly string[];
+  /** Market buy/sell signal vs KTC — rendered as a small colored pill. */
+  marketVerdict?: {
+    verdict: 'BOOM' | 'BUY' | 'HOLD' | 'SELL' | 'BUST';
+    color: string;
+    rankDelta: number | null;
+    noMarketData: boolean;
+  } | null;
 }
 
 const POSITION_AXES: Record<string, readonly string[]> = {
@@ -86,6 +93,7 @@ export default function PlayerCard({
   radarVals,
   tier,
   axisLabels: axisLabelsProp,
+  marketVerdict,
 }: PlayerCardProps) {
   const [imgFailed, setImgFailed] = useState(false);
   const verdict = getVerdict(tfoScore);
@@ -123,9 +131,22 @@ export default function PlayerCard({
 
   return (
     <div
-      className="flex h-full min-h-[280px] flex-col overflow-visible rounded-[9px] bg-surface transition-transform duration-100 hover:-translate-y-px"
+      className="relative flex h-full min-h-[280px] flex-col overflow-visible rounded-[9px] bg-surface transition-transform duration-100 hover:-translate-y-px"
       style={borderStyle}
     >
+      {marketVerdict && (
+        <div
+          className="absolute right-2 top-2 z-10 rounded-[4px] px-1.5 py-0.5 font-mono text-[8px] font-bold uppercase tracking-wide"
+          style={{ color: marketVerdict.color, background: `${marketVerdict.color}1f` }}
+          title={
+            marketVerdict.noMarketData
+              ? 'No market data — held by default'
+              : `Market signal · rank Δ ${marketVerdict.rankDelta != null && marketVerdict.rankDelta >= 0 ? '+' : ''}${marketVerdict.rankDelta ?? '—'}`
+          }
+        >
+          {marketVerdict.verdict}
+        </div>
+      )}
       <div className="flex items-stretch px-3 pb-3 pt-3">
         <div
           className="relative w-[64px] shrink-0 overflow-hidden rounded-[7px] border border-border/60 bg-surface2"

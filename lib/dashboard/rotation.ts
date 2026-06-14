@@ -54,6 +54,14 @@ export interface PlayerComponents {
   projectedPpg: number;
 }
 
+/** Market verdict (engine TFO rank vs KTC market rank); null when unscored. */
+export interface PlayerMarketVerdict {
+  verdict: 'BOOM' | 'BUY' | 'HOLD' | 'SELL' | 'BUST';
+  color: string;
+  rankDelta: number | null; // null when no_market_data
+  noMarketData: boolean;
+}
+
 export interface RotationPlayer {
   playerId: string;
   name: string;
@@ -63,6 +71,8 @@ export interface RotationPlayer {
   verdictClass: VerdictClass;
   /** Real engine component scores for the radar; null when not scored. */
   components: PlayerComponents | null;
+  /** Market buy/sell verdict vs KTC; null when player isn't in the scored pool. */
+  marketVerdict: PlayerMarketVerdict | null;
 }
 
 export interface SignalCounts {
