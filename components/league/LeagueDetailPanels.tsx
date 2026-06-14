@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import type { LeagueDetailData } from '@/lib/league/types';
-import { VERDICT_BADGE_CLASS } from '@/lib/players/utils';
+import { getGradeLabel } from '@/lib/verdict';
 import PlayerAvatar from '@/components/players/PlayerAvatar';
 
 function TfoCircle({ score }: { score: number }) {
@@ -159,8 +159,8 @@ export default function LeagueDetailPanels({ data }: { data: LeagueDetailData })
                     </div>
                   </div>
                   <span className="font-mono text-[11px] text-text">{p.tfoScore.toFixed(1)}</span>
-                  <span className={`rounded px-1.5 py-0.5 text-[7px] font-semibold ${VERDICT_BADGE_CLASS[p.verdict]}`}>
-                    {p.verdict}
+                  <span className="rounded border border-border bg-white/[0.03] px-1.5 py-0.5 text-[7px] font-semibold text-text">
+                    {getGradeLabel(p.tfoScore)}
                   </span>
                 </div>
               ))}

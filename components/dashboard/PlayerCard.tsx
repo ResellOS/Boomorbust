@@ -2,7 +2,8 @@
 
 import { useMemo, useState } from 'react';
 import Image from 'next/image';
-import { deriveRadarVals, getCardBorderStyle, getTier, getVerdict } from '@/lib/verdict';
+import { deriveRadarVals, getCardBorderStyle, getGradeLabel, getTier, getVerdict } from '@/lib/verdict';
+import { MARKET_VERDICT_DEFINITIONS } from '@/lib/verdict/marketVerdict';
 
 export interface PlayerCardProps {
   playerName: string;
@@ -76,14 +77,6 @@ function initials(name: string): string {
   return (name.slice(0, 2) || '??').toUpperCase();
 }
 
-const BADGE_CLASS: Record<string, string> = {
-  'STRONG BOOM': 'bg-boom/10 border border-boom/30 text-boom',
-  BOOM: 'bg-boom/[0.07] border border-boom/20 text-boom',
-  HOLD: 'bg-hold/[0.08] border border-hold/[0.22] text-hold',
-  BUST: 'bg-bust/[0.08] border border-bust/[0.22] text-bust',
-  'STRONG BUST': 'bg-bust/[0.12] border border-bust/30 text-bust',
-};
-
 export default function PlayerCard({
   playerName,
   position,
@@ -134,19 +127,6 @@ export default function PlayerCard({
       className="relative flex h-full min-h-[280px] flex-col overflow-visible rounded-[9px] bg-surface transition-transform duration-100 hover:-translate-y-px"
       style={borderStyle}
     >
-      {marketVerdict && (
-        <div
-          className="absolute right-2 top-2 z-10 rounded-[4px] px-1.5 py-0.5 font-mono text-[8px] font-bold uppercase tracking-wide"
-          style={{ color: marketVerdict.color, background: `${marketVerdict.color}1f` }}
-          title={
-            marketVerdict.noMarketData
-              ? 'No market data — held by default'
-              : `Market signal · rank Δ ${marketVerdict.rankDelta != null && marketVerdict.rankDelta >= 0 ? '+' : ''}${marketVerdict.rankDelta ?? '—'}`
-          }
-        >
-          {marketVerdict.verdict}
-        </div>
-      )}
       <div className="flex items-stretch px-3 pb-3 pt-3">
         <div
           className="relative w-[64px] shrink-0 overflow-hidden rounded-[7px] border border-border/60 bg-surface2"
@@ -187,11 +167,35 @@ export default function PlayerCard({
           <div className="mt-1.5 font-mono text-[10px] text-muted">{displayTier}</div>
         </div>
       </div>
-      <div
-        className={`mx-3 mb-2.5 rounded-[5px] py-2 text-center font-figtree text-[11px] font-semibold tracking-wide ${BADGE_CLASS[verdict.label] ?? BADGE_CLASS.BOOM}`}
-      >
-        {verdict.label}
-      </div>
+      {marketVerdict === undefined ? (
+        // Surface doesn't supply a market verdict (landing / league cards):
+        // show the descriptive performance grade, not an action signal.
+        <div
+          className="mx-3 mb-2.5 rounded-[5px] border border-border bg-white/[0.03] py-2 text-center font-figtree text-[11px] font-semibold tracking-wide text-text"
+          title="Performance grade — descriptive quality"
+        >
+          {getGradeLabel(tfoScore)}
+        </div>
+      ) : marketVerdict && !marketVerdict.noMarketData ? (
+        <div
+          className="mx-3 mb-2.5 cursor-help rounded-[5px] py-2 text-center font-figtree text-[11px] font-semibold tracking-wide"
+          style={{
+            color: marketVerdict.color,
+            background: `${marketVerdict.color}1f`,
+            border: `1px solid ${marketVerdict.color}55`,
+          }}
+          title={MARKET_VERDICT_DEFINITIONS[marketVerdict.verdict]}
+        >
+          {marketVerdict.verdict}
+        </div>
+      ) : (
+        <div
+          className="mx-3 mb-2.5 flex cursor-help items-center justify-center gap-1.5 rounded-[5px] border border-border py-2 text-center font-figtree text-[11px] font-semibold tracking-wide text-muted"
+          title="No market data — held by default"
+        >
+          HOLD <span className="font-mono text-[9px] text-muted/60">N/A</span>
+        </div>
+      )}
       <div className="flex flex-1 items-center justify-center px-1 pb-3 pt-1">
         <svg
           viewBox={`0 0 ${VB} ${VB}`}

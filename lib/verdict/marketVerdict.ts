@@ -22,6 +22,15 @@ export const MARKET_VERDICT_COLORS: Record<MarketVerdict, string> = {
 
 export const NO_MARKET_DATA_FLAG = 'no_market_data';
 
+/** Hover-tooltip definitions for each market verdict (action signal). */
+export const MARKET_VERDICT_DEFINITIONS: Record<MarketVerdict, string> = {
+  BOOM: 'BOB rates this player far above market — aggressive buy',
+  BUY: 'BOB rates this player above market — buy window',
+  HOLD: 'BOB roughly agrees with market value',
+  SELL: 'BOB rates this player below market — sell window',
+  BUST: 'BOB rates this player far below market — sell now',
+};
+
 export interface MarketVerdictInput {
   playerId: string;
   tfoScore: number;

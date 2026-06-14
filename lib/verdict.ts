@@ -15,6 +15,11 @@ export function getTier(score: number) {
   return 'Avoid Tier';
 }
 
+/** Short performance-grade label (descriptive quality, NOT an action signal). */
+export function getGradeLabel(score: number): string {
+  return getTier(score).replace(/ Tier$/, '').toUpperCase();
+}
+
 export function getCardBorderStyle(label: string): { border: string; boxShadow?: string } {
   switch (label) {
     case 'STRONG BOOM':

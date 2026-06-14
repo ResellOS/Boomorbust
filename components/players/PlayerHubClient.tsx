@@ -4,13 +4,13 @@ import { useMemo, useState } from 'react';
 import { Search } from 'lucide-react';
 import type { HubPlayer } from '@/lib/players/types';
 import {
-  VERDICT_BADGE_CLASS,
   findSimilarPlayers,
   isBoomVerdict,
   isBustVerdict,
   isHoldVerdict,
   ratingColorClass,
 } from '@/lib/players/utils';
+import { getGradeLabel } from '@/lib/verdict';
 import PlayerAvatar from './PlayerAvatar';
 import PlayerDetailPanel from './PlayerDetailPanel';
 import TrendSparkline from './TrendSparkline';
@@ -151,7 +151,7 @@ export default function PlayerHubClient({ players, leaguePresence }: PlayerHubCl
             className="grid gap-2 border-b border-border bg-bg px-3 py-[7px]"
             style={{ gridTemplateColumns: '2fr 70px 110px 46px 88px' }}
           >
-            {['Player', 'Rating', 'Verdict', 'Trend', 'Action'].map((h) => (
+            {['Player', 'Rating', 'Grade', 'Trend', 'Action'].map((h) => (
               <div
                 key={h}
                 className="font-mono text-[7px] font-normal uppercase tracking-[1.5px] text-muted"
@@ -202,9 +202,9 @@ export default function PlayerHubClient({ players, leaguePresence }: PlayerHubCl
                   </div>
                   <div>
                     <span
-                      className={`inline-block whitespace-nowrap rounded px-[7px] py-[3px] text-center font-figtree text-[9px] font-medium ${VERDICT_BADGE_CLASS[p.verdict]}`}
+                      className="inline-block whitespace-nowrap rounded border border-border bg-white/[0.03] px-[7px] py-[3px] text-center font-figtree text-[9px] font-medium text-text"
                     >
-                      {p.verdict}
+                      {getGradeLabel(p.tfoScore)}
                     </span>
                   </div>
                   <div className={`text-center text-sm ${trendClass(p.trend)}`}>
@@ -276,9 +276,9 @@ export default function PlayerHubClient({ players, leaguePresence }: PlayerHubCl
                     {sp.tfoScore.toFixed(1)}
                   </div>
                   <span
-                    className={`inline-block rounded-[3px] px-2 py-0.5 font-figtree text-[9px] font-medium ${VERDICT_BADGE_CLASS[sp.verdict]}`}
+                    className="inline-block rounded-[3px] border border-border bg-white/[0.03] px-2 py-0.5 font-figtree text-[9px] font-medium text-text"
                   >
-                    {sp.verdict}
+                    {getGradeLabel(sp.tfoScore)}
                   </span>
                 </button>
               ))}

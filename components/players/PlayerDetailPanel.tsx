@@ -5,11 +5,11 @@ import { useCallback, useState } from 'react';
 import type { HubPlayer } from '@/lib/players/types';
 import { generateBobVerdict } from '@/lib/players/bobVerdict';
 import {
-  VERDICT_BADGE_CLASS,
   getDynastyTier,
   initials,
   ratingColorClass,
 } from '@/lib/players/utils';
+import { getGradeLabel } from '@/lib/verdict';
 import PlayerRadar from './PlayerRadar';
 
 const WATCHLIST_KEY = 'bb_watchlist';
@@ -44,7 +44,6 @@ export default function PlayerDetailPanel({ player, leagueNames }: PlayerDetailP
   const [imgFailed, setImgFailed] = useState(false);
 
   const tier = getDynastyTier(player.tfoScore);
-  const verdictClass = VERDICT_BADGE_CLASS[player.verdict];
   const bob = generateBobVerdict(
     player.fullName,
     player.position,
@@ -116,11 +115,14 @@ export default function PlayerDetailPanel({ player, leagueNames }: PlayerDetailP
               </div>
             </div>
             <div className="flex shrink-0 flex-col items-center gap-2">
-              <span
-                className={`inline-block whitespace-nowrap rounded-[5px] px-[14px] py-[5px] font-figtree text-[11px] font-medium ${verdictClass}`}
-              >
-                {player.verdict}
-              </span>
+              <div className="text-center">
+                <div className="mb-0.5 font-mono text-[8px] uppercase tracking-[2px] text-muted">
+                  Performance Grade
+                </div>
+                <span className="inline-block whitespace-nowrap rounded-[5px] border border-border bg-white/[0.03] px-[14px] py-[5px] font-figtree text-[11px] font-medium text-text">
+                  {getGradeLabel(player.tfoScore)}
+                </span>
+              </div>
               <div className="text-center">
                 <div className="mb-0.5 font-mono text-[8px] uppercase tracking-[2px] text-muted">
                   Trend

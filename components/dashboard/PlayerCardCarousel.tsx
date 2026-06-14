@@ -66,7 +66,7 @@ export default function PlayerCardCarousel({ players, staticMode = false }: Play
     <div className="w-full">
       <div className="mb-2 flex items-center justify-between">
         <span className="font-figtree text-[12px] font-semibold uppercase tracking-[1.5px] text-text">
-          {staticMode ? 'Portfolio Boom/Bust Players' : 'League Boom/Bust Players'}
+          MARKET SIGNALS
         </span>
         <Link href="/players" className="font-mono text-[10px] text-boom no-underline">
           View All Players →
