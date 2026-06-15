@@ -179,7 +179,7 @@ function SideColumn({
       {/* Side totals */}
       <div className="mt-1 border-t border-border px-2.5 py-2">
         <div className="flex items-center justify-between font-mono text-[10px]">
-          <span className="text-muted">TFO total</span>
+          <span className="text-muted">Value total</span>
           <span className="text-text">{tfoSum.toFixed(1)}</span>
         </div>
         <div className="flex items-center justify-between font-mono text-[10px]">
@@ -268,7 +268,7 @@ export default function TradeCalculator({ givePicks }: { givePicks: OwnedPick[] 
             {verdict.label}
           </div>
           <div className="text-right">
-            <div className="font-mono text-[9px] uppercase tracking-wide text-muted">TFO Delta</div>
+            <div className="font-mono text-[9px] uppercase tracking-wide text-muted">Trade Value Delta</div>
             <div className="font-mono text-[15px] font-bold" style={{ color: verdict.color }}>
               {delta >= 0 ? '+' : ''}{delta.toFixed(1)}
             </div>
