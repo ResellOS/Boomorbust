@@ -1,4 +1,5 @@
 import { createAdminClient } from '@/lib/supabase/admin';
+import { fetchMarketVerdicts } from '@/lib/verdict/fetchMarketVerdicts';
 import type { PlayerHubData, HubPlayer, RosterSnapshotPlayer } from './types';
 import {
   calcTrend,
@@ -213,6 +214,10 @@ export async function fetchPlayerHubData(
     }
   }
 
+  // Market verdicts (BUY/SELL vs KTC) — market-wide across the scored skill pool,
+  // identical computation to the dashboard via the shared helper.
+  const marketVerdicts = await fetchMarketVerdicts(supabase, 'dynasty');
+
   const hubPlayers: HubPlayer[] = [];
   for (const [pid, tfo] of Array.from(latestByPlayer.entries())) {
     const meta = playerMeta.get(pid);
@@ -236,6 +241,7 @@ export async function fetchPlayerHubData(
       trendDelta: prev !== null && prev > 0 ? Math.round((score - prev) * 10) / 10 : 0,
       scoreHistory: (historyByPlayer.get(pid) ?? [score]).reverse(),
       calculatedAt: tfo.calculated_at ?? null,
+      marketVerdict: marketVerdicts.get(pid) ?? null,
     });
   }
 

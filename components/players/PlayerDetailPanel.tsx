@@ -7,7 +7,6 @@ import { generateBobVerdict } from '@/lib/players/bobVerdict';
 import {
   getDynastyTier,
   initials,
-  ratingColorClass,
 } from '@/lib/players/utils';
 import { getGradeLabel } from '@/lib/verdict';
 import PlayerRadar from './PlayerRadar';
@@ -50,13 +49,11 @@ export default function PlayerDetailPanel({ player, leagueNames }: PlayerDetailP
     player.tfoScore,
     player.subScores,
   );
-  const ratingClass = ratingColorClass(player.tfoScore);
-  const borderColor =
-    player.verdict === 'STRONG BOOM' || player.verdict === 'BOOM'
-      ? 'border-boom'
-      : player.verdict === 'HOLD'
-        ? 'border-hold'
-        : 'border-bust';
+  // Market verdict (5-color) drives the detail theming; neutral when no signal.
+  const marketColor =
+    player.marketVerdict && !player.marketVerdict.noMarketData
+      ? player.marketVerdict.color
+      : '#6b7a99';
 
   const handleWatch = useCallback(() => {
     try {
@@ -76,7 +73,8 @@ export default function PlayerDetailPanel({ player, leagueNames }: PlayerDetailP
     <div className="flex h-full flex-col bg-[#080d14] shadow-[inset_0_0_20px_rgba(54,231,161,0.03)]">
       <div className="flex shrink-0 items-stretch gap-4 border-b border-border p-[18px]">
         <div
-          className={`relative flex h-[130px] w-[110px] shrink-0 items-center justify-center self-center overflow-hidden rounded-full border-[3px] bg-[radial-gradient(circle,rgba(54,231,161,0.18)_0%,transparent_68%)] ${borderColor}`}
+          className="relative flex h-[130px] w-[110px] shrink-0 items-center justify-center self-center overflow-hidden rounded-full border-[3px] bg-[radial-gradient(circle,rgba(54,231,161,0.18)_0%,transparent_68%)]"
+          style={{ borderColor: marketColor }}
         >
           {!imgFailed ? (
             // eslint-disable-next-line @next/next/no-img-element
@@ -107,7 +105,7 @@ export default function PlayerDetailPanel({ player, leagueNames }: PlayerDetailP
               <div className="mb-[3px] font-mono text-[8px] uppercase tracking-[2px] text-muted">
                 Dynasty Rating
               </div>
-              <div className={`font-figtree text-[52px] font-normal leading-none tracking-[-3px] ${ratingClass}`}>
+              <div className="font-figtree text-[52px] font-normal leading-none tracking-[-3px]" style={{ color: marketColor }}>
                 {player.tfoScore.toFixed(1)}
               </div>
               <div className="mt-1 font-mono text-[9px] uppercase tracking-[1.5px] text-muted">
@@ -142,7 +140,7 @@ export default function PlayerDetailPanel({ player, leagueNames }: PlayerDetailP
         style={{ gridTemplateColumns: '190px 1fr 148px' }}
       >
         <div className="border-r border-border bg-[#060a10] px-2.5 py-3">
-          <PlayerRadar subScores={player.subScores} />
+          <PlayerRadar subScores={player.subScores} color={marketColor} />
         </div>
         <div className="border-r border-border px-3.5 py-[13px]">
           <div className="mb-2 font-mono text-[7.5px] uppercase tracking-[2px] text-muted">

@@ -1,3 +1,5 @@
+import type { MarketVerdictDisplay } from '@/lib/verdict/fetchMarketVerdicts';
+
 export type VerdictLabel =
   | 'STRONG BOOM'
   | 'BOOM'
@@ -28,6 +30,8 @@ export interface HubPlayer {
   trendDelta: number;
   scoreHistory: number[];
   calculatedAt: string | null;
+  /** Market buy/sell verdict vs KTC; null when not in the scored skill pool. */
+  marketVerdict: MarketVerdictDisplay | null;
 }
 
 export interface RosterSnapshotPlayer {

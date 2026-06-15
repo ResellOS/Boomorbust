@@ -8,9 +8,13 @@ import {
   isBoomVerdict,
   isBustVerdict,
   isHoldVerdict,
-  ratingColorClass,
 } from '@/lib/players/utils';
 import { getGradeLabel } from '@/lib/verdict';
+
+// Market verdict color (5-color) for a player; neutral gray when no signal.
+function mvColor(p: HubPlayer): string {
+  return p.marketVerdict && !p.marketVerdict.noMarketData ? p.marketVerdict.color : '#6b7a99';
+}
 import PlayerAvatar from './PlayerAvatar';
 import PlayerDetailPanel from './PlayerDetailPanel';
 import TrendSparkline from './TrendSparkline';
@@ -180,13 +184,7 @@ export default function PlayerHubClient({ players, leaguePresence }: PlayerHubCl
                       playerId={p.playerId}
                       name={p.fullName}
                       size={30}
-                      fallbackColor={
-                        isBoomVerdict(p.verdict)
-                          ? '#36E7A1'
-                          : isHoldVerdict(p.verdict)
-                            ? '#FBBF24'
-                            : '#A78BFA'
-                      }
+                      fallbackColor={mvColor(p)}
                     />
                     <div>
                       <div className="mb-px font-figtree text-[11.5px] leading-tight text-text">
@@ -197,7 +195,7 @@ export default function PlayerHubClient({ players, leaguePresence }: PlayerHubCl
                       </div>
                     </div>
                   </div>
-                  <div className={`font-mono text-[13px] ${ratingColorClass(p.tfoScore)}`}>
+                  <div className="font-mono text-[13px]" style={{ color: mvColor(p) }}>
                     {p.tfoScore.toFixed(1)}
                   </div>
                   <div>
@@ -272,7 +270,7 @@ export default function PlayerHubClient({ players, leaguePresence }: PlayerHubCl
                       </div>
                     </div>
                   </div>
-                  <div className={`mb-1 font-figtree text-[22px] font-normal ${ratingColorClass(sp.tfoScore)}`}>
+                  <div className="mb-1 font-figtree text-[22px] font-normal" style={{ color: mvColor(sp) }}>
                     {sp.tfoScore.toFixed(1)}
                   </div>
                   <span
