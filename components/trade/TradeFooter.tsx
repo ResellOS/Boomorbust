@@ -24,10 +24,12 @@ export default function TradeFooter({ footer }: TradeFooterProps) {
             Smart Counter Accuracy
           </div>
           <div className="font-figtree text-sm font-bold text-text">
-            {footer.smartCounterAccuracy}%
+            {footer.smartCounterAccuracy != null ? `${footer.smartCounterAccuracy}%` : '—'}
           </div>
         </div>
-        <span className="ml-1.5 font-mono text-[7.5px] text-muted">Elite</span>
+        <span className="ml-1.5 font-mono text-[7.5px] text-muted">
+          {footer.smartCounterAccuracy != null ? 'Elite' : 'No data yet'}
+        </span>
       </div>
       <div className="flex h-full items-center gap-2 border-r border-border/40 px-[18px]">
         <div>
@@ -35,10 +37,12 @@ export default function TradeFooter({ footer }: TradeFooterProps) {
             Suggestion Success Rate
           </div>
           <div className="font-figtree text-sm font-bold text-boom">
-            {footer.suggestionSuccessRate}%
+            {footer.suggestionSuccessRate != null ? `${footer.suggestionSuccessRate}%` : '—'}
           </div>
         </div>
-        <span className="ml-1.5 font-mono text-[7.5px] text-muted">High</span>
+        <span className="ml-1.5 font-mono text-[7.5px] text-muted">
+          {footer.suggestionSuccessRate != null ? 'High' : 'No data yet'}
+        </span>
       </div>
       <div className="flex h-full items-center gap-2 px-[18px]">
         <div>

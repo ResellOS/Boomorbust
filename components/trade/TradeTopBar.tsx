@@ -8,7 +8,7 @@ interface TradeTopBarProps {
 const CELLS = [
   { key: 'openOffers' as const, label: 'Open Offers', desc: 'Pending Review', color: 'text-boom' },
   { key: 'acceptedThisWeek' as const, label: 'Accepted This Week', desc: 'Last 7 Days', color: 'text-text' },
-  { key: 'bobWinRate' as const, label: 'BOB Win Rate', desc: 'Avg Player Score', color: 'text-boom', format: (v: number) => v.toFixed(1) },
+  { key: 'avgRosterTfo' as const, label: 'Avg Roster TFO', desc: 'Across Rostered', color: 'text-boom', format: (v: number) => (v > 0 ? v.toFixed(1) : '—') },
   { key: 'smartCounterUses' as const, label: 'Smart Counter Uses', desc: 'All Time', color: 'text-hold' },
   { key: 'leaguesActive' as const, label: 'Leagues Active', desc: 'All Connected', color: 'text-text' },
 ];

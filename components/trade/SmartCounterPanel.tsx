@@ -90,9 +90,11 @@ export default function SmartCounterPanel({
     <div className="flex h-full min-h-0 flex-col gap-2.5 overflow-y-auto border-l border-border bg-bg p-3.5">
       <div className="mb-1">
         <div className="font-figtree text-[11px] font-bold uppercase tracking-wide text-text">
-          Smart Counter (3 Responses)
+          Smart Counter
         </div>
-        <div className="mt-0.5 font-mono text-[8.5px] text-muted">Powered by BOB Engine</div>
+        <div className="mt-0.5 font-mono text-[8.5px] text-muted">
+          Aggressive · Balanced · Conservative
+        </div>
       </div>
 
       {loading ? (

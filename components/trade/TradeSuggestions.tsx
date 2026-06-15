@@ -35,32 +35,28 @@ export default function TradeSuggestions({ suggestions }: TradeSuggestionsProps)
             <div className="flex-1 font-figtree text-[11px] text-text">
               {s.type === 'buy' ? (
                 <>
-                  <span className="font-semibold text-boom">Buy</span> low on {s.playerName}
+                  <span className="font-semibold" style={{ color: s.verdictColor }}>Buy</span> low on {s.playerName}
+                  {s.managerName ? (
+                    <span className="ml-1 font-mono text-[8.5px] text-muted">via {s.managerName}</span>
+                  ) : null}
                 </>
               ) : (
                 <>
-                  <span className="font-semibold text-bust">Sell</span> high on {s.playerName}
+                  <span className="font-semibold" style={{ color: s.verdictColor }}>Sell</span> high on {s.playerName}
                 </>
               )}
+              <span
+                className="ml-1.5 rounded-[3px] px-1 py-px font-mono text-[7px] font-bold"
+                style={{ color: s.verdictColor, background: `${s.verdictColor}1f` }}
+              >
+                {s.verdict}
+              </span>
             </div>
-            {s.targetName ? (
-              <div className="flex items-center gap-1.5">
-                <div className="relative h-[26px] w-[26px] overflow-hidden rounded-full border border-border bg-surface2">
-                  {s.targetPlayerId ? (
-                    <Image
-                      src={`https://sleepercdn.com/content/nfl/players/thumb/${s.targetPlayerId}.jpg`}
-                      alt={s.targetName}
-                      width={26}
-                      height={26}
-                      unoptimized
-                      className="h-full w-full object-cover"
-                    />
-                  ) : null}
-                </div>
-                <span className="font-figtree text-[11px] font-medium text-text">{s.targetName}</span>
-              </div>
-            ) : null}
-            <div className="min-w-[44px] text-right font-figtree text-[15px] font-bold text-boom">
+            <div
+              className="min-w-[44px] text-right font-figtree text-[15px] font-bold"
+              title="Engine vs market rank delta (scaled)"
+              style={{ color: s.verdictColor }}
+            >
               +{s.edgeScore.toFixed(1)}
             </div>
           </div>

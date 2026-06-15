@@ -53,7 +53,15 @@ export interface BobSuggestion {
   playerName: string;
   targetPlayerId?: string;
   targetName?: string;
+  /** Scaled rank_delta (engine vs market) — the "+11.7" style number. */
   edgeScore: number;
+  /** Market verdict driving this suggestion. */
+  verdict: 'BOOM' | 'BUY' | 'HOLD' | 'SELL' | 'BUST';
+  verdictColor: string;
+  leagueId: string;
+  leagueName: string;
+  /** For buy-low: the manager who rosters the player (trade target). */
+  managerName?: string;
 }
 
 export interface TradeHistoryRow {
@@ -63,20 +71,24 @@ export interface TradeHistoryRow {
   receivedDisplay: string;
   verdict: TradeVerdictBadge;
   edgeScore: number;
+  /** League this trade belongs to; undefined when unknown (shown in ALL only). */
+  leagueId?: string;
 }
 
 export interface TradePageStats {
   openOffers: number;
   acceptedThisWeek: number;
-  bobWinRate: number;
+  /** Mean tfo_score of rostered players (NOT a win rate). */
+  avgRosterTfo: number;
   smartCounterUses: number;
   leaguesActive: number;
 }
 
 export interface TradePageFooter {
   engineStatus: string;
-  smartCounterAccuracy: number;
-  suggestionSuccessRate: number;
+  /** null until real outcome data exists (shown as "No data yet"). */
+  smartCounterAccuracy: number | null;
+  suggestionSuccessRate: number | null;
   tradeVolumeThisMonth: number;
 }
 

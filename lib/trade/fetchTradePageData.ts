@@ -1,6 +1,7 @@
 import { createAdminClient } from '@/lib/supabase/admin';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import {
+  fetchLeagueRosters,
   fetchLeagueTrades,
   fetchLeagueUsers,
   fetchNflState,
@@ -10,6 +11,7 @@ import {
 } from '@/lib/sleeper';
 import { fetchAllPlayers } from '@/lib/sleeper/players';
 import { tradeVerdictFromDelta } from '@/lib/trade/verdict';
+import { fetchMarketVerdicts } from '@/lib/verdict/fetchMarketVerdicts';
 import type {
   BobSuggestion,
   TradeHistoryRow,
@@ -58,7 +60,7 @@ function emptyStats(): TradePageStats {
   return {
     openOffers: 0,
     acceptedThisWeek: 0,
-    bobWinRate: 0,
+    avgRosterTfo: 0,
     smartCounterUses: 0,
     leaguesActive: 0,
   };
@@ -67,8 +69,9 @@ function emptyStats(): TradePageStats {
 function emptyFooter(): TradePageFooter {
   return {
     engineStatus: 'Optimal',
-    smartCounterAccuracy: 94.7,
-    suggestionSuccessRate: 78.3,
+    // No outcome-tracking table yet — surfaced as "No data yet", not fake %s.
+    smartCounterAccuracy: null,
+    suggestionSuccessRate: null,
     tradeVolumeThisMonth: 0,
   };
 }
@@ -369,64 +372,88 @@ export async function fetchTradePageData(userId: string): Promise<TradePageData>
   );
 
   const tfoScores = playerIds.map((id) => tfoMap.get(id) ?? 0).filter((s) => s > 0);
-  const bobWinRate =
+  const avgRosterTfo =
     tfoScores.length > 0
       ? Math.round((tfoScores.reduce((a, b) => a + b, 0) / tfoScores.length) * 10) / 10
-      : 72;
+      : 0;
 
   const stats: TradePageStats = {
     openOffers: allOffers.length,
     acceptedThisWeek,
-    bobWinRate,
+    avgRosterTfo,
     smartCounterUses,
     leaguesActive: leagues.length,
   };
 
-  // BOB Suggestions
+  // BOB Suggestions — powered by the shared market verdict engine (rank_delta).
+  // Buy-low  = BOOM/BUY players (engine >> market) rostered by OTHER managers.
+  // Sell-high = SELL/BUST players (market >> engine) on the user's own roster.
+  // edgeScore is the rank_delta scaled by /10 to a "+11.7" magnitude.
   const suggestions: BobSuggestion[] = [];
   try {
-    const { data: allTfo } = await supabase
-      .from('formula_scores')
-      .select('player_id, tfo_score')
-      .gt('tfo_score', 70)
-      .order('tfo_score', { ascending: false })
-      .limit(30);
+    const marketVerdicts = await fetchMarketVerdicts(supabase, 'dynasty');
+    const myRosterIdSet = new Set(playerIds);
 
-    const rosteredSet = new Set(playerIds);
-    let buyCount = 0;
-    for (const row of allTfo ?? []) {
-      if (buyCount >= 3) break;
-      const pid = row.player_id as string;
-      if (rosteredSet.has(pid)) continue;
-      const name = playerDb[pid]?.full_name ?? 'Player';
-      const score = row.tfo_score as number;
-      suggestions.push({
-        id: `buy-${pid}`,
-        type: 'buy',
-        headline: `Buy low on ${name}`,
-        playerId: pid,
-        playerName: name ?? 'Player',
-        edgeScore: Math.round((score - 65) * 10) / 10,
-      });
-      buyCount += 1;
+    for (const lg of leaguesRaw.slice(0, 15)) {
+      const [users, rosters] = await Promise.all([
+        fetchLeagueUsers(lg.id).catch(() => [] as SleeperUser[]),
+        fetchLeagueRosters(lg.id).catch(() => null),
+      ]);
+      const ownerName = new Map<string, string>();
+      for (const u of users ?? []) {
+        ownerName.set(u.user_id, u.username ? `@${u.username}` : (u.display_name ?? 'Manager'));
+      }
+
+      // Buy-low: scan other managers' rosters for BOOM/BUY players.
+      for (const r of rosters ?? []) {
+        if (!r.owner_id || r.owner_id === sleeperUserId) continue;
+        for (const pid of r.players ?? []) {
+          const mv = marketVerdicts.get(String(pid));
+          if (!mv || mv.noMarketData) continue;
+          if (mv.verdict !== 'BOOM' && mv.verdict !== 'BUY') continue;
+          const name = playerDb[pid]?.full_name ?? 'Player';
+          suggestions.push({
+            id: `buy-${lg.id}-${pid}`,
+            type: 'buy',
+            headline: `Buy low on ${name}`,
+            playerId: String(pid),
+            playerName: name,
+            edgeScore: Math.round(Math.abs(mv.rankDelta ?? 0) / 10 * 10) / 10,
+            verdict: mv.verdict,
+            verdictColor: mv.color,
+            leagueId: lg.id,
+            leagueName: lg.name,
+            managerName: ownerName.get(r.owner_id),
+          });
+        }
+      }
+
+      // Sell-high: user's own roster players flagged SELL/BUST in this league.
+      const myRoster = rosters?.find((r) => r.owner_id === sleeperUserId);
+      for (const pid of myRoster?.players ?? []) {
+        if (!myRosterIdSet.has(String(pid))) continue;
+        const mv = marketVerdicts.get(String(pid));
+        if (!mv || mv.noMarketData) continue;
+        if (mv.verdict !== 'SELL' && mv.verdict !== 'BUST') continue;
+        const name = playerDb[pid]?.full_name ?? 'Player';
+        suggestions.push({
+          id: `sell-${lg.id}-${pid}`,
+          type: 'sell',
+          headline: `Sell high on ${name}`,
+          playerId: String(pid),
+          playerName: name,
+          edgeScore: Math.round(Math.abs(mv.rankDelta ?? 0) / 10 * 10) / 10,
+          verdict: mv.verdict,
+          verdictColor: mv.color,
+          leagueId: lg.id,
+          leagueName: lg.name,
+        });
+      }
     }
 
-    const sellCandidates = playerIds
-      .map((pid) => ({ pid, score: tfoMap.get(pid) ?? 100 }))
-      .filter((p) => p.score < 50)
-      .slice(0, 2);
-
-    for (const s of sellCandidates) {
-      const p = buildPlayer(s.pid);
-      suggestions.push({
-        id: `sell-${s.pid}`,
-        type: 'sell',
-        headline: `Sell high on ${p.name}`,
-        playerId: s.pid,
-        playerName: p.name,
-        edgeScore: Math.round((55 - s.score) * 10) / 10,
-      });
-    }
+    // Strongest signals first; cap to keep the payload light.
+    suggestions.sort((a, b) => b.edgeScore - a.edgeScore);
+    suggestions.splice(40);
   } catch (err) {
     console.error('[trade] suggestions failed:', err);
   }
@@ -483,6 +510,7 @@ export async function fetchTradePageData(userId: string): Promise<TradePageData>
         receivedDisplay: recv,
         verdict: offer.verdict,
         edgeScore: offer.offerValue,
+        leagueId: offer.leagueId,
       });
     }
     tradeVolumeThisMonth = completedOffers.filter(
@@ -503,8 +531,9 @@ export async function fetchTradePageData(userId: string): Promise<TradePageData>
     history,
     footer: {
       engineStatus: 'Optimal',
-      smartCounterAccuracy: 94.7,
-      suggestionSuccessRate: 78.3,
+      // No outcome-tracking table yet — surfaced as "No data yet", not fake %s.
+      smartCounterAccuracy: null,
+      suggestionSuccessRate: null,
       tradeVolumeThisMonth: tradeVolumeThisMonth || completedOffers.length,
     },
     selectedOfferDefaults: topOffer
