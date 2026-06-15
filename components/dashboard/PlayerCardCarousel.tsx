@@ -13,7 +13,7 @@ import type { RotationPlayer } from '@/lib/dashboard/rotation';
 import PlayerCard from './PlayerCard';
 
 const VISIBLE = 5;
-const ROTATE_MS = 8000;
+const ROTATE_MS = 3000;
 
 interface PlayerCardCarouselProps {
   players: RotationPlayer[];
@@ -26,11 +26,22 @@ export default function PlayerCardCarousel({ players, staticMode = false }: Play
   const [paused, setPaused] = useState(false);
   const [sliding, setSliding] = useState(false);
 
+  // Market Signals: biggest |rank_delta| first (biggest BOOMs + biggest BUSTs),
+  // players with no market signal sink to the back, then by TFO.
   const sorted = useMemo(
     () =>
       [...players].sort((a, b) => {
-        const scoreA = a.tfoScore > 0 ? a.tfoScore : 0;
+        const da =
+          a.marketVerdict && !a.marketVerdict.noMarketData
+            ? Math.abs(a.marketVerdict.rankDelta ?? 0)
+            : -1;
+        const db =
+          b.marketVerdict && !b.marketVerdict.noMarketData
+            ? Math.abs(b.marketVerdict.rankDelta ?? 0)
+            : -1;
+        if (db !== da) return db - da;
         const scoreB = b.tfoScore > 0 ? b.tfoScore : 0;
+        const scoreA = a.tfoScore > 0 ? a.tfoScore : 0;
         if (scoreB !== scoreA) return scoreB - scoreA;
         return a.name.localeCompare(b.name);
       }),

@@ -159,6 +159,8 @@ export interface DashboardRotationData {
   overvalued: OvervaluedItem[];
   incomingTrades: DashboardIncomingTrade[];
   newsItems: DashboardNewsItem[];
+  /** Players rostered by ANY team in each league (league-scoped news). */
+  leagueRosteredIds: Record<string, string[]>;
   nflSeason: NflSeasonInfo;
   scoringContext: 'dynasty' | 'redraft';
 }

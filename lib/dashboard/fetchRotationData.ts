@@ -167,6 +167,7 @@ export async function fetchRotationData(
     overvalued: [],
     incomingTrades: [],
     newsItems: [],
+    leagueRosteredIds: {},
     nflSeason,
     scoringContext: 'dynasty',
   };
@@ -335,6 +336,16 @@ export async function fetchRotationData(
       }
     }),
   );
+
+  // Every player rostered by ANY team in each league (for league-scoped news).
+  const leagueRosteredIds: Record<string, string[]> = {};
+  for (const [leagueId, rosters] of Array.from(sleeperByLeague.entries())) {
+    const ids = new Set<string>();
+    for (const r of rosters) {
+      for (const pid of r.players ?? []) if (pid) ids.add(String(pid));
+    }
+    leagueRosteredIds[leagueId] = Array.from(ids);
+  }
 
   const toRotationPlayer = (pid: string): RotationPlayer | null => {
     const meta = metaByPlayer.get(pid);
@@ -528,6 +539,7 @@ export async function fetchRotationData(
     overvalued,
     incomingTrades,
     newsItems,
+    leagueRosteredIds,
     nflSeason,
     scoringContext,
   };

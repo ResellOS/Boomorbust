@@ -15,14 +15,14 @@ import DynastyNewsFeed from './DynastyNewsFeed';
 import IncomingTrades from './IncomingTrades';
 import Footer from './Footer';
 
-const ROTATE_SECONDS = 60;
+const ROTATE_SECONDS = 30;
 const EMPTY_SIGNALS = { boom: 0, hold: 0, bust: 0, total: 0 };
 
 export default function DashboardClient({ data }: { data: DashboardRotationData }) {
   const { leagues, portfolio, tradeTargets, overvalued, incomingTrades, newsItems, nflSeason } =
     data;
 
-  const [mode, setMode] = useState<DashboardMode>('rotate');
+  const [mode, setMode] = useState<DashboardMode>('all');
   const [rotIndex, setRotIndex] = useState(0);
   const [secondsLeft, setSecondsLeft] = useState(ROTATE_SECONDS);
 
@@ -61,10 +61,12 @@ export default function DashboardClient({ data }: { data: DashboardRotationData 
   const dynastyEdge = Math.max(0, teamTfo - 70);
   const empireRating = empireRatingFromTfo(teamTfo);
 
-  const rosterPlayerIds = useMemo(
-    () => new Set(players.map((p) => p.playerId)),
-    [players],
-  );
+  // News scopes to EVERY player rostered in the selected league (all teams),
+  // not just the user's roster. ALL mode shows general news (allMode handles it).
+  const newsRosterIds = useMemo(() => {
+    if (isAll || !currentLeague) return new Set<string>();
+    return new Set(data.leagueRosteredIds[currentLeague.id] ?? []);
+  }, [isAll, currentLeague, data.leagueRosteredIds]);
 
   const leagueIncoming = useMemo(() => {
     if (isAll) return incomingTrades;
@@ -111,7 +113,7 @@ export default function DashboardClient({ data }: { data: DashboardRotationData 
             <div className="flex min-h-0 flex-col gap-[9px]">
               <DynastyNewsFeed
                 items={newsItems}
-                rosterPlayerIds={rosterPlayerIds}
+                rosterPlayerIds={newsRosterIds}
                 allMode={isAll}
               />
               <IncomingTrades trades={leagueIncoming.length > 0 ? leagueIncoming : incomingTrades} />
