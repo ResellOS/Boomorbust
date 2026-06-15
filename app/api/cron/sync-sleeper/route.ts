@@ -91,6 +91,9 @@ export async function GET(request: Request) {
           scoring_settings: league.scoring_settings,
           settings: league.settings,
           status: league.status,
+          // Sleeper returns roster_positions on the league object — keep it current.
+          roster_positions:
+            (league as unknown as { roster_positions?: string[] }).roster_positions ?? null,
           synced_at: new Date().toISOString(),
         }, { onConflict: 'id' });
 
