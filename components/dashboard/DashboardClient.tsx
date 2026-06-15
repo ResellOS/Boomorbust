@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import type { DashboardRotationData } from '@/lib/dashboard/rotation';
 import { empireRatingFromTfo } from '@/lib/dashboard/rotation';
+import { LEAGUE_ROTATE_SECONDS } from '@/lib/dashboard/constants';
 import DashboardTopBar from './DashboardTopBar';
 import ModeToggleBar, { type DashboardMode } from './ModeToggleBar';
 import LeagueRotationHeader from './LeagueRotationHeader';
@@ -13,10 +14,8 @@ import RightPanel from './RightPanel';
 import TradeTargetsTable from './TradeTargetsTable';
 import DynastyNewsFeed from './DynastyNewsFeed';
 import IncomingTrades from './IncomingTrades';
+import LineupOpportunityBanner from './LineupOpportunityBanner';
 import Footer from './Footer';
-
-const ROTATE_SECONDS = 30;
-const EMPTY_SIGNALS = { boom: 0, hold: 0, bust: 0, total: 0 };
 
 export default function DashboardClient({ data }: { data: DashboardRotationData }) {
   const { leagues, portfolio, tradeTargets, overvalued, incomingTrades, newsItems, nflSeason } =
@@ -24,16 +23,16 @@ export default function DashboardClient({ data }: { data: DashboardRotationData 
 
   const [mode, setMode] = useState<DashboardMode>('all');
   const [rotIndex, setRotIndex] = useState(0);
-  const [secondsLeft, setSecondsLeft] = useState(ROTATE_SECONDS);
+  const [secondsLeft, setSecondsLeft] = useState(LEAGUE_ROTATE_SECONDS);
 
   useEffect(() => {
     if (mode !== 'rotate' || leagues.length === 0) return;
-    setSecondsLeft(ROTATE_SECONDS);
+    setSecondsLeft(LEAGUE_ROTATE_SECONDS);
     const iv = setInterval(() => {
       setSecondsLeft((s) => {
         if (s <= 1) {
           setRotIndex((i) => (i + 1) % leagues.length);
-          return ROTATE_SECONDS;
+          return LEAGUE_ROTATE_SECONDS;
         }
         return s - 1;
       });
@@ -55,7 +54,9 @@ export default function DashboardClient({ data }: { data: DashboardRotationData 
     [isAll, portfolio.players, currentLeague?.players],
   );
   const teamTfo = isAll ? portfolio.teamTfo : currentLeague?.teamTfo ?? 0;
-  const signals = isAll ? portfolio.signalCounts : currentLeague?.signalCounts ?? EMPTY_SIGNALS;
+  const breakdown = isAll
+    ? portfolio.breakdown
+    : currentLeague?.breakdown ?? portfolio.breakdown;
   const playersRostered = isAll ? portfolio.playersRostered : players.length;
   const contextLabel = isAll ? 'All Leagues' : currentLeague?.name ?? '—';
   const dynastyEdge = Math.max(0, teamTfo - 70);
@@ -98,8 +99,11 @@ export default function DashboardClient({ data }: { data: DashboardRotationData 
             league={currentLeague}
             mode={effectiveMode}
             secondsLeft={secondsLeft}
+            rotateSeconds={LEAGUE_ROTATE_SECONDS}
             leagueCount={leagues.length}
           />
+
+          <LineupOpportunityBanner opportunity={data.lineupOpportunity} />
 
           <PlayerTicker players={players} animated={!isAll} />
 
@@ -121,7 +125,7 @@ export default function DashboardClient({ data }: { data: DashboardRotationData 
           </div>
         </div>
 
-        <RightPanel signals={signals} exposureWarnings={[]} overvalued={overvalued} />
+        <RightPanel breakdown={breakdown} exposureWarnings={[]} overvalued={overvalued} />
       </div>
 
       <Footer

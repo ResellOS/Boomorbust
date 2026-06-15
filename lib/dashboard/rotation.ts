@@ -82,6 +82,24 @@ export interface SignalCounts {
   total: number;
 }
 
+export type PositionKey = 'QB' | 'RB' | 'WR' | 'TE';
+export type GradeLabel = 'Strong' | 'Average' | 'Weak';
+
+export interface PositionGrade {
+  position: PositionKey;
+  grade: GradeLabel;
+  avgTfo: number;
+  required: number;
+  have: number;
+}
+
+/** Roster Breakdown widget data: contention status + per-position grades + action. */
+export interface RosterBreakdown {
+  status: LeagueStatusKey;
+  positionGrades: PositionGrade[];
+  actionSummary: string;
+}
+
 export interface LeagueBundle {
   id: string;
   name: string;
@@ -93,6 +111,7 @@ export interface LeagueBundle {
   teamTfo: number;
   players: RotationPlayer[];
   signalCounts: SignalCounts;
+  breakdown: RosterBreakdown;
 }
 
 export interface PortfolioBundle {
@@ -100,6 +119,21 @@ export interface PortfolioBundle {
   teamTfo: number;
   signalCounts: SignalCounts;
   playersRostered: number;
+  breakdown: RosterBreakdown;
+}
+
+/** Biggest bench-outscores-starter projection gap across the user's rosters. */
+export interface LineupOpportunity {
+  leagueId: string;
+  leagueName: string;
+  position: string;
+  benchPlayerId: string;
+  benchName: string;
+  benchProj: number;
+  starterPlayerId: string;
+  starterName: string;
+  starterProj: number;
+  gap: number;
 }
 
 export interface TradeTargetItem {
@@ -161,6 +195,8 @@ export interface DashboardRotationData {
   newsItems: DashboardNewsItem[];
   /** Players rostered by ANY team in each league (league-scoped news). */
   leagueRosteredIds: Record<string, string[]>;
+  /** Biggest start/sit upgrade across the user's rosters; null when no data. */
+  lineupOpportunity: LineupOpportunity | null;
   nflSeason: NflSeasonInfo;
   scoringContext: 'dynasty' | 'redraft';
 }
@@ -168,4 +204,74 @@ export interface DashboardRotationData {
 // Empire rating shares the dashboard's existing curve: clamp(teamTfo + 8, 40..99).
 export function empireRatingFromTfo(teamTfo: number): number {
   return Math.round(Math.min(99, Math.max(40, teamTfo + 8)) * 10) / 10;
+}
+
+const DEFAULT_REQUIRED: Record<PositionKey, number> = { QB: 1, RB: 2, WR: 2, TE: 1 };
+
+// Derive starter requirements per position from Sleeper roster_positions; falls
+// back to a standard lineup when unavailable. SUPER_FLEX counts toward QB depth.
+function requiredFromPositions(rosterPositions: string[] | null): Record<PositionKey, number> {
+  if (!rosterPositions || rosterPositions.length === 0) return { ...DEFAULT_REQUIRED };
+  const count = (tok: string) => rosterPositions.filter((p) => p === tok).length;
+  return {
+    QB: Math.max(1, count('QB') + count('SUPER_FLEX')),
+    RB: Math.max(1, count('RB')),
+    WR: Math.max(1, count('WR')),
+    TE: Math.max(1, count('TE')),
+  };
+}
+
+function gradeFor(avgTfo: number, have: number, required: number): GradeLabel {
+  if (have < required) return 'Weak'; // not enough bodies to fill the slots
+  if (avgTfo >= 68) return 'Strong';
+  if (avgTfo >= 58) return 'Average';
+  return 'Weak';
+}
+
+/**
+ * Roster Breakdown: per-position grade (top-N starters' avg TFO vs the league's
+ * positional requirements) + a short action summary, given the league's
+ * contention status. Pure — safe on client or server.
+ */
+export function computeRosterBreakdown(
+  players: RotationPlayer[],
+  rosterPositions: string[] | null,
+  status: LeagueStatusKey,
+): RosterBreakdown {
+  const required = requiredFromPositions(rosterPositions);
+  const positions: PositionKey[] = ['QB', 'RB', 'WR', 'TE'];
+
+  const positionGrades: PositionGrade[] = positions.map((pos) => {
+    const atPos = players
+      .filter((p) => p.position === pos && p.tfoScore > 0)
+      .sort((a, b) => b.tfoScore - a.tfoScore);
+    const req = required[pos];
+    const topN = atPos.slice(0, Math.max(1, req));
+    const avgTfo =
+      topN.length > 0
+        ? Math.round((topN.reduce((s, p) => s + p.tfoScore, 0) / topN.length) * 10) / 10
+        : 0;
+    return { position: pos, grade: gradeFor(avgTfo, atPos.length, req), avgTfo, required: req, have: atPos.length };
+  });
+
+  const strong = positionGrades.filter((g) => g.grade === 'Strong').map((g) => g.position);
+  const weak = positionGrades.filter((g) => g.grade === 'Weak').map((g) => g.position);
+  const label = LEAGUE_STATUS[status].label;
+
+  let actionSummary: string;
+  if (players.length === 0) {
+    actionSummary = 'No rostered players synced for this league yet.';
+  } else {
+    const parts = [`${label} roster.`];
+    if (strong.length) parts.push(`Strong at ${strong.join('/')}.`);
+    if (weak.length) {
+      const verb = status === 'REBUILD' || status === 'ORPHAN' ? 'Build up' : 'Upgrade';
+      parts.push(`${verb} ${weak.join('/')}.`);
+    } else {
+      parts.push('Balanced — hold and contend.');
+    }
+    actionSummary = parts.join(' ');
+  }
+
+  return { status, positionGrades, actionSummary };
 }

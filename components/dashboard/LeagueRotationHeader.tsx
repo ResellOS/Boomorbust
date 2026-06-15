@@ -1,20 +1,21 @@
 'use client';
 
+import { LEAGUE_ROTATE_SECONDS } from '@/lib/dashboard/constants';
 import { LEAGUE_STATUS, type LeagueBundle } from '@/lib/dashboard/rotation';
 
 interface LeagueRotationHeaderProps {
   league: LeagueBundle | null;
   mode: 'rotate' | 'all' | string;
   secondsLeft: number;
+  rotateSeconds?: number;
   leagueCount: number;
 }
-
-const ROTATE_SECONDS = 60;
 
 export default function LeagueRotationHeader({
   league,
   mode,
   secondsLeft,
+  rotateSeconds = LEAGUE_ROTATE_SECONDS,
   leagueCount,
 }: LeagueRotationHeaderProps) {
   if (!league) {
@@ -34,7 +35,7 @@ export default function LeagueRotationHeader({
 
   const meta = LEAGUE_STATUS[league.status];
   const isRotating = mode === 'rotate';
-  const pct = Math.max(0, Math.min(100, (secondsLeft / ROTATE_SECONDS) * 100));
+  const pct = Math.max(0, Math.min(100, (secondsLeft / rotateSeconds) * 100));
 
   return (
     <div className="flex w-full items-center gap-2.5 rounded-[8px] border border-border bg-surface px-3.5 py-2">

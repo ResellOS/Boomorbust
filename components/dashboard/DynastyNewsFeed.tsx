@@ -88,10 +88,11 @@ export default function DynastyNewsFeed({ items, rosterPlayerIds, allMode = fals
   const [modalItem, setModalItem] = useState<DashboardNewsItem | null>(null);
 
   const visible = useMemo(() => {
-    const filtered = allMode
-      ? items
-      : items.filter((i) => !i.playerId || rosterPlayerIds?.has(i.playerId));
-    return filtered.slice(0, 6);
+    if (allMode) return items.slice(0, 6);
+    // League mode: only players rostered anywhere in the selected league.
+    return items
+      .filter((i) => Boolean(i.playerId) && rosterPlayerIds?.has(i.playerId!))
+      .slice(0, 6);
   }, [items, rosterPlayerIds, allMode]);
 
   return (

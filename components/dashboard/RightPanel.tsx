@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import RosterBreakdown from './RosterBreakdown';
+import type { RosterBreakdown as RosterBreakdownData } from '@/lib/dashboard/rotation';
 
 export interface SignalCounts {
   boom: number;
@@ -24,16 +26,9 @@ export interface OvervaluedAsset {
 }
 
 interface RightPanelProps {
-  signals: SignalCounts;
+  breakdown: RosterBreakdownData;
   exposureWarnings: ExposureWarning[];
   overvalued: OvervaluedAsset[];
-}
-
-const CIRCUMFERENCE = 2 * Math.PI * 44;
-
-function donutArc(count: number, total: number): number {
-  if (total <= 0) return 0;
-  return (count / total) * CIRCUMFERENCE;
 }
 
 function initials(name: string): string {
@@ -76,15 +71,7 @@ function PlayerThumb({
   );
 }
 
-export default function RightPanel({ signals, exposureWarnings, overvalued }: RightPanelProps) {
-  const { boom, hold, bust, total } = signals;
-  const boomArc = donutArc(boom, total);
-  const holdArc = donutArc(hold, total);
-  const bustArc = donutArc(bust, total);
-  const boomPct = total > 0 ? ((boom / total) * 100).toFixed(1) : '0.0';
-  const holdPct = total > 0 ? ((hold / total) * 100).toFixed(1) : '0.0';
-  const bustPct = total > 0 ? ((bust / total) * 100).toFixed(1) : '0.0';
-
+export default function RightPanel({ breakdown, exposureWarnings, overvalued }: RightPanelProps) {
   const defaultWarnings: ExposureWarning[] =
     exposureWarnings.length > 0
       ? exposureWarnings
@@ -96,86 +83,7 @@ export default function RightPanel({ signals, exposureWarnings, overvalued }: Ri
 
   return (
     <div className="flex h-full min-h-0 flex-col gap-[9px] overflow-hidden border-l border-border bg-bg p-[11px]">
-      <div className="flex flex-col overflow-hidden rounded-lg border border-border bg-surface">
-        <div className="shrink-0 border-b border-border bg-bg px-[13px] py-2">
-          <span className="font-figtree text-[9.5px] font-bold uppercase tracking-[1.5px] text-text">
-            Boom / Hold / Bust Signals
-          </span>
-        </div>
-        <div className="flex-1 overflow-hidden p-3">
-          <div className="relative mx-auto mb-3.5 h-[130px] w-[130px]">
-            <svg viewBox="0 0 120 120" className="h-full w-full">
-              <circle cx={60} cy={60} r={44} fill="none" stroke="#141929" strokeWidth={18} />
-              {boomArc > 0 && (
-                <circle
-                  cx={60}
-                  cy={60}
-                  r={44}
-                  fill="none"
-                  stroke="#36E7A1"
-                  strokeWidth={18}
-                  strokeDasharray={`${boomArc} ${CIRCUMFERENCE - boomArc}`}
-                  strokeDashoffset={0}
-                  transform="rotate(-90 60 60)"
-                />
-              )}
-              {holdArc > 0 && (
-                <circle
-                  cx={60}
-                  cy={60}
-                  r={44}
-                  fill="none"
-                  stroke="#FBBF24"
-                  strokeWidth={18}
-                  strokeDasharray={`${holdArc} ${CIRCUMFERENCE - holdArc}`}
-                  strokeDashoffset={-boomArc}
-                  transform="rotate(-90 60 60)"
-                />
-              )}
-              {bustArc > 0 && (
-                <circle
-                  cx={60}
-                  cy={60}
-                  r={44}
-                  fill="none"
-                  stroke="#A78BFA"
-                  strokeWidth={18}
-                  strokeDasharray={`${bustArc} ${CIRCUMFERENCE - bustArc}`}
-                  strokeDashoffset={-(boomArc + holdArc)}
-                  transform="rotate(-90 60 60)"
-                />
-              )}
-            </svg>
-            <div className="absolute inset-0 flex flex-col items-center justify-center">
-              <div className="font-figtree text-[30px] font-bold leading-none text-text">
-                {total}
-              </div>
-              <div className="mt-0.5 font-mono text-[9px] text-muted">Total</div>
-            </div>
-          </div>
-          {[
-            { label: 'BOOM', count: boom, pct: boomPct, color: '#36E7A1', textClass: 'text-boom' },
-            { label: 'HOLD', count: hold, pct: holdPct, color: '#FBBF24', textClass: 'text-hold' },
-            { label: 'BUST', count: bust, pct: bustPct, color: '#A78BFA', textClass: 'text-bust' },
-          ].map((row) => (
-            <div
-              key={row.label}
-              className="flex items-center justify-between border-b border-border/40 py-1.5 last:border-b-0"
-            >
-              <div className="flex items-center gap-[7px]">
-                <div className="h-2 w-2 rounded-full" style={{ background: row.color }} />
-                <span className={`font-figtree text-[13px] font-bold ${row.textClass}`}>
-                  {row.label}
-                </span>
-              </div>
-              <div className="flex gap-3">
-                <span className="font-mono text-[10px] text-text">{row.count} players</span>
-                <span className="font-mono text-[10px] text-muted">{row.pct}%</span>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
+      <RosterBreakdown breakdown={breakdown} />
 
       <div className="flex flex-col overflow-hidden rounded-lg border border-border bg-surface">
         <div className="shrink-0 border-b border-border bg-bg px-[13px] py-2">

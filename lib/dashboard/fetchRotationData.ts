@@ -16,11 +16,14 @@ import {
   getTradeVerdictLabel,
 } from '@/lib/verdict';
 import { fetchDashboardNews } from './fetchDashboardNews';
+import { sortByMarketSignal } from './sortPlayers';
 import {
+  computeRosterBreakdown,
   deriveLeagueStatus,
   type DashboardIncomingTrade,
   type DashboardRotationData,
   type LeagueBundle,
+  type LineupOpportunity,
   type OvervaluedItem,
   type PlayerComponents,
   type RotationPlayer,
@@ -160,14 +163,23 @@ export async function fetchRotationData(
       nflStateRaw.week <= 18,
   };
 
+  const emptyBreakdown = computeRosterBreakdown([], null, 'ORPHAN');
+
   const empty: DashboardRotationData = {
     leagues: [],
-    portfolio: { players: [], teamTfo: 0, signalCounts: emptySignals(), playersRostered: 0 },
+    portfolio: {
+      players: [],
+      teamTfo: 0,
+      signalCounts: emptySignals(),
+      playersRostered: 0,
+      breakdown: emptyBreakdown,
+    },
     tradeTargets: [],
     overvalued: [],
     incomingTrades: [],
     newsItems: [],
     leagueRosteredIds: {},
+    lineupOpportunity: null,
     nflSeason,
     scoringContext: 'dynasty',
   };
@@ -191,11 +203,17 @@ export async function fetchRotationData(
     scoringContext = 'redraft';
   }
 
-  let leaguesRaw: { id: string; name: string; status: string | null; total_rosters: number | null }[] = [];
+  let leaguesRaw: {
+    id: string;
+    name: string;
+    status: string | null;
+    total_rosters: number | null;
+    roster_positions: string[] | null;
+  }[] = [];
   try {
     const { data, error } = await supabase
       .from('leagues')
-      .select('id, name, status, total_rosters')
+      .select('id, name, status, total_rosters, roster_positions')
       .eq('user_id', userId);
     if (error) throw error;
     leaguesRaw = data ?? [];
@@ -366,10 +384,11 @@ export async function fetchRotationData(
 
   const leagues: LeagueBundle[] = leaguesRaw.map((l) => {
     const roster = rosterByLeague.get(l.id);
-    const players = (roster?.playerIds ?? [])
-      .map(toRotationPlayer)
-      .filter((p): p is RotationPlayer => p !== null)
-      .sort((a, b) => b.tfoScore - a.tfoScore);
+    const players = sortByMarketSignal(
+      (roster?.playerIds ?? [])
+        .map(toRotationPlayer)
+        .filter((p): p is RotationPlayer => p !== null),
+    );
 
     const teamTfo = avgTfo(players);
     const signalCounts = tallySignals(players);
@@ -411,6 +430,8 @@ export async function fetchRotationData(
             isOffseason,
           );
 
+    const rosterPositions = (l.roster_positions as string[] | null) ?? null;
+
     return {
       id: l.id,
       name: l.name,
@@ -422,18 +443,28 @@ export async function fetchRotationData(
       teamTfo,
       players,
       signalCounts,
+      breakdown: computeRosterBreakdown(players, rosterPositions, status),
     };
   });
 
-  const portfolioPlayers = idList
-    .map(toRotationPlayer)
-    .filter((p): p is RotationPlayer => p !== null)
-    .sort((a, b) => b.tfoScore - a.tfoScore);
+  const portfolioPlayers = sortByMarketSignal(
+    idList.map(toRotationPlayer).filter((p): p is RotationPlayer => p !== null),
+  );
+  const portfolioTeamTfo = avgTfo(portfolioPlayers);
+  const portfolioStatus =
+    portfolioPlayers.length === 0
+      ? 'ORPHAN'
+      : deriveLeagueStatus(
+          0,
+          portfolioTeamTfo,
+          nflSeason.week === 0 || nflSeason.seasonType !== 'regular',
+        );
   const portfolio = {
     players: portfolioPlayers,
-    teamTfo: avgTfo(portfolioPlayers),
+    teamTfo: portfolioTeamTfo,
     signalCounts: tallySignals(portfolioPlayers),
     playersRostered: portfolioPlayers.length,
+    breakdown: computeRosterBreakdown(portfolioPlayers, null, portfolioStatus),
   };
 
   const tradeTargets: TradeTargetItem[] = [];
@@ -527,9 +558,90 @@ export async function fetchRotationData(
 
   let newsItems: DashboardRotationData['newsItems'] = [];
   try {
-    newsItems = await fetchDashboardNews(metaByPlayer, allPlayerIds, true);
+    // Expand name lookup so RSS headlines match ANY player rostered in a league,
+    // not just the user's roster — client filters by leagueRosteredIds per league.
+    const newsMetaByPlayer = new Map(metaByPlayer);
+    const leaguePlayerIdSet = new Set<string>();
+    for (const ids of Object.values(leagueRosteredIds)) {
+      for (const id of ids) leaguePlayerIdSet.add(id);
+    }
+    const missingNewsIds = Array.from(leaguePlayerIdSet).filter((id) => !newsMetaByPlayer.has(id));
+    if (missingNewsIds.length > 0) {
+      const batch = 200;
+      for (let i = 0; i < missingNewsIds.length; i += batch) {
+        const slice = missingNewsIds.slice(i, i + batch);
+        try {
+          const { data } = await supabase
+            .from('players')
+            .select('id, full_name, position, team')
+            .in('id', slice);
+          for (const p of data ?? []) {
+            const pid = String(p.id);
+            newsMetaByPlayer.set(pid, {
+              name: cleanName(p.full_name),
+              position: (p.position ?? '—').toUpperCase(),
+              team: p.team ?? '—',
+              tfoScore: tfoMap.get(pid) ?? 0,
+            });
+          }
+        } catch {
+          /* optional batch */
+        }
+      }
+    }
+    newsItems = await fetchDashboardNews(newsMetaByPlayer, allPlayerIds, true);
   } catch (err) {
     console.error('[dashboard] news fetch failed:', err);
+  }
+
+  // Item 8: biggest bench-outscores-starter projection gap across the user's
+  // rosters. Uses Sleeper starters[] + the engine's projected_ppg. In the
+  // offseason starters[] is often empty/stale → no opportunity (null), no faking.
+  let lineupOpportunity: LineupOpportunity | null = null;
+  for (const l of leaguesRaw) {
+    const mine = (sleeperByLeague.get(l.id) ?? []).find((r) => r.owner_id === sleeperUserId);
+    if (!mine) continue;
+    const starters = (mine.starters ?? []).filter((s) => s && s !== '0').map(String);
+    if (starters.length === 0) continue;
+    const starterSet = new Set(starters);
+    const bench = (mine.players ?? []).filter((p) => p && !starterSet.has(String(p))).map(String);
+
+    const proj = (pid: string) => componentsByPlayer.get(pid)?.projectedPpg ?? 0;
+    const posOf = (pid: string) => metaByPlayer.get(pid)?.position ?? '';
+    const nameOf = (pid: string) => metaByPlayer.get(pid)?.name ?? 'Unknown Player';
+
+    // Weakest projected starter per position.
+    const weakestStarter = new Map<string, { pid: string; proj: number }>();
+    for (const sid of starters) {
+      const pos = posOf(sid);
+      if (!pos) continue;
+      const pr = proj(sid);
+      const cur = weakestStarter.get(pos);
+      if (!cur || pr < cur.proj) weakestStarter.set(pos, { pid: sid, proj: pr });
+    }
+
+    for (const bid of bench) {
+      const pos = posOf(bid);
+      const bp = proj(bid);
+      if (!pos || bp <= 0) continue;
+      const weak = weakestStarter.get(pos);
+      if (!weak) continue;
+      const gap = bp - weak.proj;
+      if (gap > 0 && (!lineupOpportunity || gap > lineupOpportunity.gap)) {
+        lineupOpportunity = {
+          leagueId: l.id,
+          leagueName: l.name,
+          position: pos,
+          benchPlayerId: bid,
+          benchName: nameOf(bid),
+          benchProj: Math.round(bp * 10) / 10,
+          starterPlayerId: weak.pid,
+          starterName: nameOf(weak.pid),
+          starterProj: Math.round(weak.proj * 10) / 10,
+          gap: Math.round(gap * 10) / 10,
+        };
+      }
+    }
   }
 
   return {
@@ -540,6 +652,7 @@ export async function fetchRotationData(
     incomingTrades,
     newsItems,
     leagueRosteredIds,
+    lineupOpportunity,
     nflSeason,
     scoringContext,
   };
