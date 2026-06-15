@@ -18,18 +18,6 @@ interface PlayerDetailPanelProps {
   leagueNames: string[];
 }
 
-function trendGlyph(trend: HubPlayer['trend']): string {
-  if (trend === 'up') return '↑';
-  if (trend === 'down') return '↓';
-  return '→';
-}
-
-function trendColor(trend: HubPlayer['trend']): string {
-  if (trend === 'up') return 'text-boom';
-  if (trend === 'down') return 'text-bust';
-  return 'text-muted';
-}
-
 // Real engine component axes. Fallback labels are used only when a player has
 // no scored components (keeps the derived subScores shape rather than blank).
 const COMPONENT_LABELS = ['OPS', 'SFS', 'YOY', 'SIT', 'PPG'] as const;
@@ -137,15 +125,6 @@ export default function PlayerDetailPanel({ player, leagueNames }: PlayerDetailP
                 <span className="inline-block whitespace-nowrap rounded-[5px] border border-border bg-white/[0.03] px-[14px] py-[5px] font-figtree text-[11px] font-medium text-text">
                   {getGradeLabel(player.tfoScore)}
                 </span>
-              </div>
-              <div className="text-center">
-                <div className="mb-0.5 font-mono text-[8px] uppercase tracking-[2px] text-muted">
-                  Trend
-                </div>
-                <div className={`font-figtree text-xl font-normal leading-none ${trendColor(player.trend)}`}>
-                  {trendGlyph(player.trend)}
-                </div>
-                <div className="mt-0.5 font-mono text-[8px] text-muted">This Week</div>
               </div>
             </div>
           </div>
