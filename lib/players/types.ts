@@ -17,6 +17,15 @@ export interface PlayerSubScores {
   upside: number;
 }
 
+/** Real engine component scores (0–100; PPG raw) for the detail radar/signal bars. */
+export interface HubComponents {
+  ops: number;
+  sfs: number;
+  yoysi: number;
+  sit: number;
+  projectedPpg: number;
+}
+
 export interface HubPlayer {
   playerId: string;
   fullName: string;
@@ -26,6 +35,8 @@ export interface HubPlayer {
   tfoScore: number;
   verdict: VerdictLabel;
   subScores: PlayerSubScores;
+  /** Real engine components (OPS/SFS/YOY/SIT/PPG); null when not scored. */
+  components: HubComponents | null;
   trend: TrendDirection;
   trendDelta: number;
   scoreHistory: number[];

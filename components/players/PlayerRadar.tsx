@@ -1,9 +1,7 @@
 'use client';
 
 import { useMemo } from 'react';
-import type { PlayerSubScores } from '@/lib/players/types';
 
-const AXES = ['OPPORTUNITY', 'SITUATION', 'AGE CURVE', 'IQ', 'UPSIDE'] as const;
 const N = 5;
 const CX = 95;
 const CY = 95;
@@ -15,19 +13,15 @@ function vertexPoint(i: number, radius: number): { x: number; y: number } {
 }
 
 interface PlayerRadarProps {
-  subScores: PlayerSubScores;
+  /** 5 axis values on a 0–100 scale, in label order. */
+  vals: number[];
+  labels: readonly string[];
   color?: string;
 }
 
-export default function PlayerRadar({ subScores, color = '#36E7A1' }: PlayerRadarProps) {
+export default function PlayerRadar({ vals: rawVals, labels: axisLabels, color = '#36E7A1' }: PlayerRadarProps) {
   const radar = useMemo(() => {
-    const vals = [
-      subScores.opportunity / 100,
-      subScores.situation / 100,
-      subScores.ageCurve / 100,
-      subScores.iq / 100,
-      subScores.upside / 100,
-    ];
+    const vals = rawVals.map((v) => v / 100);
 
     const rings = [1, 0.75, 0.5, 0.25].map((scale) =>
       Array.from({ length: N }, (_, i) => {
@@ -43,13 +37,13 @@ export default function PlayerRadar({ subScores, color = '#36E7A1' }: PlayerRada
       })
       .join(' ');
 
-    const labels = AXES.map((label, i) => {
+    const labels = axisLabels.map((label, i) => {
       const p = vertexPoint(i, MAX_R + 14);
       return { label, x: p.x, y: p.y };
     });
 
     return { rings, dataPts, labels, vals };
-  }, [subScores]);
+  }, [rawVals, axisLabels]);
 
   return (
     <svg viewBox="0 0 190 190" className="mx-auto block w-full max-w-[190px]" aria-hidden>

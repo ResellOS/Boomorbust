@@ -30,17 +30,34 @@ function trendColor(trend: HubPlayer['trend']): string {
   return 'text-muted';
 }
 
-const SIGNAL_ROWS: { key: keyof HubPlayer['subScores']; label: string }[] = [
-  { key: 'opportunity', label: 'OPPORTUNITY' },
-  { key: 'situation', label: 'SITUATION' },
-  { key: 'iq', label: 'IQ' },
-  { key: 'ageCurve', label: 'AGE CURVE' },
-  { key: 'upside', label: 'UPSIDE' },
-];
+// Real engine component axes. Fallback labels are used only when a player has
+// no scored components (keeps the derived subScores shape rather than blank).
+const COMPONENT_LABELS = ['OPS', 'SFS', 'YOY', 'SIT', 'PPG'] as const;
+const FALLBACK_LABELS = ['OPPORTUNITY', 'SITUATION', 'IQ', 'AGE CURVE', 'UPSIDE'] as const;
 
 export default function PlayerDetailPanel({ player, leagueNames }: PlayerDetailPanelProps) {
   const [watching, setWatching] = useState(false);
   const [imgFailed, setImgFailed] = useState(false);
+
+  // Radar + signal bars from REAL components (OPS/SFS/YOY/SIT/PPG); fall back to
+  // the derived subScores only when the player has no scored components.
+  const c = player.components;
+  const radarLabels: readonly string[] = c ? COMPONENT_LABELS : FALLBACK_LABELS;
+  const radarVals: number[] = c
+    ? [
+        Math.round(c.ops),
+        Math.round(c.sfs),
+        Math.round(c.yoysi),
+        Math.round(c.sit),
+        Math.round(Math.min(100, (c.projectedPpg / 28) * 100)),
+      ]
+    : [
+        player.subScores.opportunity,
+        player.subScores.situation,
+        player.subScores.iq,
+        player.subScores.ageCurve,
+        player.subScores.upside,
+      ];
 
   const tier = getDynastyTier(player.tfoScore);
   const bob = generateBobVerdict(
@@ -140,24 +157,24 @@ export default function PlayerDetailPanel({ player, leagueNames }: PlayerDetailP
         style={{ gridTemplateColumns: '190px 1fr 148px' }}
       >
         <div className="border-r border-border bg-[#060a10] px-2.5 py-3">
-          <PlayerRadar subScores={player.subScores} color={marketColor} />
+          <PlayerRadar vals={radarVals} labels={radarLabels} color={marketColor} />
         </div>
         <div className="border-r border-border px-3.5 py-[13px]">
           <div className="mb-2 font-mono text-[7.5px] uppercase tracking-[2px] text-muted">
             Signal Bars
           </div>
-          {SIGNAL_ROWS.map(({ key, label }) => {
-            const val = player.subScores[key];
+          {radarLabels.map((label, i) => {
+            const val = radarVals[i] ?? 0;
             return (
-              <div key={key} className="mb-2 flex items-center gap-2 last:mb-0">
+              <div key={label} className="mb-2 flex items-center gap-2 last:mb-0">
                 <div className="w-[88px] shrink-0 font-mono text-[8.5px] text-muted">{label}</div>
                 <div className="h-1.5 flex-1 overflow-hidden rounded-[3px] bg-border">
                   <div
-                    className="h-full rounded-[3px] bg-boom"
-                    style={{ width: `${Math.min(100, val)}%` }}
+                    className="h-full rounded-[3px]"
+                    style={{ width: `${Math.min(100, val)}%`, background: marketColor }}
                   />
                 </div>
-                <div className="w-6 shrink-0 text-right font-mono text-[10px] text-boom">{val}</div>
+                <div className="w-6 shrink-0 text-right font-mono text-[10px]" style={{ color: marketColor }}>{val}</div>
               </div>
             );
           })}

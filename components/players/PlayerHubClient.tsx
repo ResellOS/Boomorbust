@@ -17,7 +17,6 @@ function mvColor(p: HubPlayer): string {
 }
 import PlayerAvatar from './PlayerAvatar';
 import PlayerDetailPanel from './PlayerDetailPanel';
-import TrendSparkline from './TrendSparkline';
 
 const PAGE_SIZE = 25;
 
@@ -29,18 +28,6 @@ const FILTERS: FilterKey[] = ['ALL', 'BOOM', 'HOLD', 'BUST', 'QB', 'RB', 'WR', '
 interface PlayerHubClientProps {
   players: HubPlayer[];
   leaguePresence: Record<string, string[]>;
-}
-
-function trendSymbol(trend: HubPlayer['trend']): string {
-  if (trend === 'up') return '↑';
-  if (trend === 'down') return '↓';
-  return '→';
-}
-
-function trendClass(trend: HubPlayer['trend']): string {
-  if (trend === 'up') return 'text-boom';
-  if (trend === 'down') return 'text-bust';
-  return 'text-muted';
 }
 
 export default function PlayerHubClient({ players, leaguePresence }: PlayerHubClientProps) {
@@ -153,9 +140,9 @@ export default function PlayerHubClient({ players, leaguePresence }: PlayerHubCl
         <div className="overflow-hidden rounded-[7px] border border-border bg-surface">
           <div
             className="grid gap-2 border-b border-border bg-bg px-3 py-[7px]"
-            style={{ gridTemplateColumns: '2fr 70px 110px 46px 88px' }}
+            style={{ gridTemplateColumns: '2fr 70px 110px' }}
           >
-            {['Player', 'Rating', 'Grade', 'Trend', 'Action'].map((h) => (
+            {['Player', 'Rating', 'Grade'].map((h) => (
               <div
                 key={h}
                 className="font-mono text-[7px] font-normal uppercase tracking-[1.5px] text-muted"
@@ -177,7 +164,7 @@ export default function PlayerHubClient({ players, leaguePresence }: PlayerHubCl
                       ? 'border-l-2 border-l-boom bg-boom/[0.04] pl-[10px]'
                       : 'border-l-2 border-l-transparent'
                   }`}
-                  style={{ gridTemplateColumns: '2fr 70px 110px 46px 88px' }}
+                  style={{ gridTemplateColumns: '2fr 70px 110px' }}
                 >
                   <div className="flex items-center gap-2">
                     <PlayerAvatar
@@ -204,12 +191,6 @@ export default function PlayerHubClient({ players, leaguePresence }: PlayerHubCl
                     >
                       {getGradeLabel(p.tfoScore)}
                     </span>
-                  </div>
-                  <div className={`text-center text-sm ${trendClass(p.trend)}`}>
-                    {trendSymbol(p.trend)}
-                  </div>
-                  <div className="flex justify-center">
-                    <TrendSparkline history={p.scoreHistory} trend={p.trend} />
                   </div>
                 </button>
               );

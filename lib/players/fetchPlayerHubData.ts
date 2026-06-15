@@ -32,6 +32,12 @@ type TfoCacheRow = {
   sfs?: number | null;
   ffig?: number | null;
   sit?: number | null;
+  // Real engine component columns.
+  ops_score?: number | null;
+  sfs_score?: number | null;
+  yoysi_score?: number | null;
+  sit_score?: number | null;
+  projected_ppg?: number | null;
   calculated_at?: string | null;
 };
 
@@ -146,7 +152,7 @@ export async function fetchPlayerHubData(
   try {
     const { data, error } = await supabase
       .from('formula_scores')
-      .select('player_id, tfo_score, verdict, calculated_at')
+      .select('player_id, tfo_score, verdict, ops_score, sfs_score, yoysi_score, sit_score, projected_ppg, calculated_at')
       .order('calculated_at', { ascending: false });
     if (error) throw error;
 
@@ -228,6 +234,19 @@ export async function fetchPlayerHubData(
     const trend = calcTrend(score, prev);
     const subScores = resolveSubScores(tfo, pid, score);
 
+    // Real engine components for the detail radar/signal bars (null when unscored).
+    const hasComponents =
+      tfo.ops_score != null || tfo.sfs_score != null || tfo.yoysi_score != null || tfo.sit_score != null;
+    const components = hasComponents
+      ? {
+          ops: safeScore(tfo.ops_score),
+          sfs: safeScore(tfo.sfs_score),
+          yoysi: safeScore(tfo.yoysi_score),
+          sit: safeScore(tfo.sit_score),
+          projectedPpg: safeScore(tfo.projected_ppg),
+        }
+      : null;
+
     hubPlayers.push({
       playerId: pid,
       fullName: meta?.full_name ?? 'Unknown Player',
@@ -237,6 +256,7 @@ export async function fetchPlayerHubData(
       tfoScore: score,
       verdict: normalizeVerdict(tfo.verdict, score),
       subScores,
+      components,
       trend,
       trendDelta: prev !== null && prev > 0 ? Math.round((score - prev) * 10) / 10 : 0,
       scoreHistory: (historyByPlayer.get(pid) ?? [score]).reverse(),
