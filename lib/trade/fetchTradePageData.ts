@@ -2,9 +2,9 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import {
   fetchLeagueRosters,
-  fetchLeagueTrades,
   fetchLeagueUsers,
   fetchNflState,
+  fetchTradedPicks,
   fetchTransactions,
   type SleeperTransaction,
   type SleeperUser,
@@ -14,6 +14,7 @@ import { tradeVerdictFromDelta } from '@/lib/trade/verdict';
 import { fetchMarketVerdicts } from '@/lib/verdict/fetchMarketVerdicts';
 import type {
   BobSuggestion,
+  OwnedPick,
   TradeHistoryRow,
   TradeLeague,
   TradeOffer,
@@ -23,6 +24,9 @@ import type {
   TradePick,
   TradePlayer,
 } from '@/lib/trade/types';
+
+const ORD = (r: number): string =>
+  r === 1 ? '1st' : r === 2 ? '2nd' : r === 3 ? '3rd' : `${r}th`;
 
 function timeAgo(ts: string | number): string {
   const ms = typeof ts === 'number' ? ts : new Date(ts).getTime();
@@ -87,6 +91,7 @@ export async function fetchTradePageData(userId: string): Promise<TradePageData>
     suggestions: [],
     history: [],
     footer: emptyFooter(),
+    ownedPicksByLeague: {},
     selectedOfferDefaults: null,
   };
 
@@ -232,22 +237,28 @@ export async function fetchTradePageData(userId: string): Promise<TradePageData>
     const myRoster = rosterByLeague.get(lg.id);
     const myRosterId = myRoster?.roster_id;
 
-    // Pending trades from Sleeper trades endpoint
+    // Pending trades. Sleeper has NO /trades endpoint — pending trades live in
+    // /transactions/{week} with status 'pending'. Scan the current week plus a
+    // couple of fallbacks (offseason pending trades often sit under week 1).
     try {
-      const pending = (await fetchLeagueTrades(lg.id)) ?? [];
-      for (const tx of pending) {
-        if (!myRosterId || !tx.roster_ids?.includes(myRosterId)) continue;
-        if (tx.status && tx.status !== 'pending' && tx.status !== 'proposed') continue;
+      const pendingWeeks = Array.from(
+        new Set([1, currentWeek, currentWeek + 1, 18].filter((w) => w >= 1)),
+      );
+      const seenTx = new Set<string>();
+      for (const wk of pendingWeeks) {
+        const txns = (await fetchTransactions(lg.id, wk)) ?? [];
+        for (const tx of txns) {
+          if (tx.type !== 'trade') continue;
+          if (tx.status !== 'pending' && tx.status !== 'proposed') continue;
+          if (!myRosterId || !tx.roster_ids?.includes(myRosterId)) continue;
+          if (seenTx.has(tx.transaction_id)) continue;
+          seenTx.add(tx.transaction_id);
 
-        const offer = await parseTransaction(
-          tx,
-          lg,
-          myRosterId,
-          users,
-          'pending',
-          'incoming',
-        );
-        if (offer) allOffers.push(offer);
+          // You proposed it → outgoing; someone proposed to you → incoming.
+          const direction = tx.creator && tx.creator === sleeperUserId ? 'outgoing' : 'incoming';
+          const offer = await parseTransaction(tx, lg, myRosterId, users, 'pending', direction);
+          if (offer) allOffers.push(offer);
+        }
       }
     } catch (err) {
       console.error('[trade] pending trades failed:', lg.id, err);
@@ -390,18 +401,63 @@ export async function fetchTradePageData(userId: string): Promise<TradePageData>
   // Sell-high = SELL/BUST players (market >> engine) on the user's own roster.
   // edgeScore is the rank_delta scaled by /10 to a "+11.7" magnitude.
   const suggestions: BobSuggestion[] = [];
+  // Draft picks the user currently owns, per league (give-side dropdown).
+  const ownedPicksByLeague: Record<string, OwnedPick[]> = {};
+  const baseYear = new Date().getFullYear();
+  const targetSeasons = [String(baseYear + 1), String(baseYear + 2)];
   try {
     const marketVerdicts = await fetchMarketVerdicts(supabase, 'dynasty');
     const myRosterIdSet = new Set(playerIds);
 
     for (const lg of leaguesRaw.slice(0, 15)) {
-      const [users, rosters] = await Promise.all([
+      const [users, rosters, tradedPicks] = await Promise.all([
         fetchLeagueUsers(lg.id).catch(() => [] as SleeperUser[]),
         fetchLeagueRosters(lg.id).catch(() => null),
+        fetchTradedPicks(lg.id).catch(() => null),
       ]);
       const ownerName = new Map<string, string>();
+      const userDisplay = new Map<string, string>();
       for (const u of users ?? []) {
         ownerName.set(u.user_id, u.username ? `@${u.username}` : (u.display_name ?? 'Manager'));
+        userDisplay.set(u.user_id, u.display_name ?? u.username ?? 'Team');
+      }
+
+      // ── Owned draft picks (Sleeper traded_picks + original slots) ──────────
+      const myRosterId = rosterByLeague.get(lg.id)?.roster_id;
+      if (myRosterId != null) {
+        const rosterTeam = new Map<number, string>();
+        for (const r of rosters ?? []) {
+          rosterTeam.set(r.roster_id, userDisplay.get(r.owner_id ?? '') ?? `Team ${r.roster_id}`);
+        }
+        // current owner keyed by season-round-originalRoster
+        const tradedMap = new Map<string, number>();
+        for (const tp of tradedPicks ?? []) {
+          tradedMap.set(`${tp.season}-${tp.round}-${tp.roster_id}`, tp.owner_id);
+        }
+        const picks: OwnedPick[] = [];
+        // Own picks not traded away
+        for (const season of targetSeasons) {
+          for (let round = 1; round <= 4; round++) {
+            const cur: number = tradedMap.get(`${season}-${round}-${myRosterId}`) ?? myRosterId;
+            if (cur === myRosterId) {
+              picks.push({ label: `${season} ${ORD(round)} (own)`, season, round, leagueId: lg.id });
+            }
+          }
+        }
+        // Picks acquired from other teams
+        for (const tp of tradedPicks ?? []) {
+          if (tp.owner_id !== myRosterId || tp.roster_id === myRosterId) continue;
+          if (!targetSeasons.includes(tp.season)) continue;
+          const team = rosterTeam.get(tp.roster_id) ?? `Team ${tp.roster_id}`;
+          picks.push({
+            label: `${tp.season} ${ORD(tp.round)} (via ${team})`,
+            season: tp.season,
+            round: tp.round,
+            leagueId: lg.id,
+          });
+        }
+        picks.sort((a, b) => a.season.localeCompare(b.season) || a.round - b.round);
+        ownedPicksByLeague[lg.id] = picks;
       }
 
       // Buy-low: scan other managers' rosters for BOOM/BUY players.
@@ -524,8 +580,8 @@ export async function fetchTradePageData(userId: string): Promise<TradePageData>
     stats,
     leagues,
     topOffer,
-    incomingOffers: allOffers,
-    outgoingOffers: [],
+    incomingOffers: allOffers.filter((o) => o.direction === 'incoming'),
+    outgoingOffers: allOffers.filter((o) => o.direction === 'outgoing'),
     completedOffers,
     suggestions,
     history,
@@ -536,6 +592,7 @@ export async function fetchTradePageData(userId: string): Promise<TradePageData>
       suggestionSuccessRate: null,
       tradeVolumeThisMonth: tradeVolumeThisMonth || completedOffers.length,
     },
+    ownedPicksByLeague,
     selectedOfferDefaults: topOffer
       ? {
           offeredPlayerIds: topOffer.offeredPlayerIds,

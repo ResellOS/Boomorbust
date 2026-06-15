@@ -72,6 +72,9 @@ export interface SleeperTransaction {
   drops: Record<string, number> | null;
   draft_picks: SleeperDraftPick[];
   roster_ids: number[];
+  /** user_id of the proposer (used to split incoming vs outgoing). */
+  creator?: string;
+  consenter_ids?: number[];
 }
 
 export interface SleeperUser {

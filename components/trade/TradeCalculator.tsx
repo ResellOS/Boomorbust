@@ -1,7 +1,8 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import type { CalculatorSearchHit } from '@/app/api/trade/calculator-search/route';
+import type { OwnedPick } from '@/lib/trade/types';
 
 interface Asset {
   key: string;
@@ -11,24 +12,34 @@ interface Asset {
   ktcValue: number | null;
 }
 
-const PICK_TFO = 55; // nominal TFO weight for a draft pick
-const PICK_KTC = 2500;
+interface PickOption {
+  label: string;
+  round: number;
+}
+
+// Nominal TFO / KTC weight of a rookie pick by round (no per-pick value source).
+const PICK_TFO: Record<number, number> = { 1: 70, 2: 55, 3: 40, 4: 25 };
+const PICK_KTC: Record<number, number> = { 1: 4000, 2: 2500, 3: 1200, 4: 500 };
 
 function SideColumn({
   title,
   assets,
+  pickOptions,
+  pickPlaceholder,
   onAdd,
   onRemove,
 }: {
   title: string;
   assets: Asset[];
+  pickOptions: PickOption[];
+  pickPlaceholder: string;
   onAdd: (a: Asset) => void;
   onRemove: (key: string) => void;
 }) {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<CalculatorSearchHit[]>([]);
   const [open, setOpen] = useState(false);
-  const [pick, setPick] = useState('2027 1st Round');
+  const [pickIdx, setPickIdx] = useState('');
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
@@ -61,6 +72,7 @@ function SideColumn({
         {title}
       </div>
 
+      {/* Player search */}
       <div className="relative p-2.5">
         <input
           value={query}
@@ -101,22 +113,36 @@ function SideColumn({
         )}
       </div>
 
-      {/* Pick entry */}
+      {/* Pick dropdown */}
       <div className="flex items-center gap-1.5 px-2.5 pb-2">
-        <input
-          value={pick}
-          onChange={(e) => setPick(e.target.value)}
-          placeholder="2027 1st Round"
-          className="min-w-0 flex-1 rounded-[6px] border border-border bg-bg px-2 py-1 font-figtree text-[10px] text-text outline-none placeholder:text-muted focus:border-boom/50"
-        />
+        <select
+          value={pickIdx}
+          onChange={(e) => setPickIdx(e.target.value)}
+          className="min-w-0 flex-1 rounded-[6px] border border-border bg-bg px-2 py-1 font-figtree text-[10px] text-text outline-none focus:border-boom/50"
+        >
+          <option value="">{pickOptions.length ? pickPlaceholder : 'No picks available'}</option>
+          {pickOptions.map((p, i) => (
+            <option key={`${p.label}-${i}`} value={String(i)}>
+              {p.label}
+            </option>
+          ))}
+        </select>
         <button
           type="button"
+          disabled={pickIdx === ''}
           onClick={() => {
-            const label = pick.trim();
-            if (!label) return;
-            onAdd({ key: `pick-${label}-${Date.now()}`, label, isPick: true, tfoScore: PICK_TFO, ktcValue: PICK_KTC });
+            const opt = pickOptions[Number(pickIdx)];
+            if (!opt) return;
+            onAdd({
+              key: `pick-${opt.label}-${Date.now()}`,
+              label: opt.label,
+              isPick: true,
+              tfoScore: PICK_TFO[opt.round] ?? 20,
+              ktcValue: PICK_KTC[opt.round] ?? 300,
+            });
+            setPickIdx('');
           }}
-          className="shrink-0 rounded-[6px] border border-border px-2 py-1 font-figtree text-[10px] text-muted hover:text-text"
+          className="shrink-0 rounded-[6px] border border-border px-2 py-1 font-figtree text-[10px] text-muted hover:text-text disabled:opacity-40"
         >
           + Pick
         </button>
@@ -128,10 +154,7 @@ function SideColumn({
           <div className="py-3 text-center font-figtree text-[10px] text-muted">No assets yet.</div>
         ) : (
           assets.map((a) => (
-            <div
-              key={a.key}
-              className="flex items-center justify-between gap-2 border-b border-border/40 py-1.5"
-            >
+            <div key={a.key} className="flex items-center justify-between gap-2 border-b border-border/40 py-1.5">
               <span className="min-w-0 truncate font-figtree text-[11px] text-text">
                 {a.isPick ? '🎟 ' : ''}{a.label}
               </span>
@@ -168,21 +191,39 @@ function SideColumn({
   );
 }
 
-export default function TradeCalculator() {
+export default function TradeCalculator({ givePicks }: { givePicks: OwnedPick[] }) {
   const [give, setGive] = useState<Asset[]>([]);
   const [get, setGet] = useState<Asset[]>([]);
+
+  // Give-side: only picks the user actually owns in the selected league.
+  const givePickOptions: PickOption[] = useMemo(
+    () => givePicks.map((p) => ({ label: p.label, round: p.round })),
+    [givePicks],
+  );
+
+  // Get-side: generic picks (current + next 2 years, rounds 1-4) — no ownership check.
+  const getPickOptions: PickOption[] = useMemo(() => {
+    const base = new Date().getFullYear();
+    const ord = (r: number) => (r === 1 ? '1st' : r === 2 ? '2nd' : r === 3 ? '3rd' : `${r}th`);
+    const out: PickOption[] = [];
+    for (const year of [base, base + 1, base + 2]) {
+      for (let round = 1; round <= 4; round++) out.push({ label: `${year} ${ord(round)}`, round });
+    }
+    return out;
+  }, []);
 
   const giveTfo = give.reduce((s, a) => s + (a.tfoScore ?? 0), 0);
   const getTfo = get.reduce((s, a) => s + (a.tfoScore ?? 0), 0);
 
-  // Fairness verdict based on TFO totals (the always-present metric).
+  // Fairness verdict — green when gaining, gray when even, amber when giving up
+  // value (no red/purple — "uneven", not "bad").
   let verdict: { label: string; color: string } = { label: 'Add players to compare', color: '#6b7a99' };
   if (give.length > 0 && get.length > 0) {
     const base = Math.max(giveTfo, getTfo, 1);
     const diffPct = ((getTfo - giveTfo) / base) * 100;
     if (Math.abs(diffPct) <= 10) verdict = { label: 'Fair Trade', color: '#6b7a99' };
     else if (diffPct > 10) verdict = { label: "You're Winning", color: '#36E7A1' };
-    else verdict = { label: "You're Losing", color: '#A78BFA' };
+    else verdict = { label: "You're Losing", color: '#f59e0b' };
   }
 
   const delta = Math.round((getTfo - giveTfo) * 10) / 10;
@@ -200,12 +241,16 @@ export default function TradeCalculator() {
         <SideColumn
           title="You Give"
           assets={give}
+          pickOptions={givePickOptions}
+          pickPlaceholder="Add an owned pick…"
           onAdd={(a) => setGive((p) => [...p, a])}
           onRemove={(k) => setGive((p) => p.filter((x) => x.key !== k))}
         />
         <SideColumn
           title="You Get"
           assets={get}
+          pickOptions={getPickOptions}
+          pickPlaceholder="Add a pick…"
           onAdd={(a) => setGet((p) => [...p, a])}
           onRemove={(k) => setGet((p) => p.filter((x) => x.key !== k))}
         />

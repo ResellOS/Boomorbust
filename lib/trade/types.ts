@@ -92,6 +92,15 @@ export interface TradePageFooter {
   tradeVolumeThisMonth: number;
 }
 
+/** A draft pick the current user owns in a given league (for the calculator). */
+export interface OwnedPick {
+  /** "2027 1st (own)" or "2027 2nd (via Team X)" */
+  label: string;
+  season: string;
+  round: number;
+  leagueId: string;
+}
+
 export interface TradePageData {
   stats: TradePageStats;
   leagues: TradeLeague[];
@@ -102,6 +111,8 @@ export interface TradePageData {
   suggestions: BobSuggestion[];
   history: TradeHistoryRow[];
   footer: TradePageFooter;
+  /** Picks the user currently owns, keyed by leagueId (give-side dropdown). */
+  ownedPicksByLeague: Record<string, OwnedPick[]>;
   selectedOfferDefaults: {
     offeredPlayerIds: string[];
     yourPlayerIds: string[];

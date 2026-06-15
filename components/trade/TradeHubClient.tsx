@@ -65,6 +65,13 @@ export default function TradeHubClient({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const history = useMemo(() => inLeague(data.history), [data.history, league]);
 
+  // Give-side picks: the selected league's owned picks, or all leagues combined.
+  const givePicks = useMemo(() => {
+    const byLeague = data.ownedPicksByLeague ?? {};
+    if (league === ALL) return Object.values(byLeague).flat();
+    return byLeague[league] ?? [];
+  }, [data.ownedPicksByLeague, league]);
+
   const selected = useMemo(() => {
     const list = data.incomingOffers.length ? data.incomingOffers : tabOffers;
     return list.find((o) => o.id === selectedId) ?? list[0] ?? null;
@@ -131,7 +138,7 @@ export default function TradeHubClient({
         </div>
 
         {tab === 'calculator' ? (
-          <TradeCalculator />
+          <TradeCalculator givePicks={givePicks} />
         ) : (
           <>
             <div>
