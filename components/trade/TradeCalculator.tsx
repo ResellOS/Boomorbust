@@ -217,16 +217,18 @@ export default function TradeCalculator({ givePicks }: { givePicks: OwnedPick[] 
 
   // Fairness verdict — green when gaining, gray when even, amber when giving up
   // value (no red/purple — "uneven", not "bad").
+  const active = give.length > 0 && get.length > 0;
+  const diffPct = active ? ((getTfo - giveTfo) / Math.max(giveTfo, getTfo, 1)) * 100 : 0;
   let verdict: { label: string; color: string } = { label: 'Add players to compare', color: '#6b7a99' };
-  if (give.length > 0 && get.length > 0) {
-    const base = Math.max(giveTfo, getTfo, 1);
-    const diffPct = ((getTfo - giveTfo) / base) * 100;
+  if (active) {
     if (Math.abs(diffPct) <= 10) verdict = { label: 'Fair Trade', color: '#6b7a99' };
     else if (diffPct > 10) verdict = { label: "You're Winning", color: '#36E7A1' };
     else verdict = { label: "You're Losing", color: '#f59e0b' };
   }
 
   const delta = Math.round((getTfo - giveTfo) * 10) / 10;
+  // Diverging meter: segment grows from center toward the favored side.
+  const meterMag = Math.min(Math.abs(diffPct), 100) / 2; // 0–50 (% of track)
 
   return (
     <div className="rounded-[8px] border border-border bg-bg/40 p-3">
@@ -258,17 +260,38 @@ export default function TradeCalculator({ givePicks }: { givePicks: OwnedPick[] 
 
       {/* Verdict bar */}
       <div
-        className="mt-3 flex items-center justify-between rounded-[8px] border px-4 py-2.5"
+        className="mt-3 rounded-[8px] border px-4 py-2.5"
         style={{ borderColor: `${verdict.color}66`, background: `${verdict.color}12` }}
       >
-        <div className="font-figtree text-[13px] font-bold" style={{ color: verdict.color }}>
-          {verdict.label}
-        </div>
-        <div className="text-right">
-          <div className="font-mono text-[9px] uppercase tracking-wide text-muted">TFO Delta</div>
-          <div className="font-mono text-[15px] font-bold" style={{ color: verdict.color }}>
-            {delta >= 0 ? '+' : ''}{delta.toFixed(1)}
+        <div className="flex items-center justify-between">
+          <div className="font-figtree text-[13px] font-bold" style={{ color: verdict.color }}>
+            {verdict.label}
           </div>
+          <div className="text-right">
+            <div className="font-mono text-[9px] uppercase tracking-wide text-muted">TFO Delta</div>
+            <div className="font-mono text-[15px] font-bold" style={{ color: verdict.color }}>
+              {delta >= 0 ? '+' : ''}{delta.toFixed(1)}
+            </div>
+          </div>
+        </div>
+
+        {/* Value-balance meter — fills from center toward the favored side */}
+        <div className="relative mt-2 h-1.5 w-full rounded-full bg-border/70">
+          <div className="absolute left-1/2 top-[-2px] h-[10px] w-px -translate-x-1/2 bg-muted/60" />
+          {active && meterMag > 0 && (
+            <div
+              className="absolute top-0 h-1.5 rounded-full"
+              style={{
+                background: verdict.color,
+                width: `${meterMag}%`,
+                left: diffPct >= 0 ? '50%' : `${50 - meterMag}%`,
+              }}
+            />
+          )}
+        </div>
+        <div className="mt-1 flex justify-between font-mono text-[7.5px] uppercase tracking-wide text-muted">
+          <span>You Give</span>
+          <span>You Get</span>
         </div>
       </div>
     </div>
