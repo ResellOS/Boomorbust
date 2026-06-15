@@ -23,7 +23,6 @@ import {
   type LeagueBundle,
   type OvervaluedItem,
   type PlayerComponents,
-  type PlayerMarketVerdict,
   type RotationPlayer,
   type SignalCounts,
   type TradeTargetItem,
