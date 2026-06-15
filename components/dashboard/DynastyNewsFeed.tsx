@@ -91,7 +91,7 @@ export default function DynastyNewsFeed({ items, rosterPlayerIds, allMode = fals
     const filtered = allMode
       ? items
       : items.filter((i) => !i.playerId || rosterPlayerIds?.has(i.playerId));
-    return filtered.slice(0, 4);
+    return filtered.slice(0, 6);
   }, [items, rosterPlayerIds, allMode]);
 
   return (

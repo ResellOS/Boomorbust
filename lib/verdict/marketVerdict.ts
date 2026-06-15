@@ -22,6 +22,49 @@ export const MARKET_VERDICT_COLORS: Record<MarketVerdict, string> = {
 
 export const NO_MARKET_DATA_FLAG = 'no_market_data';
 
+/** Neutral border for players with no real market signal. */
+export const NEUTRAL_BORDER = '#1e2640';
+
+/** Full-card border + glow per market verdict. Neutral when no market data. */
+export function marketCardBorderStyle(
+  verdict: MarketVerdict | null | undefined,
+): { border: string; boxShadow?: string } {
+  switch (verdict) {
+    case 'BOOM':
+      return { border: '2px solid #36E7A1', boxShadow: '0 0 12px rgba(54,231,161,0.3)' };
+    case 'BUY':
+      return { border: '1px solid #60a5fa' };
+    case 'HOLD':
+      return { border: '1px solid #FBBF24' };
+    case 'SELL':
+      return { border: '1px solid #f59e0b' };
+    case 'BUST':
+      return { border: '2px solid #A78BFA', boxShadow: '0 0 12px rgba(167,139,250,0.3)' };
+    default:
+      return { border: `1px solid ${NEUTRAL_BORDER}` };
+  }
+}
+
+/** Radar polygon fill/stroke per market verdict (0.25 fill, 0.8 stroke). */
+export function marketRadarColors(
+  verdict: MarketVerdict | null | undefined,
+): { fill: string; stroke: string } {
+  switch (verdict) {
+    case 'BOOM':
+      return { fill: 'rgba(54,231,161,0.25)', stroke: 'rgba(54,231,161,0.8)' };
+    case 'BUY':
+      return { fill: 'rgba(96,165,250,0.25)', stroke: 'rgba(96,165,250,0.8)' };
+    case 'HOLD':
+      return { fill: 'rgba(251,191,36,0.25)', stroke: 'rgba(251,191,36,0.8)' };
+    case 'SELL':
+      return { fill: 'rgba(245,158,11,0.25)', stroke: 'rgba(245,158,11,0.8)' };
+    case 'BUST':
+      return { fill: 'rgba(167,139,250,0.25)', stroke: 'rgba(167,139,250,0.8)' };
+    default:
+      return { fill: 'rgba(107,122,153,0.20)', stroke: 'rgba(107,122,153,0.7)' };
+  }
+}
+
 /** Hover-tooltip definitions for each market verdict (action signal). */
 export const MARKET_VERDICT_DEFINITIONS: Record<MarketVerdict, string> = {
   BOOM: 'BOB rates this player far above market — aggressive buy',

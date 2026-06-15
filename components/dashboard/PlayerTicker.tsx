@@ -8,14 +8,10 @@ interface PlayerTickerProps {
   animated: boolean;
 }
 
-const VERDICT_COLOR: Record<string, string> = {
-  boom: '#36E7A1',
-  hold: '#FBBF24',
-  bust: '#A78BFA',
-};
-
 function TickerItem({ p }: { p: RotationPlayer }) {
-  const scoreColor = VERDICT_COLOR[p.verdictClass] ?? '#6b7a99';
+  // Score colored by the MARKET verdict (5-color); neutral when no signal.
+  const scoreColor =
+    p.marketVerdict && !p.marketVerdict.noMarketData ? p.marketVerdict.color : '#6b7a99';
   const score = p.tfoScore > 0 ? p.tfoScore.toFixed(1) : '—';
   // Guard against a blank name so the ticker never shows a leading bare score.
   const name = p.name?.trim() ? p.name : 'Unknown Player';

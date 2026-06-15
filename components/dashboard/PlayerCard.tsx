@@ -2,8 +2,13 @@
 
 import { useMemo, useState } from 'react';
 import Image from 'next/image';
-import { deriveRadarVals, getCardBorderStyle, getGradeLabel, getTier, getVerdict } from '@/lib/verdict';
-import { MARKET_VERDICT_DEFINITIONS } from '@/lib/verdict/marketVerdict';
+import { deriveRadarVals, getGradeLabel, getTier } from '@/lib/verdict';
+import {
+  MARKET_VERDICT_COLORS,
+  MARKET_VERDICT_DEFINITIONS,
+  marketCardBorderStyle,
+  marketRadarColors,
+} from '@/lib/verdict/marketVerdict';
 
 export interface PlayerCardProps {
   playerName: string;
@@ -49,16 +54,6 @@ function axisColorFor(position: string): string {
   return POSITION_COLOR[(position ?? '').toUpperCase()] ?? '#6b7a99';
 }
 
-function radarColors(verdictLabel: string): { fill: string; stroke: string } {
-  if (verdictLabel.includes('BOOM')) {
-    return { fill: 'rgba(54,231,161,0.25)', stroke: 'rgba(54,231,161,0.8)' };
-  }
-  if (verdictLabel === 'HOLD') {
-    return { fill: 'rgba(251,191,36,0.25)', stroke: 'rgba(251,191,36,0.8)' };
-  }
-  return { fill: 'rgba(167,139,250,0.25)', stroke: 'rgba(167,139,250,0.8)' };
-}
-
 const N = 5;
 const VB = 200;
 const CX = 100;
@@ -89,12 +84,17 @@ export default function PlayerCard({
   marketVerdict,
 }: PlayerCardProps) {
   const [imgFailed, setImgFailed] = useState(false);
-  const verdict = getVerdict(tfoScore);
   const displayTier = tier || getTier(tfoScore);
   const axisLabels = axisLabelsProp ?? axisLabelsFor(position);
   const axisColor = axisColorFor(position);
-  const borderStyle = getCardBorderStyle(verdict.label);
-  const radarStyle = radarColors(verdict.label);
+
+  // Card theming follows the MARKET verdict (5-color). Neutral when there's no
+  // real market signal (no_market_data, or surfaces that don't supply one).
+  const activeVerdict =
+    marketVerdict && !marketVerdict.noMarketData ? marketVerdict.verdict : null;
+  const borderStyle = marketCardBorderStyle(activeVerdict);
+  const radarStyle = marketRadarColors(activeVerdict);
+  const themeColor = activeVerdict ? MARKET_VERDICT_COLORS[activeVerdict] : '#6b7a99';
 
   const radar = useMemo(() => {
     const vals = radarVals.length === N ? radarVals : deriveRadarVals(playerId, tfoScore);
@@ -145,7 +145,7 @@ export default function PlayerCard({
           ) : (
             <div
               className="flex h-full w-full items-center justify-center font-figtree text-[15px] font-bold"
-              style={{ color: verdict.color, background: '#141929' }}
+              style={{ color: themeColor, background: '#141929' }}
             >
               {initials(playerName)}
             </div>
@@ -160,7 +160,7 @@ export default function PlayerCard({
           </div>
           <div
             className="font-figtree text-[32px] font-normal leading-none tracking-[-1.5px]"
-            style={{ color: verdict.color }}
+            style={{ color: themeColor }}
           >
             {tfoScore.toFixed(1)}
           </div>
