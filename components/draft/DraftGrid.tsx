@@ -44,14 +44,6 @@ export default function DraftGrid({ config, picks, currentOverall }: DraftGridPr
 
   const ownership = useMemo(() => initPickOwnership(config), [config]);
 
-  const slotOpts = useMemo(
-    () => ({
-      thirdRoundReversal: config.thirdRoundReversal,
-      linear: config.draftOrderType === 'linear',
-    }),
-    [config.thirdRoundReversal, config.draftOrderType],
-  );
-
   const renderRoundRow = (round: number, compact = false) => {
     const cells = Array.from({ length: teams }, (_, col) => {
       const overall = (round - 1) * teams + col + 1;

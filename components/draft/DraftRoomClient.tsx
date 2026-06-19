@@ -63,7 +63,7 @@ export default function DraftRoomClient({
   const [clock, setClock] = useState(pickSeconds);
   const [summary, setSummary] = useState<DraftGradeSummary | null>(null);
   const [starting, setStarting] = useState(false);
-  const [queue, setQueue] = useState<DraftablePlayer[]>([]);
+  const [, setQueue] = useState<DraftablePlayer[]>([]);
   const [watchlist, setWatchlist] = useState<Set<string>>(new Set());
   const [chat, setChat] = useState<ChatMessage[]>([]);
   const [pickOwnership, setPickOwnership] = useState<Map<number, number>>(() =>

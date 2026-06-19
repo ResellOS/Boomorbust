@@ -189,7 +189,7 @@ export async function fetchPlayerHubData(
   const marketVerdicts = await fetchMarketVerdicts(supabase, 'dynasty');
   const lastUpdated = await fetchLatestFormulaCalculatedAt(supabase, 'dynasty');
 
-  let sleeperBioById = new Map<string, ReturnType<typeof parseSleeperBio>>();
+  const sleeperBioById = new Map<string, ReturnType<typeof parseSleeperBio>>();
   try {
     const sleeperMap = await fetchAllPlayers();
     if (sleeperMap) {
