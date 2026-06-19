@@ -2,6 +2,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { calculateTFOScore, type CalculateTFOScoreInput } from '@/lib/tfo/formula';
 import { fetchAllPlayers } from '@/lib/sleeper/players';
 import { getKTCValues } from '@/lib/values/ktc';
+import { percentileCutoffs, verdictByPercentile } from '@/lib/formula/percentileVerdict';
 
 const SKILL = new Set(['QB', 'RB', 'WR', 'TE']);
 const BATCH = 100;
@@ -74,7 +75,7 @@ export async function rescoreAllPlayers(): Promise<RescoreResult> {
         scoring_type: 'ppr',
         weight_set_name: 'default',
         tfo_score: result.tfoScore,
-        verdict: result.verdict,
+        // verdict assigned by percentile bucketing below (not fixed thresholds)
         ops_score: opportunityScore,
         sfs_score: 55,
         yoysi_score: 50,
@@ -85,6 +86,14 @@ export async function rescoreAllPlayers(): Promise<RescoreResult> {
     } catch {
       errors++;
     }
+  }
+
+  // Assign verdicts by percentile rank within the scored pool (5/15/60/15/5 →
+  // BOOM/BUY/HOLD/SELL/BUST), mirroring the canonical formula engine so a local
+  // rescore never reverts the column to the old fixed-threshold taxonomy.
+  const cutoffs = percentileCutoffs(rows.map((r) => Number(r.tfo_score)));
+  for (const r of rows) {
+    r.verdict = verdictByPercentile(Number(r.tfo_score), cutoffs);
   }
 
   for (let i = 0; i < rows.length; i += BATCH) {
