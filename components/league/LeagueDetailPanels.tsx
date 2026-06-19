@@ -26,9 +26,9 @@ function TfoCircle({ score }: { score: number }) {
       <div className="absolute inset-0 flex flex-col items-center justify-center">
         <div className="font-mono text-2xl leading-none text-boom">{score.toFixed(1)}</div>
         <div className="mt-0.5 text-center text-[8px] leading-snug tracking-wide text-muted">
-          TFO TEAM
+          TEAM
           <br />
-          SCORE
+          RATING
         </div>
       </div>
     </div>
@@ -56,7 +56,7 @@ export default function LeagueDetailPanels({ data }: { data: LeagueDetailData })
 
   const headerStats = [
     { label: 'Team Grade', val: header.teamGrade, sub: String(header.teamGradeNumeric), grade: true },
-    { label: 'TFO Team Score', val: header.tfoTeamScore.toFixed(1), sub: header.tfoPercentile, boom: true },
+    { label: 'Team Dynasty Rating', val: header.tfoTeamScore.toFixed(1), sub: header.tfoPercentile, boom: true },
     { label: 'Contender Score', val: `${header.contenderScore}%`, sub: header.contenderLabel, boom: true },
     { label: 'Roster Construction', val: header.rosterConstruction, sub: header.rosterConstructionPct, elite: true },
     { label: 'Last Updated', val: header.lastUpdated, sub: 'Live Sync', small: true },
@@ -108,7 +108,7 @@ export default function LeagueDetailPanels({ data }: { data: LeagueDetailData })
           <div className="overflow-hidden rounded-md border border-border bg-surface">
             <div className="border-b border-border px-3 py-2">
               <div className="text-[11px] font-semibold uppercase tracking-wide text-text">Your Team</div>
-              <div className="text-[9px] text-muted">Roster overview with TFO scores and analysis</div>
+              <div className="text-[9px] text-muted">Roster overview with dynasty ratings and analysis</div>
             </div>
             <div className="p-3">
               <div className="mb-2.5 grid grid-cols-[114px_1fr] items-center gap-3.5">
@@ -148,7 +148,7 @@ export default function LeagueDetailPanels({ data }: { data: LeagueDetailData })
                   ))}
                 </div>
               </div>
-              <div className="mb-1.5 text-[8px] uppercase tracking-wide text-muted">Top Players by TFO Score</div>
+              <div className="mb-1.5 text-[8px] uppercase tracking-wide text-muted">Top Players by Dynasty Rating</div>
               {yourTeam.topPlayers.map((p) => (
                 <div key={p.playerId} className="flex items-center gap-1.5 border-b border-border/40 py-1 last:border-b-0">
                   <PlayerAvatar playerId={p.playerId} name={p.fullName} size={20} />

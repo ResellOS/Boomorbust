@@ -27,29 +27,55 @@ import {
   type OvervaluedItem,
   type PlayerComponents,
   type RotationPlayer,
-  type SignalCounts,
   type TradeTargetItem,
 } from './rotation';
 import { fetchMarketVerdicts } from '@/lib/verdict/fetchMarketVerdicts';
+import { normalizeDirection60d } from '@/lib/dashboard/tickerSignal';
+import { computeFrontOfficePriority } from './priorityAction';
+import { tallyMarketSignals, emptySignalCounts as emptySignals } from './marketSignals';
+
+function buildEmptyDashboardData(nflSeason: DashboardRotationData['nflSeason']): DashboardRotationData {
+  return {
+    leagues: [],
+    portfolio: {
+      players: [],
+      teamTfo: 0,
+      signalCounts: emptySignals(),
+      playersRostered: 0,
+      breakdown: computeRosterBreakdown([], null, 'ORPHAN'),
+    },
+    tradeTargets: [],
+    overvalued: [],
+    frontOfficePriority: null,
+    incomingTrades: [],
+    newsItems: [],
+    leagueRosteredIds: {},
+    lineupOpportunity: null,
+    nflSeason,
+    scoringContext: 'dynasty',
+  };
+}
+
+export async function emptyDashboardRotationData(): Promise<DashboardRotationData> {
+  const nflStateRaw = await fetchNflState().catch(() => null);
+  const nflSeason = {
+    week: nflStateRaw?.week ?? 0,
+    seasonType: nflStateRaw?.season_type ?? ('off' as const),
+    inSeason:
+      nflStateRaw != null &&
+      nflStateRaw.season_type === 'regular' &&
+      nflStateRaw.week >= 1 &&
+      nflStateRaw.week <= 18,
+  };
+  return buildEmptyDashboardData(nflSeason);
+}
 
 function safeScore(v: number | null | undefined): number {
   return typeof v === 'number' && Number.isFinite(v) ? v : 0;
 }
 
-function emptySignals(): SignalCounts {
-  return { boom: 0, hold: 0, bust: 0, total: 0 };
-}
-
-function tallySignals(players: RotationPlayer[]): SignalCounts {
-  const s = emptySignals();
-  for (const p of players) {
-    if (p.tfoScore <= 0) continue;
-    s.total += 1;
-    if (p.verdictClass === 'boom') s.boom += 1;
-    else if (p.verdictClass === 'hold') s.hold += 1;
-    else s.bust += 1;
-  }
-  return s;
+function hasRealProjection(ppg: number | undefined): boolean {
+  return typeof ppg === 'number' && Number.isFinite(ppg) && ppg > 0;
 }
 
 function avgTfo(players: RotationPlayer[]): number {
@@ -163,26 +189,7 @@ export async function fetchRotationData(
       nflStateRaw.week <= 18,
   };
 
-  const emptyBreakdown = computeRosterBreakdown([], null, 'ORPHAN');
-
-  const empty: DashboardRotationData = {
-    leagues: [],
-    portfolio: {
-      players: [],
-      teamTfo: 0,
-      signalCounts: emptySignals(),
-      playersRostered: 0,
-      breakdown: emptyBreakdown,
-    },
-    tradeTargets: [],
-    overvalued: [],
-    incomingTrades: [],
-    newsItems: [],
-    leagueRosteredIds: {},
-    lineupOpportunity: null,
-    nflSeason,
-    scoringContext: 'dynasty',
-  };
+  const empty: DashboardRotationData = buildEmptyDashboardData(nflSeason);
 
   let supabase: ReturnType<typeof createAdminClient>;
   try {
@@ -343,6 +350,30 @@ export async function fetchRotationData(
   // shared with the player hub so both surfaces stay identical.
   const marketVerdictByPlayer = await fetchMarketVerdicts(supabase, scoringContext);
 
+  const valueSignalByPlayer = new Map<string, { direction60d: 'up' | 'down' | 'neutral' | null }>();
+  if (idList.length > 0) {
+    try {
+      const batch = 200;
+      for (let i = 0; i < idList.length; i += batch) {
+        const slice = idList.slice(i, i + batch);
+        const { data, error } = await supabase
+          .from('player_value_signals')
+          .select('player_id, direction_60d')
+          .in('player_id', slice);
+        if (error) throw error;
+        for (const row of data ?? []) {
+          const pid = String(row.player_id);
+          if (valueSignalByPlayer.has(pid)) continue;
+          valueSignalByPlayer.set(pid, {
+            direction60d: normalizeDirection60d(row.direction_60d as string | null),
+          });
+        }
+      }
+    } catch (err) {
+      console.error('[dashboard] player_value_signals fetch failed:', err);
+    }
+  }
+
   const sleeperByLeague = new Map<string, SleeperRoster[]>();
   await Promise.all(
     leaguesRaw.map(async (l) => {
@@ -379,6 +410,7 @@ export async function fetchRotationData(
       verdictClass: tfo?.verdictClass ?? 'hold',
       components: componentsByPlayer.get(pid) ?? null,
       marketVerdict: marketVerdictByPlayer.get(pid) ?? null,
+      valueSignal: valueSignalByPlayer.get(pid) ?? null,
     };
   };
 
@@ -391,7 +423,7 @@ export async function fetchRotationData(
     );
 
     const teamTfo = avgTfo(players);
-    const signalCounts = tallySignals(players);
+    const signalCounts = tallyMarketSignals(players);
 
     const sleeperRosters = sleeperByLeague.get(l.id) ?? [];
     const totalTeams = l.total_rosters ?? sleeperRosters.length ?? 0;
@@ -462,7 +494,7 @@ export async function fetchRotationData(
   const portfolio = {
     players: portfolioPlayers,
     teamTfo: portfolioTeamTfo,
-    signalCounts: tallySignals(portfolioPlayers),
+    signalCounts: tallyMarketSignals(portfolioPlayers),
     playersRostered: portfolioPlayers.length,
     breakdown: computeRosterBreakdown(portfolioPlayers, null, portfolioStatus),
   };
@@ -616,6 +648,7 @@ export async function fetchRotationData(
       const pos = posOf(sid);
       if (!pos) continue;
       const pr = proj(sid);
+      if (!hasRealProjection(pr)) continue;
       const cur = weakestStarter.get(pos);
       if (!cur || pr < cur.proj) weakestStarter.set(pos, { pid: sid, proj: pr });
     }
@@ -623,9 +656,9 @@ export async function fetchRotationData(
     for (const bid of bench) {
       const pos = posOf(bid);
       const bp = proj(bid);
-      if (!pos || bp <= 0) continue;
+      if (!pos || !hasRealProjection(bp)) continue;
       const weak = weakestStarter.get(pos);
-      if (!weak) continue;
+      if (!weak || !hasRealProjection(weak.proj)) continue;
       const gap = bp - weak.proj;
       if (gap > 0 && (!lineupOpportunity || gap > lineupOpportunity.gap)) {
         lineupOpportunity = {
@@ -649,6 +682,7 @@ export async function fetchRotationData(
     portfolio,
     tradeTargets,
     overvalued,
+    frontOfficePriority: computeFrontOfficePriority(portfolio.players),
     incomingTrades,
     newsItems,
     leagueRosteredIds,

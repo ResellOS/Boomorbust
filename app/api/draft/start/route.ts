@@ -20,13 +20,36 @@ export async function POST(req: Request) {
   const body = await req.json().catch(() => ({}));
   const {
     draftType = 'startup',
+    draftName = 'Mock Draft',
     teams = 12,
     rounds = 5,
     scoring = 'ppr',
     superflex = false,
     yourPick = 1,
     scoringContext = 'dynasty',
+    draftOrderType,
+    pickTimer,
+    cpuAutopick,
+    playerPool,
+    thirdRoundReversal,
+    showTeamNames,
+    rosterSlots,
+    teamOrder,
   } = body ?? {};
+
+  const config = {
+    draftName,
+    draftOrderType,
+    pickTimer,
+    cpuAutopick,
+    playerPool,
+    thirdRoundReversal,
+    showTeamNames,
+    rosterSlots,
+    teamOrder,
+    scoringContext,
+    pickCount: 0,
+  };
 
   try {
     const supabase = createAdminClient();
@@ -41,7 +64,7 @@ export async function POST(req: Request) {
         superflex,
         your_pick: yourPick,
         status: 'in_progress',
-        config: { scoringContext },
+        config,
       })
       .select('id')
       .single();

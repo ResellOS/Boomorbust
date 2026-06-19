@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect, useMemo } from 'react';
+import { formatEngineGradeLabel } from '@/lib/ui/labels';
 import { useRouter } from 'next/navigation';
 import { ArrowLeftRight, ChevronDown, ChevronUp } from 'lucide-react';
 import { clsx } from 'clsx';
@@ -163,7 +164,7 @@ function PlayerRow({
         {/* TFO + Grade */}
         <div className="flex items-center gap-2">
           <span className="font-mono text-[8px] text-[var(--text-muted)] tabular-nums">
-            TFO{' '}
+            Rating{' '}
             <span className="text-white font-black">
               {tfoScore != null ? tfoScore : '—'}
             </span>
@@ -173,7 +174,7 @@ function PlayerRow({
               className="font-mono text-[7px] font-black uppercase"
               style={{ color: gradeColor }}
             >
-              {grade}
+              {formatEngineGradeLabel(grade)}
             </span>
           )}
         </div>

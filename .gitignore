@@ -36,3 +36,8 @@ yarn-error.log*
 next-env.d.ts
 
 .vercel
+
+# Sim-racing installers (junk, do not commit)
+FanatecAppInstaller_*.zip
+*FanaLab*.zip
+tp_setup_*.msi

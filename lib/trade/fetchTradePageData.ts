@@ -12,7 +12,24 @@ import {
 import { fetchAllPlayers } from '@/lib/sleeper/players';
 import { tradeVerdictFromDelta } from '@/lib/trade/verdict';
 import { fetchMarketVerdicts } from '@/lib/verdict/fetchMarketVerdicts';
+import { buildSuggestionWhyReasons, type SuggestionComponents } from '@/lib/trade/suggestionReasons';
+import { dedupeSuggestionsByPlayer } from '@/lib/trade/dedupeSuggestions';
+import { normalizeDirection60d } from '@/lib/dashboard/tickerSignal';
+import {
+  buildOwnedPicksFromTradedData,
+  defaultTargetSeasons,
+} from '@/lib/trade/ownedPicks';
+import {
+  buildManagerCards,
+  buildTradeOpportunities,
+  blockOpportunityBadge,
+  championshipOddsFromTfo,
+  computeMarketTemperature,
+  rankOpportunities,
+} from '@/lib/trade/opportunityEngine';
+import type { ManagerProfileData } from '@/lib/managers/analyzer';
 import type {
+  BlockPlayer,
   BobSuggestion,
   OwnedPick,
   TradeHistoryRow,
@@ -24,9 +41,6 @@ import type {
   TradePick,
   TradePlayer,
 } from '@/lib/trade/types';
-
-const ORD = (r: number): string =>
-  r === 1 ? '1st' : r === 2 ? '2nd' : r === 3 ? '3rd' : `${r}th`;
 
 function timeAgo(ts: string | number): string {
   const ms = typeof ts === 'number' ? ts : new Date(ts).getTime();
@@ -67,6 +81,8 @@ function emptyStats(): TradePageStats {
     avgRosterTfo: 0,
     smartCounterUses: 0,
     leaguesActive: 0,
+    championshipOdds: 0,
+    tradeOpportunities: 0,
   };
 }
 
@@ -89,6 +105,10 @@ export async function fetchTradePageData(userId: string): Promise<TradePageData>
     outgoingOffers: [],
     completedOffers: [],
     suggestions: [],
+    opportunities: [],
+    managerCards: [],
+    blockPlayers: [],
+    marketTemperature: [],
     history: [],
     footer: emptyFooter(),
     ownedPicksByLeague: {},
@@ -178,11 +198,12 @@ export async function fetchTradePageData(userId: string): Promise<TradePageData>
   }
 
   const tfoMap = new Map<string, number>();
+  const componentsByPlayer = new Map<string, SuggestionComponents>();
   try {
     if (playerIds.length > 0) {
       const { data, error } = await supabase
         .from('formula_scores')
-        .select('player_id, tfo_score, calculated_at')
+        .select('player_id, tfo_score, ops_score, sfs_score, sit_score, confidence_tier, calculated_at')
         .in('player_id', playerIds)
         .order('calculated_at', { ascending: false });
 
@@ -191,6 +212,15 @@ export async function fetchTradePageData(userId: string): Promise<TradePageData>
         const pid = row.player_id as string;
         if (!tfoMap.has(pid) && typeof row.tfo_score === 'number') {
           tfoMap.set(pid, row.tfo_score);
+        }
+        if (!componentsByPlayer.has(pid)) {
+          componentsByPlayer.set(pid, {
+            ops: typeof row.ops_score === 'number' ? row.ops_score : 0,
+            sfs: typeof row.sfs_score === 'number' ? row.sfs_score : 0,
+            sit: typeof row.sit_score === 'number' ? row.sit_score : 0,
+            direction60d: null,
+            confidenceTier: typeof row.confidence_tier === 'string' ? row.confidence_tier : null,
+          });
         }
       }
     }
@@ -394,7 +424,13 @@ export async function fetchTradePageData(userId: string): Promise<TradePageData>
     avgRosterTfo,
     smartCounterUses,
     leaguesActive: leagues.length,
+    championshipOdds: championshipOddsFromTfo(avgRosterTfo),
+    tradeOpportunities: 0,
   };
+
+  const blockPlayers: BlockPlayer[] = [];
+  const rosterIdByLeagueManager = new Map<string, number>();
+  const playerTeams = new Map<string, string>();
 
   // BOB Suggestions — powered by the shared market verdict engine (rank_delta).
   // Buy-low  = BOOM/BUY players (engine >> market) rostered by OTHER managers.
@@ -403,8 +439,7 @@ export async function fetchTradePageData(userId: string): Promise<TradePageData>
   const suggestions: BobSuggestion[] = [];
   // Draft picks the user currently owns, per league (give-side dropdown).
   const ownedPicksByLeague: Record<string, OwnedPick[]> = {};
-  const baseYear = new Date().getFullYear();
-  const targetSeasons = [String(baseYear + 1), String(baseYear + 2)];
+  const targetSeasons = defaultTargetSeasons();
   try {
     const marketVerdicts = await fetchMarketVerdicts(supabase, 'dynasty');
     const myRosterIdSet = new Set(playerIds);
@@ -425,39 +460,14 @@ export async function fetchTradePageData(userId: string): Promise<TradePageData>
       // ── Owned draft picks (Sleeper traded_picks + original slots) ──────────
       const myRosterId = rosterByLeague.get(lg.id)?.roster_id;
       if (myRosterId != null) {
-        const rosterTeam = new Map<number, string>();
-        for (const r of rosters ?? []) {
-          rosterTeam.set(r.roster_id, userDisplay.get(r.owner_id ?? '') ?? `Team ${r.roster_id}`);
-        }
-        // current owner keyed by season-round-originalRoster
-        const tradedMap = new Map<string, number>();
-        for (const tp of tradedPicks ?? []) {
-          tradedMap.set(`${tp.season}-${tp.round}-${tp.roster_id}`, tp.owner_id);
-        }
-        const picks: OwnedPick[] = [];
-        // Own picks not traded away
-        for (const season of targetSeasons) {
-          for (let round = 1; round <= 4; round++) {
-            const cur: number = tradedMap.get(`${season}-${round}-${myRosterId}`) ?? myRosterId;
-            if (cur === myRosterId) {
-              picks.push({ label: `${season} ${ORD(round)} (own)`, season, round, leagueId: lg.id });
-            }
-          }
-        }
-        // Picks acquired from other teams
-        for (const tp of tradedPicks ?? []) {
-          if (tp.owner_id !== myRosterId || tp.roster_id === myRosterId) continue;
-          if (!targetSeasons.includes(tp.season)) continue;
-          const team = rosterTeam.get(tp.roster_id) ?? `Team ${tp.roster_id}`;
-          picks.push({
-            label: `${tp.season} ${ORD(tp.round)} (via ${team})`,
-            season: tp.season,
-            round: tp.round,
-            leagueId: lg.id,
-          });
-        }
-        picks.sort((a, b) => a.season.localeCompare(b.season) || a.round - b.round);
-        ownedPicksByLeague[lg.id] = picks;
+        ownedPicksByLeague[lg.id] = buildOwnedPicksFromTradedData(
+          lg.id,
+          myRosterId,
+          rosters,
+          tradedPicks,
+          userDisplay,
+          targetSeasons,
+        );
       }
 
       // Buy-low: scan other managers' rosters for BOOM/BUY players.
@@ -468,18 +478,51 @@ export async function fetchTradePageData(userId: string): Promise<TradePageData>
           if (!mv || mv.noMarketData) continue;
           if (mv.verdict !== 'BOOM' && mv.verdict !== 'BUY') continue;
           const name = playerDb[pid]?.full_name ?? 'Player';
+          const mgrLabel = ownerName.get(r.owner_id);
+          rosterIdByLeagueManager.set(`${lg.id}:${mgrLabel ?? ''}`, r.roster_id);
+          playerTeams.set(String(pid), playerDb[pid]?.team ?? 'FA');
           suggestions.push({
             id: `buy-${lg.id}-${pid}`,
             type: 'buy',
             headline: `Buy low on ${name}`,
             playerId: String(pid),
             playerName: name,
+            position: playerDb[pid]?.position ?? undefined,
+            team: playerDb[pid]?.team ?? 'FA',
+            tfoScore: tfoMap.get(String(pid)) ?? null,
+            ktcRank: mv.ktcRank,
             edgeScore: Math.round(Math.abs(mv.rankDelta ?? 0) / 10 * 10) / 10,
+            rankDelta: mv.rankDelta,
             verdict: mv.verdict,
             verdictColor: mv.color,
             leagueId: lg.id,
             leagueName: lg.name,
-            managerName: ownerName.get(r.owner_id),
+            managerName: mgrLabel,
+            targetRosterId: r.roster_id,
+          });
+        }
+
+        // On-the-block scan: SELL/BUST on other managers' rosters
+        for (const pid of r.players ?? []) {
+          const mv = marketVerdicts.get(String(pid));
+          if (!mv || mv.noMarketData) continue;
+          if (mv.verdict !== 'SELL' && mv.verdict !== 'BUST') continue;
+          if (blockPlayers.some((b) => b.playerId === String(pid))) continue;
+          if (blockPlayers.length >= 20) break;
+          const name = playerDb[pid]?.full_name ?? 'Player';
+          blockPlayers.push({
+            playerId: String(pid),
+            playerName: name,
+            position: (playerDb[pid]?.position ?? 'WR').toUpperCase(),
+            team: playerDb[pid]?.team ?? 'FA',
+            ownerName: userDisplay.get(r.owner_id ?? '') ?? 'Manager',
+            leagueName: lg.name,
+            leagueId: lg.id,
+            verdictLabel: mv.verdict === 'BUST' ? 'Sell Now' : 'Sell High',
+            bobOpportunityBadge: blockOpportunityBadge(
+              mv.verdict === 'BUST' ? 'Sell Now' : 'Sell High',
+              mv.verdict,
+            ),
           });
         }
       }
@@ -498,7 +541,12 @@ export async function fetchTradePageData(userId: string): Promise<TradePageData>
           headline: `Sell high on ${name}`,
           playerId: String(pid),
           playerName: name,
+          position: playerDb[pid]?.position ?? undefined,
+          team: playerDb[pid]?.team ?? 'FA',
+          tfoScore: tfoMap.get(String(pid)) ?? null,
+          ktcRank: mv.ktcRank,
           edgeScore: Math.round(Math.abs(mv.rankDelta ?? 0) / 10 * 10) / 10,
+          rankDelta: mv.rankDelta,
           verdict: mv.verdict,
           verdictColor: mv.color,
           leagueId: lg.id,
@@ -507,9 +555,75 @@ export async function fetchTradePageData(userId: string): Promise<TradePageData>
       }
     }
 
-    // Strongest signals first; cap to keep the payload light.
-    suggestions.sort((a, b) => b.edgeScore - a.edgeScore);
-    suggestions.splice(40);
+    // Strongest signals first; one row per player; cap payload size.
+    const deduped = dedupeSuggestionsByPlayer(suggestions);
+    deduped.sort((a, b) => b.edgeScore - a.edgeScore);
+    suggestions.length = 0;
+    suggestions.push(...deduped.slice(0, 40));
+
+    // Component scores + WHY bullets (include buy-low targets not on user's roster).
+    const suggestionPids = suggestions.map((s) => s.playerId);
+    const missingPids = Array.from(
+      new Set(suggestionPids.filter((id) => !componentsByPlayer.has(id))),
+    );
+    if (missingPids.length > 0) {
+      try {
+        const { data: compRows } = await supabase
+          .from('formula_scores')
+          .select('player_id, ops_score, sfs_score, sit_score, confidence_tier, calculated_at')
+          .in('player_id', missingPids.slice(0, 200))
+          .order('calculated_at', { ascending: false });
+        for (const row of compRows ?? []) {
+          const pid = String(row.player_id);
+          if (componentsByPlayer.has(pid)) continue;
+          componentsByPlayer.set(pid, {
+            ops: typeof row.ops_score === 'number' ? row.ops_score : 0,
+            sfs: typeof row.sfs_score === 'number' ? row.sfs_score : 0,
+            sit: typeof row.sit_score === 'number' ? row.sit_score : 0,
+            direction60d: null,
+            confidenceTier: typeof row.confidence_tier === 'string' ? row.confidence_tier : null,
+          });
+        }
+      } catch {
+        /* optional enrichment */
+      }
+    }
+
+    if (suggestionPids.length > 0) {
+      try {
+        const uniquePids = Array.from(new Set(suggestionPids));
+        const { data: signalRows } = await supabase
+          .from('player_value_signals')
+          .select('player_id, direction_60d')
+          .in('player_id', uniquePids.slice(0, 200));
+        for (const row of signalRows ?? []) {
+          const pid = String(row.player_id);
+          const existing = componentsByPlayer.get(pid);
+          const direction60d = normalizeDirection60d(row.direction_60d as string | null);
+          if (existing) {
+            existing.direction60d = direction60d;
+          } else {
+            componentsByPlayer.set(pid, {
+              ops: 0,
+              sfs: 0,
+              sit: 0,
+              direction60d,
+              confidenceTier: null,
+            });
+          }
+        }
+      } catch {
+        /* optional enrichment */
+      }
+    }
+
+    for (const s of suggestions) {
+      s.whyReasons = buildSuggestionWhyReasons(
+        s,
+        s.rankDelta,
+        componentsByPlayer.get(s.playerId),
+      );
+    }
   } catch (err) {
     console.error('[trade] suggestions failed:', err);
   }
@@ -576,6 +690,61 @@ export async function fetchTradePageData(userId: string): Promise<TradePageData>
 
   const topOffer = allOffers[0] ?? null;
 
+  // Manager profiles + ranked opportunities
+  let opportunities = rankOpportunities(
+    buildTradeOpportunities(
+      suggestions,
+      new Map<string, ManagerProfileData>(),
+      rosterIdByLeagueManager,
+      playerTeams,
+    ),
+  );
+  let managerCards: ReturnType<typeof buildManagerCards> = [];
+
+  try {
+    const leagueIds = leaguesRaw.map((l) => l.id);
+    if (leagueIds.length > 0) {
+      const { data: mgrRows } = await supabase
+        .from('manager_profiles')
+        .select('league_id, sleeper_roster_id, display_name, avatar, data')
+        .in('league_id', leagueIds.slice(0, 15));
+
+      const managerByLeagueRoster = new Map<string, ManagerProfileData>();
+      const mgrCardRows: Parameters<typeof buildManagerCards>[0] = [];
+
+      for (const row of mgrRows ?? []) {
+        const data = row.data as ManagerProfileData | null;
+        if (!data) continue;
+        const leagueId = row.league_id as string;
+        const rosterId = row.sleeper_roster_id as number;
+        managerByLeagueRoster.set(`${leagueId}:${rosterId}`, data);
+        const leagueName = leaguesRaw.find((l) => l.id === leagueId)?.name ?? 'League';
+        mgrCardRows.push({
+          leagueId,
+          leagueName,
+          rosterId,
+          displayName: (row.display_name as string) ?? 'Manager',
+          avatar: (row.avatar as string) ?? null,
+          data,
+        });
+      }
+
+      managerCards = buildManagerCards(mgrCardRows);
+      opportunities = rankOpportunities(
+        buildTradeOpportunities(
+          suggestions,
+          managerByLeagueRoster,
+          rosterIdByLeagueManager,
+          playerTeams,
+        ),
+      );
+    }
+  } catch (err) {
+    console.error('[trade] manager profiles failed:', err);
+  }
+
+  stats.tradeOpportunities = opportunities.length;
+
   return {
     stats,
     leagues,
@@ -584,6 +753,10 @@ export async function fetchTradePageData(userId: string): Promise<TradePageData>
     outgoingOffers: allOffers.filter((o) => o.direction === 'outgoing'),
     completedOffers,
     suggestions,
+    opportunities,
+    managerCards,
+    blockPlayers,
+    marketTemperature: computeMarketTemperature(suggestions),
     history,
     footer: {
       engineStatus: 'Optimal',

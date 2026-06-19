@@ -11,6 +11,8 @@ export interface MarketVerdictDisplay {
   verdict: MarketVerdict;
   color: string;
   rankDelta: number | null;
+  ktcRank: number | null;
+  ktcValue: number | null;
   noMarketData: boolean;
 }
 
@@ -78,6 +80,8 @@ export async function fetchMarketVerdicts(
         verdict: r.verdict,
         color: r.color,
         rankDelta: r.rankDelta,
+        ktcRank: r.ktcRank,
+        ktcValue: r.ktcValue,
         noMarketData: r.flags.includes(NO_MARKET_DATA_FLAG),
       });
     }

@@ -1,12 +1,15 @@
 'use client';
 
 import { Suspense, useState } from 'react';
+import { formatPerformanceVerdictLabel } from '@/lib/ui/labels';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { triggerAutoSync } from '@/lib/sync/autoSync';
 import { useLightning } from '@/lib/hooks/useLightning';
+import DataFeedBackground from '@/components/login/DataFeedBackground';
+import LiveSignalCard from '@/components/login/LiveSignalCard';
 
 const LIGHTNING_CSS = `
 @keyframes glow-breathe {
@@ -39,6 +42,7 @@ function LightningBackground() {
 
   return (
     <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
+      <DataFeedBackground />
       {/* Ambient glows */}
       <div
         className="glow-blob absolute -left-[15%] top-[5%] h-[70vh] w-[55vw] rounded-full"
@@ -93,7 +97,7 @@ function GhostPanelLeft() {
   return (
     <div className="pointer-events-none absolute left-6 top-1/2 hidden w-[230px] -translate-y-1/2 flex-col gap-4 opacity-[0.15] xl:flex" aria-hidden>
       <div className="rounded-lg border border-boom/40 bg-surface p-3">
-        <div className="mb-2 text-[8px] uppercase tracking-[2px] text-boom">Top Boom Players</div>
+        <div className="mb-2 text-[8px] uppercase tracking-[2px] text-boom">Top Buy Targets</div>
         {players.map((p) => (
           <div key={p.name} className="flex items-center gap-2 border-b border-border/40 py-1.5 last:border-b-0">
             <div className="h-5 w-5 shrink-0 rounded-full bg-surface2" />
@@ -102,21 +106,15 @@ function GhostPanelLeft() {
               <div className="text-[7px] text-muted">{p.meta}</div>
             </div>
             <span className="font-mono text-[10px] text-text">{p.score}</span>
-            <span className="rounded-sm bg-boom/10 px-1 py-0.5 text-[6px] font-semibold text-boom">{p.badge}</span>
+            <span className="rounded-sm bg-boom/10 px-1 py-0.5 text-[6px] font-semibold text-boom">{formatPerformanceVerdictLabel(p.badge)}</span>
           </div>
         ))}
       </div>
       <div className="rounded-lg border border-boom/40 bg-surface p-3">
-        <div className="mb-2 text-[8px] uppercase tracking-[2px] text-boom">BOB Confidence Score</div>
-        <div className="relative mx-auto h-[90px] w-[90px]">
-          <svg viewBox="0 0 90 90" className="h-full w-full">
-            <circle cx="45" cy="45" r="38" fill="none" stroke="#1e2640" strokeWidth="6" />
-            <circle cx="45" cy="45" r="38" fill="none" stroke="#36E7A1" strokeWidth="6" strokeDasharray="208 240" strokeLinecap="round" transform="rotate(-90 45 45)" />
-          </svg>
-          <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <span className="font-mono text-lg text-text">87%</span>
-            <span className="text-[6px] uppercase text-muted">Model Confidence</span>
-          </div>
+        <div className="mb-2 text-[8px] uppercase tracking-[2px] text-boom">Lineup Confidence</div>
+        <div className="relative mx-auto flex h-[90px] w-[90px] flex-col items-center justify-center">
+          <span className="font-figtree text-lg font-bold text-boom">Strong</span>
+          <span className="text-[6px] uppercase text-muted">Start / Sit</span>
         </div>
       </div>
     </div>
@@ -230,12 +228,16 @@ function LoginForm() {
     setError(null);
     const supabase = createClient();
 
+    const next = searchParams?.get('next');
+    const destination =
+      next && next.startsWith('/') && !next.startsWith('//') ? next : '/dashboard';
+
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) {
       setError(error.message);
     } else {
       triggerAutoSync();
-      router.push('/dashboard');
+      router.push(destination);
       router.refresh();
     }
 
@@ -245,9 +247,12 @@ function LoginForm() {
   async function handleOAuth(provider: 'google' | 'apple') {
     setError(null);
     const supabase = createClient();
+    const next = searchParams?.get('next');
+    const destination =
+      next && next.startsWith('/') && !next.startsWith('//') ? next : '/dashboard';
     const { error } = await supabase.auth.signInWithOAuth({
       provider,
-      options: { redirectTo: `${window.location.origin}/auth/callback?next=/dashboard` },
+      options: { redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(destination)}` },
     });
     if (error) setError(error.message);
   }
@@ -259,24 +264,25 @@ function LoginForm() {
       <GhostPanelLeft />
       <GhostPanelRight />
 
-      <div className="relative z-10 flex min-h-screen flex-col items-center justify-center px-4 py-10">
-        {/* Logo */}
+      <div className="relative z-10 flex min-h-screen flex-col items-center justify-center overflow-x-hidden px-4 py-10 pb-16">
+        {/* Logo — hero element, ~35% larger */}
         <div className="mb-2 flex flex-col items-center">
-          <Image
-            src="/logo.png"
-            alt="Boom or Bust"
-            width={340}
-            height={120}
-            priority
-            unoptimized
-            className="h-auto w-[280px] object-contain sm:w-[340px]"
-            style={{
-              mixBlendMode: 'screen',
-              filter:
-                'drop-shadow(0 0 30px rgba(54,231,161,0.6)) drop-shadow(0 0 60px rgba(167,139,250,0.4))',
-            }}
-          />
-          <div className="mt-1 flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[4px] text-text/80">
+          <div className="bg-transparent" style={{ mixBlendMode: 'screen' }}>
+            <Image
+              src="/logo.png"
+              alt="Boom or Bust"
+              width={460}
+              height={160}
+              priority
+              unoptimized
+              className="h-auto w-[378px] bg-transparent object-contain sm:w-[459px]"
+              style={{
+                mixBlendMode: 'screen',
+                filter: 'brightness(1.25) saturate(1.25) contrast(1.08)',
+              }}
+            />
+          </div>
+          <div className="mt-1 flex items-center gap-2 text-[10px] font-normal uppercase tracking-[4px] text-text/80">
             <span className="h-px w-8 bg-gradient-to-r from-transparent to-boom" />
             The Dynasty
             <span className="text-boom">⚡</span>
@@ -284,6 +290,8 @@ function LoginForm() {
             <span className="h-px w-8 bg-gradient-to-l from-transparent to-bust" />
           </div>
         </div>
+
+        <LiveSignalCard />
 
         {/* Glass card */}
         <div
@@ -295,7 +303,7 @@ function LoginForm() {
             boxShadow: '0 0 40px rgba(54,231,161,0.08), 0 0 80px rgba(167,139,250,0.06)',
           }}
         >
-          <h1 className="text-center text-sm font-bold uppercase tracking-[2px] text-boom">
+          <h1 className="text-center text-sm font-normal uppercase tracking-[2px] text-boom">
             Welcome Back, Champion
           </h1>
           <p className="mb-6 mt-1.5 text-center text-[11px] text-muted">
@@ -304,7 +312,7 @@ function LoginForm() {
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label htmlFor="email" className="mb-1.5 block text-[9px] font-semibold uppercase tracking-[1.5px] text-muted">
+              <label htmlFor="email" className="mb-1.5 block text-[9px] font-normal uppercase tracking-[1.5px] text-muted">
                 Email
               </label>
               <div className="relative">
@@ -328,7 +336,7 @@ function LoginForm() {
 
             <div>
               <div className="mb-1.5 flex items-center justify-between">
-                <label htmlFor="password" className="block text-[9px] font-semibold uppercase tracking-[1.5px] text-muted">
+                <label htmlFor="password" className="block text-[9px] font-normal uppercase tracking-[1.5px] text-muted">
                   Password
                 </label>
                 <Link href="/auth/forgot-password" className="text-[10px] text-bust no-underline hover:text-bust/80">
@@ -364,7 +372,7 @@ function LoginForm() {
             <button
               type="submit"
               disabled={loading}
-              className="flex w-full items-center justify-center gap-2 rounded-md py-2.5 text-xs font-bold uppercase tracking-[1.5px] text-bg transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50"
+              className="flex min-h-[44px] w-full items-center justify-center gap-2 rounded-md py-2.5 text-xs font-normal uppercase tracking-[1.5px] text-bg transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50"
               style={{
                 background: 'linear-gradient(90deg, #36E7A1 0%, #A78BFA 100%)',
                 boxShadow: '0 0 20px rgba(54,231,161,0.35), 0 0 30px rgba(167,139,250,0.2)',
@@ -384,7 +392,7 @@ function LoginForm() {
           <div className="space-y-2">
             <Link
               href="/auth/signup?via=sleeper"
-              className="flex w-full items-center justify-center gap-2 rounded-md border border-white/15 bg-bg/60 py-2.5 text-[11px] font-semibold uppercase tracking-[1px] text-text no-underline transition hover:border-boom/40 hover:bg-bg/80"
+              className="flex min-h-[44px] w-full items-center justify-center gap-2 rounded-md border border-white/15 bg-bg/60 py-2.5 text-[11px] font-normal uppercase tracking-[1px] text-text no-underline transition hover:border-boom/40 hover:bg-bg/80"
             >
               <SleeperIcon />
               Sign In with Sleeper
@@ -393,7 +401,7 @@ function LoginForm() {
               <button
                 type="button"
                 onClick={() => handleOAuth('google')}
-                className="flex items-center justify-center gap-2 rounded-md border border-white/15 bg-bg/60 py-2.5 text-[11px] font-semibold text-text transition hover:border-white/30 hover:bg-bg/80"
+                className="flex min-h-[44px] items-center justify-center gap-2 rounded-md border border-white/15 bg-bg/60 py-2.5 text-[11px] font-normal text-text transition hover:border-white/30 hover:bg-bg/80"
               >
                 <GoogleIcon />
                 Google
@@ -401,7 +409,7 @@ function LoginForm() {
               <button
                 type="button"
                 onClick={() => handleOAuth('apple')}
-                className="flex items-center justify-center gap-2 rounded-md border border-white/15 bg-bg/60 py-2.5 text-[11px] font-semibold text-text transition hover:border-white/30 hover:bg-bg/80"
+                className="flex min-h-[44px] items-center justify-center gap-2 rounded-md border border-white/15 bg-bg/60 py-2.5 text-[11px] font-normal text-text transition hover:border-white/30 hover:bg-bg/80"
               >
                 <AppleIcon />
                 Apple
@@ -411,7 +419,7 @@ function LoginForm() {
 
           <p className="mt-6 text-center text-[11px] text-muted">
             New to Boom or Bust?{' '}
-            <Link href="/auth/signup" className="font-semibold text-boom no-underline hover:underline">
+            <Link href="/auth/signup" className="font-normal text-boom no-underline hover:underline">
               Create an account
             </Link>
           </p>
@@ -421,7 +429,6 @@ function LoginForm() {
         <div className="mt-9 flex flex-wrap items-center justify-center gap-x-8 gap-y-2 px-4">
           {[
             ['🔒', '256-bit Encrypted'],
-            ['✓', '42-18-2 Verified Record'],
             ['🏈', '68+ Leagues Synced'],
             ['⚡', 'BOB-POWERED Analytics'],
           ].map(([icon, text]) => (
@@ -430,6 +437,12 @@ function LoginForm() {
               {text}
             </div>
           ))}
+          <Link
+            href="/performance"
+            className="flex items-center gap-1.5 text-[10px] text-boom no-underline hover:underline"
+          >
+            Every call tracked publicly →
+          </Link>
         </div>
       </div>
     </div>

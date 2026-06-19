@@ -1,63 +1,86 @@
 'use client';
 
-import { useId } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import type { RotationPlayer } from '@/lib/dashboard/rotation';
+import { TICKER_ROTATE_MS } from '@/lib/dashboard/constants';
+import { sortByMarketSignal } from '@/lib/dashboard/sortPlayers';
+import { buildTickerDisplay } from '@/lib/dashboard/tickerSignal';
 
 interface PlayerTickerProps {
   players: RotationPlayer[];
   animated: boolean;
 }
 
-function TickerItem({ p }: { p: RotationPlayer }) {
-  // Score colored by the MARKET verdict (5-color); neutral when no signal.
-  const scoreColor =
-    p.marketVerdict && !p.marketVerdict.noMarketData ? p.marketVerdict.color : '#6b7a99';
-  const score = p.tfoScore > 0 ? p.tfoScore.toFixed(1) : '—';
-  // Guard against a blank name so the ticker never shows a leading bare score.
-  const name = p.name?.trim() ? p.name : 'Unknown Player';
+function TickerCard({ p }: { p: RotationPlayer }) {
+  const { name, arrow, color, delta, reason } = buildTickerDisplay(p);
 
   return (
-    <span className="mx-4 inline-flex shrink-0 items-center gap-1.5">
-      <span className="font-figtree text-[12px] text-text">{name}</span>
-      <span className="font-mono text-[11px] text-muted">≡</span>
-      <span className="font-mono text-[12px] tabular-nums" style={{ color: scoreColor }}>
-        {score}
-      </span>
-    </span>
+    <div className="flex min-w-0 flex-col gap-0.5 px-1">
+      <div className="flex min-w-0 items-center gap-2">
+        <span className="shrink-0 font-mono text-[13px] font-bold tabular-nums" style={{ color }}>
+          {arrow}
+        </span>
+        <span className="min-w-0 truncate font-figtree text-[12px] font-semibold text-text">{name}</span>
+        <span className="shrink-0 font-mono text-[12px] font-bold tabular-nums" style={{ color }}>
+          {delta}
+        </span>
+      </div>
+      <p className="truncate pl-[22px] font-mono text-[10px] leading-snug text-[#64748B]">{reason}</p>
+    </div>
   );
 }
 
 export default function PlayerTicker({ players, animated }: PlayerTickerProps) {
-  const rawId = useId();
-  const animName = `bobticker${rawId.replace(/[^a-zA-Z0-9]/g, '')}`;
+  const sorted = useMemo(() => sortByMarketSignal(players), [players]);
+  const [index, setIndex] = useState(0);
+  const [fade, setFade] = useState(false);
 
-  if (players.length === 0) {
+  useEffect(() => {
+    setIndex(0);
+  }, [sorted]);
+
+  useEffect(() => {
+    if (!animated || sorted.length <= 1) return;
+    const iv = setInterval(() => {
+      setFade(true);
+      setTimeout(() => {
+        setIndex((i) => (i + 1) % sorted.length);
+        setFade(false);
+      }, 220);
+    }, TICKER_ROTATE_MS);
+    return () => clearInterval(iv);
+  }, [animated, sorted.length]);
+
+  if (sorted.length === 0) {
     return (
-      <div className="flex h-[30px] items-center rounded-[7px] border border-border bg-surface px-3 font-mono text-[11px] text-muted">
+      <div className="flex h-[46px] items-center rounded-[7px] border border-border bg-surface px-3 font-mono text-[11px] text-muted">
         No rostered players in this league yet.
       </div>
     );
   }
 
-  const durationS = Math.max(14, players.length * 2.6);
+  const current = sorted[index % sorted.length];
+
+  if (!animated) {
+    return (
+      <div className="overflow-hidden rounded-[7px] border border-border bg-surface px-3 py-2">
+        <div className="flex flex-col gap-2">
+          {sorted.slice(0, 5).map((p) => (
+            <TickerCard key={p.playerId} p={p} />
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="relative overflow-hidden rounded-[7px] border border-border bg-surface py-1.5">
+    <div className="relative overflow-hidden rounded-[7px] border border-border bg-surface px-3 py-2">
       <div
-        className="flex w-max items-center"
-        style={
-          animated ? { animation: `${animName} ${durationS}s linear infinite` } : undefined
-        }
+        className="transition-opacity duration-200"
+        style={{ opacity: fade ? 0 : 1 }}
       >
-        {players.map((p) => (
-          <TickerItem key={`a-${p.playerId}`} p={p} />
-        ))}
-        {animated &&
-          players.map((p) => <TickerItem key={`b-${p.playerId}`} p={p} />)}
+        <TickerCard p={current} />
       </div>
-      {animated && (
-        <style>{`@keyframes ${animName} { from { transform: translateX(0); } to { transform: translateX(-50%); } }`}</style>
-      )}
     </div>
   );
 }

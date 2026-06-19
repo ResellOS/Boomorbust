@@ -12,6 +12,7 @@ import type { GameWeather } from '@/lib/external/weather';
 import type { LineupOptimizePlayerRow, LineupOptimizeResponse } from '@/app/api/lineup/optimize/route';
 import type { ProjectionCardData } from '@/app/api/cards/projection/route';
 import ProjectionCard from '@/components/cards/ProjectionCard';
+import { formatStartSitConfidence } from '@/lib/ui/labels';
 import { espnNflLogoUrl } from '@/lib/nfl/espnTeam';
 
 type EnrichedRec = LineupRecommendation & {
@@ -142,16 +143,16 @@ function gradeFromTfoScore(score: number): string {
 function boomNeutralBustChip(verdict: string): { label: string; style: CSSProperties } {
   if (verdict === 'START')
     return {
-      label: 'BOOM',
+      label: 'Start',
       style: { color: '#36E7A1', borderColor: 'rgba(54,231,161,0.45)', backgroundColor: 'rgba(54,231,161,0.12)' },
     };
   if (verdict === 'FLEX')
     return {
-      label: 'NEUTRAL',
+      label: 'Flex',
       style: { color: '#FBBF24', borderColor: 'rgba(251,191,36,0.45)', backgroundColor: 'rgba(251,191,36,0.12)' },
     };
   return {
-    label: 'BUST',
+    label: 'Sit',
     style: { color: '#EF4444', borderColor: 'rgba(239,68,68,0.45)', backgroundColor: 'rgba(239,68,68,0.12)' },
   };
 }
@@ -687,7 +688,7 @@ export default function LineupPage() {
                       PROJ: {data?.projectedStarterPoints != null ? data.projectedStarterPoints.toFixed(1) : '—'} pts
                     </p>
                     <p className="text-sm text-[var(--text-secondary)] mt-3" style={{ fontFamily: 'var(--font-body)' }}>
-                      Model blend: TFO + matchup + weather · Starters only in projection sum
+                      Model blend: dynasty rating + matchup + weather · Starters only in projection sum
                       {typeof userPts === 'number' ? (
                         <span className="block mt-3 text-[var(--text-muted)] text-xs">
                           Recorded matchup: <span className="text-emerald-300">{userPts.toFixed(2)}</span>
@@ -867,7 +868,7 @@ export default function LineupPage() {
                                         Start <span className="text-white tabular-nums font-mono">{Math.round(opt.startScore)}</span>
                                       </span>
                                       <span>
-                                        TFO <span className="text-white tabular-nums font-mono">{Math.round(opt.tfoScore)}</span>
+                                        Rating <span className="text-white tabular-nums font-mono">{Math.round(opt.tfoScore)}</span>
                                       </span>
                                       <span>
                                         Matchup <span className="text-white tabular-nums font-mono">{Math.round(opt.matchupGrade)}</span>
@@ -886,7 +887,7 @@ export default function LineupPage() {
                                       <span>
                                         Projection <span className="text-white">{r.projected_points.toFixed(1)}</span>
                                       </span>
-                                      <span className="text-[var(--indigo-light)]">{r.confidence}% conf</span>
+                                      <span className="text-[var(--indigo-light)]">{formatStartSitConfidence(r.confidence)}</span>
                                     </>
                                   )}
                                   {consider ? (

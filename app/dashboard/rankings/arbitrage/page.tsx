@@ -1,6 +1,7 @@
 'use client';
 
 import type { CSSProperties } from 'react';
+import { formatEngineGradeLabel, formatPerformanceVerdictLabel } from '@/lib/ui/labels';
 import { useEffect, useMemo, useState } from 'react';
 import { clsx } from 'clsx';
 import { ArrowDownRight, ArrowUpRight, Loader2, X } from 'lucide-react';
@@ -177,7 +178,7 @@ function PlayerContext({
             </p>
           </div>
           <div className="pt-2 border-t border-[var(--border)] flex flex-wrap gap-3 items-baseline">
-            <span className="text-[10px] text-[var(--text-muted)]">TFO score</span>
+            <span className="text-[10px] text-[var(--text-muted)]">Dynasty rating</span>
             <span className="display text-lg text-white tabular-nums">{player.tfoScore.toFixed(1)}</span>
             <span
               className="text-[10px] font-bold px-2 py-0.5 rounded border border-white/15 uppercase tracking-wide display"
@@ -187,7 +188,7 @@ function PlayerContext({
                 backgroundColor: `${TFO_VERDICT_HEX[player.tfoVerdict] ?? '#94A3B8'}12`,
               }}
             >
-              {player.tfoVerdict.replace(/_/g, ' ')}
+              {formatPerformanceVerdictLabel(player.tfoVerdict.replace(/_/g, ' '))}
             </span>
           </div>
           {player.tfoFlags.length > 0 && (
@@ -285,8 +286,8 @@ export default function ArbitragePage() {
             MARKET ARBITRAGE — FIND THE GAP
           </p>
           <p className="mt-3 text-sm text-[var(--text-secondary)]" style={{ fontFamily: 'var(--font-body)' }}>
-            TFO verdict plus BBSM vs KTC delta sets the signal — bullish TFO (BOOM / LEAN BOOM) never produces SELL;
-            sells require bearish TFO and market premium (delta below thresholds).
+            Dynasty rating plus waiver score vs KTC delta sets the signal — strong ratings (Buy Now) never produce SELL;
+            sells require weak ratings and market premium (delta below thresholds).
           </p>
           {rankingsHint && (
             <p className="mt-2 text-xs text-amber-400/90" style={{ fontFamily: 'var(--font-body)' }}>
@@ -360,9 +361,9 @@ export default function ArbitragePage() {
                     'MARKET VAL',
                     'BBSM VAL',
                     'DELTA %',
-                    'TFO',
-                    'TFO GRADE',
-                    'TFO SIGNAL',
+                    'RATING',
+                    'ASSET TIER',
+                    'PERFORMANCE',
                     'SIGNAL',
                     'NOTES',
                   ].map((h) => (
@@ -442,7 +443,7 @@ export default function ArbitragePage() {
                       {/* TFO grade */}
                       <td className="px-4 py-3">
                         <span className="text-[10px] font-bold text-[var(--cyan)] whitespace-nowrap">
-                          {p.tfoGrade.replace(/_/g, ' ')}
+                          {formatEngineGradeLabel(p.tfoGrade.replace(/_/g, ' '))}
                         </span>
                       </td>
 
@@ -456,7 +457,7 @@ export default function ArbitragePage() {
                             backgroundColor: `${TFO_VERDICT_HEX[p.tfoVerdict] ?? '#94A3B8'}14`,
                           }}
                         >
-                          {p.tfoVerdict.replace(/_/g, ' ')}
+                          {formatPerformanceVerdictLabel(p.tfoVerdict.replace(/_/g, ' '))}
                         </span>
                       </td>
 

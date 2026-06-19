@@ -1,113 +1,355 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import type {
+  DecisionsSummary,
   FlexDecision,
+  LineupDecision,
+  LineupOptimizer,
   SeasonRecord,
-  StartSitRecommendation,
 } from '@/lib/startsit/types';
+import OffseasonContextBanner from '@/components/startsit/OffseasonContextBanner';
 import PlayerAvatar from '@/components/players/PlayerAvatar';
+import ConfidenceBadge from '@/components/startsit/ConfidenceBadge';
+import { startSitConfidenceStyle } from '@/lib/ui/labels';
 
 interface StartSitClientProps {
   nflWeek: number;
+  isOffseason: boolean;
   leagues: { id: string; name: string }[];
   seasonRecord: SeasonRecord;
-  startThese: StartSitRecommendation[];
-  sitThese: StartSitRecommendation[];
+  decisions: LineupDecision[];
+  decisionsSummary: DecisionsSummary;
+  lineupOptimizer: LineupOptimizer;
   flexDecisions: FlexDecision[];
-  allRecommendations: StartSitRecommendation[];
+  hasRealData: boolean;
 }
 
-function RecommendationRow({
-  rec,
-  variant,
-}: {
-  rec: StartSitRecommendation;
-  variant: 'start' | 'sit';
-}) {
-  const barColor = variant === 'start' ? '#36E7A1' : '#ef4444';
-  const scoreColor = variant === 'start' ? 'text-boom' : 'text-[#ef4444]';
+const DISMISSED_KEY = 'bob_startsit_dismissed';
+const ACCEPTED_KEY = 'bob_startsit_accepted';
+
+function loadIdSet(key: string): Set<string> {
+  if (typeof window === 'undefined') return new Set();
+  try {
+    const raw = localStorage.getItem(key);
+    if (!raw) return new Set();
+    return new Set(JSON.parse(raw) as string[]);
+  } catch {
+    return new Set();
+  }
+}
+
+function saveIdSet(key: string, ids: Set<string>) {
+  try {
+    localStorage.setItem(key, JSON.stringify(Array.from(ids)));
+  } catch {
+    /* ignore */
+  }
+}
+
+function ConfidencePill({ tier }: { tier: 'Lean' | 'Strong' | 'Smash' }) {
+  const style = startSitConfidenceStyle(tier);
+  const bg =
+    tier === 'Smash'
+      ? 'rgba(54,231,161,0.12)'
+      : tier === 'Strong'
+        ? 'rgba(34,211,238,0.12)'
+        : 'rgba(251,191,36,0.12)';
+  const border =
+    tier === 'Smash'
+      ? 'rgba(54,231,161,0.35)'
+      : tier === 'Strong'
+        ? 'rgba(34,211,238,0.35)'
+        : 'rgba(251,191,36,0.35)';
+
+  return (
+    <span
+      className="inline-block rounded px-2 py-0.5 font-mono text-[9px] uppercase tracking-wide"
+      style={{ color: style.color, background: bg, border: `1px solid ${border}` }}
+    >
+      {tier}
+    </span>
+  );
+}
+
+function HeroDecisionCard({ decision }: { decision: LineupDecision }) {
+  const isStart = decision.variant === 'start';
+  const glow = isStart ? '#36E7A1' : '#A78BFA';
+  const label = isStart ? 'MUST START' : 'MUST SIT';
 
   return (
     <div
-      className="grid items-center gap-1.5 border-b border-border/50 px-3 py-[5px] last:border-b-0"
-      style={{ gridTemplateColumns: '26px 130px 1fr 52px 44px' }}
+      className="min-h-[160px] rounded-md border border-border bg-surface p-4"
+      style={{
+        borderLeftWidth: 3,
+        borderLeftColor: glow,
+        boxShadow: `inset 3px 0 12px -4px ${glow}40`,
+      }}
     >
-      <PlayerAvatar playerId={rec.playerId} name={rec.fullName} size={24} />
-      <div className="min-w-0">
-        <div className="text-[11px] text-text">{rec.fullName}</div>
-        <div className="text-[9px] text-muted">
-          {rec.position} · {rec.team}{' '}
-          <span className="text-muted">{rec.opponent}</span>
+      <div className="mb-3 font-mono text-[9px] uppercase tracking-[1.5px]" style={{ color: glow }}>
+        {label}
+      </div>
+
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-1 flex-col gap-2">
+          <div className="flex items-center gap-2.5">
+            <PlayerAvatar
+              playerId={decision.startPlayer.playerId}
+              name={decision.startPlayer.fullName}
+              size={40}
+            />
+            <div>
+              <div className="font-mono text-[13px] uppercase text-text">
+                {decision.startPlayer.fullName}
+              </div>
+              <div className="font-mono text-[10px] text-muted">
+                {decision.startPlayer.position} · {decision.startPlayer.team}
+              </div>
+            </div>
+          </div>
+
+          <div className="text-center font-mono text-[10px] uppercase tracking-widest text-muted">
+            over
+          </div>
+
+          <div className="flex items-center gap-2.5">
+            <PlayerAvatar
+              playerId={decision.sitPlayer.playerId}
+              name={decision.sitPlayer.fullName}
+              size={40}
+            />
+            <div>
+              <div className="font-mono text-[13px] uppercase text-text">
+                {decision.sitPlayer.fullName}
+              </div>
+              <div className="font-mono text-[10px] text-muted">
+                {decision.sitPlayer.position} · {decision.sitPlayer.team}
+              </div>
+            </div>
+          </div>
         </div>
-        <div className="text-[8px] leading-snug text-muted">{rec.reasoning}</div>
-      </div>
-      <div className="flex items-center gap-1 pr-1">
-        <div className="h-[5px] flex-1 overflow-hidden rounded-sm bg-border">
-          <div
-            className="h-full rounded-sm"
-            style={{ width: `${Math.min(100, rec.barScore)}%`, background: barColor }}
-          />
+
+        <div className="flex shrink-0 flex-col items-end gap-1 sm:min-w-[140px]">
+          <div className="font-mono text-[18px] text-boom">+{decision.edgePts.toFixed(1)}</div>
+          <div className="text-[9px] text-muted">Expected Points</div>
+          <div className="mt-1 flex items-center gap-1.5">
+            <span className="font-mono text-[11px] text-text">{decision.confidence}%</span>
+            <ConfidenceBadge pct={decision.confidence} />
+          </div>
+          <div className="mt-2 font-mono text-[9px] text-muted">
+            League: {decision.leagueName}
+          </div>
         </div>
-        <span className="font-mono text-[9px]" style={{ color: barColor }}>
-          {rec.startScore.toFixed(1)}
-        </span>
       </div>
-      <div className={`font-mono text-[13px] font-medium text-right ${scoreColor}`}>
-        {rec.confidence}
-      </div>
-      <div className="text-right">
-        <div className="text-[8px] text-muted">Proj:</div>
-        <div className="font-mono text-[9px] text-text">
-          {rec.projectedPoints !== null ? rec.projectedPoints.toFixed(1) : '—'}
+
+      <div className="mt-4 border-t border-border/60 pt-3">
+        <div className="mb-1.5 font-mono text-[8px] uppercase tracking-wide text-muted">Why</div>
+        <ul className="space-y-0.5">
+          {decision.whyBullets.slice(0, 4).map((b) => (
+            <li key={b} className="font-mono text-[9px] text-muted">
+              • {b}
+            </li>
+          ))}
+        </ul>
+        <div className="mt-2 font-mono text-[9px] text-bust/80">
+          If ignored: -{decision.edgePts.toFixed(1)} projected points
         </div>
       </div>
     </div>
   );
 }
 
-function FlexCard({ flex }: { flex: FlexDecision }) {
-  const title =
-    flex.position === 'RB'
-      ? 'RB Flex Matchup'
-      : flex.position === 'WR'
-        ? 'WR Flex Matchup'
-        : 'TE Flex Matchup';
+function DecisionsTable({
+  rows,
+  onAccept,
+  onIgnore,
+  accepted,
+  ignored,
+}: {
+  rows: LineupDecision[];
+  onAccept: (id: string) => void;
+  onIgnore: (id: string) => void;
+  accepted: Set<string>;
+  ignored: Set<string>;
+}) {
+  const [expanded, setExpanded] = useState<string | null>(null);
+
+  if (rows.length === 0) {
+    return (
+      <div className="rounded-md border border-border bg-surface px-4 py-8 text-center">
+        <p className="font-mono text-[11px] text-muted">No additional decisions to review.</p>
+      </div>
+    );
+  }
 
   return (
-    <div className="border-r border-border px-3 py-2.5 last:border-r-0">
-      <div className="mb-2 text-[8px] uppercase tracking-wide text-muted">{title}</div>
-      <div className="mb-1.5 flex items-center justify-between gap-1">
-        {[flex.playerA, flex.playerB].map((p, i) => (
-          <div key={p.playerId} className="contents">
-            {i === 1 && (
-              <div className="shrink-0 text-[10px] font-medium text-muted">VS</div>
-            )}
-            <div className="flex flex-1 flex-col items-center gap-[3px]">
-              <PlayerAvatar playerId={p.playerId} name={p.fullName} size={28} />
-              <div className="text-center text-[10px] text-text">{p.fullName}</div>
-              <div className="text-center text-[8px] text-muted">
-                {p.position} · {p.team}
-              </div>
-              <div
-                className={`font-mono text-[11px] ${
-                  flex.pick.playerId === p.playerId ? 'text-boom' : 'text-muted'
-                }`}
+    <div className="overflow-x-auto rounded-md border border-border bg-surface">
+      <table className="w-full min-w-[640px] border-collapse text-left">
+        <thead>
+          <tr className="border-b border-border">
+            {['Confidence', 'Decision', 'League', 'Edge', 'Why', 'Action'].map((h) => (
+              <th
+                key={h}
+                className="px-3 py-2 font-mono text-[8px] uppercase tracking-wide text-muted"
               >
-                {p.startScore.toFixed(1)}
-              </div>
-              <div className="text-[8px] text-muted">Rating</div>
+                {h}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((d) => {
+            const done = accepted.has(d.id) || ignored.has(d.id);
+            return (
+              <tr
+                key={d.id}
+                className={`border-b border-border/50 last:border-b-0 ${done ? 'opacity-50' : ''}`}
+              >
+                <td className="px-3 py-2.5">
+                  <ConfidencePill tier={d.confidenceTier} />
+                </td>
+                <td className="px-3 py-2.5 font-mono text-[10px] text-text">
+                  {d.decisionLabel}
+                </td>
+                <td className="px-3 py-2.5 font-mono text-[10px] text-muted">{d.leagueName}</td>
+                <td className="px-3 py-2.5 font-mono text-[10px] text-boom">
+                  +{d.edgePts.toFixed(1)} pts
+                </td>
+                <td className="max-w-[180px] px-3 py-2.5">
+                  <button
+                    type="button"
+                    onClick={() => setExpanded(expanded === d.id ? null : d.id)}
+                    className="border-none bg-transparent p-0 text-left font-mono text-[9px] text-muted hover:text-text"
+                  >
+                    {expanded === d.id
+                      ? d.whyBullets.join(' · ')
+                      : `${d.whyOneLine.slice(0, 48)}${d.whyOneLine.length > 48 ? '…' : ''}`}
+                  </button>
+                </td>
+                <td className="px-3 py-2.5">
+                  <div className="flex gap-1.5">
+                    <button
+                      type="button"
+                      disabled={done}
+                      onClick={() => onAccept(d.id)}
+                      className="rounded border border-boom/30 bg-boom/10 px-2 py-1 font-mono text-[9px] text-boom disabled:opacity-40"
+                    >
+                      {accepted.has(d.id) ? 'Accepted' : 'Accept'}
+                    </button>
+                    <button
+                      type="button"
+                      disabled={done}
+                      onClick={() => onIgnore(d.id)}
+                      className="rounded border border-border px-2 py-1 font-mono text-[9px] text-muted disabled:opacity-40"
+                    >
+                      {ignored.has(d.id) ? 'Ignored' : 'Ignore'}
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+function OptimizeModal({
+  optimizer,
+  onClose,
+}: {
+  optimizer: LineupOptimizer;
+  onClose: () => void;
+}) {
+  const [showReview, setShowReview] = useState(false);
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-bg/80 p-4">
+      <div className="max-h-[85vh] w-full max-w-md overflow-y-auto rounded-md border border-border bg-surface p-5">
+        {!showReview ? (
+          <>
+            <div className="mb-4 font-mono text-[11px] uppercase tracking-wide text-text">
+              Lineup Optimizer
             </div>
-          </div>
-        ))}
+            <div className="space-y-2 font-mono text-[11px] text-muted">
+              <p>
+                <span className="text-text">{optimizer.leagueCount}</span> leagues checked
+              </p>
+              <p>
+                <span className="text-boom">{optimizer.changesRecommended}</span> lineup changes
+                recommended
+              </p>
+              <p>
+                Potential gain:{' '}
+                <span className="text-boom">+{optimizer.totalPotentialGain.toFixed(1)} points</span>
+              </p>
+            </div>
+            <div className="mt-5 flex flex-col gap-2">
+              <button
+                type="button"
+                onClick={() => setShowReview(true)}
+                className="w-full rounded border-none bg-boom py-2.5 font-mono text-[11px] uppercase tracking-wide text-bg"
+              >
+                Review Changes →
+              </button>
+              <button
+                type="button"
+                onClick={onClose}
+                className="w-full rounded border border-border bg-transparent py-2 font-mono text-[10px] text-muted"
+              >
+                Close
+              </button>
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="mb-3 font-mono text-[11px] uppercase tracking-wide text-text">
+              Recommended Changes
+            </div>
+            <div className="space-y-3">
+              {optimizer.leagueChanges.map((lc) => (
+                <div key={lc.leagueId} className="rounded border border-border/60 p-3">
+                  <div className="mb-2 font-mono text-[10px] text-text">{lc.leagueName}</div>
+                  <div className="mb-1 font-mono text-[9px] text-boom">
+                    +{lc.potentialGain.toFixed(1)} pts potential
+                  </div>
+                  <ul className="space-y-1">
+                    {lc.decisions.map((d) => (
+                      <li key={d.id} className="font-mono text-[9px] text-muted">
+                        {d.decisionLabel}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+            <button
+              type="button"
+              onClick={onClose}
+              className="mt-4 w-full rounded border border-border bg-transparent py-2 font-mono text-[10px] text-muted"
+            >
+              Close
+            </button>
+          </>
+        )}
       </div>
-      <div className="mt-1 rounded border border-boom/15 bg-boom/[0.06] px-2 py-1.5">
-        <div className="text-[8px] font-semibold uppercase tracking-wide text-boom">
-          BOB Pick: <span className="text-boom">{flex.pick.fullName}</span>
-        </div>
-        <div className="mt-px text-[8px] leading-snug text-muted">{flex.pickNote}</div>
-        <div className="mt-1 font-mono text-[9px] text-boom">+{flex.dynastyEdge} Dynasty Edge</div>
+    </div>
+  );
+}
+
+function FlexDecisionRow({ flex }: { flex: FlexDecision }) {
+  const tier = flex.confidenceTier ?? 'Lean';
+  return (
+    <div className="border-b border-border/50 px-3 py-2.5 last:border-b-0">
+      <div className="font-mono text-[10px] text-text">{flex.pickNote}</div>
+      <div className="mt-1 flex items-center gap-2">
+        <span className="font-mono text-[10px] text-boom">+{flex.dynastyEdge.toFixed(1)} projected</span>
+        <span className="text-muted">·</span>
+        <ConfidencePill tier={tier} />
+        <span className="font-mono text-[9px] text-muted">confidence</span>
       </div>
     </div>
   );
@@ -115,76 +357,98 @@ function FlexCard({ flex }: { flex: FlexDecision }) {
 
 export default function StartSitClient({
   nflWeek,
+  isOffseason,
   leagues,
   seasonRecord,
-  startThese: initialStart,
-  sitThese: initialSit,
+  decisions: initialDecisions,
+  decisionsSummary: _initialSummary,
+  lineupOptimizer,
   flexDecisions: initialFlex,
-  allRecommendations,
+  hasRealData,
 }: StartSitClientProps) {
   const router = useRouter();
   const [week, setWeek] = useState(nflWeek);
   const [leagueId, setLeagueId] = useState('all');
+  const [showOptimizeModal, setShowOptimizeModal] = useState(false);
+  const [accepted, setAccepted] = useState<Set<string>>(() => loadIdSet(ACCEPTED_KEY));
+  const [ignored, setIgnored] = useState<Set<string>>(() => loadIdSet(DISMISSED_KEY));
+  const preseason = isOffseason || nflWeek === 0;
 
-  const { startThese, sitThese, flexDecisions } = useMemo(() => {
-    let recs = [...allRecommendations];
+  const { decisions, summary, flexDecisions } = useMemo(() => {
+    let decs = [...initialDecisions];
+    let flex = [...initialFlex];
+
     if (leagueId !== 'all') {
-      recs = recs.filter((r) => r.leagueIds.includes(leagueId));
+      decs = decs.filter((d) => d.leagueId === leagueId);
+      flex = flex.filter(
+        (f) =>
+          f.playerA.leagueIds.includes(leagueId) || f.playerB.leagueIds.includes(leagueId),
+      );
     }
-    recs.sort((a, b) => b.startScore - a.startScore);
-    const start = recs.slice(0, 8).map((r) => ({
-      ...r,
-      confidence: Math.round(r.startScore),
-      barScore: r.startScore,
-    }));
-    const sitPool = recs.filter((r) => r.startScore < 50).sort((a, b) => a.startScore - b.startScore);
-    const sit = (sitPool.length >= 8 ? sitPool.slice(0, 8) : [...recs].sort((a, b) => a.startScore - b.startScore).slice(0, 8)).map(
-      (r) => {
-        const conf = Math.min(95, Math.round(100 - r.startScore + 38));
-        return { ...r, confidence: conf, barScore: conf };
-      },
-    );
-    const flexPool = recs.filter((r) => r.startScore >= 45 && r.startScore <= 65);
-    const flex: FlexDecision[] = [];
-    for (const pos of ['RB', 'WR', 'TE'] as const) {
-      const group = flexPool.filter((r) => r.position === pos);
-      if (group.length < 2) continue;
-      const sorted = [...group].sort((a, b) => b.startScore - a.startScore);
-      const playerA = sorted[0];
-      const playerB = sorted[1];
-      const pick = playerA.startScore >= playerB.startScore ? playerA : playerB;
-      const other = pick.playerId === playerA.playerId ? playerB : playerA;
-      flex.push({
-        position: pos,
-        playerA,
-        playerB,
-        pick,
-        pickNote: `${pick.fullName} has matchup edge over ${other.fullName}`,
-        dynastyEdge: Math.round(Math.abs(playerA.startScore - playerB.startScore) * 10) / 10,
-      });
-    }
-    return { startThese: start, sitThese: sit, flexDecisions: flex };
-  }, [allRecommendations, leagueId]);
 
-  const displayStart = leagueId === 'all' ? initialStart : startThese;
-  const displaySit = leagueId === 'all' ? initialSit : sitThese;
-  const displayFlex = leagueId === 'all' ? initialFlex : flexDecisions;
+    const active = decs.filter((d) => !ignored.has(d.id));
+    let high = 0;
+    let medium = 0;
+    let low = 0;
+    let gain = 0;
+    for (const d of active) {
+      gain += d.edgePts;
+      if (d.confidence >= 71) high += 1;
+      else if (d.confidence >= 62) medium += 1;
+      else low += 1;
+    }
+
+    const sum: DecisionsSummary = {
+      total: active.length,
+      high,
+      medium,
+      low,
+      expectedGain: Math.round(gain * 10) / 10,
+      potentialCost: Math.round(gain * 10) / 10,
+    };
+
+    return { decisions: active, summary: sum, flexDecisions: flex };
+  }, [initialDecisions, initialFlex, leagueId, ignored]);
+
+  const heroDecisions = decisions.slice(0, 3);
+  const tableDecisions = decisions.slice(3);
+
+  const handleAccept = useCallback((id: string) => {
+    setAccepted((prev) => {
+      const next = new Set(prev);
+      next.add(id);
+      saveIdSet(ACCEPTED_KEY, next);
+      return next;
+    });
+  }, []);
+
+  const handleIgnore = useCallback((id: string) => {
+    setIgnored((prev) => {
+      const next = new Set(prev);
+      next.add(id);
+      saveIdSet(DISMISSED_KEY, next);
+      return next;
+    });
+  }, []);
 
   const handleWeekChange = (delta: number) => {
-    const next = Math.min(18, Math.max(1, week + delta));
+    const minWeek = preseason ? 0 : 1;
+    const next = Math.min(18, Math.max(minWeek, week + delta));
     setWeek(next);
     router.push(`/startsit?week=${next}${leagueId !== 'all' ? `&league=${leagueId}` : ''}`);
   };
+
+  const weekLabel = preseason ? 'WEEK 1' : `WEEK ${week}`;
 
   return (
     <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
       <div className="flex shrink-0 items-start justify-between px-[18px] pb-1.5 pt-2.5">
         <div>
-          <div className="text-[22px] font-bold uppercase tracking-[-0.5px] text-text">
-            Start / Sit
+          <div className="font-mono text-[22px] uppercase tracking-[-0.5px] text-text">
+            Weekly Decisions
           </div>
-          <div className="mt-0.5 text-[11px] text-muted">
-            Week {week} decisions. Backed by data, not gut.
+          <div className="mt-0.5 font-mono text-[11px] text-muted">
+            What lineup changes should you make today?
           </div>
         </div>
         <div className="flex items-center gap-2">
@@ -196,8 +460,8 @@ export default function StartSitClient({
             >
               ‹
             </button>
-            <span className="flex h-7 items-center border-x border-border px-2.5 text-[11px] text-text">
-              Week {week}
+            <span className="flex h-7 items-center border-x border-border px-2.5 font-mono text-[11px] text-text">
+              {preseason ? 'Preseason' : `Week ${week}`}
             </span>
             <button
               type="button"
@@ -210,7 +474,7 @@ export default function StartSitClient({
           <select
             value={leagueId}
             onChange={(e) => setLeagueId(e.target.value)}
-            className="h-7 cursor-pointer rounded-[5px] border border-border bg-surface2 px-2.5 font-figtree text-[11px] text-text outline-none"
+            className="h-7 cursor-pointer rounded-[5px] border border-border bg-surface2 px-2.5 font-mono text-[11px] text-text outline-none"
           >
             <option value="all">All Leagues</option>
             {leagues.map((l) => (
@@ -222,96 +486,161 @@ export default function StartSitClient({
         </div>
       </div>
 
+      <OffseasonContextBanner isOffseason={preseason} />
+
       <div className="min-h-0 flex-1 overflow-y-auto px-[18px] pb-3 [scrollbar-width:thin]">
-        <div className="mb-2.5 flex items-center gap-0 rounded-md border border-border bg-surface px-4 py-3">
-          <div className="flex-1">
-            <div className="mb-1.5 text-[8px] uppercase tracking-[1.5px] text-muted">
-              Verified Season Record
-            </div>
-            <div className="flex items-center gap-3">
-              <div className="text-center">
-                <div className="font-mono text-[28px] font-bold text-boom">{seasonRecord.wins}</div>
-                <div className="text-[9px] text-muted">Win</div>
-              </div>
-              <span className="font-mono text-xl text-muted">-</span>
-              <div className="text-center">
-                <div className="font-mono text-[28px] font-bold text-[#ef4444]">
-                  {seasonRecord.losses}
-                </div>
-                <div className="text-[9px] text-muted">Loss</div>
-              </div>
-              <span className="font-mono text-xl text-muted">-</span>
-              <div className="text-center">
-                <div className="font-mono text-[28px] font-bold text-muted">
-                  {seasonRecord.pushes}
-                </div>
-                <div className="text-[9px] text-muted">Push</div>
-              </div>
-            </div>
+        {/* Decisions Summary */}
+        <div className="mb-3 rounded-md border border-border bg-surface px-4 py-3">
+          <div className="font-mono text-[11px] uppercase tracking-wide text-text">
+            {weekLabel} Front Office Decisions
           </div>
-          <div className="mx-6 h-[60px] w-px bg-border" />
-          <div className="flex items-center gap-3.5">
-            <div className="font-mono text-4xl font-bold text-boom">{seasonRecord.winRate}%</div>
-            <div>
-              <div className="text-[11px] font-medium text-text">WIN RATE</div>
-              <div className="text-[9px] text-muted">
-                Verified across {seasonRecord.totalDecisions.toLocaleString()} lineup decisions
+          {!hasRealData || summary.total === 0 ? (
+            <p className="mt-2 font-mono text-[10px] leading-relaxed text-muted">
+              Preseason Mode — BOB needs scored players in your rosters before lineup decisions
+              can be generated. Projections will update as 2026 training camp data arrives. All calls
+              are tracked starting Week 1.
+            </p>
+          ) : (
+            <>
+              <p className="mt-2 font-mono text-[11px] text-muted">
+                {summary.total} decision{summary.total !== 1 ? 's' : ''} identified
+              </p>
+              <p className="mt-1 font-mono text-[10px] text-muted">
+                {summary.high} High Confidence · {summary.medium} Medium · {summary.low} Low
+              </p>
+              <div className="mt-2 flex flex-wrap gap-4">
+                <div>
+                  <div className="font-mono text-[9px] uppercase text-muted">Expected gain if followed</div>
+                  <div className="font-mono text-[16px] text-boom">+{summary.expectedGain.toFixed(1)} pts</div>
+                </div>
+                <div>
+                  <div className="font-mono text-[9px] uppercase text-muted">Potential cost if ignored</div>
+                  <div className="font-mono text-[16px] text-bust/90">-{summary.potentialCost.toFixed(1)} pts</div>
+                </div>
               </div>
-              <div className="text-[9px] text-muted">Updated after every game</div>
-            </div>
-            <div className="flex h-9 w-9 items-center justify-center rounded-full border border-boom/30 bg-boom/10 text-base text-boom">
-              ✓
-            </div>
-          </div>
+            </>
+          )}
+          {preseason && hasRealData && (
+            <p className="mt-2 font-mono text-[9px] leading-relaxed text-muted">
+              Preseason projections based on 2025 historical data — confidence increases as 2026
+              season data arrives.
+            </p>
+          )}
         </div>
 
-        <div className="mb-2.5 grid grid-cols-2 gap-2.5">
-          <div className="overflow-hidden rounded-md border border-border bg-surface">
-            <div className="border-b border-border px-3 py-2">
-              <div className="flex items-center gap-1 text-[10px] font-semibold text-boom">
-                ▲ START THESE
-              </div>
-              <div className="text-[9px] text-muted">High confidence plays for Week {week}</div>
+        {/* Must Act — Hero Cards */}
+        {heroDecisions.length > 0 && (
+          <div className="mb-3 space-y-2.5">
+            <div className="font-mono text-[9px] uppercase tracking-[1.5px] text-muted">
+              Must Act
             </div>
-            {displayStart.length > 0 ? (
-              displayStart.map((r) => (
-                <RecommendationRow key={r.playerId} rec={r} variant="start" />
-              ))
-            ) : (
-              <div className="px-3 py-6 text-center text-[11px] text-muted">No start calls yet</div>
-            )}
-          </div>
-          <div className="overflow-hidden rounded-md border border-border bg-surface">
-            <div className="border-b border-border px-3 py-2">
-              <div className="flex items-center gap-1 text-[10px] font-semibold text-[#ef4444]">
-                ▼ SIT THESE
-              </div>
-              <div className="text-[9px] text-muted">Fade these plays in Week {week}</div>
-            </div>
-            {displaySit.length > 0 ? (
-              displaySit.map((r) => (
-                <RecommendationRow key={r.playerId} rec={r} variant="sit" />
-              ))
-            ) : (
-              <div className="px-3 py-6 text-center text-[11px] text-muted">No sit calls yet</div>
-            )}
-          </div>
-        </div>
-
-        {displayFlex.length > 0 && (
-          <div className="overflow-hidden rounded-md border border-border bg-surface">
-            <div className="flex items-center gap-2 border-b border-border px-3 py-2">
-              <div className="text-[10px] font-semibold text-hold">⚡ FLEX DECISIONS</div>
-              <div className="text-[9px] text-muted">Too close to call — BOB breaks the tie</div>
-            </div>
-            <div className="grid grid-cols-3">
-              {displayFlex.map((f) => (
-                <FlexCard key={f.position} flex={f} />
-              ))}
-            </div>
+            {heroDecisions.map((d) => (
+              <HeroDecisionCard key={d.id} decision={d} />
+            ))}
           </div>
         )}
+
+        {/* All Decisions Table */}
+        {decisions.length > 0 && (
+          <div className="mb-3">
+            <div className="mb-2 font-mono text-[9px] uppercase tracking-[1.5px] text-muted">
+              {tableDecisions.length > 0 ? 'All Decisions' : 'Decision Log'}
+            </div>
+            <DecisionsTable
+              rows={tableDecisions.length > 0 ? tableDecisions : heroDecisions}
+              onAccept={handleAccept}
+              onIgnore={handleIgnore}
+              accepted={accepted}
+              ignored={ignored}
+            />
+            {tableDecisions.length > 0 && heroDecisions.length > 0 && (
+              <div className="mt-2 text-center">
+                <span className="font-mono text-[9px] text-muted">
+                  {heroDecisions.length} hero decision{heroDecisions.length !== 1 ? 's' : ''} shown above
+                </span>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Lineup Optimizer */}
+        <div className="mb-3 rounded-md border border-border bg-surface px-4 py-4">
+          <div className="font-mono text-[9px] uppercase tracking-[1.5px] text-muted">
+            Lineup Optimizer
+          </div>
+          {hasRealData && lineupOptimizer.optimizedLineupPts > 0 ? (
+            <>
+              <div className="mt-3 flex flex-wrap items-end gap-4">
+                <div>
+                  <div className="font-mono text-[9px] text-muted">Lineup Grade</div>
+                  <div className="font-mono text-[28px] text-boom">{lineupOptimizer.grade}</div>
+                </div>
+                <div>
+                  <div className="font-mono text-[9px] text-muted">Current Lineup Projected</div>
+                  <div className="font-mono text-[14px] text-text">
+                    {lineupOptimizer.currentLineupPts.toFixed(1)} pts
+                  </div>
+                </div>
+                <div>
+                  <div className="font-mono text-[9px] text-muted">BOB Optimized Lineup</div>
+                  <div className="font-mono text-[14px] text-boom">
+                    {lineupOptimizer.optimizedLineupPts.toFixed(1)} pts
+                  </div>
+                </div>
+                <div>
+                  <div className="font-mono text-[9px] text-muted">Potential Gain</div>
+                  <div className="font-mono text-[14px] text-boom">
+                    +{lineupOptimizer.potentialGain.toFixed(1)} pts
+                  </div>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowOptimizeModal(true)}
+                className="mt-4 w-full rounded border-none bg-boom py-3 font-mono text-[11px] uppercase tracking-wide text-bg sm:w-auto sm:px-8"
+              >
+                Optimize All Leagues
+              </button>
+            </>
+          ) : (
+            <p className="mt-2 font-mono text-[10px] text-muted">
+              Optimizer activates once scored roster data is available for your leagues.
+            </p>
+          )}
+        </div>
+
+        {/* Flex Decisions */}
+        {flexDecisions.length > 0 && (
+          <div className="overflow-hidden rounded-md border border-border bg-surface">
+            <div className="border-b border-border px-3 py-2">
+              <div className="font-mono text-[10px] uppercase text-hold">Flex Decisions</div>
+              <div className="font-mono text-[9px] text-muted">Close calls — BOB breaks the tie</div>
+            </div>
+            {flexDecisions.map((f) => (
+              <FlexDecisionRow key={f.position} flex={f} />
+            ))}
+          </div>
+        )}
+
+        {/* Season record strip (compact) */}
+        <div className="mt-3 rounded-md border border-border/60 bg-surface2/40 px-3 py-2">
+          <div className="flex flex-wrap items-center gap-3 font-mono text-[9px] text-muted">
+            <span>
+              Season: {seasonRecord.wins}-{seasonRecord.losses}-{seasonRecord.pushes}
+            </span>
+            <span>Win Rate: {seasonRecord.winRate}%</span>
+            {seasonRecord.totalDecisions === 0 && (
+              <Link href="/performance" className="text-boom hover:underline">
+                Tracking begins Week 1 →
+              </Link>
+            )}
+          </div>
+        </div>
       </div>
+
+      {showOptimizeModal && (
+        <OptimizeModal optimizer={lineupOptimizer} onClose={() => setShowOptimizeModal(false)} />
+      )}
     </div>
   );
 }

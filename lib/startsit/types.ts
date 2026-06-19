@@ -11,6 +11,8 @@ export interface StartSitRecommendation {
   barScore: number;
   projectedPoints: number | null;
   reasoning: string;
+  whyBullets: string[];
+  obviousCall?: boolean;
   tfoScore: number;
   verdict: VerdictLabel;
   leagueIds: string[];
@@ -24,6 +26,51 @@ export interface FlexDecision {
   pick: StartSitRecommendation;
   pickNote: string;
   dynastyEdge: number;
+  confidence?: number;
+  confidenceTier?: 'Lean' | 'Strong' | 'Smash';
+}
+
+export interface LineupDecision {
+  id: string;
+  variant: 'start' | 'sit';
+  startPlayer: StartSitRecommendation;
+  sitPlayer: StartSitRecommendation;
+  leagueId: string;
+  leagueName: string;
+  position: string;
+  edgePts: number;
+  confidence: number;
+  confidenceTier: 'Lean' | 'Strong' | 'Smash';
+  whyBullets: string[];
+  whyOneLine: string;
+  decisionLabel: string;
+}
+
+export interface DecisionsSummary {
+  total: number;
+  high: number;
+  medium: number;
+  low: number;
+  expectedGain: number;
+  potentialCost: number;
+}
+
+export interface LeagueLineupChange {
+  leagueId: string;
+  leagueName: string;
+  decisions: LineupDecision[];
+  potentialGain: number;
+}
+
+export interface LineupOptimizer {
+  grade: string;
+  currentLineupPts: number;
+  optimizedLineupPts: number;
+  potentialGain: number;
+  leagueCount: number;
+  changesRecommended: number;
+  totalPotentialGain: number;
+  leagueChanges: LeagueLineupChange[];
 }
 
 export interface SeasonRecord {
@@ -47,6 +94,8 @@ export interface WeekContext {
   windowOpen: boolean;
   lockDeadline: string;
   weatherImpact: string;
+  /** NFL week 0 / no active regular season */
+  isOffseason: boolean;
 }
 
 export interface HighConfidenceAlerts {
@@ -58,8 +107,11 @@ export interface HighConfidenceAlerts {
 export interface StartSitTopbar {
   seasonRecord: string;
   seasonWinRate: number;
+  /** @deprecated use decisionsToday */
   thisWeekCalls: number;
-  confidenceLevel: 'High' | 'Medium' | 'Low';
+  decisionsToday: number;
+  expectedGain: number;
+  confidenceLevel: 'Smash' | 'Strong' | 'Lean' | 'Preseason';
   avgConfidence: number;
   lastUpdatedMinutes: number;
 }
@@ -74,8 +126,12 @@ export interface StartSitPageData {
   seasonSparkline: { week: number; winRate: number }[];
   startThese: StartSitRecommendation[];
   sitThese: StartSitRecommendation[];
+  decisions: LineupDecision[];
+  decisionsSummary: DecisionsSummary;
+  lineupOptimizer: LineupOptimizer;
   flexDecisions: FlexDecision[];
   alerts: HighConfidenceAlerts;
   allRecommendations: StartSitRecommendation[];
   leagueCount: number;
+  hasRealData: boolean;
 }

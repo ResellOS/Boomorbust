@@ -1,58 +1,93 @@
 import { redirect } from 'next/navigation';
-import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { fetchRotationData } from '@/lib/dashboard/fetchRotationData';
+import { resolveDashboardAuth } from '@/lib/auth/serverSession';
+import {
+  emptyDashboardRotationData,
+  fetchRotationData,
+} from '@/lib/dashboard/fetchRotationData';
+import { fetchDailyTasks } from '@/lib/dashboard/fetchDailyTasks';
 import { LEAGUE_STATUS } from '@/lib/dashboard/rotation';
+import { getUserTier } from '@/lib/access/gates';
 import Sidebar, { type League } from '@/components/dashboard/Sidebar';
 import DashboardClient from '@/components/dashboard/DashboardClient';
+import TerminalPageGrid from '@/components/dashboard/TerminalPageGrid';
 
 export const dynamic = 'force-dynamic';
 
 export default async function DashboardPage() {
-  let userId: string | null = null;
+  const auth = await resolveDashboardAuth();
 
-  try {
-    const authClient = createClient();
-    const { data, error } = await authClient.auth.getUser();
-    if (error) console.error('[dashboard] getUser error:', error);
-    userId = data?.user?.id ?? null;
-  } catch (err) {
-    console.error('[dashboard] getUser failed:', err);
-  }
+  if (auth.needsOnboarding) redirect('/onboarding');
+  if (!auth.userId) redirect('/auth/login');
 
-  if (!userId) redirect('/login');
+  let sleeperUserId = auth.sleeperUserId;
+  let lastEmpireRating: number | null = null;
 
-  // Owner lookup: auth.uid() -> profiles.id -> profiles.sleeper_user_id.
-  let sleeperUserId: string | null = null;
-  let needsOnboarding = false;
+  if (!sleeperUserId) {
+    try {
+      const supabase = createAdminClient();
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('sleeper_user_id, last_empire_rating')
+        .eq('id', auth.userId)
+        .maybeSingle();
 
-  try {
-    const supabase = createAdminClient();
-    const { data: profile, error } = await supabase
-      .from('profiles')
-      .select('sleeper_user_id')
-      .eq('id', userId)
-      .maybeSingle();
+      if (profile?.sleeper_user_id) {
+        sleeperUserId = profile.sleeper_user_id;
+      } else if (!auth.profileUnavailable && !profile?.sleeper_user_id) {
+        redirect('/onboarding');
+      }
 
-    if (error) {
-      console.error('[dashboard] profile query error:', error);
-    } else if (!profile) {
-      console.error('[dashboard] no profile found for user:', userId);
-    } else if (!profile.sleeper_user_id) {
-      needsOnboarding = true;
-    } else {
-      sleeperUserId = profile.sleeper_user_id;
+      const raw = profile?.last_empire_rating;
+      lastEmpireRating =
+        raw != null && Number.isFinite(Number(raw)) ? Number(raw) : null;
+    } catch (err) {
+      console.error('[dashboard] admin profile fetch failed:', err);
     }
-  } catch (err) {
-    console.error('[dashboard] profile fetch failed:', err);
+  } else {
+    try {
+      const supabase = createAdminClient();
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('last_empire_rating')
+        .eq('id', auth.userId)
+        .maybeSingle();
+      const raw = profile?.last_empire_rating;
+      lastEmpireRating =
+        raw != null && Number.isFinite(Number(raw)) ? Number(raw) : null;
+    } catch {
+      /* non-blocking */
+    }
   }
 
-  if (needsOnboarding) redirect('/onboarding');
-  if (!sleeperUserId) redirect('/login');
+  if (!sleeperUserId && !auth.profileUnavailable) {
+    redirect('/auth/login');
+  }
 
-  // One initial load of every league's data; the client filters in memory on
-  // rotation / league switch (no further API calls).
-  const data = await fetchRotationData(userId, sleeperUserId);
+  let data = await emptyDashboardRotationData();
+  if (sleeperUserId) {
+    try {
+      data = await fetchRotationData(auth.userId, sleeperUserId);
+    } catch (err) {
+      console.error('[dashboard] fetchRotationData failed:', err);
+    }
+  }
+
+  let dailyTasks: Awaited<ReturnType<typeof fetchDailyTasks>> = [];
+  try {
+    dailyTasks = await fetchDailyTasks(auth.userId);
+  } catch (err) {
+    console.error('[dashboard] fetchDailyTasks failed:', err);
+  }
+
+  let tier: Awaited<ReturnType<typeof getUserTier>> = 'free';
+  try {
+    tier = await getUserTier(auth.userId);
+  } catch (err) {
+    console.error('[dashboard] getUserTier failed:', err);
+  }
+
+  const showAds = tier === 'free';
 
   const sidebarLeagues: League[] = data.leagues.map((l) => {
     const meta = LEAGUE_STATUS[l.status];
@@ -64,15 +99,13 @@ export default async function DashboardPage() {
   });
 
   return (
-    <div
-      className="grid h-screen overflow-hidden"
-      style={{
-        gridTemplateRows: '66px 1fr 28px',
-        gridTemplateColumns: '215px 1fr',
-      }}
-    >
-      <Sidebar leagues={sidebarLeagues} />
-      <DashboardClient data={data} />
-    </div>
+    <TerminalPageGrid>
+      <Sidebar
+        leagues={sidebarLeagues}
+        signalCounts={data.portfolio.signalCounts}
+        showAds={showAds}
+      />
+      <DashboardClient data={data} dailyTasks={dailyTasks} lastEmpireRating={lastEmpireRating} />
+    </TerminalPageGrid>
   );
 }

@@ -51,6 +51,11 @@ export interface BobSuggestion {
   headline: string;
   playerId: string;
   playerName: string;
+  position?: string;
+  team?: string;
+  tfoScore?: number | null;
+  ktcValue?: number | null;
+  ktcRank?: number | null;
   targetPlayerId?: string;
   targetName?: string;
   /** Scaled rank_delta (engine vs market) — the "+11.7" style number. */
@@ -62,6 +67,71 @@ export interface BobSuggestion {
   leagueName: string;
   /** For buy-low: the manager who rosters the player (trade target). */
   managerName?: string;
+  targetRosterId?: number;
+  /** Raw engine vs market rank delta (negative = market overvalues). */
+  rankDelta?: number | null;
+  /** Plain-English bullets shown under each suggestion row. */
+  whyReasons?: string[];
+}
+
+export interface TradeOpportunity {
+  id: string;
+  playerId: string;
+  playerName: string;
+  position: string;
+  team: string;
+  leagueId: string;
+  leagueName: string;
+  managerName: string;
+  type: 'buy_low' | 'sell_high' | 'buy_window' | 'neutral';
+  bobRank: number | null;
+  marketRank: number | null;
+  valueGap: number | null;
+  suggestedPrice: string;
+  givePlayerName: string;
+  getPlayerName: string;
+  suggestedAddOn?: string;
+  acceptanceProbability: number;
+  mutualBenefitScore: number;
+  championshipImpact: number;
+  tfoDelta: number;
+  whyReasons: string[];
+  reasonChips: string[];
+  opportunityScore: number;
+  actionVerb: string;
+  portfolioImpactScore: number;
+  portfolioImpactNote: string;
+  tradeConfidence: 'Low' | 'Medium' | 'High' | 'Elite';
+  bobOpportunityBadge: string;
+  marketVerdict: BobSuggestion['verdict'];
+}
+
+export interface ManagerTradeCard {
+  sleeperRosterId: number;
+  leagueId: string;
+  leagueName: string;
+  displayName: string;
+  avatar: string | null;
+  tradeLikelihood: number;
+  confidenceLabel: string;
+  profile: import('@/lib/managers/analyzer').ManagerProfileData;
+  youthPreference: number;
+  pickHoarderScore: number;
+  responseSpeed?: string;
+  negotiationStyle: string;
+  overpayTendency: string;
+}
+
+export interface BlockPlayer {
+  playerId: string;
+  playerName: string;
+  position: string;
+  team: string;
+  ownerName: string;
+  leagueName: string;
+  leagueId: string;
+  verdictLabel: string;
+  bobOpportunityBadge: string;
 }
 
 export interface TradeHistoryRow {
@@ -82,6 +152,10 @@ export interface TradePageStats {
   avgRosterTfo: number;
   smartCounterUses: number;
   leaguesActive: number;
+  /** Championship odds proxy across rostered players. */
+  championshipOdds: number;
+  /** Count of ranked trade opportunities. */
+  tradeOpportunities: number;
 }
 
 export interface TradePageFooter {
@@ -101,6 +175,12 @@ export interface OwnedPick {
   leagueId: string;
 }
 
+export interface MarketTemperatureRow {
+  position: string;
+  status: string;
+  icon: string;
+}
+
 export interface TradePageData {
   stats: TradePageStats;
   leagues: TradeLeague[];
@@ -109,6 +189,10 @@ export interface TradePageData {
   outgoingOffers: TradeOffer[];
   completedOffers: TradeOffer[];
   suggestions: BobSuggestion[];
+  opportunities: TradeOpportunity[];
+  managerCards: ManagerTradeCard[];
+  blockPlayers: BlockPlayer[];
+  marketTemperature: MarketTemperatureRow[];
   history: TradeHistoryRow[];
   footer: TradePageFooter;
   /** Picks the user currently owns, keyed by leagueId (give-side dropdown). */

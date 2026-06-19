@@ -47,8 +47,8 @@ export default function TradeTargetsTable({ targets, leagueId }: TradeTargetsTab
           Recommended Trade Targets
         </span>
       </div>
-      <div className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-        <table className="w-full border-collapse">
+      <div className="min-h-0 flex-1 overflow-x-auto overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <table className="w-full min-w-[480px] border-collapse">
           <thead>
             <tr>
               {['Player', 'League', 'Why Target', 'Acquire Cost'].map((col, i) => (

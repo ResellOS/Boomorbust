@@ -1,15 +1,19 @@
 import { createAdminClient } from '@/lib/supabase/admin';
 import { fetchMarketVerdicts } from '@/lib/verdict/fetchMarketVerdicts';
-import type { PlayerHubData, HubPlayer, RosterSnapshotPlayer } from './types';
+import { fetchLatestFormulaCalculatedAt } from '@/lib/formula/lastRescore';
+import { normalizeDirection60d } from '@/lib/dashboard/tickerSignal';
+import type { PlayerHubData, HubPlayer, RosterSnapshotPlayer, PlayerHubPortfolio } from './types';
 import {
   calcTrend,
-  isBoomVerdict,
-  isBustVerdict,
   minutesAgo,
   normalizeVerdict,
   resolveSubScores,
   safeScore,
 } from './utils';
+import { fetchAllPlayers } from '@/lib/sleeper/players';
+import { parseSleeperBio } from './playerIntelligence';
+
+const SKILL_POSITIONS = new Set(['QB', 'RB', 'WR', 'TE']);
 
 type PlayerRow = {
   player_id: string;
@@ -38,6 +42,7 @@ type TfoCacheRow = {
   yoysi_score?: number | null;
   sit_score?: number | null;
   projected_ppg?: number | null;
+  confidence_tier?: string | null;
   calculated_at?: string | null;
 };
 
@@ -75,6 +80,7 @@ export async function fetchPlayerHubData(
     rosterPlayerIds: [],
     rosterSnapshot: [],
     leaguePresence: {},
+    portfolio: { avgPortfolioTfo: 0, totalPortfolioTfo: 0, positionSharePct: {} },
     edgeOpportunities: 0,
     leagueCount: 0,
   };
@@ -135,24 +141,22 @@ export async function fetchPlayerHubData(
   }
 
   let playersTracked = 0;
-  try {
-    const { count, error } = await supabase
-      .from('players')
-      .select('*', { count: 'exact', head: true });
-    if (error) throw error;
-    playersTracked = count ?? 0;
-  } catch (err) {
-    console.error('[players] players count failed:', err);
-  }
+  let boomPlayers = 0;
+  let bustPlayers = 0;
 
   const latestByPlayer = new Map<string, TfoCacheRow>();
   const previousByPlayer = new Map<string, number>();
   const historyByPlayer = new Map<string, number[]>();
+  const historyDatesByPlayer = new Map<string, string[]>();
+  const confidenceByPlayer = new Map<string, string | null>();
 
   try {
     const { data, error } = await supabase
       .from('formula_scores')
-      .select('player_id, tfo_score, verdict, ops_score, sfs_score, yoysi_score, sit_score, projected_ppg, calculated_at')
+      .select(
+        'player_id, tfo_score, verdict, ops_score, sfs_score, yoysi_score, sit_score, projected_ppg, confidence_tier, calculated_at',
+      )
+      .eq('scoring_context', 'dynasty')
       .order('calculated_at', { ascending: false });
     if (error) throw error;
 
@@ -160,44 +164,98 @@ export async function fetchPlayerHubData(
       const pid = String(row.player_id);
       if (!latestByPlayer.has(pid)) {
         latestByPlayer.set(pid, row);
+        confidenceByPlayer.set(pid, typeof row.confidence_tier === 'string' ? row.confidence_tier : null);
       } else if (!previousByPlayer.has(pid)) {
         previousByPlayer.set(pid, safeScore(row.tfo_score));
       }
       const hist = historyByPlayer.get(pid) ?? [];
-      if (hist.length < 7) {
+      const histDates = historyDatesByPlayer.get(pid) ?? [];
+      if (hist.length < 12) {
         hist.push(safeScore(row.tfo_score));
         historyByPlayer.set(pid, hist);
+        if (row.calculated_at) {
+          histDates.push(String(row.calculated_at));
+          historyDatesByPlayer.set(pid, histDates);
+        }
       }
     }
   } catch (err) {
     console.error('[players] tfo_cache fetch failed:', err);
   }
 
-  let boomPlayers = 0;
-  let bustPlayers = 0;
   let scoreSum = 0;
   let scoreCount = 0;
-  let lastUpdated: string | null = null;
+
+  const marketVerdicts = await fetchMarketVerdicts(supabase, 'dynasty');
+  const lastUpdated = await fetchLatestFormulaCalculatedAt(supabase, 'dynasty');
+
+  let sleeperBioById = new Map<string, ReturnType<typeof parseSleeperBio>>();
+  try {
+    const sleeperMap = await fetchAllPlayers();
+    if (sleeperMap) {
+      for (const [pid, row] of Object.entries(sleeperMap)) {
+        sleeperBioById.set(pid, parseSleeperBio(row as unknown as Record<string, unknown>));
+      }
+    }
+  } catch {
+    /* optional */
+  }
+
+  const latestPlayerIds = Array.from(latestByPlayer.keys());
+
+  const valueSignalByPlayer = new Map<string, { direction60d: 'up' | 'down' | 'neutral' | null; prob60d: number | null }>();
+  if (latestPlayerIds.length > 0) {
+    try {
+      for (let i = 0; i < latestPlayerIds.length; i += 200) {
+        const slice = latestPlayerIds.slice(i, i + 200);
+        const { data: sigRows, error: sigErr } = await supabase
+          .from('player_value_signals')
+          .select('player_id, direction_60d, prob_60d')
+          .in('player_id', slice);
+        if (sigErr) throw sigErr;
+        for (const row of sigRows ?? []) {
+          const pid = String(row.player_id);
+          if (valueSignalByPlayer.has(pid)) continue;
+          valueSignalByPlayer.set(pid, {
+            direction60d: normalizeDirection60d(row.direction_60d as string | null),
+            prob60d: typeof row.prob_60d === 'number' ? row.prob_60d : null,
+          });
+        }
+      }
+    } catch {
+      /* prob_60d column may not exist — retry direction only */
+      try {
+        for (let i = 0; i < latestPlayerIds.length; i += 200) {
+          const slice = latestPlayerIds.slice(i, i + 200);
+          const { data: sigRows } = await supabase
+            .from('player_value_signals')
+            .select('player_id, direction_60d')
+            .in('player_id', slice);
+          for (const row of sigRows ?? []) {
+            const pid = String(row.player_id);
+            if (valueSignalByPlayer.has(pid)) continue;
+            valueSignalByPlayer.set(pid, {
+              direction60d: normalizeDirection60d(row.direction_60d as string | null),
+              prob60d: null,
+            });
+          }
+        }
+      } catch {
+        /* optional */
+      }
+    }
+  }
 
   for (const row of Array.from(latestByPlayer.values())) {
     const score = safeScore(row.tfo_score);
     if (score <= 0) continue;
-    const verdict = normalizeVerdict(row.verdict, score);
-    if (isBoomVerdict(verdict)) boomPlayers += 1;
-    if (isBustVerdict(verdict)) bustPlayers += 1;
     scoreSum += score;
     scoreCount += 1;
-    if (row.calculated_at) {
-      if (!lastUpdated || row.calculated_at > lastUpdated) {
-        lastUpdated = row.calculated_at;
-      }
-    }
   }
 
   const avgDynastyRating =
     scoreCount > 0 ? Math.round((scoreSum / scoreCount) * 10) / 10 : 0;
 
-  const latestPlayerIds = Array.from(latestByPlayer.keys());
   let playerMeta = new Map<string, PlayerRow>();
 
   if (latestPlayerIds.length > 0) {
@@ -222,8 +280,6 @@ export async function fetchPlayerHubData(
 
   // Market verdicts (BUY/SELL vs KTC) — market-wide across the scored skill pool,
   // identical computation to the dashboard via the shared helper.
-  const marketVerdicts = await fetchMarketVerdicts(supabase, 'dynasty');
-
   const hubPlayers: HubPlayer[] = [];
   for (const [pid, tfo] of Array.from(latestByPlayer.entries())) {
     const meta = playerMeta.get(pid);
@@ -260,12 +316,25 @@ export async function fetchPlayerHubData(
       trend,
       trendDelta: prev !== null && prev > 0 ? Math.round((score - prev) * 10) / 10 : 0,
       scoreHistory: (historyByPlayer.get(pid) ?? [score]).reverse(),
+      scoreHistoryDates: (historyDatesByPlayer.get(pid) ?? []).reverse(),
       calculatedAt: tfo.calculated_at ?? null,
+      confidenceTier: confidenceByPlayer.get(pid) ?? null,
+      valueSignal: valueSignalByPlayer.get(pid) ?? null,
       marketVerdict: marketVerdicts.get(pid) ?? null,
+      bio: sleeperBioById.get(pid),
     });
   }
 
   hubPlayers.sort((a, b) => b.tfoScore - a.tfoScore);
+
+  for (const p of hubPlayers) {
+    if (!SKILL_POSITIONS.has(p.position)) continue;
+    const mv = p.marketVerdict;
+    if (!mv || mv.noMarketData || mv.rankDelta == null) continue;
+    playersTracked += 1;
+    if (mv.verdict === 'BOOM' || mv.verdict === 'BUY') boomPlayers += 1;
+    else if (mv.verdict === 'SELL' || mv.verdict === 'BUST') bustPlayers += 1;
+  }
 
   const rosterSet = new Set(rosterPlayerIds);
   const edgeOpportunities = hubPlayers.filter(
@@ -283,6 +352,25 @@ export async function fetchPlayerHubData(
       tfoScore: p.tfoScore,
     }));
 
+  const rosterHub = hubPlayers.filter((p) => rosterSet.has(p.playerId));
+  const totalPortfolioTfo = rosterHub.reduce((s, p) => s + p.tfoScore, 0);
+  const avgPortfolioTfo =
+    rosterHub.length > 0 ? Math.round((totalPortfolioTfo / rosterHub.length) * 10) / 10 : avgDynastyRating;
+  const positionTfo: Record<string, number> = {};
+  for (const p of rosterHub) {
+    positionTfo[p.position] = (positionTfo[p.position] ?? 0) + p.tfoScore;
+  }
+  const positionSharePct: Record<string, number> = {};
+  for (const [pos, tfo] of Object.entries(positionTfo)) {
+    positionSharePct[pos] =
+      totalPortfolioTfo > 0 ? Math.round((tfo / totalPortfolioTfo) * 1000) / 10 : 0;
+  }
+  const portfolio: PlayerHubPortfolio = {
+    avgPortfolioTfo,
+    totalPortfolioTfo,
+    positionSharePct,
+  };
+
   return {
     leagues: leagueList,
     stats: {
@@ -297,6 +385,7 @@ export async function fetchPlayerHubData(
     rosterPlayerIds,
     rosterSnapshot,
     leaguePresence,
+    portfolio,
     edgeOpportunities,
     leagueCount: leagueList.length,
   };

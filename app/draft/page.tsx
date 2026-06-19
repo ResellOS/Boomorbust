@@ -2,7 +2,6 @@ import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { fetchDraftData } from '@/lib/draft/fetchDraftData';
-import Sidebar from '@/components/dashboard/Sidebar';
 import DraftRoomClient from '@/components/draft/DraftRoomClient';
 
 export const dynamic = 'force-dynamic';
@@ -21,7 +20,6 @@ export default async function DraftPage() {
 
   if (!userId) redirect('/login');
 
-  // Owner lookup: auth.uid() -> profiles.id -> profiles.sleeper_user_id.
   let sleeperUserId: string | null = null;
   let needsOnboarding = false;
 
@@ -52,15 +50,14 @@ export default async function DraftPage() {
   const data = await fetchDraftData(userId);
 
   return (
-    <div
-      className="grid h-screen overflow-hidden"
-      style={{
-        gridTemplateRows: '66px 1fr 28px',
-        gridTemplateColumns: '215px 1fr 320px',
-      }}
-    >
-      <Sidebar leagues={data.leagues} />
-      <DraftRoomClient pool={data.pool} scoringContext={data.scoringContext} />
+    <div className="draft-page-grid h-full overflow-hidden">
+      <DraftRoomClient
+        pool={data.pool}
+        scoringContext={data.scoringContext}
+        sessions={data.sessions}
+        leagues={data.leagues}
+        ownedPicksByLeague={data.ownedPicksByLeague}
+      />
     </div>
   );
 }

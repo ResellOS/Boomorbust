@@ -157,7 +157,7 @@ export default function DraftBoard({
           <span>Player</span>
           <span className="text-right">ADP</span>
           <span className="text-right">Age</span>
-          <span className="text-right">TFO</span>
+          <span className="text-right">Rating</span>
         </div>
         {available.map((p) => (
           <button

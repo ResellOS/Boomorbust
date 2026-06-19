@@ -7,17 +7,17 @@ export function getVerdict(score: number) {
 }
 
 export function getTier(score: number) {
-  if (score >= 90) return 'Elite Tier';
-  if (score >= 80) return 'Strong Tier';
-  if (score >= 70) return 'Solid Tier';
-  if (score >= 60) return 'Average Tier';
-  if (score >= 50) return 'Weak Tier';
-  return 'Avoid Tier';
+  if (score >= 90) return 'Elite Asset';
+  if (score >= 80) return 'Strong Asset';
+  if (score >= 70) return 'Stable Asset';
+  if (score >= 60) return 'Developing';
+  if (score >= 50) return 'Monitor';
+  return 'High Risk';
 }
 
 /** Short performance-grade label (descriptive quality, NOT an action signal). */
 export function getGradeLabel(score: number): string {
-  return getTier(score).replace(/ Tier$/, '').toUpperCase();
+  return getTier(score).toUpperCase();
 }
 
 export function getCardBorderStyle(label: string): { border: string; boxShadow?: string } {

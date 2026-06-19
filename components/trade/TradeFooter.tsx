@@ -7,7 +7,7 @@ interface TradeFooterProps {
 export default function TradeFooter({ footer }: TradeFooterProps) {
   return (
     <footer
-      className="col-span-2 row-start-3 grid border-t border-border/50 bg-bg/[0.98]"
+      className="col-span-1 md:col-span-2 row-start-3 hidden md:grid border-t border-border/50 bg-bg/[0.98]"
       style={{ gridTemplateColumns: 'repeat(4, 1fr)', height: 28 }}
     >
       <div className="flex h-full items-center gap-2 border-r border-border/40 px-[18px]">

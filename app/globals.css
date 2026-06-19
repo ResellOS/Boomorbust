@@ -976,3 +976,53 @@ html, body {
     -webkit-overflow-scrolling: touch;
   }
 }
+
+/* ── Terminal pages: single column on mobile, sidebar column on md+ ── */
+.terminal-page-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 768px) {
+  .terminal-page-grid {
+    grid-template-columns: 215px 1fr;
+  }
+}
+
+.performance-page-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 66px 1fr 28px;
+  height: 100%;
+}
+
+@media (min-width: 768px) {
+  .performance-page-grid {
+    grid-template-columns: 215px 1fr 280px;
+  }
+}
+
+.performance-page-grid .col-span-full {
+  grid-column: 1 / -1;
+}
+
+.draft-page-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 56px 1fr;
+}
+
+@media (min-width: 768px) {
+  .draft-page-grid {
+    grid-template-columns: 160px 1fr 300px;
+    grid-template-rows: 56px 1fr 28px;
+  }
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}

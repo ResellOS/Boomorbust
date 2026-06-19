@@ -1,4 +1,5 @@
 import type { MarketVerdictDisplay } from '@/lib/verdict/fetchMarketVerdicts';
+import type { PlayerBio } from './playerIntelligence';
 
 export type VerdictLabel =
   | 'STRONG BOOM'
@@ -26,6 +27,17 @@ export interface HubComponents {
   projectedPpg: number;
 }
 
+export interface PlayerValueSignal {
+  direction60d: 'up' | 'down' | 'neutral' | null;
+  prob60d: number | null;
+}
+
+export interface PlayerHubPortfolio {
+  avgPortfolioTfo: number;
+  totalPortfolioTfo: number;
+  positionSharePct: Record<string, number>;
+}
+
 export interface HubPlayer {
   playerId: string;
   fullName: string;
@@ -40,9 +52,13 @@ export interface HubPlayer {
   trend: TrendDirection;
   trendDelta: number;
   scoreHistory: number[];
+  scoreHistoryDates: string[];
   calculatedAt: string | null;
+  confidenceTier: string | null;
+  valueSignal: PlayerValueSignal | null;
   /** Market buy/sell verdict vs KTC; null when not in the scored skill pool. */
   marketVerdict: MarketVerdictDisplay | null;
+  bio?: PlayerBio;
 }
 
 export interface RosterSnapshotPlayer {
@@ -69,6 +85,7 @@ export interface PlayerHubData {
   rosterPlayerIds: string[];
   rosterSnapshot: RosterSnapshotPlayer[];
   leaguePresence: Record<string, string[]>;
+  portfolio: PlayerHubPortfolio;
   edgeOpportunities: number;
   leagueCount: number;
 }

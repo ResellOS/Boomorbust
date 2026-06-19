@@ -53,7 +53,7 @@ function UsageDonut({ label, current, max, color }: DonutProps) {
 
 interface Props {
   usage:       ProfileData['usage'];
-  renewsLabel: string;
+  renewsLabel?: string | null;
 }
 
 const DONUT_COLORS = ['#36E7A1', '#22D3EE', '#A78BFA', '#FBBF24'];
@@ -90,7 +90,7 @@ export default function UsageDonuts({ usage, renewsLabel }: Props) {
           <circle cx="5.5" cy="5.5" r="4.5" stroke="#64748B" strokeWidth="1"/>
           <path d="M5.5 3.5v2.5l1.5 1" stroke="#64748B" strokeWidth="1" strokeLinecap="round"/>
         </svg>
-        Next Reset: {renewsLabel}
+        Next Reset: {renewsLabel ?? 'End of billing period'}
       </p>
     </div>
   );

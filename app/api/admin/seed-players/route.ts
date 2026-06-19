@@ -23,22 +23,20 @@ interface SleeperRawPlayer {
   active?: boolean;
 }
 
+function requireAdmin(email: string | undefined) {
+  return email === process.env.ADMIN_EMAIL;
+}
+
 export async function GET() {
   const supabase = createClient();
-  const { data: { session } } = await supabase.auth.getSession();
-  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-
-  const db = createAdminClient();
-
-  const { data: profile } = await db
-    .from('profiles')
-    .select('is_admin')
-    .eq('id', session.user.id)
-    .single();
-
-  if (!profile?.is_admin) {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!requireAdmin(user?.email)) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
+
+  const db = createAdminClient();
   const errors: string[] = [];
   let count = 0;
 
@@ -96,7 +94,7 @@ export async function GET() {
       void db.from('error_logs').insert({
         source: 'seed-players',
         message: `Batch ${batchNum} failed: ${error.message}`,
-        user_id: session.user.id,
+        user_id: user!.id,
         metadata: { batch: batchNum, batch_size: batch.length, code: error.code },
       });
     } else {
@@ -106,7 +104,7 @@ export async function GET() {
         void db.from('error_logs').insert({
           source: 'seed-progress',
           message: `Seeded ${count}/${total} players`,
-          user_id: session.user.id,
+          user_id: user!.id,
           metadata: { count, total },
         });
       }

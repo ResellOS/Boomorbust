@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import type { CalculatorSearchHit } from '@/app/api/trade/calculator-search/route';
 import type { OwnedPick } from '@/lib/trade/types';
 
-interface Asset {
+export interface CalculatorAsset {
   key: string;
   label: string;
   isPick: boolean;
@@ -15,6 +15,14 @@ interface Asset {
 interface PickOption {
   label: string;
   round: number;
+}
+
+export interface TradeCalculatorProps {
+  givePicks: OwnedPick[];
+  initialGive?: CalculatorAsset[];
+  initialGet?: CalculatorAsset[];
+  /** Strip outer card chrome when embedded in a modal. */
+  embedded?: boolean;
 }
 
 // Nominal TFO / KTC weight of a rookie pick by round (no per-pick value source).
@@ -30,10 +38,10 @@ function SideColumn({
   onRemove,
 }: {
   title: string;
-  assets: Asset[];
+  assets: CalculatorAsset[];
   pickOptions: PickOption[];
   pickPlaceholder: string;
-  onAdd: (a: Asset) => void;
+  onAdd: (a: CalculatorAsset) => void;
   onRemove: (key: string) => void;
 }) {
   const [query, setQuery] = useState('');
@@ -191,9 +199,14 @@ function SideColumn({
   );
 }
 
-export default function TradeCalculator({ givePicks }: { givePicks: OwnedPick[] }) {
-  const [give, setGive] = useState<Asset[]>([]);
-  const [get, setGet] = useState<Asset[]>([]);
+export default function TradeCalculator({
+  givePicks,
+  initialGive = [],
+  initialGet = [],
+  embedded = false,
+}: TradeCalculatorProps) {
+  const [give, setGive] = useState<CalculatorAsset[]>(initialGive);
+  const [get, setGet] = useState<CalculatorAsset[]>(initialGet);
 
   // Give-side: only picks the user actually owns in the selected league.
   const givePickOptions: PickOption[] = useMemo(
@@ -230,14 +243,16 @@ export default function TradeCalculator({ givePicks }: { givePicks: OwnedPick[] 
   // Diverging meter: segment grows from center toward the favored side.
   const meterMag = Math.min(Math.abs(diffPct), 100) / 2; // 0–50 (% of track)
 
-  return (
-    <div className="rounded-[8px] border border-border bg-bg/40 p-3">
-      <div className="mb-2 flex items-center justify-between">
-        <span className="font-figtree text-[11px] font-bold uppercase tracking-[1.5px] text-text">
-          Trade Calculator
-        </span>
-        <span className="font-mono text-[8px] text-muted">Roster-agnostic · any players or picks</span>
-      </div>
+  const inner = (
+    <>
+      {!embedded && (
+        <div className="mb-2 flex items-center justify-between">
+          <span className="font-figtree text-[11px] font-bold uppercase tracking-[1.5px] text-text">
+            Trade Calculator
+          </span>
+          <span className="font-mono text-[8px] text-muted">Roster-agnostic · any players or picks</span>
+        </div>
+      )}
 
       <div className="grid gap-3" style={{ gridTemplateColumns: '1fr 1fr' }}>
         <SideColumn
@@ -294,6 +309,14 @@ export default function TradeCalculator({ givePicks }: { givePicks: OwnedPick[] 
           <span>You Get</span>
         </div>
       </div>
+    </>
+  );
+
+  if (embedded) return inner;
+
+  return (
+    <div className="rounded-[8px] border border-border bg-bg/40 p-3">
+      {inner}
     </div>
   );
 }

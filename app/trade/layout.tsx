@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import DashboardBodyLock from '@/components/dashboard/DashboardBodyLock';
+import TerminalShell from '@/components/dashboard/TerminalShell';
 
 export const dynamic = 'force-dynamic';
 
@@ -46,9 +47,7 @@ export default async function TradeLayout({
   return (
     <>
       <DashboardBodyLock />
-      <div className="min-w-[1280px] h-screen overflow-hidden bg-bg text-text font-figtree">
-        {children}
-      </div>
+      <TerminalShell>{children}</TerminalShell>
     </>
   );
 }

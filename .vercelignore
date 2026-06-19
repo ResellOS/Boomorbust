@@ -1,0 +1,8 @@
+node_modules
+.git
+*.msi
+tp_setup*
+*.zip
+PageMockups
+scripts/security-audit*.mjs
+scripts/apply-feedback-migration.mjs

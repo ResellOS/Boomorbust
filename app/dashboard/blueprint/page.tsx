@@ -1,5 +1,6 @@
 'use client';
 
+import { formatEngineGradeLabel } from '@/lib/ui/labels';
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { useDashboardLeagueStore } from '@/store/dashboardLeagueStore';
@@ -121,13 +122,13 @@ function TFOGradePill({ grade }: { grade: string | null }) {
     SPECULATIVE: '#F97316',
     AVOID: '#EF4444',
   };
-  const c = colors[grade] ?? '#64748B';
+  const c = colors[grade.toUpperCase()] ?? colors[grade] ?? '#64748B';
   return (
     <span
       className="px-1.5 py-0.5 rounded text-[9px]"
       style={{ ...MONO, color: c, background: `${c}15`, border: `1px solid ${c}30` }}
     >
-      {grade}
+      {formatEngineGradeLabel(grade)}
     </span>
   );
 }
@@ -200,7 +201,7 @@ function RiskCard({ risk }: { risk: RosterRisk }) {
     AGE_CLIFF: 'AGE CLIFF',
     INJURY_HISTORY: 'MED RISK',
     SCHEME_INSTABILITY: 'SCHEME',
-    DECLINING_TFO: 'TFO TREND',
+    DECLINING_TFO: 'Rating Trend',
   };
   return (
     <div
@@ -356,7 +357,7 @@ function TradeTargetCard({ target }: { target: TradeTarget }) {
             <div className="text-[16px] font-bold tabular-nums" style={{ ...MONO, color: '#22D3EE' }}>
               {Math.round(target.tfo_score)}
             </div>
-            <div className="text-[9px] text-white/30" style={MONO}>TFO</div>
+            <div className="text-[9px] text-white/30" style={MONO}>Rating</div>
           </div>
         )}
       </div>
@@ -542,7 +543,7 @@ export default function BlueprintPage() {
           ) : (
             <div className="rounded-xl p-6 text-center" style={GLASS}>
               <p className="text-[11px] text-white/30" style={MONO}>
-                No targets computed yet — TFO cache populates nightly
+                No targets computed yet — dynasty ratings cache populates nightly
               </p>
             </div>
           )}
@@ -644,7 +645,7 @@ function BlueprintHeader({
           {avgTFO != null && (
             <div className="flex items-center gap-1.5">
               <span className="text-[9px] text-white/25 uppercase tracking-widest" style={MONO}>
-                Avg TFO
+                Avg Dynasty Rating
               </span>
               <span className="text-[11px] font-bold tabular-nums" style={{ ...MONO, color: '#36E7A1' }}>
                 {avgTFO}

@@ -5,6 +5,7 @@ import { SpeedInsights } from '@vercel/speed-insights/next';
 import Script from 'next/script';
 import ToasterWrapper from '@/components/ToasterWrapper';
 import LoadingScreen from '@/components/LoadingScreen';
+import { FeedbackPromptHost } from '@/components/feedback/FeedbackPrompt';
 import './globals.css';
 
 const bebasNeue = Bebas_Neue({
@@ -40,7 +41,7 @@ export const metadata: Metadata = {
     template: 'Boom or Bust · %s',
   },
   description:
-    'Manage your dynasty leagues like a portfolio. Sit/start decisions, trade analysis, and dynasty scouting powered by the TFO formula.',
+    'Manage your dynasty leagues like a portfolio. Sit/start decisions, trade analysis, and dynasty scouting powered by the BOB engine.',
   metadataBase: new URL(
     process.env.NEXT_PUBLIC_SITE_URL ?? 'https://boomorbust.app'
   ),
@@ -72,7 +73,9 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const adsenseId = process.env.NEXT_PUBLIC_ADSENSE_PUBLISHER_ID;
+  const adsenseId =
+    process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID ??
+    process.env.NEXT_PUBLIC_ADSENSE_PUBLISHER_ID;
 
   return (
     /*
@@ -91,6 +94,7 @@ export default function RootLayout({
         <LoadingScreen />
         {children}
         <ToasterWrapper />
+        <FeedbackPromptHost />
         <Analytics />
         <SpeedInsights />
       </body>

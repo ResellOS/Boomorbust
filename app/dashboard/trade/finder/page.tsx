@@ -689,7 +689,7 @@ export default function TradeFinderPage() {
           {selectedPlayer && (
             <div className="max-w-md">
               <p className="text-[10px] font-mono uppercase tracking-[0.15em] text-[#475569] mb-2">
-                TFO card · piece you are shopping
+                Dynasty rating card · piece you are shopping
               </p>
               <TfoTradeCard player={selectedPlayer} side="give" />
             </div>

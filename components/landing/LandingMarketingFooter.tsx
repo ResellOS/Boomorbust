@@ -17,6 +17,7 @@ const COMPANY = [
 const RESOURCES = [
   { label: 'Blog', href: TWITTER_PROFILE_HREF },
   { label: 'Docs', href: '/resources#documentation' },
+  { label: 'BOB Record', href: '/performance' },
 ] as const;
 
 const LEGAL = [

@@ -1,11 +1,14 @@
 import { redirect } from 'next/navigation';
+import { Suspense } from 'react';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { fetchPlayerHubData } from '@/lib/players/fetchPlayerHubData';
+import { getUserTier } from '@/lib/access/gates';
 import Sidebar from '@/components/dashboard/Sidebar';
 import Footer from '@/components/dashboard/Footer';
 import PlayerHubTopBar from '@/components/players/PlayerHubTopBar';
 import PlayerHubClient from '@/components/players/PlayerHubClient';
+import TerminalPageGrid from '@/components/dashboard/TerminalPageGrid';
 
 export const dynamic = 'force-dynamic';
 
@@ -51,29 +54,35 @@ export default async function PlayersPage() {
   if (!sleeperUserId) redirect('/login');
 
   const hubData = await fetchPlayerHubData(userId, sleeperUserId);
+  const tier = await getUserTier(userId);
+  const showAds = tier === 'free';
 
   return (
-    <div
-      className="grid h-screen overflow-hidden"
-      style={{
-        gridTemplateRows: '66px 1fr 28px',
-        gridTemplateColumns: '215px 1fr',
-      }}
-    >
+    <TerminalPageGrid>
       <PlayerHubTopBar stats={hubData.stats} />
 
       <Sidebar leagues={hubData.leagues} rosterSnapshot={hubData.rosterSnapshot} />
 
-      <PlayerHubClient
-        players={hubData.players}
-        leaguePresence={hubData.leaguePresence}
-      />
+      <Suspense
+        fallback={
+          <div className="col-start-1 md:col-start-2 row-start-2 flex items-center justify-center font-mono text-[11px] text-muted">
+            Loading players…
+          </div>
+        }
+      >
+        <PlayerHubClient
+          players={hubData.players}
+          leaguePresence={hubData.leaguePresence}
+          portfolio={hubData.portfolio}
+          showAds={showAds}
+        />
+      </Suspense>
 
       <Footer
         leagueCount={hubData.leagueCount}
         edgeOpportunities={hubData.edgeOpportunities}
         lastRunMinutes={hubData.stats.lastUpdatedMinutes}
       />
-    </div>
+    </TerminalPageGrid>
   );
 }

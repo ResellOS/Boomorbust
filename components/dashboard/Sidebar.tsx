@@ -10,9 +10,13 @@ import {
   ShieldAlert,
   ClipboardList,
   Settings,
+  Trophy,
   type LucideIcon,
 } from 'lucide-react';
 import ConfidenceRing from '@/components/startsit/ConfidenceRing';
+import AdSlot from '@/components/ads/AdSlot';
+import type { SignalCounts } from '@/lib/dashboard/rotation';
+import { formatSignalBucketLabel } from '@/lib/ui/labels';
 
 export interface League {
   id: string;
@@ -49,6 +53,7 @@ export interface WeekContextData {
   windowOpen: boolean;
   lockDeadline: string;
   weatherImpact: string;
+  isOffseason?: boolean;
 }
 
 interface SidebarProps {
@@ -58,6 +63,9 @@ interface SidebarProps {
   exposureHealth?: ExposureHealthData;
   weekContext?: WeekContextData;
   bobConfidence?: number;
+  signalCounts?: SignalCounts;
+  /** True when subscription_tier === 'free' — enables sidebar AdSense. */
+  showAds?: boolean;
 }
 
 const NAV_ITEMS: { label: string; href: string; icon: LucideIcon }[] = [
@@ -67,6 +75,7 @@ const NAV_ITEMS: { label: string; href: string; icon: LucideIcon }[] = [
   { label: 'Start / Sit', href: '/startsit', icon: Play },
   { label: 'Draft Room', href: '/draft', icon: ClipboardList },
   { label: 'Exposure', href: '/exposure', icon: ShieldAlert },
+  { label: 'BOB Record', href: '/performance', icon: Trophy },
   { label: 'Settings', href: '/settings', icon: Settings },
 ];
 
@@ -109,11 +118,13 @@ export default function Sidebar({
   exposureHealth,
   weekContext,
   bobConfidence,
+  signalCounts,
+  showAds = false,
 }: SidebarProps) {
   const pathname = usePathname() ?? '';
 
   return (
-    <aside className="row-start-2 flex flex-col overflow-hidden border-r border-border bg-surface">
+    <aside className="row-start-2 col-start-1 hidden md:flex flex-col overflow-hidden border-r border-border bg-surface">
       <nav className="shrink-0 border-b border-border py-1.5">
         {NAV_ITEMS.map((item) => {
           const Icon = item.icon;
@@ -194,11 +205,13 @@ export default function Sidebar({
         <>
           <div className="shrink-0 border-t border-border px-3 pb-1 pt-2.5">
             <div className="mb-1.5 text-[8px] font-medium uppercase tracking-[1.5px] text-muted">
-              Week {weekContext.nflWeek} Context
+              {weekContext.isOffseason ? 'Preseason Context' : `Week ${weekContext.nflWeek} Context`}
             </div>
             <div className="flex items-center justify-between px-3 py-1 text-[10px]">
               <span className="text-muted">NFL Week</span>
-              <span className="text-text">{weekContext.nflWeek}</span>
+              <span className="text-text">
+                {weekContext.isOffseason ? 'Preseason' : weekContext.nflWeek}
+              </span>
             </div>
             <div className="flex items-center justify-between px-3 py-1 text-[10px]">
               <span className="text-muted">Start/Sit Window</span>
@@ -226,12 +239,7 @@ export default function Sidebar({
               <div className="mb-1 text-[8px] font-medium uppercase tracking-[1.5px] text-muted">
                 BOB Confidence Score
               </div>
-              <ConfidenceRing pct={bobConfidence} />
-              <div className="mt-1.5 text-center text-[9px] leading-snug text-muted">
-                10,000+ decisions analyzed
-                <br />
-                Updated every 60 seconds
-              </div>
+              <ConfidenceRing pct={bobConfidence} isOffseason={weekContext.isOffseason} />
             </div>
           )}
         </>
@@ -328,16 +336,44 @@ export default function Sidebar({
           </div>
         </div>
       )}
-      {!exposureOverview && !weekContext && (
-      <div className="mx-2.5 mb-[5px] mt-2 shrink-0 rounded-[7px] border border-muted/15 bg-boom/[0.018] p-[9px] text-center">
-        <div className="mb-1 font-mono text-[7px] uppercase tracking-[2px] text-muted/40">
-          Sponsored
+      {signalCounts && (
+        <div className="shrink-0 border-t border-border px-[14px] py-2.5">
+          <div className="mb-2 font-figtree text-[9px] font-medium uppercase tracking-[1.5px] text-muted">
+            Market Signals
+          </div>
+          <div className="grid grid-cols-3 gap-1.5">
+            {(
+              [
+                { key: 'boom' as const, count: signalCounts.boom, color: '#36E7A1' },
+                { key: 'hold' as const, count: signalCounts.hold, color: '#FBBF24' },
+                { key: 'bust' as const, count: signalCounts.bust, color: '#A78BFA' },
+              ] as const
+            ).map((item) => (
+              <div
+                key={item.key}
+                className="rounded-[5px] border border-border bg-[#080d14] px-2 py-2 text-center"
+              >
+                <div
+                  className="font-mono text-[14px] font-bold tabular-nums"
+                  style={{ color: item.color }}
+                >
+                  {item.count}
+                </div>
+                <div
+                  className="mt-0.5 font-mono text-[7px] font-bold uppercase tracking-wide"
+                  style={{ color: item.color }}
+                >
+                  {formatSignalBucketLabel(item.key)}
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
-        <div className="font-figtree text-lg font-extrabold tracking-wide text-boom/50">
-          UNDERDOG
+      )}
+      {showAds && (
+        <div className="shrink-0 px-2.5 pb-2">
+          <AdSlot placement="dashboard-sidebar" showAds={showAds} />
         </div>
-        <div className="mt-0.5 font-mono text-[7px] text-muted/40">Best Ball · $100K Prizes</div>
-      </div>
       )}
       {!exposureOverview && !weekContext && (
       <div className="mx-2.5 mb-2.5 shrink-0 rounded-lg border border-bust/25 bg-gradient-to-br from-bust/[0.08] to-boom/[0.04] p-3">

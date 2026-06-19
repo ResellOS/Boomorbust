@@ -74,7 +74,7 @@ function HandcuffRow({ item }: { item: HandcuffAnalysis }) {
           </div>
           {item.handcuff && (
             <div className="flex items-center gap-1.5">
-              <span className="text-[9px] text-slate-500 uppercase tracking-widest">TFO</span>
+              <span className="text-[9px] text-slate-500 uppercase tracking-widest">Rating</span>
               <span className="text-[11px] text-slate-400 tabular-nums" style={{ fontFamily: 'JetBrains Mono, monospace' }}>
                 {Math.round(item.handcuff.tfo_score)}
               </span>
@@ -161,7 +161,7 @@ export default function HandcuffTracker({ leagueId }: { leagueId?: string | null
         className="rounded-xl px-4 py-10 text-center"
         style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.07)' }}
       >
-        <p className="text-[13px] text-slate-500">No elite RBs (TFO &gt; 70) found on your roster.</p>
+        <p className="text-[13px] text-slate-500">No elite RBs (rating &gt; 70) found on your roster.</p>
         <p className="text-[12px] text-slate-600 mt-1">Sync your leagues and seed players first.</p>
       </div>
     );

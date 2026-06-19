@@ -5,8 +5,8 @@ import { fetchExposureData } from '@/lib/exposure/fetchExposureData';
 import Sidebar from '@/components/dashboard/Sidebar';
 import ExposureTopBar from '@/components/exposure/ExposureTopBar';
 import ExposureClient from '@/components/exposure/ExposureClient';
-import ExposureRightPanel from '@/components/exposure/ExposureRightPanel';
 import ExposureFooter from '@/components/exposure/ExposureFooter';
+import TerminalPageGrid from '@/components/dashboard/TerminalPageGrid';
 
 export const dynamic = 'force-dynamic';
 
@@ -52,43 +52,19 @@ export default async function ExposurePage() {
   if (!sleeperUserId) redirect('/login');
 
   const data = await fetchExposureData(userId, sleeperUserId);
-  const dangerCount = data.players.filter((p) => p.riskLevel === 'DANGER').length;
 
   return (
-    <div
-      className="grid h-screen overflow-hidden"
-      style={{
-        gridTemplateRows: '66px 1fr 28px',
-        gridTemplateColumns: '215px 1fr',
-      }}
-    >
+    <TerminalPageGrid>
       <ExposureTopBar stats={data.topbar} />
-
-      <Sidebar
-        leagues={data.leagues}
-        exposureOverview={data.portfolioOverview}
-        exposureHealth={data.exposureHealth}
-      />
-
-      <div
-        className="row-start-2 flex min-h-0 overflow-hidden"
-        style={{ minWidth: 0 }}
-      >
-        <ExposureClient players={data.players} isGameDay={data.isGameDay} />
-        <ExposureRightPanel
-          portfolioRisk={data.portfolioRisk}
-          dangerAlerts={data.dangerAlerts}
-          positionBreakdown={data.positionBreakdown}
-          positionAdvisory={data.positionAdvisory}
-          weeklyPerformance={data.weeklyPerformance}
-          nflWeek={data.nflWeek}
-        />
+      <Sidebar leagues={data.leagues} />
+      <div className="col-start-1 md:col-start-2 row-start-2 min-h-0 overflow-hidden">
+        <ExposureClient data={data} />
       </div>
-
       <ExposureFooter
-        dangerCount={dangerCount}
-        leagueCount={data.leagueCount}
+        leagueCount={data.topbar.leaguesConnected}
+        playerCount={data.players.length}
+        totalAssetValue={data.topbar.totalAssetValue}
       />
-    </div>
+    </TerminalPageGrid>
   );
 }

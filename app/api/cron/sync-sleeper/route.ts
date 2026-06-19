@@ -8,6 +8,7 @@ import {
   fetchLeagueMatchups,
 } from '@/lib/sleeper';
 import { mergeSleeperRosterSettings } from '@/lib/sleeper/leagueCardLogo';
+import { persistLastEmpireRatingAfterSync } from '@/lib/dashboard/empireRating';
 import { Redis } from '@upstash/redis';
 
 function getRedis(): Redis | null {
@@ -80,6 +81,9 @@ export async function GET(request: Request) {
       const leagues = await fetchUserLeagues(profile.sleeper_user_id, '2025');
       if (!leagues?.length) continue;
 
+      let userLeaguesSynced = 0;
+      let userRostersSynced = 0;
+
       for (const league of leagues) {
         // ── 1. Upsert league ────────────────────────────────────────────────
         const { error: leagueErr } = await db.from('leagues').upsert({
@@ -139,6 +143,7 @@ export async function GET(request: Request) {
             errors.push(`roster ${roster.roster_id} in ${league.league_id}: ${rosterErr.message}`);
           } else {
             rosters_synced++;
+            userRostersSynced++;
           }
         }
 
@@ -175,6 +180,7 @@ export async function GET(request: Request) {
         }
 
         leagues_synced++;
+        userLeaguesSynced++;
 
         // Rate limiting: 150ms between league syncs
         await sleep(150);
@@ -185,6 +191,10 @@ export async function GET(request: Request) {
           await redis.set(`sync:last:${user.id}`, new Date().toISOString(), { ex: 604800 });
           await redis.del(`sync:activity:${user.id}`);
         } catch { /* non-fatal */ }
+      }
+
+      if (userRostersSynced > 0 || userLeaguesSynced > 0) {
+        await persistLastEmpireRatingAfterSync(user.id, profile.sleeper_user_id);
       }
     } catch (err) {
       const msg = String(err);

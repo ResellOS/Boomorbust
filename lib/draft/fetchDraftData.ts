@@ -1,5 +1,11 @@
 import { createAdminClient } from '@/lib/supabase/admin';
 import type { DraftLeague, DraftPageData, DraftablePlayer } from './types';
+import { fetchDraftSessions } from './fetchDraftSessions';
+import {
+  fetchOwnedPicksByLeague,
+  fetchRosterByLeagueForUser,
+} from '@/lib/trade/ownedPicks';
+import type { OwnedPick } from '@/lib/trade/types';
 
 const POOL_LIMIT = 440; // covers 14 teams x 20 rounds (280) with headroom
 
@@ -8,7 +14,13 @@ function safeScore(v: number | null | undefined): number {
 }
 
 export async function fetchDraftData(userId: string): Promise<DraftPageData> {
-  const empty: DraftPageData = { pool: [], leagues: [], scoringContext: 'dynasty' };
+  const empty: DraftPageData = {
+    pool: [],
+    leagues: [],
+    scoringContext: 'dynasty',
+    sessions: [],
+    ownedPicksByLeague: {},
+  };
 
   let supabase: ReturnType<typeof createAdminClient>;
   try {
@@ -61,7 +73,11 @@ export async function fetchDraftData(userId: string): Promise<DraftPageData> {
     }
   }
 
-  if (!scoreRows || scoreRows.length === 0) return { ...empty, leagues };
+  if (!scoreRows || scoreRows.length === 0) {
+    const sessions = await fetchDraftSessions(supabase, userId);
+    const ownedPicksByLeague = await loadOwnedPicks(supabase, userId, leagues);
+    return { ...empty, leagues, sessions, ownedPicksByLeague };
+  }
 
   const playerIds = scoreRows.map((s) => s.player_id);
 
@@ -147,8 +163,40 @@ export async function fetchDraftData(userId: string): Promise<DraftPageData> {
       bobRank: i + 1,
       marketRank,
       adp: marketRank,
+      byeWeek: null,
+      proj: null,
+      avg: null,
+      isRookie: p.age != null && p.age <= 23,
     };
   });
 
-  return { pool, leagues, scoringContext };
+  const sessions = await fetchDraftSessions(supabase, userId);
+  const ownedPicksByLeague = await loadOwnedPicks(supabase, userId, leagues);
+  return { pool, leagues, scoringContext, sessions, ownedPicksByLeague };
+}
+
+async function loadOwnedPicks(
+  supabase: ReturnType<typeof createAdminClient>,
+  userId: string,
+  leagues: DraftLeague[],
+): Promise<Record<string, OwnedPick[]>> {
+  if (leagues.length === 0) return {};
+
+  try {
+    const { data: profile, error } = await supabase
+      .from('profiles')
+      .select('sleeper_user_id')
+      .eq('id', userId)
+      .maybeSingle();
+
+    if (error) throw error;
+    const sleeperUserId = profile?.sleeper_user_id;
+    if (!sleeperUserId) return {};
+
+    const rosterByLeague = await fetchRosterByLeagueForUser(supabase, sleeperUserId);
+    return fetchOwnedPicksByLeague(leagues, rosterByLeague);
+  } catch (err) {
+    console.error('[draft] owned picks fetch failed:', err);
+    return {};
+  }
 }

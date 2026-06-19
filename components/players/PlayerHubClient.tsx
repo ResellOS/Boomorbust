@@ -1,8 +1,9 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { Search } from 'lucide-react';
-import type { HubPlayer } from '@/lib/players/types';
+import type { HubPlayer, PlayerHubPortfolio } from '@/lib/players/types';
 import {
   findSimilarPlayers,
   isBoomVerdict,
@@ -10,6 +11,7 @@ import {
   isHoldVerdict,
 } from '@/lib/players/utils';
 import { getGradeLabel } from '@/lib/verdict';
+import { FILTER_VERDICT_LABELS } from '@/lib/ui/labels';
 
 // Market verdict color (5-color) for a player; neutral gray when no signal.
 function mvColor(p: HubPlayer): string {
@@ -17,6 +19,7 @@ function mvColor(p: HubPlayer): string {
 }
 import PlayerAvatar from './PlayerAvatar';
 import PlayerDetailPanel from './PlayerDetailPanel';
+import AdSlot from '@/components/ads/AdSlot';
 
 const PAGE_SIZE = 25;
 
@@ -28,11 +31,30 @@ const FILTERS: FilterKey[] = ['ALL', 'BOOM', 'HOLD', 'BUST', 'QB', 'RB', 'WR', '
 interface PlayerHubClientProps {
   players: HubPlayer[];
   leaguePresence: Record<string, string[]>;
+  portfolio: PlayerHubPortfolio;
+  showAds?: boolean;
 }
 
-export default function PlayerHubClient({ players, leaguePresence }: PlayerHubClientProps) {
-  const defaultId = players[0]?.playerId ?? '';
+export default function PlayerHubClient({
+  players,
+  leaguePresence,
+  portfolio,
+  showAds = false,
+}: PlayerHubClientProps) {
+  const searchParams = useSearchParams();
+  const deepLinkId =
+    searchParams.get('player') ??
+    searchParams.get('target') ??
+    searchParams.get('highlight');
+  const defaultId = players.find((p) => p.playerId === deepLinkId)?.playerId ?? players[0]?.playerId ?? '';
   const [selectedId, setSelectedId] = useState(defaultId);
+  const [mobileDetailOpen, setMobileDetailOpen] = useState(false);
+
+  useEffect(() => {
+    if (deepLinkId && players.some((p) => p.playerId === deepLinkId)) {
+      setSelectedId(deepLinkId);
+    }
+  }, [deepLinkId, players]);
   const [filter, setFilter] = useState<FilterKey>('ALL');
   const [search, setSearch] = useState('');
   const [sort, setSort] = useState<SortKey>('rating');
@@ -86,12 +108,11 @@ export default function PlayerHubClient({ players, leaguePresence }: PlayerHubCl
 
   return (
     <div
-      className="row-start-2 min-h-0 overflow-hidden"
-      style={{ display: 'grid', gridTemplateColumns: '1fr 580px', minWidth: 0 }}
+      className="col-start-1 md:col-start-2 row-start-2 min-h-0 overflow-hidden flex flex-col md:grid md:grid-cols-[1fr_minmax(580px,42%)]"
     >
       <div className="flex min-w-0 flex-col gap-2.5 overflow-y-auto overflow-x-hidden p-3 px-3.5 [scrollbar-width:thin]">
         <div>
-          <div className="font-figtree text-[34px] font-extrabold leading-none tracking-[-1px] text-text">
+          <div className="font-figtree text-[26px] font-extrabold leading-none tracking-[-1px] text-text md:text-[34px]">
             PLAYER HUB
           </div>
           <div className="mt-[3px] font-mono text-[9px] text-muted">
@@ -121,9 +142,9 @@ export default function PlayerHubClient({ players, leaguePresence }: PlayerHubCl
                 setFilter(key);
                 setPage(1);
               }}
-              className={`cursor-pointer rounded-[5px] px-[11px] py-[5px] font-figtree text-[10px] font-medium transition-colors ${filterBtnClass(key)}`}
+              className={`cursor-pointer rounded-[5px] px-[11px] py-[7px] font-figtree text-[10px] font-medium transition-colors min-h-[44px] md:min-h-0 md:py-[5px] ${filterBtnClass(key)}`}
             >
-              {key}
+              {FILTER_VERDICT_LABELS[key] ?? key}
             </button>
           ))}
           <select
@@ -158,7 +179,10 @@ export default function PlayerHubClient({ players, leaguePresence }: PlayerHubCl
                 <button
                   key={p.playerId}
                   type="button"
-                  onClick={() => setSelectedId(p.playerId)}
+                  onClick={() => {
+                    setSelectedId(p.playerId);
+                    setMobileDetailOpen(true);
+                  }}
                   className={`grid w-full cursor-pointer items-center gap-2 border-b border-border/50 px-3 py-[7px] text-left transition-colors last:border-b-0 hover:bg-white/[0.015] ${
                     sel
                       ? 'border-l-2 border-l-boom bg-boom/[0.04] pl-[10px]'
@@ -222,55 +246,18 @@ export default function PlayerHubClient({ players, leaguePresence }: PlayerHubCl
           </div>
         </div>
 
-        {selected && similar.length > 0 && (
-          <div className="overflow-hidden rounded-[7px] border border-border bg-surface">
-            <div className="border-b border-border bg-bg px-3 py-2">
-              <div className="font-figtree text-[10px] font-bold uppercase tracking-[1.5px] text-text">
-                Similar Players
-              </div>
-              <div className="mt-px font-mono text-[8px] text-muted">
-                Buy-low alternatives with upside
-              </div>
-            </div>
-            <div className="grid grid-cols-3 gap-2 p-2.5">
-              {similar.map((sp) => (
-                <button
-                  key={sp.playerId}
-                  type="button"
-                  onClick={() => setSelectedId(sp.playerId)}
-                  className="cursor-pointer rounded-[7px] border border-border bg-[#080d14] p-2.5 text-left transition-colors hover:border-boom/20"
-                >
-                  <div className="mb-2 flex items-center gap-2">
-                    <PlayerAvatar playerId={sp.playerId} name={sp.fullName} size={32} />
-                    <div>
-                      <div className="font-figtree text-[11px] leading-tight text-text">
-                        {sp.fullName}
-                      </div>
-                      <div className="font-mono text-[8px] text-muted">
-                        {sp.position} · {sp.team}
-                      </div>
-                    </div>
-                  </div>
-                  <div className="mb-1 font-figtree text-[22px] font-normal" style={{ color: mvColor(sp) }}>
-                    {sp.tfoScore.toFixed(1)}
-                  </div>
-                  <span
-                    className="inline-block rounded-[3px] border border-border bg-white/[0.03] px-2 py-0.5 font-figtree text-[9px] font-medium text-text"
-                  >
-                    {getGradeLabel(sp.tfoScore)}
-                  </span>
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
+        <AdSlot placement="player-hub" showAds={showAds} className="mt-0" />
       </div>
 
-      <div className="min-h-0 overflow-y-auto border-l border-border bg-bg">
+      <div className="hidden min-h-0 overflow-y-auto border-l border-border bg-bg md:block">
         {selected ? (
           <PlayerDetailPanel
             player={selected}
             leagueNames={leaguePresence[selected.playerId] ?? []}
+            portfolio={portfolio}
+            allPlayers={players}
+            comparables={similar}
+            onSelectPlayer={setSelectedId}
           />
         ) : (
           <div className="flex h-full items-center justify-center font-mono text-[11px] text-muted">
@@ -278,6 +265,28 @@ export default function PlayerHubClient({ players, leaguePresence }: PlayerHubCl
           </div>
         )}
       </div>
+
+      {selected && mobileDetailOpen ? (
+        <div className="fixed inset-0 z-50 flex flex-col bg-[#0a0d14] md:hidden">
+          <button
+            type="button"
+            onClick={() => setMobileDetailOpen(false)}
+            className="shrink-0 border-b border-border px-4 py-3 text-left font-mono text-[10px] text-boom"
+          >
+            ← Back to list
+          </button>
+          <div className="min-h-0 flex-1 overflow-y-auto">
+            <PlayerDetailPanel
+              player={selected}
+              leagueNames={leaguePresence[selected.playerId] ?? []}
+              portfolio={portfolio}
+              allPlayers={players}
+              comparables={similar}
+              onSelectPlayer={setSelectedId}
+            />
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }

@@ -667,7 +667,7 @@ export default function TradeHubSidebar({
         <div className="px-2 py-2 border-t border-white/[0.06] shrink-0 bg-black/25">
           <p className="font-mono text-[8px] text-[#22D3EE] uppercase tracking-[0.2em]">🔒 UNLOCK MORE INTEL</p>
           <p className="mt-1 font-mono text-[7px] text-[#64748B] leading-snug">Pro: Unlimited trades + scouting</p>
-          <p className="font-mono text-[7px] text-[#64748B] leading-snug">Elite: Full TFO access + reports</p>
+          <p className="font-mono text-[7px] text-[#64748B] leading-snug">Elite: Full rating access + reports</p>
           <Link
             href="/dashboard/settings#billing"
             className="inline-block mt-2 font-mono text-[8px] text-[#22D3EE] hover:text-white uppercase tracking-wider"
@@ -683,7 +683,7 @@ export default function TradeHubSidebar({
         style={{ background: 'rgba(54,231,161,0.10)' }}
       >
         <span className="font-mono text-[8px] font-black uppercase tracking-[0.2em] text-[#36E7A1]">
-          TFO MODEL ACTIVE
+          BOB ENGINE ACTIVE
         </span>
       </div>
     </aside>

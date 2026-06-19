@@ -27,7 +27,7 @@ export function generateBobVerdict(
 
   if (tfoScore > 85) {
     return {
-      headline: 'BOOM',
+      headline: 'Buy Now',
       description: `Elite ${pos} with ${first.toLowerCase()} and ${second.toLowerCase()} driving weekly ceiling — ${fullName} profiles as a cornerstone dynasty asset.`,
     };
   }

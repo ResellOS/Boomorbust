@@ -6,6 +6,7 @@ import Fuse from 'fuse.js';
 import { clsx } from 'clsx';
 import { X } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
+import { formatPerformanceVerdictLabel } from '@/lib/ui/labels';
 import AppBackground from '@/components/AppBackground';
 import {
   calculateLeagueHealthScore,
@@ -614,12 +615,12 @@ function TacticalMap({
         >
           <p className="font-semibold text-white truncate">{playerTip.dot.name}</p>
           <p className="mt-1 text-[#94A3B8]">
-            TFO <span className="text-white tabular-nums">{Math.round(playerTip.dot.tfoScore)}</span>
+            Rating <span className="text-white tabular-nums">{Math.round(playerTip.dot.tfoScore)}</span>
             {' · '}
             <span className="text-white">{playerTip.dot.grade}</span>
           </p>
           <p className="mt-0.5 font-semibold" style={{ color: tfoVerdictDotColors(playerTip.dot.verdict).stroke }}>
-            {playerTip.dot.verdict.replace(/_/g, ' ')}
+            {formatPerformanceVerdictLabel(playerTip.dot.verdict.replace(/_/g, ' '))}
           </p>
         </div>
       )}
@@ -655,9 +656,9 @@ function TacticalMap({
           <p className="text-xs text-[var(--text-secondary)] mb-3">
             <span className="text-amber-400 font-bold">**RATIONALE:</span>{' '}
             {popover.node.league.healthScore >= 70
-              ? 'Empire is BOOM — assets aligned. Push for the title this season.'
+              ? 'Empire is strong — assets aligned. Push for the title this season.'
               : popover.node.league.healthScore < 40
-                ? 'Roster in BUST territory. Rebuild mode — strip aging nukes for picks.'
+                ? 'Roster in rebuild territory. Strip aging nukes for picks.'
                 : 'Roster is STABLE but needs a catalyst. Target a difference-maker in trades.'}
           </p>
           <Link
@@ -1032,29 +1033,29 @@ export default function WarRoomPage() {
             <div className="px-5 pb-4 flex flex-wrap gap-x-4 gap-y-2 text-[10px] font-mono uppercase tracking-wide">
               <span className="flex items-center gap-1.5">
                 <span className="w-3 h-3 rounded-full bg-[#22d3ee] shrink-0" />
-                <span className="text-[var(--text-muted)]">League · BOOM</span>
+                <span className="text-[var(--text-muted)]">League · Strong</span>
               </span>
               <span className="flex items-center gap-1.5">
                 <span className="w-3 h-3 rounded-full bg-[#6366f1] shrink-0" />
-                <span className="text-[var(--text-muted)]">League · STABLE</span>
+                <span className="text-[var(--text-muted)]">League · Stable</span>
               </span>
               <span className="flex items-center gap-1.5">
                 <span className="w-3 h-3 rounded-full bg-[#ef4444] shrink-0" />
-                <span className="text-[var(--text-muted)]">League · BUST</span>
+                <span className="text-[var(--text-muted)]">League · Rebuild</span>
               </span>
               <span className="hidden sm:inline w-px h-4 bg-white/10 self-center" aria-hidden />
-              <span className="text-[var(--text-muted)]">Player TFO · </span>
+              <span className="text-[var(--text-muted)]">Player rating · </span>
               <span className="flex items-center gap-1.5">
                 <span className="w-2.5 h-2.5 rounded-full shrink-0 border-2 border-[#36E7A1] bg-black/40" />
-                <span className="text-[var(--text-muted)]">BOOM</span>
+                <span className="text-[var(--text-muted)]">Buy Now</span>
               </span>
               <span className="flex items-center gap-1.5">
                 <span className="w-2.5 h-2.5 rounded-full shrink-0 border-2 border-[#94A3B8] bg-black/40" />
-                <span className="text-[var(--text-muted)]">NEUTRAL</span>
+                <span className="text-[var(--text-muted)]">Hold</span>
               </span>
               <span className="flex items-center gap-1.5">
                 <span className="w-2.5 h-2.5 rounded-full shrink-0 border-2 border-[#EF4444] bg-black/40" />
-                <span className="text-[var(--text-muted)]">BUST</span>
+                <span className="text-[var(--text-muted)]">Sell Now</span>
               </span>
             </div>
           </div>
@@ -1149,7 +1150,7 @@ export default function WarRoomPage() {
                       />
                     </div>
                     <div className="mt-1 flex justify-between text-[9px] text-[var(--text-muted)] font-mono uppercase">
-                      <span>BUST</span>
+                      <span>Rebuild</span>
                       <span
                         className={
                           selectedLeague.signal === 'BOOM'
@@ -1159,9 +1160,13 @@ export default function WarRoomPage() {
                               : 'text-[var(--indigo-light)]'
                         }
                       >
-                        {selectedLeague.signal}
+                        {selectedLeague.signal === 'BOOM'
+                          ? 'Strong'
+                          : selectedLeague.signal === 'BUST'
+                            ? 'Rebuild'
+                            : 'Stable'}
                       </span>
-                      <span>BOOM</span>
+                      <span>Strong</span>
                     </div>
                   </div>
                 </>

@@ -15,12 +15,18 @@ export interface LeagueStatusMeta {
 }
 
 export const LEAGUE_STATUS: Record<LeagueStatusKey, LeagueStatusMeta> = {
-  CHAMPIONSHIP: { key: 'CHAMPIONSHIP', label: 'Championship', color: '#36E7A1' },
+  CHAMPIONSHIP: { key: 'CHAMPIONSHIP', label: 'Win-Now', color: '#36E7A1' },
   CONTENDER: { key: 'CONTENDER', label: 'Contender', color: '#60a5fa' },
   TRANSITION: { key: 'TRANSITION', label: 'Transition', color: '#FBBF24' },
   REBUILD: { key: 'REBUILD', label: 'Rebuild', color: '#A78BFA' },
-  ORPHAN: { key: 'ORPHAN', label: 'Orphan', color: '#6b7a99' },
+  ORPHAN: { key: 'ORPHAN', label: 'Unmanaged', color: '#6b7a99' },
 };
+
+/** User-facing contention label for headers; null hides internal ORPHAN bucket. */
+export function publicLeagueStatusLabel(status: LeagueStatusKey): string | null {
+  if (status === 'ORPHAN') return null;
+  return LEAGUE_STATUS[status].label.toUpperCase();
+}
 
 /** winPct is 0–1 (e.g. 0.65 = 65%). During offseason, status derives from teamTfo only. */
 export function deriveLeagueStatus(
@@ -58,8 +64,14 @@ export interface PlayerComponents {
 export interface PlayerMarketVerdict {
   verdict: 'BOOM' | 'BUY' | 'HOLD' | 'SELL' | 'BUST';
   color: string;
-  rankDelta: number | null; // null when no_market_data
+  rankDelta: number | null;
+  ktcRank: number | null;
   noMarketData: boolean;
+}
+
+/** Trajectory signal from player_value_signals. */
+export interface PlayerValueSignal {
+  direction60d: 'up' | 'down' | 'neutral' | null;
 }
 
 export interface RotationPlayer {
@@ -73,6 +85,8 @@ export interface RotationPlayer {
   components: PlayerComponents | null;
   /** Market buy/sell verdict vs KTC; null when player isn't in the scored pool. */
   marketVerdict: PlayerMarketVerdict | null;
+  /** 60-day value trajectory; null when no signal row. */
+  valueSignal: PlayerValueSignal | null;
 }
 
 export interface SignalCounts {
@@ -186,11 +200,24 @@ export interface OvervaluedItem {
   delta: number;
 }
 
+/** Top sell-high action across owned rosters (SELL/BUST, most negative rank_delta). */
+export interface FrontOfficePriority {
+  playerId: string;
+  playerName: string;
+  verdict: 'SELL' | 'BUST';
+  /** Negative when market overvalues vs BOB engine. */
+  rankDelta: number;
+  /** abs(rankDelta) rounded — display as "32 spots". */
+  spotGap: number;
+}
+
 export interface DashboardRotationData {
   leagues: LeagueBundle[];
   portfolio: PortfolioBundle;
   tradeTargets: TradeTargetItem[];
   overvalued: OvervaluedItem[];
+  /** Highest-priority sell action on the user's roster; null when none flagged. */
+  frontOfficePriority: FrontOfficePriority | null;
   incomingTrades: DashboardIncomingTrade[];
   newsItems: DashboardNewsItem[];
   /** Players rostered by ANY team in each league (league-scoped news). */

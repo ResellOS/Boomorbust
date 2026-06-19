@@ -13,6 +13,10 @@ import {
   Eye,
 } from 'lucide-react';
 import AppBackground from '@/components/AppBackground';
+import {
+  MARKET_VERDICT_COLORS,
+  normalizeToMarketVerdict,
+} from '@/lib/verdict/marketVerdict';
 import { useDashboardLeagueStore } from '@/store/dashboardLeagueStore';
 import type {
   ScoutingData,
@@ -34,15 +38,10 @@ const POS_COLOR: Record<string, string> = {
 };
 function posColor(pos: string) { return POS_COLOR[pos?.toUpperCase()] ?? '#94A3B8'; }
 
-const VERDICT_META: Record<string, { color: string; label: string }> = {
-  BOOM:      { color: '#36E7A1', label: 'BOOM' },
-  LEAN_BOOM: { color: '#86EFAC', label: 'LEAN BOOM' },
-  NEUTRAL:   { color: '#94A3B8', label: 'NEUTRAL' },
-  LEAN_BUST: { color: '#C084FC', label: 'LEAN BUST' },
-  BUST:      { color: '#F87171', label: 'BUST' },
-};
 function verdictMeta(v: string | null | undefined) {
-  return VERDICT_META[String(v ?? '').toUpperCase()] ?? { color: '#64748B', label: 'N/A' };
+  const mv = normalizeToMarketVerdict(v);
+  if (!mv) return { color: '#64748B', label: 'N/A' };
+  return { color: MARKET_VERDICT_COLORS[mv], label: mv };
 }
 
 const GLASS = {
@@ -571,7 +570,8 @@ function HiddenGemsPanel({ gems }: { gems: HiddenGem[] }) {
         )}
         {gems.map(gem => {
           const vm = verdictMeta(gem.verdict);
-          const isBoom = gem.verdict === 'BOOM' || gem.verdict === 'LEAN_BOOM';
+          const gemVerdict = normalizeToMarketVerdict(gem.verdict);
+          const isBoom = gemVerdict === 'BOOM' || gemVerdict === 'BUY';
           const posC = posColor(gem.position);
           const sparkData = [gem.results_score, (gem.results_score + gem.process_score) / 2, gem.process_score];
 

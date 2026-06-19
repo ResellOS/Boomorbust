@@ -8,6 +8,7 @@ interface DynastyNewsFeedProps {
   items: DashboardNewsItem[];
   rosterPlayerIds?: Set<string>;
   allMode?: boolean;
+  title?: string;
 }
 
 function NewsModal({
@@ -84,7 +85,12 @@ function NewsModal({
   );
 }
 
-export default function DynastyNewsFeed({ items, rosterPlayerIds, allMode = false }: DynastyNewsFeedProps) {
+export default function DynastyNewsFeed({
+  items,
+  rosterPlayerIds,
+  allMode = false,
+  title = 'DYNASTY NEWS',
+}: DynastyNewsFeedProps) {
   const [modalItem, setModalItem] = useState<DashboardNewsItem | null>(null);
 
   const visible = useMemo(() => {
@@ -99,8 +105,8 @@ export default function DynastyNewsFeed({ items, rosterPlayerIds, allMode = fals
     <>
       <div className="flex shrink-0 flex-col overflow-hidden rounded-[7px] border border-border bg-surface">
         <div className="flex shrink-0 items-center justify-between border-b border-border bg-bg px-3 py-[7px]">
-          <span className="font-figtree text-[10px] font-bold uppercase tracking-[1.5px] text-text">
-            Dynasty News Feed
+          <span className="font-figtree text-[10px] uppercase tracking-[1.5px] text-text">
+            {title}
           </span>
           <span className="font-mono text-[10px] text-boom">● LIVE</span>
         </div>

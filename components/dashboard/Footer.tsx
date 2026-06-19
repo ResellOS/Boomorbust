@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 
 interface FooterProps {
   leagueCount: number;
@@ -30,7 +31,7 @@ export default function Footer({
 
   return (
     <footer
-      className="col-span-2 row-start-3 grid border-t border-border/50 bg-bg/[0.98]"
+      className="col-span-1 md:col-span-2 row-start-3 hidden md:grid border-t border-border/50 bg-bg/[0.98]"
       style={{ gridTemplateColumns: 'repeat(4, 1fr)', height: 28 }}
     >
       <div className="flex h-full items-center gap-2 border-r border-border/40 px-[18px]">
@@ -55,6 +56,12 @@ export default function Footer({
         <span className="ml-1.5 font-mono text-[7.5px] text-muted">
           Next update in {formatCountdown(countdown)}
         </span>
+        <Link
+          href="/performance"
+          className="ml-auto font-mono text-[7.5px] text-muted no-underline hover:text-boom"
+        >
+          BOB Record →
+        </Link>
       </div>
       <div className="flex h-full items-center gap-2 border-r border-border/40 px-[18px]">
         <div>

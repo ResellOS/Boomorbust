@@ -1,5 +1,8 @@
 'use client';
 
+import Link from 'next/link';
+import { Trophy } from 'lucide-react';
+
 export type SettingsSection =
   | 'profile'
   | 'dynasty-title'
@@ -146,6 +149,15 @@ export default function SettingsNav({ active, onChange, onLogout }: Props) {
           </div>
         </div>
       ))}
+
+      <Link
+        href="/performance"
+        className="mx-3 flex items-center gap-3 rounded-lg px-3 py-2 text-left no-underline transition-colors hover:bg-white/[0.04]"
+        style={{ color: '#94a3b8' }}
+      >
+        <Trophy className="h-[15px] w-[15px] shrink-0" strokeWidth={2} />
+        <span className="text-[12px] font-medium">BOB Record</span>
+      </Link>
 
       {/* Log Out */}
       <button

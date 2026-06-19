@@ -61,12 +61,10 @@ export default function PlayerHubTopBar({ stats }: PlayerHubTopBarProps) {
 
   return (
     <header
-      className="col-span-2 grid border-b border-border bg-bg"
-      style={{ gridTemplateColumns: '215px 1fr', height: 66 }}
+      className="col-span-1 md:col-span-2 row-start-1 grid h-[66px] border-b border-border bg-bg grid-cols-1 md:grid-cols-[215px_1fr]"
     >
       <div
-        className="flex items-center justify-center overflow-hidden bg-bg px-1.5 py-1"
-        style={{ borderRight: '1px solid #1e2640' }}
+        className="hidden md:flex items-center justify-center overflow-hidden bg-bg px-1.5 py-1 border-r border-[#1e2640]"
       >
         <Image
           src="/logo.png"
@@ -83,11 +81,11 @@ export default function PlayerHubTopBar({ stats }: PlayerHubTopBarProps) {
           }}
         />
       </div>
-      <div className="grid grid-cols-5">
+      <div className="flex overflow-x-auto scrollbar-hide md:grid md:grid-cols-5">
         {items.map((item) => (
           <div
             key={item.label}
-            className="flex flex-col justify-center border-r border-border px-[18px] py-1.5 last:border-r-0"
+            className="flex min-w-[110px] shrink-0 flex-col justify-center border-r border-border px-3 py-1.5 last:border-r-0 md:min-w-0 md:px-[18px]"
           >
             <div className="mb-[3px] font-mono text-[7.5px] uppercase tracking-[1.5px] text-muted">
               {item.label}

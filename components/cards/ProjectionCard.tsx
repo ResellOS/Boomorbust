@@ -246,7 +246,7 @@ export default function ProjectionCard({
         <div className="grid grid-cols-3" style={{ gap: 8, marginTop: 14 }}>
           {[
             {
-              label: 'TFO SCORE',
+              label: 'Dynasty Rating',
               value: String(Math.round(data.tfoScore)),
               sub: data.grade.replace(/_/g, ' '),
               valueColor: data.gradeColor,

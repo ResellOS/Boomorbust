@@ -1,6 +1,4 @@
-import type { VerdictLabel } from '@/lib/players/types';
-
-export type ExposureRiskLevel = 'DANGER' | 'CAUTION' | 'SAFE';
+import type { MarketVerdictDisplay } from '@/lib/verdict/fetchMarketVerdicts';
 
 export interface ExposurePlayer {
   playerId: string;
@@ -8,78 +6,27 @@ export interface ExposurePlayer {
   position: string;
   team: string;
   leagueCount: number;
-  totalLeagues: number;
-  exposurePct: number;
   leagueNames: string[];
-  tfoScore: number;
-  verdict: VerdictLabel;
-  ageCurve: number | null;
-  weeklyPoints: number | null;
-  projectedPoints: number | null;
-  trend7d: number[];
-  riskLevel: ExposureRiskLevel;
+  marketVerdict: MarketVerdictDisplay;
+  tfoScore?: number;
+  portfolioPct?: number;
 }
 
-export interface ExposureTopbarStats {
-  totalPlayersTracked: number;
-  highExposureCount: number;
-  highExposurePct: number;
-  dangerZoneCount: number;
-  dangerZonePct: number;
-  portfolioConcentration: number;
-  concentrationLabel: 'Low' | 'Moderate' | 'High';
-  leaguesAnalyzed: number;
-}
-
-export interface PortfolioOverview {
-  totalAssets: number;
-  avgDynastyRating: number;
-  boomRate: number;
-}
-
-export interface ExposureHealth {
-  score: number;
-  label: 'Low Risk' | 'Moderate Risk' | 'High Risk';
-  sub: string;
-  pointerPct: number;
-}
-
-export interface PortfolioRisk {
-  score: number;
-  label: 'Low Risk' | 'Moderate Risk' | 'High Risk';
-  concentrationRisk: number;
-  positionDiversity: number;
-  ageCurveRisk: number;
-}
-
-export interface PositionBreakdown {
-  position: string;
-  count: number;
-  pct: number;
+export interface PositionConcentration {
+  position: 'QB' | 'RB' | 'WR' | 'TE';
+  playerCount: number;
+  leagueSlots: number;
   color: string;
 }
 
-export interface WeeklyPerformance {
-  beating: number;
-  onTrack: number;
-  below: number;
-  totalPoints: number;
-  projected: number;
-  delta: number;
-}
-
-export interface ExposurePageData {
-  leagues: { id: string; name: string; league_type?: string | null; status?: string | null }[];
-  topbar: ExposureTopbarStats;
-  portfolioOverview: PortfolioOverview;
-  exposureHealth: ExposureHealth;
-  players: ExposurePlayer[];
-  portfolioRisk: PortfolioRisk;
-  dangerAlerts: ExposurePlayer[];
-  positionBreakdown: PositionBreakdown[];
-  positionAdvisory: string | null;
-  weeklyPerformance: WeeklyPerformance;
-  nflWeek: number;
-  isGameDay: boolean;
-  leagueCount: number;
-}
+export type {
+  ConcentrationRow,
+  ExposurePageData,
+  ExposureTopbarStats,
+  MissingEliteAsset,
+  PortfolioHeroOpportunity,
+  PortfolioHeroRisk,
+  PortfolioOverview,
+  SimulatorPlayer,
+  VerdictExposureSummary,
+} from './portfolioEngine';

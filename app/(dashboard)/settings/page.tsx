@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
@@ -10,6 +11,8 @@ import SubscriptionCard from '@/components/settings/SubscriptionCard';
 import UsageDonuts from '@/components/settings/UsageDonuts';
 import NotificationToggles from '@/components/settings/NotificationToggles';
 import BobEngineCard from '@/components/settings/BobEngineCard';
+import FeedbackSection from '@/components/settings/FeedbackSection';
+import AppTopNav from '@/components/nav/AppTopNav';
 import type { ProfileData } from '@/app/api/settings/profile/route';
 
 // ─── Placeholder sections ────────────────────────────────────────────────────
@@ -92,6 +95,47 @@ function DynastyTitleSection({ currentTitle }: { currentTitle: string }) {
   );
 }
 
+function ProfileBadges({ badges }: { badges: ProfileData['badges'] }) {
+  if (badges.length === 0) {
+    return (
+      <div
+        className="rounded-xl p-6"
+        style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}
+      >
+        <p className="text-[13px] font-bold text-slate-400 uppercase tracking-widest mb-1">Earned Badges</p>
+        <p className="text-[12px] text-slate-500">
+          Share feedback when prompted to earn your first badge.
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div
+      className="rounded-xl p-6"
+      style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}
+    >
+      <p className="text-[13px] font-bold text-slate-400 uppercase tracking-widest mb-3">Earned Badges</p>
+      <div className="flex flex-wrap gap-2">
+        {badges.map((b) => (
+          <span
+            key={`${b.badgeType}-${b.awardedAt}`}
+            className="inline-flex items-center rounded-full px-3 py-1.5 font-mono text-[11px] font-semibold"
+            style={{
+              color: '#36E7A1',
+              background: 'rgba(54, 231, 161, 0.1)',
+              border: '1px solid rgba(54, 231, 161, 0.28)',
+            }}
+          >
+            {b.badgeType === 'feedback_contributor' ? '🏆 ' : ''}
+            {b.badgeLabel}
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 // ─── Page ────────────────────────────────────────────────────────────────────
 
 export default function SettingsPage() {
@@ -104,7 +148,32 @@ export default function SettingsPage() {
   const fetchProfile = useCallback(async () => {
     try {
       const res = await fetch('/api/settings/profile');
-      if (res.ok) setData(await res.json());
+      if (!res.ok) return;
+      const profile = (await res.json()) as ProfileData;
+
+      // Enrich subscription with Stripe renewal when paid
+      if (profile.subscription.isPaid) {
+        try {
+          const billRes = await fetch('/api/stripe/billing-summary');
+          if (billRes.ok) {
+            const bill = (await billRes.json()) as {
+              renewal_iso?: string | null;
+              price_label?: string | null;
+              interval?: 'month' | 'year' | null;
+            };
+            if (bill.renewal_iso) {
+              profile.subscription.renewsLabel = `Renews ${new Date(bill.renewal_iso).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}`;
+            }
+            if (bill.price_label && bill.interval) {
+              profile.subscription.price = `${bill.price_label} /${bill.interval === 'year' ? 'yr' : 'mo'}`;
+            }
+          }
+        } catch {
+          /* billing optional */
+        }
+      }
+
+      setData(profile);
     } finally {
       setLoading(false);
     }
@@ -115,7 +184,7 @@ export default function SettingsPage() {
   const handleLogout = async () => {
     const supabase = createClient();
     await supabase.auth.signOut();
-    router.push('/login');
+    router.push('/auth/login');
   };
 
   const handleNotifChange = async (key: keyof ProfileData['notifications'], value: boolean) => {
@@ -158,11 +227,31 @@ export default function SettingsPage() {
               {data && <UsageDonuts usage={data.usage} renewsLabel={data.subscription.renewsLabel} />}
             </div>
             {data && <NotificationToggles notifications={data.notifications} onChange={handleNotifChange} />}
+            <div
+              className="rounded-xl p-6"
+              style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}
+            >
+              <p className="text-[13px] font-bold text-slate-400 uppercase tracking-widest mb-1">BOB Record</p>
+              <p className="text-[12px] text-slate-500 mb-4">View your prediction track record and model accuracy.</p>
+              <Link
+                href="/performance"
+                className="inline-flex items-center gap-2 rounded-xl px-5 py-2.5 text-[12px] font-bold no-underline transition hover:opacity-90"
+                style={{ background: 'rgba(54,231,161,0.12)', color: '#36E7A1', border: '1px solid rgba(54,231,161,0.25)' }}
+              >
+                View BOB Record →
+              </Link>
+            </div>
+            <FeedbackSection />
           </div>
         );
 
       case 'dynasty-title':
-        return data ? <DynastyTitleSection currentTitle={data.dynastyTitle} /> : null;
+        return data ? (
+          <div className="space-y-5">
+            <DynastyTitleSection currentTitle={data.dynastyTitle} />
+            <ProfileBadges badges={data.badges} />
+          </div>
+        ) : null;
 
       case 'league-connections':
         return data ? <LeagueConnections leagues={data.leagues} /> : null;
@@ -190,7 +279,47 @@ export default function SettingsPage() {
         return <Placeholder title="Data Settings" description="Control how your data is stored and used within the platform." />;
 
       case 'privacy-settings':
-        return <Placeholder title="Privacy Settings" description="Manage your privacy preferences and data visibility." />;
+        return (
+          <div className="space-y-5">
+            <div
+              className="rounded-xl p-6"
+              style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}
+            >
+              <p className="text-[13px] font-bold text-slate-400 uppercase tracking-widest mb-1">
+                Privacy Settings
+              </p>
+              <p className="text-[12px] text-slate-500 mb-4 leading-relaxed">
+                We sync your Sleeper league data to power BOB — we do not sell your personal data.
+                Free-tier ads are programmatic only. Export or delete your data anytime from Export
+                My Data in the sidebar.
+              </p>
+              <div className="flex flex-wrap gap-3">
+                <Link
+                  href="/privacy"
+                  className="inline-flex items-center rounded-lg px-4 py-2 text-[11px] font-semibold transition hover:opacity-90"
+                  style={{
+                    background: 'rgba(54, 231, 161, 0.12)',
+                    color: '#36E7A1',
+                    border: '1px solid rgba(54, 231, 161, 0.25)',
+                  }}
+                >
+                  Privacy Policy
+                </Link>
+                <Link
+                  href="/terms"
+                  className="inline-flex items-center rounded-lg px-4 py-2 text-[11px] font-semibold transition hover:opacity-90"
+                  style={{
+                    background: 'rgba(255,255,255,0.05)',
+                    color: '#e8ecf4',
+                    border: '1px solid rgba(255,255,255,0.1)',
+                  }}
+                >
+                  Terms of Service
+                </Link>
+              </div>
+            </div>
+          </div>
+        );
 
       case 'export-data':
         return (
@@ -293,7 +422,9 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="min-h-dvh bg-[#0a0d14] flex">
+    <div className="flex min-h-dvh flex-col bg-[#0a0d14]">
+      <AppTopNav username={data?.username} avatarUrl={data?.avatarUrl} />
+      <div className="flex min-h-0 flex-1">
       {/* Left sidebar (desktop) */}
       <aside
         className="hidden lg:flex flex-col w-56 flex-shrink-0 border-r sticky top-0 h-dvh overflow-y-auto"
@@ -341,8 +472,25 @@ export default function SettingsPage() {
           <p className="text-[13px] text-slate-500 mt-0.5">Manage your account, leagues, and preferences.</p>
         </div>
 
+        {!loading && !data && (
+          <div
+            className="rounded-xl p-8 text-center"
+            style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.25)' }}
+          >
+            <p className="text-[14px] font-semibold text-red-400">Could not load profile</p>
+            <p className="text-[12px] text-slate-500 mt-2">Check your connection and try refreshing.</p>
+            <button
+              onClick={() => { setLoading(true); fetchProfile(); }}
+              className="mt-4 px-4 py-2 rounded-lg text-[12px] font-semibold"
+              style={{ background: '#36E7A1', color: '#0a0d14' }}
+            >
+              Retry
+            </button>
+          </div>
+        )}
         {renderSection()}
       </main>
+      </div>
     </div>
   );
 }

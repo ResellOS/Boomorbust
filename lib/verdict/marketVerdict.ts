@@ -22,6 +22,24 @@ export const MARKET_VERDICT_COLORS: Record<MarketVerdict, string> = {
 
 export const NO_MARKET_DATA_FLAG = 'no_market_data';
 
+/**
+ * Normalize any verdict string (new BUY/SELL/HOLD or legacy
+ * LEAN_BOOM/NEUTRAL/LEAN_BUST in either underscore or space form) to a
+ * canonical MarketVerdict. Returns null when unrecognizable. Used by UI
+ * surfaces that read verdicts from mixed-vintage sources (tfo_cache, engine).
+ */
+export function normalizeToMarketVerdict(
+  raw: string | null | undefined,
+): MarketVerdict | null {
+  const u = String(raw ?? '').trim().toUpperCase().replace(/_/g, ' ');
+  if (u === 'BOOM' || u === 'STRONG BOOM') return 'BOOM';
+  if (u === 'BUY' || u === 'LEAN BOOM') return 'BUY';
+  if (u === 'HOLD' || u === 'NEUTRAL') return 'HOLD';
+  if (u === 'SELL' || u === 'LEAN BUST') return 'SELL';
+  if (u === 'BUST' || u === 'STRONG BUST') return 'BUST';
+  return null;
+}
+
 /** Neutral border for players with no real market signal. */
 export const NEUTRAL_BORDER = '#1e2640';
 
@@ -67,11 +85,11 @@ export function marketRadarColors(
 
 /** Hover-tooltip definitions for each market verdict (action signal). */
 export const MARKET_VERDICT_DEFINITIONS: Record<MarketVerdict, string> = {
-  BOOM: 'BOB rates this player far above market — aggressive buy',
-  BUY: 'BOB rates this player above market — buy window',
+  BOOM: 'BOB rates this player far above market — buy aggressively',
+  BUY: 'BOB rates this player above market — good buy window',
   HOLD: 'BOB roughly agrees with market value',
-  SELL: 'BOB rates this player below market — sell window',
-  BUST: 'BOB rates this player far below market — sell now',
+  SELL: 'BOB rates this player below market — consider selling',
+  BUST: 'BOB rates this player far below market — sell while you can',
 };
 
 export interface MarketVerdictInput {
@@ -84,6 +102,8 @@ export interface MarketVerdictResult {
   verdict: MarketVerdict;
   color: string;
   rankDelta: number | null; // null when no_market_data
+  ktcRank: number | null;
+  ktcValue: number | null;
   flags: string[];
 }
 
@@ -118,6 +138,8 @@ export function computeMarketVerdicts(
       verdict: 'HOLD',
       color: MARKET_VERDICT_COLORS.HOLD,
       rankDelta: null,
+      ktcRank: null,
+      ktcValue: null,
       flags: [NO_MARKET_DATA_FLAG],
     });
   }
@@ -158,6 +180,8 @@ export function computeMarketVerdicts(
       verdict,
       color: MARKET_VERDICT_COLORS[verdict],
       rankDelta: entry.rankDelta,
+      ktcRank: marketRank.get(entry.p) ?? null,
+      ktcValue: entry.p.ktcValue > 0 ? entry.p.ktcValue : null,
       flags: [],
     });
   });

@@ -17,7 +17,7 @@ export default function StartSitFooter({
 }: StartSitFooterProps) {
   return (
     <footer
-      className="col-span-2 row-start-3 flex h-7 shrink-0 items-center justify-between border-t border-border bg-surface px-3.5"
+      className="col-span-1 md:col-span-2 row-start-3 hidden md:flex h-7 shrink-0 items-center justify-between border-t border-border bg-surface px-3.5"
     >
       <div className="flex items-center gap-1 text-[8px] uppercase tracking-wide text-muted">
         <span className="h-[5px] w-[5px] rounded-full bg-boom" />
@@ -29,8 +29,8 @@ export default function StartSitFooter({
         <span> · {winRate}% Win Rate</span>
       </div>
       <div className="text-[8px] uppercase tracking-wide text-muted">
-        Week {nflWeek} Calls <span className="text-boom">{weekCalls}</span>
-        <span> · High Confidence</span>
+        Week {nflWeek === 0 ? 'Preseason' : nflWeek} Calls <span className="text-boom">{weekCalls}</span>
+        <span> · {nflWeek === 0 ? 'Preseason Mode' : 'High Confidence'}</span>
       </div>
       <div className="flex items-center gap-1 text-[8px] uppercase tracking-wide text-muted">
         League Sync <span className="text-boom">{leagueCount}/{leagueCount}</span>

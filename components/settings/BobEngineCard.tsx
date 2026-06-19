@@ -9,10 +9,10 @@ interface EngineStatus {
 }
 
 const WEIGHTS = [
-  { label: 'OPS', value: '60%' },
-  { label: 'SFS', value: '15%' },
-  { label: 'YOYSI', value: '20%' },
-  { label: 'SIT', value: '5%' },
+  { label: 'Opportunity', value: '35%' },
+  { label: 'Scheme Fit', value: '25%' },
+  { label: 'Profile', value: '25%' },
+  { label: 'Situation', value: '15%' },
 ];
 
 function fmtTime(iso: string | null): string {
@@ -37,8 +37,11 @@ export default function BobEngineCard() {
     setLoadingStatus(true);
     try {
       const res = await fetch('/api/engine/status', { cache: 'no-store' });
-      const json = (await res.json()) as EngineStatus;
-      setStatus(json);
+      if (res.ok) {
+        setStatus((await res.json()) as EngineStatus);
+      } else {
+        setStatus({ online: false, lastRun: null, dynastyCount: 0 });
+      }
     } catch {
       setStatus({ online: false, lastRun: null, dynastyCount: 0 });
     } finally {
@@ -54,17 +57,20 @@ export default function BobEngineCard() {
     setRescoring(true);
     setResult(null);
     try {
-      const res = await fetch('/api/engine/rescore', { method: 'POST' });
+      const res = await fetch('/api/admin/rescore-all', { method: 'POST' });
       const json = await res.json();
-      if (res.ok && json?.error == null && json?.ok !== false) {
-        const scored = json?.scored ?? json?.result?.scored;
+      if (res.ok && json?.ok !== false) {
+        const scored = json?.scored ?? 0;
         setResult({
           ok: true,
-          message: scored != null ? `Rescore complete — ${scored} players scored.` : 'Rescore triggered successfully.',
+          message: `Rescore complete — ${scored.toLocaleString()} players scored.`,
         });
         loadStatus();
       } else {
-        setResult({ ok: false, message: json?.error ?? 'Rescore failed. Engine may be offline.' });
+        setResult({
+          ok: false,
+          message: json?.error ?? 'Rescore failed. Admin access required.',
+        });
       }
     } catch {
       setResult({ ok: false, message: 'Rescore request failed.' });
@@ -82,10 +88,9 @@ export default function BobEngineCard() {
     >
       <p className="text-[13px] font-bold text-slate-400 uppercase tracking-widest mb-1">BOB Engine</p>
       <p className="text-[12px] text-slate-500 mb-5">
-        Proprietary scoring engine. Trigger a full rescore of every player across dynasty and redraft contexts.
+        Proprietary scoring engine. Trigger a full rescore of every player across dynasty contexts.
       </p>
 
-      {/* Status grid */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5">
         <div className="p-4 rounded-xl" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
           <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Engine Status</p>
@@ -104,19 +109,20 @@ export default function BobEngineCard() {
         </div>
 
         <div className="p-4 rounded-xl" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
-          <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Last Run</p>
+          <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Last Rescore</p>
           <p className="font-mono text-[13px] text-white">{loadingStatus ? '…' : fmtTime(status?.lastRun ?? null)}</p>
         </div>
 
         <div className="p-4 rounded-xl" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
-          <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Dynasty Players Scored</p>
-          <p className="font-mono text-[16px] font-semibold text-[#36E7A1]">{loadingStatus ? '…' : (status?.dynastyCount ?? 0).toLocaleString()}</p>
+          <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Players Scored</p>
+          <p className="font-mono text-[16px] font-semibold text-[#36E7A1]">
+            {loadingStatus ? '…' : (status?.dynastyCount ?? 0).toLocaleString()}
+          </p>
         </div>
       </div>
 
-      {/* Weights */}
       <div className="p-4 rounded-xl mb-5" style={{ background: 'rgba(124,58,237,0.08)', border: '1px solid rgba(124,58,237,0.2)' }}>
-        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-3">Current Weights</p>
+        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-3">TFO Weights</p>
         <div className="flex flex-wrap gap-2">
           {WEIGHTS.map((w) => (
             <div key={w.label} className="flex items-baseline gap-1.5 px-3 py-1.5 rounded-lg" style={{ background: 'rgba(255,255,255,0.04)' }}>
@@ -127,7 +133,6 @@ export default function BobEngineCard() {
         </div>
       </div>
 
-      {/* Rescore action */}
       <div className="flex flex-wrap items-center gap-3">
         <button
           onClick={rescore}
@@ -138,14 +143,14 @@ export default function BobEngineCard() {
           {rescoring ? 'Rescoring…' : 'Rescore All Players'}
         </button>
         {result && (
-          <span
-            className="text-[12px] font-medium"
-            style={{ color: result.ok ? '#36E7A1' : '#EF4444' }}
-          >
+          <span className="text-[12px] font-medium" style={{ color: result.ok ? '#36E7A1' : '#EF4444' }}>
             {result.message}
           </span>
         )}
       </div>
+      <p className="mt-3 text-[10px] text-slate-600">
+        Admin-only. Reads bbv_values, writes formula_scores (dynasty / PPR).
+      </p>
     </div>
   );
 }

@@ -141,7 +141,7 @@ function prospectTfoScore(p: Prospect): number {
 function landingQuality(tfo: number): { label: string; tone: 'elite' | 'good' | 'neutral' | 'poor' } {
   if (tfo >= 85) return { label: 'ELITE LANDING', tone: 'elite' };
   if (tfo >= 70) return { label: 'GOOD LANDING', tone: 'good' };
-  if (tfo >= 55) return { label: 'NEUTRAL', tone: 'neutral' };
+  if (tfo >= 55) return { label: 'AVERAGE LANDING', tone: 'neutral' };
   return { label: 'POOR LANDING', tone: 'poor' };
 }
 
@@ -855,7 +855,7 @@ function ProspectRow(props: {
             </span>
           </div>
           <span className="font-mono text-[9px] font-bold tracking-[0.08em] text-[var(--text-muted)]">
-            {landing.label} · {Math.round(tfo)} TFO
+            {landing.label} · Rating {Math.round(tfo)}
           </span>
         </div>
 
@@ -1002,7 +1002,7 @@ function HistoricalAccuracy({
               <th className="pb-3 pr-4">{tab === 'year' ? 'Year' : tab === 'pos' ? 'Position' : 'Round'}</th>
               <th className="pb-3 pr-4">Graded</th>
               <th className="pb-3 pr-4">Elite tier hits</th>
-              <th className="pb-3 pr-4">Avoid-tier busts</th>
+              <th className="pb-3 pr-4">High Risk misses</th>
               <th className="pb-3 pr-4">Model %</th>
               <th className="pb-3">vs Consensus %</th>
             </tr>

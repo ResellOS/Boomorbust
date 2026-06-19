@@ -1,4 +1,5 @@
-﻿
+﻿import { formatPerformanceVerdictLabel } from '@/lib/ui/labels';
+
 export type ProjectionCardProps = {
   playerName: string;
   position: string;
@@ -36,7 +37,7 @@ export default function ProjectionCard(p: ProjectionCardProps) {
           </p>
         </div>
         <div className="shrink-0 text-right">
-          <p className="text-[10px] font-bold uppercase tracking-wide text-[#64748B]">TFO</p>
+          <p className="text-[10px] font-bold uppercase tracking-wide text-[#64748B]">Rating</p>
           <p className="text-xl font-black tabular-nums text-white font-mono">{p.tfoScore}</p>
         </div>
       </div>
@@ -52,7 +53,7 @@ export default function ProjectionCard(p: ProjectionCardProps) {
           className="rounded-md px-2 py-0.5 text-[10px] font-black uppercase tracking-wide"
           style={{ color: p.verdictColor, background: `${p.verdictColor}14` }}
         >
-          {p.verdict}
+          {formatPerformanceVerdictLabel(p.verdict)}
         </span>
         <span className="text-[10px] text-[#94A3B8]">
           Start score <span className="font-mono font-bold tabular-nums text-white">{p.startScore}</span>

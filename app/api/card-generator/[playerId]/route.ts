@@ -22,17 +22,17 @@ function getRedis(): Redis | null {
 
 const VERDICT_COLORS: Record<string, string> = {
   'BOOM': '#36E7A1',
-  'LEAN BOOM': '#22D3EE',
-  'NEUTRAL': '#94A3B8',
-  'LEAN BUST': '#A78BFA',
-  'BUST': '#EF4444',
+  'BUY': '#60a5fa',
+  'HOLD': '#FBBF24',
+  'SELL': '#f59e0b',
+  'BUST': '#A78BFA',
 };
 
 function verdictFromTFO(score: number): { label: string; color: string } {
   if (score >= 80) return { label: 'BOOM', color: VERDICT_COLORS['BOOM'] };
-  if (score >= 65) return { label: 'LEAN BOOM', color: VERDICT_COLORS['LEAN BOOM'] };
-  if (score >= 50) return { label: 'NEUTRAL', color: VERDICT_COLORS['NEUTRAL'] };
-  if (score >= 35) return { label: 'LEAN BUST', color: VERDICT_COLORS['LEAN BUST'] };
+  if (score >= 65) return { label: 'BUY', color: VERDICT_COLORS['BUY'] };
+  if (score >= 50) return { label: 'HOLD', color: VERDICT_COLORS['HOLD'] };
+  if (score >= 35) return { label: 'SELL', color: VERDICT_COLORS['SELL'] };
   return { label: 'BUST', color: VERDICT_COLORS['BUST'] };
 }
 

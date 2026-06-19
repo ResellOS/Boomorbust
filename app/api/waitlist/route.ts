@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { sendWaitlistConfirmationEmail } from '@/lib/email/waitlistConfirmation';
 import { getUpstashRedis } from '@/lib/upstash';
 
 export const dynamic = 'force-dynamic';
@@ -10,6 +11,13 @@ function normalizeEmail(raw: unknown): string | null {
   const s = typeof raw === 'string' ? raw.trim().toLowerCase() : '';
   if (!s || s.length > 320) return null;
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s)) return null;
+  return s;
+}
+
+function normalizeName(raw: unknown): string | null {
+  if (typeof raw !== 'string') return null;
+  const s = raw.trim();
+  if (!s || s.length > 120) return null;
   return s;
 }
 
@@ -24,6 +32,8 @@ export async function POST(req: Request) {
   if (!email) {
     return NextResponse.json({ error: 'Valid email required' }, { status: 400 });
   }
+
+  const name = normalizeName((body as { name?: unknown })?.name);
 
   const admin = createAdminClient();
   const { error } = await admin.from('waitlist').insert({
@@ -43,6 +53,12 @@ export async function POST(req: Request) {
 
   const redis = getUpstashRedis();
   if (redis) await redis.del(COUNT_CACHE_KEY).catch(() => {});
+
+  try {
+    await sendWaitlistConfirmationEmail(email, name);
+  } catch (err) {
+    console.error('[waitlist] confirmation email failed:', err);
+  }
 
   return NextResponse.json({ ok: true });
 }

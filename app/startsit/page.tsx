@@ -7,6 +7,7 @@ import StartSitTopBar from '@/components/startsit/StartSitTopBar';
 import StartSitClient from '@/components/startsit/StartSitClient';
 import StartSitRightPanel from '@/components/startsit/StartSitRightPanel';
 import StartSitFooter from '@/components/startsit/StartSitFooter';
+import TerminalPageGrid from '@/components/dashboard/TerminalPageGrid';
 
 export const dynamic = 'force-dynamic';
 
@@ -67,14 +68,8 @@ export default async function StartSitPage({ searchParams }: PageProps) {
   );
 
   return (
-    <div
-      className="grid h-screen overflow-hidden"
-      style={{
-        gridTemplateRows: '58px 1fr 28px',
-        gridTemplateColumns: '215px 1fr',
-      }}
-    >
-      <StartSitTopBar stats={data.topbar} />
+    <TerminalPageGrid variant="startsit">
+      <StartSitTopBar stats={data.topbar} isOffseason={data.weekContext.isOffseason} />
 
       <Sidebar
         leagues={data.leagues}
@@ -83,37 +78,41 @@ export default async function StartSitPage({ searchParams }: PageProps) {
           windowOpen: data.weekContext.windowOpen,
           lockDeadline: data.weekContext.lockDeadline,
           weatherImpact: data.weekContext.weatherImpact,
+          isOffseason: data.weekContext.isOffseason,
         }}
         bobConfidence={data.bobConfidence}
       />
 
-      <div className="row-start-2 flex min-h-0 overflow-hidden" style={{ minWidth: 0 }}>
+      <div className="col-start-1 md:col-start-2 row-start-2 flex min-h-0 flex-col overflow-hidden md:flex-row">
         <StartSitClient
           nflWeek={data.weekContext.nflWeek}
+          isOffseason={data.weekContext.isOffseason}
           leagues={data.leagues}
           seasonRecord={data.seasonRecord}
-          startThese={data.startThese}
-          sitThese={data.sitThese}
+          decisions={data.decisions}
+          decisionsSummary={data.decisionsSummary}
+          lineupOptimizer={data.lineupOptimizer}
           flexDecisions={data.flexDecisions}
-          allRecommendations={data.allRecommendations}
+          hasRealData={data.hasRealData}
         />
-        <StartSitRightPanel
-          weekRecord={data.weekRecord}
-          seasonSparkline={data.seasonSparkline}
-          alerts={data.alerts}
-          nflWeek={data.weekContext.nflWeek}
-          leagueCount={data.leagueCount}
-        />
+        <div className="hidden md:block md:shrink-0">
+          <StartSitRightPanel
+            seasonRecord={data.seasonRecord}
+            alerts={data.alerts}
+            weekContext={data.weekContext}
+            leagueCount={data.leagueCount}
+          />
+        </div>
       </div>
 
       <StartSitFooter
         seasonRecord={data.topbar.seasonRecord}
         winRate={data.topbar.seasonWinRate}
-        weekCalls={data.topbar.thisWeekCalls}
+        weekCalls={data.topbar.decisionsToday ?? data.topbar.thisWeekCalls}
         leagueCount={data.leagueCount}
         nflWeek={data.weekContext.nflWeek}
         lastRunMinutes={data.topbar.lastUpdatedMinutes}
       />
-    </div>
+    </TerminalPageGrid>
   );
 }

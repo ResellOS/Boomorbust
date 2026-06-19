@@ -62,10 +62,10 @@ function labelForType(t: string): string {
       return 'TRADE OFFER';
     case 'boom_signal':
     case 'tfo_boom':
-      return 'BOOM SIGNAL';
+      return 'Buy Signal';
     case 'bust_signal':
     case 'tfo_bust':
-      return 'BUST SIGNAL';
+      return 'Sell Signal';
     default:
       return t.replace(/_/g, ' ').toUpperCase() || 'ALERT';
   }

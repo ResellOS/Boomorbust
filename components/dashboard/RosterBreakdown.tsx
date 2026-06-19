@@ -15,8 +15,8 @@ export default function RosterBreakdown({ breakdown }: { breakdown: RosterBreakd
   return (
     <div className="flex flex-col overflow-hidden rounded-lg border border-border bg-surface">
       <div className="flex shrink-0 items-center justify-between border-b border-border bg-bg px-[13px] py-2">
-        <span className="font-figtree text-[9.5px] font-bold uppercase tracking-[1.5px] text-text">
-          Roster Breakdown
+        <span className="font-figtree text-[9.5px] uppercase tracking-[1.5px] text-text">
+          Dynasty GPS
         </span>
         <span
           className="rounded-[3px] px-1.5 py-0.5 font-mono text-[8px] font-bold uppercase tracking-wide"

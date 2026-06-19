@@ -289,7 +289,7 @@ function TeamNeedsStrip({ needs }: { needs: TeamNeedsProfile }) {
     <div className="rounded-2xl border border-white/10 bg-[#0f172a]/80 p-4 md:p-5">
       <p className="text-[10px] uppercase tracking-[0.2em] text-[#64748B] font-semibold mb-2">YOUR TEAM NEEDS</p>
       <p className="text-[11px] text-[#94A3B8] mb-3 leading-relaxed">
-        Position grades from average TFO on your roster (QB / RB / WR / TE only).
+        Position grades from average dynasty rating on your roster (QB / RB / WR / TE only).
       </p>
       <p className="font-mono text-[13px] font-bold text-[#CBD5E1] mb-4 flex flex-wrap items-center gap-x-1 gap-y-1">
         {order.map((pos, i) => {
@@ -316,7 +316,7 @@ function TeamNeedsStrip({ needs }: { needs: TeamNeedsProfile }) {
             >
               <span className="text-[#94A3B8]">{pos}</span>
               <span className="tabular-nums">{g.letter}</span>
-              <span className="text-[10px] opacity-80 tabular-nums">avg {g.avgTfo.toFixed(1)} TFO</span>
+              <span className="text-[10px] opacity-80 tabular-nums">avg {g.avgTfo.toFixed(1)} rating</span>
             </div>
           );
         })}

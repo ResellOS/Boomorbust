@@ -3,23 +3,44 @@
 import { useEffect, useMemo, useState } from 'react';
 import type { DashboardRotationData } from '@/lib/dashboard/rotation';
 import { empireRatingFromTfo } from '@/lib/dashboard/rotation';
+import { empireRatingDelta } from '@/lib/dashboard/empireRating';
+import { computeDynastyGps } from '@/lib/dashboard/dynastyGps';
+import { computePortfolioExposure } from '@/lib/dashboard/portfolioExposure';
+import { computeLeagueCounts } from '@/lib/dashboard/leagueCounts';
+import { computeDashboardPortfolioOverview } from '@/lib/dashboard/portfolioOverview';
 import { LEAGUE_ROTATE_SECONDS } from '@/lib/dashboard/constants';
 import DashboardTopBar from './DashboardTopBar';
 import ModeToggleBar, { type DashboardMode } from './ModeToggleBar';
 import LeagueRotationHeader from './LeagueRotationHeader';
 import LiveScoreTicker from './LiveScoreTicker';
-import PlayerTicker from './PlayerTicker';
-import PlayerCardCarousel from './PlayerCardCarousel';
-import RightPanel from './RightPanel';
-import TradeTargetsTable from './TradeTargetsTable';
+import FrontOfficeCommandCenter from './FrontOfficeCommandCenter';
+import DynastyGpsCard from './DynastyGpsCard';
+import OpportunityFeed from './OpportunityFeed';
+import MarketSignalsCompact from './MarketSignalsCompact';
+import DashboardPortfolioOverview from './DashboardPortfolioOverview';
 import DynastyNewsFeed from './DynastyNewsFeed';
-import IncomingTrades from './IncomingTrades';
-import LineupOpportunityBanner from './LineupOpportunityBanner';
+import RightPanel from './RightPanel';
 import Footer from './Footer';
+import type { DailyTask } from '@/lib/dashboard/dailyTasks';
 
-export default function DashboardClient({ data }: { data: DashboardRotationData }) {
-  const { leagues, portfolio, tradeTargets, overvalued, incomingTrades, newsItems, nflSeason } =
-    data;
+export default function DashboardClient({
+  data,
+  dailyTasks,
+  lastEmpireRating,
+}: {
+  data: DashboardRotationData;
+  dailyTasks: DailyTask[];
+  lastEmpireRating: number | null;
+}) {
+  const {
+    leagues,
+    portfolio,
+    tradeTargets,
+    incomingTrades,
+    newsItems,
+    nflSeason,
+    lineupOpportunity,
+  } = data;
 
   const [mode, setMode] = useState<DashboardMode>('all');
   const [rotIndex, setRotIndex] = useState(0);
@@ -53,27 +74,61 @@ export default function DashboardClient({ data }: { data: DashboardRotationData 
     () => (isAll ? portfolio.players : currentLeague?.players ?? []),
     [isAll, portfolio.players, currentLeague?.players],
   );
-  const teamTfo = isAll ? portfolio.teamTfo : currentLeague?.teamTfo ?? 0;
-  const breakdown = isAll
-    ? portfolio.breakdown
-    : currentLeague?.breakdown ?? portfolio.breakdown;
   const playersRostered = isAll ? portfolio.playersRostered : players.length;
+  const empireRating = empireRatingFromTfo(data.portfolio.teamTfo);
+  const empireDelta = empireRatingDelta(empireRating, lastEmpireRating);
+  const dynastyEdge = Math.max(0, (isAll ? portfolio.teamTfo : currentLeague?.teamTfo ?? 0) - 70);
   const contextLabel = isAll ? 'All Leagues' : currentLeague?.name ?? '—';
-  const dynastyEdge = Math.max(0, teamTfo - 70);
-  const empireRating = empireRatingFromTfo(teamTfo);
 
-  // News scopes to EVERY player rostered in the selected league (all teams),
-  // not just the user's roster. ALL mode shows general news (allMode handles it).
+  const gps = useMemo(
+    () => computeDynastyGps(portfolio, leagues, currentLeague, empireRating),
+    [portfolio, leagues, currentLeague, empireRating],
+  );
+
+  const rosterMap = useMemo(() => {
+    const map = new Map<string, string[]>();
+    for (const lg of leagues) {
+      map.set(
+        lg.id,
+        lg.players.map((p) => p.playerId),
+      );
+    }
+    return map;
+  }, [leagues]);
+
+  const leagueCounts = useMemo(() => computeLeagueCounts(rosterMap), [rosterMap]);
+
+  const portfolioOverview = useMemo(
+    () => computeDashboardPortfolioOverview(portfolio, leagues),
+    [portfolio, leagues],
+  );
+
+  const exposure = useMemo(
+    () => computePortfolioExposure(rosterMap, portfolio.players, tradeTargets),
+    [rosterMap, portfolio.players, tradeTargets],
+  );
+
+  const signalPlayerIds = useMemo(
+    () => new Set(players.filter((p) => p.marketVerdict && !p.marketVerdict.noMarketData).map((p) => p.playerId)),
+    [players],
+  );
+
   const newsRosterIds = useMemo(() => {
-    if (isAll || !currentLeague) return new Set<string>();
+    if (isAll) {
+      return new Set(portfolio.players.map((p) => p.playerId));
+    }
+    if (!currentLeague) return new Set<string>();
     return new Set(data.leagueRosteredIds[currentLeague.id] ?? []);
-  }, [isAll, currentLeague, data.leagueRosteredIds]);
+  }, [isAll, currentLeague, data.leagueRosteredIds, portfolio.players]);
 
-  const leagueIncoming = useMemo(() => {
-    if (isAll) return incomingTrades;
-    if (!currentLeague) return [];
-    return incomingTrades.filter((t) => t.leagueId === currentLeague.id);
-  }, [incomingTrades, currentLeague, isAll]);
+  const filteredNews = useMemo(() => {
+    return newsItems.filter((item) => {
+      if (!item.playerId) return false;
+      if (newsRosterIds.has(item.playerId)) return true;
+      if (signalPlayerIds.has(item.playerId)) return true;
+      return false;
+    });
+  }, [newsItems, newsRosterIds, signalPlayerIds]);
 
   return (
     <>
@@ -82,15 +137,13 @@ export default function DashboardClient({ data }: { data: DashboardRotationData 
         playersRostered={playersRostered}
         tradeOffers={incomingTrades.length}
         dynastyEdge={dynastyEdge}
-        empireRating={empireRating}
+        portfolioStrength={empireRating}
+        portfolioDelta={empireDelta}
         contextLabel={contextLabel}
       />
 
-      <div
-        className="col-start-2 row-start-2 flex min-h-0 min-w-0 flex-col overflow-hidden"
-        style={{ display: 'grid', gridTemplateColumns: '1fr 288px', minWidth: 0 }}
-      >
-        <div className="flex min-w-0 flex-col gap-[9px] overflow-hidden p-[11px_13px]">
+      <div className="col-start-1 row-start-2 flex min-h-0 min-w-0 flex-col overflow-hidden lg:col-start-2 lg:grid lg:grid-cols-[1fr_280px]">
+        <div className="flex min-w-0 flex-col gap-3 overflow-y-auto overflow-x-hidden p-[11px_13px] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           <LiveScoreTicker inSeason={nflSeason.inSeason} />
 
           <ModeToggleBar leagues={leagues} mode={effectiveMode} onSelect={setMode} />
@@ -103,29 +156,32 @@ export default function DashboardClient({ data }: { data: DashboardRotationData 
             leagueCount={leagues.length}
           />
 
-          <LineupOpportunityBanner opportunity={data.lineupOpportunity} />
+          <FrontOfficeCommandCenter initialTasks={dailyTasks} lineupOpportunity={lineupOpportunity} />
 
-          <PlayerTicker players={players} animated={!isAll} />
-
-          <PlayerCardCarousel players={players} staticMode={isAll} />
-
-          <div className="min-h-0 flex-1" style={{ display: 'grid', gridTemplateColumns: '1.15fr 1fr', gap: 9 }}>
-            <TradeTargetsTable
-              targets={tradeTargets}
-              leagueId={currentLeague?.id}
+          <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3 lg:min-h-[300px]">
+            <DynastyGpsCard data={gps} />
+            <OpportunityFeed
+              lineupOpportunity={lineupOpportunity}
+              players={players}
+              tradeTargets={tradeTargets}
             />
-            <div className="flex min-h-0 flex-col gap-[9px]">
-              <DynastyNewsFeed
-                items={newsItems}
-                rosterPlayerIds={newsRosterIds}
-                allMode={isAll}
-              />
-              <IncomingTrades trades={leagueIncoming.length > 0 ? leagueIncoming : incomingTrades} />
-            </div>
+            <MarketSignalsCompact players={players} leagueCounts={leagueCounts} />
           </div>
+
+          <DashboardPortfolioOverview
+            data={portfolioOverview}
+            title={isAll ? 'Portfolio Overview (All Leagues)' : `Portfolio Overview · ${contextLabel}`}
+          />
+
+          <DynastyNewsFeed
+            items={filteredNews.length > 0 ? filteredNews : newsItems.slice(0, 4)}
+            rosterPlayerIds={newsRosterIds}
+            allMode={isAll}
+            title="Latest News"
+          />
         </div>
 
-        <RightPanel breakdown={breakdown} exposureWarnings={[]} overvalued={overvalued} />
+        <RightPanel mostExposed={exposure.mostExposed} noExposure={exposure.noExposure} />
       </div>
 
       <Footer

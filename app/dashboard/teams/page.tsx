@@ -347,7 +347,7 @@ function FullAnalysis({ card }: { card: TeamCard }) {
             className="text-[9px] text-white/40 mb-1 uppercase"
             style={{ fontFamily: 'var(--font-mono), "JetBrains Mono", monospace' }}
           >
-            TFO Avg
+            Dynasty Rating Avg
           </p>
           <p
             className="text-[14px] font-bold"

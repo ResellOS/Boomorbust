@@ -1,53 +1,52 @@
-import { createServerClient } from '@supabase/ssr';
-import { NextResponse, type NextRequest } from 'next/server';
+import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
+import {
+  checkPresetRateLimit,
+  clientIpFromHeaders,
+  rateLimit429Response,
+  type RateLimitPreset,
+} from '@/lib/rateLimit/general';
+import { updateSession } from '@/lib/supabase/middleware';
+
+function presetForPath(pathname: string): RateLimitPreset | null {
+  if (pathname.startsWith('/api/auth/')) return 'auth';
+  if (pathname.startsWith('/api/sync/')) return 'sync';
+  if (pathname.startsWith('/api/feedback')) return 'feedback';
+  return null;
+}
 
 export async function middleware(request: NextRequest) {
-  // Public marketing `/` uses no Supabase SSR — skipping middleware avoids edge failures
-  // when env is misconfigured and reduces cache oddities on the homepage.
-  if (request.nextUrl.pathname === '/') {
-    const res = NextResponse.next({ request });
-    // Must match next.config.mjs — tell browsers + Vercel edge not to reuse HTML/RSC for `/`
-    res.headers.set(
-      'Cache-Control',
-      'no-store, no-cache, max-age=0, s-maxage=0, must-revalidate'
-    );
-    res.headers.set('Pragma', 'no-cache');
-    res.headers.set('Surrogate-Control', 'no-store');
-    res.headers.set('CDN-Cache-Control', 'no-store');
-    res.headers.set('Vercel-CDN-Cache-Control', 'no-store');
-    return res;
-  }
+  // Always refresh Supabase session cookies before Server Components run.
+  let response = await updateSession(request);
 
-  try {
-    let supabaseResponse = NextResponse.next({ request });
+  const preset = presetForPath(request.nextUrl.pathname);
+  if (!preset) return response;
 
-    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-    if (!url || !anon) {
-      return supabaseResponse;
-    }
+  const ip = clientIpFromHeaders(request.headers);
+  const result = await checkPresetRateLimit(preset, ip);
 
-    const supabase = createServerClient(url, anon, {
-      cookies: {
-        getAll() {
-          return request.cookies.getAll();
-        },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
-          supabaseResponse = NextResponse.next({ request });
-          cookiesToSet.forEach(({ name, value, options }) => supabaseResponse.cookies.set(name, value, options));
-        },
+  if (!result.allowed) {
+    return NextResponse.json(rateLimit429Response(result), {
+      status: 429,
+      headers: {
+        'Retry-After': String(result.retryAfterSec),
+        'X-RateLimit-Limit': String(result.limit),
+        'X-RateLimit-Remaining': String(result.remaining),
       },
     });
-
-    await supabase.auth.getUser();
-
-    return supabaseResponse;
-  } catch {
-    return NextResponse.next({ request });
   }
+
+  response.headers.set('X-RateLimit-Limit', String(result.limit));
+  response.headers.set('X-RateLimit-Remaining', String(result.remaining));
+  return response;
 }
 
 export const config = {
-  matcher: ['/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)'],
+  matcher: [
+    /*
+     * Session refresh on all app routes; skip static assets.
+     * Rate limits still apply only to auth/sync/feedback API paths above.
+     */
+    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)',
+  ],
 };

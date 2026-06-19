@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { fetchUserLeagues, fetchLeagueFull, fetchLeagueRosters, fetchNflState, type SleeperLeague, type SleeperLeagueFull } from '@/lib/sleeper';
 import { mergeSleeperRosterSettings } from '@/lib/sleeper/leagueCardLogo';
+import { persistLastEmpireRatingAfterSync } from '@/lib/dashboard/empireRating';
 
 export async function POST(req: Request) {
   // Auth check via cookie-based client (anon key)
@@ -124,6 +125,10 @@ export async function POST(req: Request) {
   }
 
   console.log(`[sync] done — leagues: ${leaguesSynced}, rosters: ${rostersSynced}, errors: ${syncErrors.length}`);
+
+  if (rostersSynced > 0 || leaguesSynced > 0) {
+    await persistLastEmpireRatingAfterSync(userId, profile.sleeper_user_id);
+  }
 
   return NextResponse.json({
     success: true,

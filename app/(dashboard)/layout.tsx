@@ -1,85 +1,52 @@
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
-import { normalizeTier } from '@/lib/access/gates';
-import TopNav from '@/components/nav/TopNav';
-import AdSlot from '@/components/ads/AdSlot';
-import DashboardStoreInitializer from '@/components/layout/DashboardStoreInitializer';
+import DashboardBodyLock from '@/components/dashboard/DashboardBodyLock';
+import TerminalShell from '@/components/dashboard/TerminalShell';
 
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: {
-    default: 'Dashboard',
-    template: 'Boom or Bust · %s',
-  },
+  title: 'Settings',
 };
 
-/**
- * Authenticated app shell for all routes inside the (dashboard) route group.
- *
- * Structure:
- *   <html bg="#0a0d14">                        ← no FOUC; set in globals.css + layout.tsx
- *     <TopNav fixed 56px />                    ← primary chrome
- *     <div className="pt-14">…main…</div>      ← clears fixed bar
- *   </html>
- *
- * No sidebar here — each page owns its own sidebar/panel layout if needed.
- */
-export default async function DashboardLayout({
+export default async function DashboardGroupLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const supabase = createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  let userId: string | null = null;
+  let hasSleeper = false;
+  let needsOnboarding = false;
 
-  if (!user) redirect('/auth/login');
+  try {
+    const supabase = createClient();
+    const { data, error } = await supabase.auth.getUser();
+    if (error) console.error('[settings/layout] getUser error:', error);
+    else userId = data?.user?.id ?? null;
 
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('username, is_paid, subscription_tier, preference_data, sleeper_user_id')
-    .eq('id', user.id)
-    .maybeSingle();
+    if (userId) {
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('sleeper_user_id, username')
+        .eq('id', userId)
+        .maybeSingle();
 
-  if (!profile?.sleeper_user_id) redirect('/onboarding');
+      if (profileError) console.error('[settings/layout] profile error:', profileError);
+      else if (!profile?.sleeper_user_id) needsOnboarding = true;
+      else hasSleeper = true;
+    }
+  } catch (err) {
+    console.error('[settings/layout] auth failed:', err);
+  }
 
-  const rawTier = (profile as { subscription_tier?: string } | null)?.subscription_tier;
-  const tier = normalizeTier(rawTier, profile?.is_paid);
+  if (needsOnboarding) redirect('/onboarding');
+  if (!userId || !hasSleeper) redirect('/auth/login');
 
   return (
-    /*
-     * Outer wrapper fills the viewport with the canonical background so there
-     * is never a white flash between the <html> background and the first paint.
-     * min-h-dvh uses the dynamic viewport height so mobile chrome bars don't
-     * cause a layout shift.
-     */
-    <div
-      className="relative min-h-dvh"
-      style={{
-        background: '#0a0d14',
-        fontFamily: 'var(--font-body)',
-        color: '#f8fafc',
-      }}
-    >
-      {/* NAV — fixed 56px bar; content clears via pt-14 wrapper below */}
-      <TopNav email={user.email ?? ''} username={profile?.username ?? null} />
-
-      <div className="pt-14" style={{ background: '#0a0d14' }}>
-        {tier === 'free' ? <AdSlot /> : null}
-
-        <main
-          className="relative min-h-[calc(100dvh-3.5rem)]"
-          style={{ background: '#0a0d14' }}
-        >
-          {children}
-        </main>
-      </div>
-
-      {/* Initialise Zustand activeLeagueId → 'all' on mount */}
-      <DashboardStoreInitializer />
-    </div>
+    <>
+      <DashboardBodyLock />
+      <TerminalShell>{children}</TerminalShell>
+    </>
   );
 }

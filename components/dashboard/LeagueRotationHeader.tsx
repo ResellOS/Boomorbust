@@ -1,7 +1,7 @@
 'use client';
 
 import { LEAGUE_ROTATE_SECONDS } from '@/lib/dashboard/constants';
-import { LEAGUE_STATUS, type LeagueBundle } from '@/lib/dashboard/rotation';
+import { LEAGUE_STATUS, publicLeagueStatusLabel, type LeagueBundle } from '@/lib/dashboard/rotation';
 
 interface LeagueRotationHeaderProps {
   league: LeagueBundle | null;
@@ -33,7 +33,8 @@ export default function LeagueRotationHeader({
     );
   }
 
-  const meta = LEAGUE_STATUS[league.status];
+  const statusLabel = publicLeagueStatusLabel(league.status);
+  const statusMeta = LEAGUE_STATUS[league.status];
   const isRotating = mode === 'rotate';
   const pct = Math.max(0, Math.min(100, (secondsLeft / rotateSeconds) * 100));
 
@@ -41,18 +42,25 @@ export default function LeagueRotationHeader({
     <div className="flex w-full items-center gap-2.5 rounded-[8px] border border-border bg-surface px-3.5 py-2">
       <span
         className="h-2 w-2 shrink-0 rounded-full"
-        style={{ background: meta.color, boxShadow: `0 0 8px ${meta.color}` }}
+        style={{
+          background: statusMeta.color,
+          boxShadow: `0 0 8px ${statusMeta.color}`,
+        }}
       />
       <span className="font-figtree text-[14px] font-semibold uppercase tracking-[0.5px] text-text">
         {league.name}
       </span>
-      <span className="text-muted">•</span>
-      <span
-        className="font-figtree text-[12px] font-medium uppercase tracking-[1px]"
-        style={{ color: meta.color }}
-      >
-        {meta.label}
-      </span>
+      {statusLabel ? (
+        <>
+          <span className="text-muted">•</span>
+          <span
+            className="font-figtree text-[12px] font-medium uppercase tracking-[1px]"
+            style={{ color: statusMeta.color }}
+          >
+            {statusLabel}
+          </span>
+        </>
+      ) : null}
       <span className="text-muted">•</span>
       {league.standingRank > 0 ? (
         <span className="font-mono text-[12px] text-muted">

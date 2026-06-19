@@ -36,6 +36,7 @@ const nextConfig = {
   /** Legacy `/dashboard/*` URLs from older builds → canonical App Router paths (route group omits segment). */
   async redirects() {
     return [
+      { source: '/login', destination: '/auth/login', permanent: false },
       { source: '/dashboard/lineup', destination: '/lineup', permanent: false },
       { source: '/dashboard/lineup/:path*', destination: '/lineup', permanent: false },
       { source: '/dashboard/trade-hub', destination: '/trade-hub', permanent: false },

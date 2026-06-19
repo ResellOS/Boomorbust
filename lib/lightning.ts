@@ -30,6 +30,8 @@ export function generateBolt(
   maxBranches: number = branches,
   out: BoltSegment[] = [],
   isBranch = false,
+  /** 0–1 scale on perpendicular displacement; lower = straighter bolt */
+  jitterScale = 1,
 ): BoltSegment[] {
   const length = Math.hypot(x2 - x1, y2 - y1);
 
@@ -38,27 +40,35 @@ export function generateBolt(
     return out;
   }
 
-  // Midpoint, displaced perpendicular to the segment
   let midX = (x1 + x2) / 2;
   let midY = (y1 + y2) / 2;
-  const displacement = rand(-80, 80) * (branches / maxBranches);
+  const displacement = rand(-80, 80) * (branches / maxBranches) * jitterScale;
   midX += (-(y2 - y1) * displacement) / length;
   midY += ((x2 - x1) * displacement) / length;
 
-  generateBolt(x1, y1, midX, midY, branches - 1, maxBranches, out, isBranch);
-  generateBolt(midX, midY, x2, y2, branches - 1, maxBranches, out, isBranch);
+  generateBolt(x1, y1, midX, midY, branches - 1, maxBranches, out, isBranch, jitterScale);
+  generateBolt(midX, midY, x2, y2, branches - 1, maxBranches, out, isBranch, jitterScale);
 
-  // Random chance to spawn a forking branch off the midpoint,
-  // biased to continue in the bolt's direction of travel.
-  if (Math.random() < 0.3 && branches >= 2) {
+  if (jitterScale > 0.2 && Math.random() < 0.3 && branches >= 2) {
     const dirX = (x2 - x1) / length;
     const dirY = (y2 - y1) / length;
-    const branchEndX = midX + dirX * rand(50, 200) + rand(-150, 150) * 0.45;
-    const branchEndY = midY + dirY * rand(50, 200) + rand(-150, 150) * 0.45;
-    generateBolt(midX, midY, branchEndX, branchEndY, branches - 2, maxBranches, out, true);
+    const branchEndX = midX + dirX * rand(50, 200) + rand(-150, 150) * 0.45 * jitterScale;
+    const branchEndY = midY + dirY * rand(50, 200) + rand(-150, 150) * 0.45 * jitterScale;
+    generateBolt(midX, midY, branchEndX, branchEndY, branches - 2, maxBranches, out, true, jitterScale);
   }
 
   return out;
+}
+
+/** Vertical power strike — minimal jitter, always terminates at target. */
+export function generatePowerStrikeBolt(
+  x1: number,
+  y1: number,
+  x2: number,
+  y2: number,
+  branches = 9,
+): BoltSegment[] {
+  return generateBolt(x1, y1, x2, y2, branches, branches, [], false, 0.08);
 }
 
 const PASSES = [

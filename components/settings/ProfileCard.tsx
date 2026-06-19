@@ -41,11 +41,15 @@ export default function ProfileCard({ data, onEdit }: Props) {
   };
 
   const stats = [
-    { label: 'LEAGUES',          value: data.leagueCount.toString(),       color: '#A78BFA' },
-    { label: 'CHAMPIONSHIPS',    value: data.championships.toString(),      color: '#A78BFA' },
-    { label: 'DYNASTY POWER RATING',     value: data.empireScore.toString(),        color: '#36E7A1', sub: 'Top 8%' },
-    { label: 'PLAYERS ROSTERED', value: data.playersRostered.toString(),    color: '#22D3EE' },
-    { label: 'TROPHIES',         value: data.trophies.toString(),           color: '#A78BFA' },
+    { label: 'LEAGUES', value: String(data.leagueCount), color: '#A78BFA' },
+    { label: 'CHAMPIONSHIPS', value: String(data.championships), color: '#A78BFA' },
+    {
+      label: 'AVG ROSTER TFO',
+      value: data.dynastyPowerRating != null ? data.dynastyPowerRating.toFixed(1) : '—',
+      color: '#36E7A1',
+      sub: data.dynastyPowerRating != null ? 'Dynasty power' : 'Sync leagues first',
+    },
+    { label: 'PLAYERS ROSTERED', value: String(data.playersRostered), color: '#22D3EE' },
   ];
 
   return (
@@ -54,14 +58,17 @@ export default function ProfileCard({ data, onEdit }: Props) {
       style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}
     >
       <div className="flex items-start justify-between mb-5">
-        {/* Avatar + name + badge */}
         <div className="flex items-start gap-4">
-          {/* Crown avatar */}
           <div
-            className="w-16 h-16 rounded-full flex items-center justify-center flex-shrink-0"
+            className="w-16 h-16 rounded-full flex items-center justify-center flex-shrink-0 overflow-hidden"
             style={{ background: 'rgba(124,58,237,0.15)', border: '2px solid rgba(167,139,250,0.4)', boxShadow: '0 0 24px rgba(124,58,237,0.3)' }}
           >
-            <CrownSVG />
+            {data.avatarUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={data.avatarUrl} alt="" className="h-full w-full object-cover" />
+            ) : (
+              <CrownSVG />
+            )}
           </div>
 
           <div>
@@ -75,7 +82,8 @@ export default function ProfileCard({ data, onEdit }: Props) {
               <h2 className="text-[22px] font-bold text-white mb-1">{teamName}</h2>
             )}
 
-            {/* Dynasty title badge */}
+            <p className="text-[12px] font-mono text-slate-400 mb-1">@{data.username}</p>
+
             <span
               className="inline-block px-2.5 py-0.5 rounded text-[10px] font-bold tracking-wider mb-1.5"
               style={{ background: 'rgba(124,58,237,0.2)', color: '#A78BFA', border: '1px solid rgba(167,139,250,0.3)' }}
@@ -90,15 +98,17 @@ export default function ProfileCard({ data, onEdit }: Props) {
                 value={bio}
                 onChange={(e) => setBio(e.target.value)}
                 rows={2}
+                placeholder="Tell your league who you are…"
                 className="mt-1.5 w-full max-w-xs text-[13px] text-slate-300 bg-white/[0.05] rounded-lg px-3 py-2 border border-white/10 outline-none resize-none"
               />
             ) : (
-              <p className="text-[13px] text-slate-400 mt-1.5">{bio}</p>
+              bio ? (
+                <p className="text-[13px] text-slate-400 mt-1.5">{bio}</p>
+              ) : null
             )}
           </div>
         </div>
 
-        {/* Edit button */}
         <div className="flex gap-2">
           {editing ? (
             <>
@@ -129,8 +139,7 @@ export default function ProfileCard({ data, onEdit }: Props) {
         </div>
       </div>
 
-      {/* Stats row */}
-      <div className="grid grid-cols-5 gap-3 pt-4 border-t" style={{ borderColor: 'rgba(255,255,255,0.07)' }}>
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-4 border-t" style={{ borderColor: 'rgba(255,255,255,0.07)' }}>
         {stats.map((s) => (
           <div key={s.label} className="text-center">
             <p
@@ -139,7 +148,9 @@ export default function ProfileCard({ data, onEdit }: Props) {
             >
               {s.value}
             </p>
-            {s.sub && <p className="text-[10px] font-semibold" style={{ color: s.color }}>{s.sub}</p>}
+            {'sub' in s && s.sub && (
+              <p className="text-[10px] font-semibold" style={{ color: s.color }}>{s.sub}</p>
+            )}
             <p className="text-[10px] text-slate-500 uppercase tracking-wider mt-0.5">{s.label}</p>
           </div>
         ))}

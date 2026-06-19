@@ -1,15 +1,41 @@
 import { fetchNflState } from '@/lib/sleeper';
 
-export function confidenceLevelLabel(
-  avg: number,
-): 'High' | 'Medium' | 'Low' {
-  if (avg > 80) return 'High';
-  if (avg >= 60) return 'Medium';
-  return 'Low';
+import { formatStartSitConfidence } from '@/lib/ui/labels';
+
+export function isOffseasonWeek(nflWeek: number): boolean {
+  return nflWeek === 0;
 }
 
-export function sitConfidence(startScore: number): number {
-  return Math.min(95, Math.round(100 - startScore + 38));
+export function confidenceLevelLabel(avg: number): 'Smash' | 'Strong' | 'Lean' {
+  const label = formatStartSitConfidence(avg);
+  return label as 'Smash' | 'Strong' | 'Lean';
+}
+
+/** Effective confidence for display — sit rows use inverted sit score, capped at 85 unless inactive. */
+export function effectiveRecommendationConfidence(
+  rec: { startScore: number; obviousCall?: boolean },
+  variant: 'start' | 'sit',
+): number {
+  if (variant === 'sit') {
+    const obvious = rec.obviousCall ?? isObviousSitCall(rec.startScore, null);
+    return sitConfidence(rec.startScore, obvious);
+  }
+  return Math.round(rec.startScore);
+}
+
+export function sitConfidence(startScore: number, obviousCall = false): number {
+  const raw = Math.round(100 - startScore + 38);
+  return obviousCall ? Math.min(98, raw) : Math.min(85, raw);
+}
+
+const INJURY_SIT = /^(out|ir|pup|doubtful|inactive)/i;
+
+export function isObviousSitCall(
+  startScore: number,
+  injuryStatus: string | null | undefined,
+): boolean {
+  if (injuryStatus && INJURY_SIT.test(injuryStatus.trim())) return true;
+  return startScore < 25;
 }
 
 export function estimateProjection(tfoScore: number, position: string): number {
@@ -37,7 +63,7 @@ export function deriveNflWeekFromDate(date = new Date()): { week: number; season
     firstThursday.setDate(firstThursday.getDate() + 1);
   }
   if (date < firstThursday) {
-    return { week: 1, season: year };
+    return { week: 0, season: year };
   }
   const diffMs = date.getTime() - firstThursday.getTime();
   const week = Math.min(18, Math.max(1, Math.floor(diffMs / (7 * 24 * 60 * 60 * 1000)) + 1));
@@ -48,8 +74,9 @@ export async function resolveNflWeek(): Promise<{ week: number; season: number }
   try {
     const state = await fetchNflState();
     if (state) {
+      const week = state.week ?? state.display_week ?? 0;
       return {
-        week: state.week ?? state.display_week ?? 1,
+        week,
         season: Number(state.season ?? state.league_season ?? new Date().getFullYear()),
       };
     }

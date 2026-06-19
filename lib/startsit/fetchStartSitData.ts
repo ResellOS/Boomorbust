@@ -1,11 +1,21 @@
 import { createAdminClient } from '@/lib/supabase/admin';
 import {
+  hasRealSubScoreData,
   normalizeVerdict,
   resolveSubScores,
   safeScore,
 } from '@/lib/players/utils';
+import { fetchLatestFormulaCalculatedAt } from '@/lib/formula/lastRescore';
+import { fetchMarketVerdicts } from '@/lib/verdict/fetchMarketVerdicts';
 import { matchupScore } from './matchupRankings';
-import { generateStartSitReasoning } from './reasoning';
+import { buildStartSitWhyBullets, generateStartSitReasoning } from './reasoning';
+import {
+  buildFlexDecisionsFromRecs,
+  buildLineupDecisions,
+  buildLineupOptimizer,
+  summarizeDecisions,
+} from './buildDecisions';
+import { dedupeStartSitLists } from './dedupeStartSit';
 import type {
   FlexDecision,
   HighConfidenceAlerts,
@@ -16,9 +26,12 @@ import type {
 } from './types';
 import {
   confidenceLevelLabel,
+  effectiveRecommendationConfidence,
   estimateProjection,
   fetchWeekOpponents,
+  isOffseasonWeek,
   isStartSitWindowOpen,
+  isObviousSitCall,
   minutesAgo,
   nextLockDeadlineLabel,
   resolveNflWeek,
@@ -72,30 +85,7 @@ async function fetchWeekProjections(
 function buildFlexDecisions(
   recs: StartSitRecommendation[],
 ): FlexDecision[] {
-  const flexPool = recs.filter((r) => r.startScore >= 45 && r.startScore <= 65);
-  const out: FlexDecision[] = [];
-
-  for (const pos of ['RB', 'WR', 'TE'] as const) {
-    const group = flexPool.filter((r) => r.position === pos);
-    if (group.length < 2) continue;
-    const sorted = [...group].sort((a, b) => b.startScore - a.startScore);
-    const playerA = sorted[0];
-    const playerB = sorted[1];
-    const pick = playerA.startScore >= playerB.startScore ? playerA : playerB;
-    const other = pick.playerId === playerA.playerId ? playerB : playerA;
-    const edge = Math.round(Math.abs(playerA.startScore - playerB.startScore) * 10) / 10;
-
-    out.push({
-      position: pos,
-      playerA,
-      playerB,
-      pick,
-      pickNote: `${pick.fullName} has matchup edge over ${other.fullName}`,
-      dynastyEdge: edge,
-    });
-  }
-
-  return out;
+  return buildFlexDecisionsFromRecs(recs);
 }
 
 export async function fetchStartSitData(
@@ -106,6 +96,7 @@ export async function fetchStartSitData(
 ): Promise<StartSitPageData> {
   const { week: currentWeek, season } = await resolveNflWeek();
   const viewWeek = selectedWeek ?? currentWeek;
+  const isOffseason = isOffseasonWeek(viewWeek);
 
   const empty: StartSitPageData = {
     leagues: [],
@@ -113,7 +104,9 @@ export async function fetchStartSitData(
       seasonRecord: '0-0-0',
       seasonWinRate: 0,
       thisWeekCalls: 0,
-      confidenceLevel: 'Low',
+      decisionsToday: 0,
+      expectedGain: 0,
+      confidenceLevel: isOffseason ? 'Preseason' : 'Lean',
       avgConfidence: 0,
       lastUpdatedMinutes: 8,
     },
@@ -123,6 +116,7 @@ export async function fetchStartSitData(
       windowOpen: isStartSitWindowOpen(),
       lockDeadline: nextLockDeadlineLabel(),
       weatherImpact: 'Low',
+      isOffseason,
     },
     bobConfidence: 0,
     seasonRecord: { wins: 0, losses: 0, pushes: 0, winRate: 0, totalDecisions: 0 },
@@ -130,10 +124,30 @@ export async function fetchStartSitData(
     seasonSparkline: [],
     startThese: [],
     sitThese: [],
+    decisions: [],
+    decisionsSummary: {
+      total: 0,
+      high: 0,
+      medium: 0,
+      low: 0,
+      expectedGain: 0,
+      potentialCost: 0,
+    },
+    lineupOptimizer: {
+      grade: '—',
+      currentLineupPts: 0,
+      optimizedLineupPts: 0,
+      potentialGain: 0,
+      leagueCount: 0,
+      changesRecommended: 0,
+      totalPotentialGain: 0,
+      leagueChanges: [],
+    },
     flexDecisions: [],
     alerts: { mustStart: null, mustSit: null, sleeperPick: null },
     allRecommendations: [],
     leagueCount: 0,
+    hasRealData: false,
   };
 
   let supabase;
@@ -159,6 +173,7 @@ export async function fetchStartSitData(
   }
 
   const playerLeagues = new Map<string, string[]>();
+  const leagueRosters = new Map<string, string[]>();
   try {
     // rosters.owner_id stores the Sleeper user id; players (text[]) is the only
     // player column — player_id/player_ids don't exist and error the query.
@@ -173,10 +188,13 @@ export async function fetchStartSitData(
     if (error) throw error;
     for (const row of data ?? []) {
       const leagueId = String(row.league_id);
+      if (!leagueRosters.has(leagueId)) leagueRosters.set(leagueId, []);
+      const rosterPids = leagueRosters.get(leagueId)!;
       for (const pid of collectRosterIds(row)) {
         if (!playerLeagues.has(pid)) playerLeagues.set(pid, []);
         const arr = playerLeagues.get(pid)!;
         if (!arr.includes(leagueId)) arr.push(leagueId);
+        if (!rosterPids.includes(pid)) rosterPids.push(pid);
       }
     }
   } catch (err) {
@@ -188,6 +206,7 @@ export async function fetchStartSitData(
 
   const opponents = await fetchWeekOpponents(season, viewWeek);
   const projections = await fetchWeekProjections(season, viewWeek);
+  const lastUpdated = await fetchLatestFormulaCalculatedAt(supabase, 'dynasty');
 
   const tfoMap = new Map<
     string,
@@ -195,7 +214,12 @@ export async function fetchStartSitData(
       score: number;
       verdict: string | null;
       subScores: ReturnType<typeof resolveSubScores>;
+      hasRealSubScores: boolean;
       calculatedAt: string | null;
+      opsScore: number | null;
+      sitScore: number | null;
+      sfsScore: number | null;
+      efficiencyRow: { iq?: number | null; ffig?: number | null; sit_score?: number | null };
     }
   >();
 
@@ -203,7 +227,10 @@ export async function fetchStartSitData(
     try {
       const { data, error } = await supabase
         .from('formula_scores')
-        .select('player_id, tfo_score, verdict, calculated_at')
+        .select(
+          'player_id, tfo_score, verdict, calculated_at, ops_score, sfs_score, yoysi_score, sit_score, opportunity, situation, age_curve, iq, upside, ops, sfs, ffig, sit',
+        )
+        .eq('scoring_context', 'dynasty')
         .in('player_id', playerIds)
         .order('calculated_at', { ascending: false });
       if (error) throw error;
@@ -219,7 +246,27 @@ export async function fetchStartSitData(
             pid,
             score > 0 ? score : 50,
           ),
+          hasRealSubScores: hasRealSubScoreData(
+            row as unknown as Parameters<typeof hasRealSubScoreData>[0],
+          ),
           calculatedAt: row.calculated_at ?? null,
+          opsScore:
+            typeof row.ops_score === 'number' && Number.isFinite(row.ops_score)
+              ? row.ops_score
+              : null,
+          sitScore:
+            typeof row.sit_score === 'number' && Number.isFinite(row.sit_score)
+              ? row.sit_score
+              : null,
+          sfsScore:
+            typeof row.sfs_score === 'number' && Number.isFinite(row.sfs_score)
+              ? row.sfs_score
+              : null,
+          efficiencyRow: {
+            iq: row.iq ?? null,
+            ffig: row.ffig ?? null,
+            sit_score: row.sit_score ?? null,
+          },
         });
       }
     } catch (err) {
@@ -227,15 +274,22 @@ export async function fetchStartSitData(
     }
   }
 
+  let marketVerdicts = new Map<string, { rankDelta: number | null }>();
+  try {
+    marketVerdicts = await fetchMarketVerdicts(supabase, 'dynasty');
+  } catch (err) {
+    console.error('[startsit] market verdicts fetch failed:', err);
+  }
+
   const playerMeta = new Map<
     string,
-    { full_name: string; position: string; team: string }
+    { full_name: string; position: string; team: string; injury_status: string | null }
   >();
   if (playerIds.length > 0) {
     try {
       const { data, error } = await supabase
         .from('players')
-        .select('id, full_name, position, team')
+        .select('id, full_name, position, team, injury_status')
         .in('id', playerIds);
       if (error) throw error;
       for (const p of data ?? []) {
@@ -243,6 +297,7 @@ export async function fetchStartSitData(
           full_name: p.full_name ?? 'Unknown Player',
           position: (p.position ?? 'WR').toUpperCase(),
           team: p.team ?? 'FA',
+          injury_status: p.injury_status ?? null,
         });
       }
     } catch (err) {
@@ -250,13 +305,15 @@ export async function fetchStartSitData(
     }
   }
 
-  let lastUpdated: string | null = null;
   const recommendations: StartSitRecommendation[] = [];
 
   for (const pid of playerIds) {
     const meta = playerMeta.get(pid);
     const tfo = tfoMap.get(pid);
-    const tfoScore = tfo?.score ?? 50;
+    const rawTfo = tfo?.score ?? 0;
+    if (rawTfo <= 0) continue;
+
+    const tfoScore = rawTfo;
     const team = meta?.team ?? 'FA';
     const position = meta?.position ?? 'WR';
     const opponent = opponents[team] ?? 'TBD';
@@ -266,12 +323,27 @@ export async function fetchStartSitData(
     const ownershipPct =
       totalLeagues > 0 ? Math.round((leagueIds.length / totalLeagues) * 100) : 0;
 
-    if (tfo?.calculatedAt && (!lastUpdated || tfo.calculatedAt > lastUpdated)) {
-      lastUpdated = tfo.calculatedAt;
-    }
-
     const proj =
-      projections[pid] ?? estimateProjection(tfoScore, position);
+      projections[pid] ??
+      (tfoScore > 0 ? estimateProjection(tfoScore, position) : null);
+
+    const rankDelta = marketVerdicts.get(pid)?.rankDelta ?? null;
+    const subScores = tfo?.subScores ?? resolveSubScores({}, pid, tfoScore);
+    const hasRealSubScores = tfo?.hasRealSubScores ?? false;
+    const injuryStatus = meta?.injury_status ?? null;
+
+    const whyBullets = buildStartSitWhyBullets({
+      variant: startScore >= 50 ? 'start' : 'sit',
+      opsScore: tfo?.opsScore,
+      sitScore: tfo?.sitScore,
+      sfsScore: tfo?.sfsScore,
+      rankDelta,
+      opponent,
+      position,
+      hasRealSubScores,
+      subScores,
+      efficiencyRow: tfo?.efficiencyRow,
+    });
 
     recommendations.push({
       playerId: pid,
@@ -284,12 +356,18 @@ export async function fetchStartSitData(
       barScore: startScore,
       projectedPoints: proj,
       reasoning: generateStartSitReasoning(
-        tfo?.subScores ?? resolveSubScores({}, pid, tfoScore),
+        subScores,
         opponent,
         position,
         team,
         startScore,
+        {
+          hasRealSubScores,
+          efficiencyRow: tfo?.efficiencyRow,
+        },
       ),
+      whyBullets,
+      obviousCall: isObviousSitCall(startScore, injuryStatus),
       tfoScore,
       verdict: normalizeVerdict(tfo?.verdict, tfoScore),
       leagueIds,
@@ -299,32 +377,81 @@ export async function fetchStartSitData(
 
   recommendations.sort((a, b) => b.startScore - a.startScore);
 
-  const startThese = recommendations.slice(0, 8).map((r) => ({
-    ...r,
-    confidence: Math.round(r.startScore),
-    barScore: r.startScore,
-  }));
+  const leagueNames = new Map(leagueList.map((l) => [l.id, l.name]));
+  const recById = new Map(recommendations.map((r) => [r.playerId, r]));
+  const decisions = buildLineupDecisions(leagueRosters, leagueNames, recById);
+  const decisionsSummary = summarizeDecisions(decisions);
+  const lineupOptimizer = buildLineupOptimizer(decisions, leagueRosters, recById);
+  const hasRealData = recommendations.length > 0 && decisions.length > 0;
+
+  const startTheseRaw = recommendations.slice(0, 8).map((r) => {
+    const tfo = tfoMap.get(r.playerId);
+    return {
+      ...r,
+      confidence: Math.round(r.startScore),
+      barScore: r.startScore,
+      whyBullets: buildStartSitWhyBullets({
+        variant: 'start',
+        opsScore: tfo?.opsScore,
+        sitScore: tfo?.sitScore,
+        sfsScore: tfo?.sfsScore,
+        rankDelta: marketVerdicts.get(r.playerId)?.rankDelta ?? null,
+        opponent: r.opponent,
+        position: r.position,
+        hasRealSubScores: tfo?.hasRealSubScores ?? false,
+        subScores: tfo?.subScores ?? resolveSubScores({}, r.playerId, r.tfoScore),
+        efficiencyRow: tfo?.efficiencyRow,
+      }),
+    };
+  });
 
   const sitCandidates = recommendations
     .filter((r) => r.startScore < 50)
     .sort((a, b) => a.startScore - b.startScore);
-  const sitThese = (sitCandidates.length >= 8
+  const sitTheseRaw = (sitCandidates.length >= 8
     ? sitCandidates.slice(0, 8)
     : [...recommendations].sort((a, b) => a.startScore - b.startScore).slice(0, 8)
   ).map((r) => {
-    const conf = sitConfidence(r.startScore);
+    const obvious = r.obviousCall ?? isObviousSitCall(r.startScore, null);
+    const conf = sitConfidence(r.startScore, obvious);
     return {
       ...r,
       confidence: conf,
       barScore: conf,
+      obviousCall: obvious,
+      whyBullets: buildStartSitWhyBullets({
+        variant: 'sit',
+        opsScore: tfoMap.get(r.playerId)?.opsScore,
+        sitScore: tfoMap.get(r.playerId)?.sitScore,
+        sfsScore: tfoMap.get(r.playerId)?.sfsScore,
+        rankDelta: marketVerdicts.get(r.playerId)?.rankDelta ?? null,
+        opponent: r.opponent,
+        position: r.position,
+        hasRealSubScores: tfoMap.get(r.playerId)?.hasRealSubScores ?? false,
+        subScores: tfoMap.get(r.playerId)?.subScores ?? resolveSubScores({}, r.playerId, r.tfoScore),
+        efficiencyRow: tfoMap.get(r.playerId)?.efficiencyRow,
+      }),
     };
   });
+
+  const { start: startThese, sit: sitThese } = dedupeStartSitLists(
+    startTheseRaw,
+    sitTheseRaw,
+  );
 
   const flexDecisions = buildFlexDecisions(recommendations);
 
   const avgConf =
     recommendations.length > 0
-      ? recommendations.reduce((s, r) => s + r.confidence, 0) / recommendations.length
+      ? recommendations.reduce(
+          (s, r) =>
+            s +
+            effectiveRecommendationConfidence(
+              r,
+              r.startScore < 50 ? 'sit' : 'start',
+            ),
+          0,
+        ) / recommendations.length
       : 0;
 
   let seasonRecord: SeasonRecord = {
@@ -404,13 +531,30 @@ export async function fetchStartSitData(
     weekRecord.pending = recommendations.length;
   }
 
-  const mustStart =
-    recommendations.find((r) => r.startScore > 90) ?? recommendations[0] ?? null;
-  const mustSitRaw =
-    [...recommendations].sort((a, b) => a.startScore - b.startScore)[0] ?? null;
-  const mustSit = mustSitRaw
-    ? { ...mustSitRaw, confidence: sitConfidence(mustSitRaw.startScore) }
+  const highConfDecisions = decisions.filter((d) => d.confidence >= 71);
+  const mustStartDec =
+    highConfDecisions.find((d) => d.variant === 'start') ?? highConfDecisions[0] ?? null;
+  const mustSitDec =
+    highConfDecisions.find((d) => d.variant === 'sit') ??
+    decisions.find((d) => d.sitPlayer.obviousCall) ??
+    null;
+
+  const mustStart = mustStartDec
+    ? {
+        ...mustStartDec.startPlayer,
+        confidence: mustStartDec.confidence,
+        reasoning: mustStartDec.whyOneLine,
+      }
+    : recommendations.find((r) => r.startScore > 70) ?? null;
+
+  const mustSit = mustSitDec
+    ? {
+        ...mustSitDec.sitPlayer,
+        confidence: mustSitDec.confidence,
+        reasoning: `Sit ${mustSitDec.sitPlayer.fullName} — start ${mustSitDec.startPlayer.fullName} instead`,
+      }
     : null;
+
   const sleeperPick =
     recommendations.find((r) => r.startScore > 70 && r.ownershipPct < 50) ?? null;
 
@@ -418,13 +562,13 @@ export async function fetchStartSitData(
     mustStart: mustStart
       ? {
           ...mustStart,
-          reasoning: 'Matchup of the week — elite play',
+          reasoning: mustStart.reasoning || 'High-confidence start call',
         }
       : null,
     mustSit: mustSit
       ? {
           ...mustSit,
-          reasoning: `Worst ${mustSit.position} matchup of the week`,
+          reasoning: mustSit.reasoning || `Fade ${mustSit.fullName} this week`,
         }
       : null,
     sleeperPick: sleeperPick
@@ -437,10 +581,12 @@ export async function fetchStartSitData(
     topbar: {
       seasonRecord: `${seasonRecord.wins}-${seasonRecord.losses}-${seasonRecord.pushes}`,
       seasonWinRate: seasonRecord.winRate,
-      thisWeekCalls: recommendations.length,
-      confidenceLevel: confidenceLevelLabel(avgConf),
+      thisWeekCalls: decisionsSummary.total,
+      decisionsToday: decisionsSummary.total,
+      expectedGain: decisionsSummary.expectedGain,
+      confidenceLevel: isOffseason ? 'Preseason' : confidenceLevelLabel(avgConf),
       avgConfidence: Math.round(avgConf),
-      lastUpdatedMinutes: minutesAgo(lastUpdated),
+      lastUpdatedMinutes: minutesAgo(lastUpdated ?? null),
     },
     weekContext: {
       nflWeek: viewWeek,
@@ -448,6 +594,7 @@ export async function fetchStartSitData(
       windowOpen: isStartSitWindowOpen(),
       lockDeadline: nextLockDeadlineLabel(),
       weatherImpact: 'Low',
+      isOffseason,
     },
     bobConfidence: Math.round(avgConf),
     seasonRecord,
@@ -455,9 +602,13 @@ export async function fetchStartSitData(
     seasonSparkline,
     startThese,
     sitThese,
+    decisions,
+    decisionsSummary,
+    lineupOptimizer,
     flexDecisions,
     alerts,
     allRecommendations: recommendations,
     leagueCount: leagueList.length,
+    hasRealData,
   };
 }

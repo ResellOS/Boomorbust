@@ -136,7 +136,7 @@ export default function DynastyThreeYearSection({
           <h2 className="font-mono text-[10px] font-black uppercase tracking-[0.2em] text-[#64748B]">
             ROSTER TRAJECTORY
           </h2>
-          <p className="text-xs text-[var(--text-secondary)]">TFO score outlook · 2025–2027</p>
+          <p className="text-xs text-[var(--text-secondary)]">Dynasty rating outlook · 2025–2027</p>
         </div>
         <div className="flex flex-wrap gap-1.5">
           {(

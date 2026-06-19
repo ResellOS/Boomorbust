@@ -6,8 +6,8 @@ export const FEATURE_TABLE = [
     rows: [
       { label: 'Leagues synced', values: ['1', '5', '10', 'Unlimited'] },
       { label: 'Sit/start recommendations', checks: [true, true, true, true] },
-      { label: 'Weekly BOOM/BUST verdicts', checks: [true, true, true, true] },
-      { label: 'Bust alert', checks: [true, true, true, true] },
+      { label: 'Weekly buy/sell verdicts', checks: [true, true, true, true] },
+      { label: 'Sell-now alert', checks: [true, true, true, true] },
       { label: 'Trade grader', values: ['1/day', '✓', '✓', '✓'] },
       { label: 'Smart counter', values: ['1/day', '✓', '✓', '✓'] },
       { label: 'Buy/sell ticker', checks: [false, true, true, true] },
@@ -105,7 +105,19 @@ export const FAQ_ITEMS = [
 ] as const;
 
 export const ENGINE_TAGS = [
-  'TFO', 'DMS', 'BPS', 'RTS', 'DAC',
-  'RI', 'SOSPP', 'F-FIG', 'OPS', 'SFS',
-  'SASSP', 'DPM', 'BBE', 'YOYSI', 'CIM',
+  'Dynasty Rating',
+  'Momentum',
+  'Buy Window',
+  'Rookie Score',
+  'Sell Window',
+  'Injury Risk',
+  'Matchup',
+  'Scouting',
+  'Opportunity',
+  'Scheme Fit',
+  'Start/Sit',
+  'Manager Profile',
+  'Trade Edge',
+  'Year-Over-Year',
+  'Confidence',
 ] as const;

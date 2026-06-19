@@ -275,7 +275,7 @@ export default function PricingPageClient({
             <div className="my-2.5 h-px bg-border" />
             {[
               '1 league synced',
-              'Weekly BOOM/BUST verdicts',
+              'Weekly buy/sell verdicts',
               'Sit/start recommendations',
               'Team health score',
               'Trade grader (1/day)',
@@ -543,7 +543,7 @@ export default function PricingPageClient({
                   ['Trade grades', false, false, true],
                   ['Smart counter', false, false, true],
                   ['League Intel', false, false, true],
-                  ['Bust alerts', false, false, true],
+                  ['Sell-now alerts', false, false, true],
                   ['3-yr outlook', false, false, true],
                   ['Dynasty only', false, false, true],
                   ['Price', 'Free', 'Free', '$0–$35/mo'],

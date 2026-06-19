@@ -25,13 +25,11 @@ function resolveTierBadge(tier: SubscriptionTier | null): { text: string; color:
 
 const NAV_LINKS = [
   { label: 'Dashboard', href: '/dashboard', exact: true },
-  { label: 'Trade Hub', href: '/trade-hub', exact: false },
-  { label: 'Leagues', href: '/leagues', exact: false },
-  { label: 'Players', href: '/arbitrage', exact: false },
-  { label: 'Rookies', href: '/rookies', exact: false },
-  { label: 'Dynasty Coach', href: '/coach', exact: false },
-  { label: 'Analytics', href: '/scouting', exact: false },
-  { label: 'TRE Engine', href: '/trade-hub', exact: false },
+  { label: 'Trade Hub', href: '/trade', exact: false },
+  { label: 'Players', href: '/players', exact: false },
+  { label: 'Start/Sit', href: '/dashboard/lineup', exact: false },
+  { label: 'Draft Room', href: '/draft', exact: false },
+  { label: 'Exposure', href: '/exposure', exact: false },
 ] as const;
 
 function isLinkActive(pathname: string, href: string, exact: boolean) {
@@ -250,7 +248,7 @@ function UserAccountMenu({
             className="truncate text-[13px] font-medium text-white leading-tight"
             style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}
           >
-            Dynasty Empire
+            {displayName}
           </span>
           {tierBadge ? (
             <span

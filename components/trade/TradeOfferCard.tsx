@@ -42,10 +42,11 @@ export default function TradeOfferCard({ offer, active, onSelect }: TradeOfferCa
         <span className="flex-1" />
         <span className="font-mono text-[9px] text-muted">{offer.managerHandle} vs You</span>
       </div>
-      <div
-        className="grid items-center gap-3.5"
-        style={{ gridTemplateColumns: '1fr auto 1fr auto auto' }}
-      >
+      <div className="overflow-x-auto">
+        <div
+          className="grid min-w-[320px] items-center gap-3.5"
+          style={{ gridTemplateColumns: '1fr auto 1fr auto auto' }}
+        >
         <div className="flex items-center gap-2.5">
           {primaryGive ? (
             <>
@@ -108,6 +109,7 @@ export default function TradeOfferCard({ offer, active, onSelect }: TradeOfferCa
             {offer.offerValue.toFixed(1)}
           </div>
           <div className="font-mono text-[8px] text-muted">Dynasty Edge</div>
+        </div>
         </div>
       </div>
     </div>

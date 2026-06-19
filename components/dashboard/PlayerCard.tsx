@@ -9,6 +9,7 @@ import {
   marketCardBorderStyle,
   marketRadarColors,
 } from '@/lib/verdict/marketVerdict';
+import { formatMarketVerdictLabel } from '@/lib/ui/labels';
 
 export interface PlayerCardProps {
   playerName: string;
@@ -186,14 +187,14 @@ export default function PlayerCard({
           }}
           title={MARKET_VERDICT_DEFINITIONS[marketVerdict.verdict]}
         >
-          {marketVerdict.verdict}
+          {formatMarketVerdictLabel(marketVerdict.verdict)}
         </div>
       ) : (
         <div
           className="mx-3 mb-2.5 flex cursor-help items-center justify-center gap-1.5 rounded-[5px] border border-border py-2 text-center font-figtree text-[11px] font-semibold tracking-wide text-muted"
           title="No market data — held by default"
         >
-          HOLD <span className="font-mono text-[9px] text-muted/60">N/A</span>
+          Hold <span className="font-mono text-[9px] text-muted/60">N/A</span>
         </div>
       )}
       <div className="flex flex-1 items-center justify-center px-1 pb-3 pt-1">

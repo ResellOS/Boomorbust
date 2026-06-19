@@ -17,12 +17,19 @@ export async function POST(req: Request) {
   if (!userId) return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
 
   const body = await req.json().catch(() => ({}));
-  const { sessionId = null, grade = null, avgTfo = null, agreementRate = null } = body ?? {};
+  const { sessionId = null, grade = null, avgTfo = null, agreementRate = null, draftName = null } =
+    body ?? {};
 
   if (!sessionId) return NextResponse.json({ ok: false, skipped: true });
 
   try {
     const supabase = createAdminClient();
+    const { data: existing } = await supabase
+      .from('draft_sessions')
+      .select('config')
+      .eq('id', sessionId)
+      .maybeSingle();
+    const prevConfig = (existing?.config ?? {}) as Record<string, unknown>;
     const { error } = await supabase
       .from('draft_sessions')
       .update({
@@ -31,6 +38,7 @@ export async function POST(req: Request) {
         avg_tfo: avgTfo,
         agreement_rate: agreementRate,
         completed_at: new Date().toISOString(),
+        config: { ...prevConfig, draftName: draftName ?? prevConfig.draftName },
       })
       .eq('id', sessionId)
       .eq('user_id', userId);

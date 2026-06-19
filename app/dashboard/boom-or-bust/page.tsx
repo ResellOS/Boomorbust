@@ -32,7 +32,7 @@ const SAMPLE_CARD: ProjectionCardData = {
   matchupLabel: 'vs PIT',
   weatherIcon: '🏟️',
   caption:
-    "Ja'Marr Chase is a LOCK this week. TFO 91 | 18-28 pts proj | thefrontoffice.app",
+    "Ja'Marr Chase is a LOCK this week. Rating 91 | 18-28 pts proj | thefrontoffice.app",
 };
 
 const FEATURES = [
@@ -40,7 +40,7 @@ const FEATURES = [
     icon: '📊',
     title: 'WEEKLY PROJECTIONS',
     body:
-      'Stat line projections for every player — yards, TDs, fantasy points. Powered by TFO formula + live matchup data.',
+      'Stat line projections for every player — yards, TDs, fantasy points. Powered by dynasty rating + live matchup data.',
   },
   {
     icon: '🌦️',

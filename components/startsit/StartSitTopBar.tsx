@@ -3,6 +3,7 @@ import type { StartSitTopbar } from '@/lib/startsit/types';
 
 interface StartSitTopBarProps {
   stats: StartSitTopbar;
+  isOffseason?: boolean;
 }
 
 function formatUpdated(minutes: number): string {
@@ -10,7 +11,15 @@ function formatUpdated(minutes: number): string {
   return `${minutes} min ago`;
 }
 
-export default function StartSitTopBar({ stats }: StartSitTopBarProps) {
+function formatGain(pts: number): string {
+  if (pts <= 0) return '—';
+  return `+${pts.toFixed(1)} pts`;
+}
+
+export default function StartSitTopBar({ stats, isOffseason = false }: StartSitTopBarProps) {
+  const preseason = isOffseason || stats.confidenceLevel === 'Preseason';
+  const decisionsCount = stats.decisionsToday ?? stats.thisWeekCalls;
+
   const items = [
     {
       label: 'Season Record',
@@ -21,19 +30,25 @@ export default function StartSitTopBar({ stats }: StartSitTopBarProps) {
     {
       label: 'Win Rate',
       value: `${stats.seasonWinRate}%`,
-      sub: 'Verified Performance',
+      sub: preseason ? 'Tracking begins Week 1' : 'Verified Performance',
       color: 'text-boom',
     },
     {
-      label: "This Week's Calls",
-      value: String(stats.thisWeekCalls),
-      sub: `${stats.confidenceLevel} Confidence`,
+      label: 'Decisions Today',
+      value: String(decisionsCount),
+      sub: preseason ? 'Preseason projections' : 'Lineup changes identified',
       color: 'text-text',
     },
     {
+      label: 'Expected Gain',
+      value: formatGain(stats.expectedGain ?? 0),
+      sub: preseason ? 'If all calls followed' : 'Projected edge',
+      color: 'text-boom',
+    },
+    {
       label: 'Confidence Level',
-      value: stats.confidenceLevel,
-      sub: 'Strong Model Consensus',
+      value: preseason ? 'Preseason' : stats.confidenceLevel,
+      sub: preseason ? '2025 data · builds Week 1' : 'Model consensus',
       color: 'text-boom',
     },
     {
@@ -46,11 +61,8 @@ export default function StartSitTopBar({ stats }: StartSitTopBarProps) {
   ];
 
   return (
-    <header
-      className="col-span-2 grid border-b border-border bg-surface"
-      style={{ gridTemplateColumns: '215px 1fr', height: 58 }}
-    >
-      <div className="flex items-center border-r border-border px-3">
+    <header className="col-span-1 md:col-span-2 row-start-1 grid h-[58px] border-b border-border bg-surface grid-cols-1 md:grid-cols-[215px_1fr]">
+      <div className="hidden md:flex items-center border-r border-border px-3">
         <Image
           src="/logo.png"
           alt="Boom or Bust"
@@ -65,11 +77,11 @@ export default function StartSitTopBar({ stats }: StartSitTopBarProps) {
           }}
         />
       </div>
-      <div className="grid grid-cols-5">
+      <div className="flex overflow-x-auto scrollbar-hide md:grid md:grid-cols-6">
         {items.map((item) => (
           <div
             key={item.label}
-            className="flex flex-col justify-center border-r border-border px-[18px] last:border-r-0"
+            className="flex min-w-[110px] shrink-0 flex-col justify-center border-r border-border px-3 last:border-r-0 md:min-w-0 md:px-[14px]"
           >
             <div className="text-[8px] uppercase tracking-wide text-muted whitespace-nowrap">
               {item.label}

@@ -1,39 +1,49 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type {
+  ChatMessage,
   DraftConfig,
   DraftGradeSummary,
+  DraftLeague,
   DraftPhase,
   DraftPickRecord,
+  DraftSessionSummary,
   DraftablePlayer,
 } from '@/lib/draft/types';
+import type { OwnedPick } from '@/lib/trade/types';
+import { defaultDraftConfig, pickTimerSeconds } from '@/lib/draft/defaults';
 import {
-  PICK_SECONDS,
   bestAvailable,
+  initPickOwnership,
+  randomCpuChat,
   slotForOverall,
+  slotOnClock,
   summarizeDraft,
 } from '@/lib/draft/engine';
+import { computeTierBreaks } from '@/lib/draft/tiers';
 import DraftSetup from './DraftSetup';
-import DraftBoard from './DraftBoard';
+import DraftLanding from './DraftLanding';
+import DraftGrid from './DraftGrid';
+import DraftHeader from './DraftHeader';
+import DraftMyTeamPanel from './DraftMyTeamPanel';
+import DraftBottomStrip from './DraftBottomStrip';
+import DraftPlayerPool from './DraftPlayerPool';
 import DraftAssistantPanel from './DraftAssistantPanel';
 import DraftComplete from './DraftComplete';
+import DraftTradeModal from './DraftTradeModal';
+import { normalizeDraftConfig } from '@/lib/draft/normalizeConfig';
+import { safeTotalPicks } from '@/lib/draft/safeDisplay';
 
 interface DraftRoomClientProps {
   pool: DraftablePlayer[];
   scoringContext: 'dynasty' | 'redraft';
+  sessions: DraftSessionSummary[];
+  leagues: DraftLeague[];
+  ownedPicksByLeague: Record<string, OwnedPick[]>;
 }
 
 const CPU_DELAY_MS = 650;
-
-const DEFAULT_CONFIG: DraftConfig = {
-  draftType: 'startup',
-  teams: 12,
-  rounds: 5,
-  scoring: 'ppr',
-  superflex: false,
-  yourPick: 1,
-};
 
 function takenSet(picks: DraftPickRecord[]): Set<string> {
   return new Set(picks.map((p) => p.player.playerId));
@@ -42,24 +52,80 @@ function takenSet(picks: DraftPickRecord[]): Set<string> {
 export default function DraftRoomClient({
   pool,
   scoringContext,
+  sessions: initialSessions,
+  leagues,
+  ownedPicksByLeague,
 }: DraftRoomClientProps) {
-  const [phase, setPhase] = useState<DraftPhase>('setup');
-  const [config, setConfig] = useState<DraftConfig>(DEFAULT_CONFIG);
+  const [phase, setPhase] = useState<DraftPhase>('landing');
+  const [config, setConfig] = useState<DraftConfig>(defaultDraftConfig());
   const [picks, setPicks] = useState<DraftPickRecord[]>([]);
-  const [clock, setClock] = useState(PICK_SECONDS);
+  const pickSeconds = pickTimerSeconds(config.pickTimer) || 60;
+  const [clock, setClock] = useState(pickSeconds);
   const [summary, setSummary] = useState<DraftGradeSummary | null>(null);
   const [starting, setStarting] = useState(false);
+  const [queue, setQueue] = useState<DraftablePlayer[]>([]);
+  const [watchlist, setWatchlist] = useState<Set<string>>(new Set());
+  const [chat, setChat] = useState<ChatMessage[]>([]);
+  const [pickOwnership, setPickOwnership] = useState<Map<number, number>>(() =>
+    initPickOwnership(defaultDraftConfig()),
+  );
+  const [tradeTargetSlot, setTradeTargetSlot] = useState<number | null>(null);
+  const [sessions] = useState(initialSessions);
+  const [showMobileAssistant, setShowMobileAssistant] = useState(false);
+  const [landingTab, setLandingTab] = useState<'mocks' | 'capital'>('mocks');
+  const [draftStartedAt, setDraftStartedAt] = useState<number | null>(null);
+
+  const normalizedConfig = useMemo(() => normalizeDraftConfig(config), [config]);
 
   const sessionIdRef = useRef<string | null>(null);
   const picksRef = useRef<DraftPickRecord[]>([]);
-  const lastFilledRef = useRef(0); // highest overall already drafted
+  const lastFilledRef = useRef(0);
+  const chatCounter = useRef(0);
 
   useEffect(() => {
     picksRef.current = picks;
   }, [picks]);
 
-  const total = config.teams * config.rounds;
-  const currentOverall = picks.length + 1;
+  const filteredPool = useMemo(() => {
+    if (config.playerPool === 'rookies') return pool.filter((p) => p.isRookie);
+    if (config.playerPool === 'vets') return pool.filter((p) => !p.isRookie);
+    return pool;
+  }, [pool, config.playerPool]);
+
+  const tierBreaks = useMemo(() => computeTierBreaks(filteredPool), [filteredPool]);
+  const total = safeTotalPicks(normalizedConfig);
+  const currentOverall = Math.max(1, picks.length + 1);
+
+  const slotOpts = useMemo(
+    () => ({
+      thirdRoundReversal: normalizedConfig.thirdRoundReversal,
+      linear: normalizedConfig.draftOrderType === 'linear',
+    }),
+    [normalizedConfig.thirdRoundReversal, normalizedConfig.draftOrderType],
+  );
+
+  const currentSlot = slotOnClock(currentOverall, normalizedConfig, pickOwnership);
+  const isUserTurn = phase === 'drafting' && currentSlot === normalizedConfig.yourPick;
+  const bobTop = useMemo(
+    () => bestAvailable(filteredPool, takenSet(picks)),
+    [filteredPool, picks],
+  );
+
+  const enrichPicks = useCallback(
+    (raw: DraftPickRecord[]): DraftPickRecord[] =>
+      raw.map((pk) => {
+        const fromPool = pool.find((p) => p.playerId === pk.player?.playerId);
+        const player = fromPool ?? {
+          ...pk.player,
+          tfoScore: pk.player?.tfoScore ?? 0,
+          bobRank: pk.player?.bobRank ?? 999,
+          marketRank: pk.player?.marketRank ?? 999,
+          adp: pk.player?.adp ?? 999,
+        };
+        return { ...pk, player };
+      }),
+    [pool],
+  );
 
   const logPick = useCallback(
     (record: DraftPickRecord) => {
@@ -88,18 +154,27 @@ export default function DraftRoomClient({
     [scoringContext],
   );
 
+  const pushChat = useCallback((slot: number, teamName: string, text: string) => {
+    chatCounter.current += 1;
+    setChat((c) => [
+      ...c.slice(-40),
+      { id: String(chatCounter.current), slot, teamName, text, ts: Date.now() },
+    ]);
+  }, []);
+
   const makePick = useCallback(
     (player: DraftablePlayer, isUser: boolean) => {
       const prev = picksRef.current;
       const overall = prev.length + 1;
       if (overall > total) return;
-      if (overall <= lastFilledRef.current) return; // guard double-fire
+      if (overall <= lastFilledRef.current) return;
       const taken = takenSet(prev);
       if (taken.has(player.playerId)) return;
       lastFilledRef.current = overall;
 
-      const top = bestAvailable(pool, taken);
-      const { round, slot } = slotForOverall(overall, config.teams);
+      const top = bestAvailable(filteredPool, taken);
+      const { round } = slotForOverall(overall, normalizedConfig.teams, slotOpts);
+      const slot = slotOnClock(overall, normalizedConfig, pickOwnership);
       const record: DraftPickRecord = {
         overall,
         round,
@@ -111,8 +186,16 @@ export default function DraftRoomClient({
       };
       logPick(record);
       setPicks((curr) => [...curr, record]);
+      setQueue((q) => q.filter((x) => x.playerId !== player.playerId));
+
+      if (!isUser) {
+        const team = normalizedConfig.teamOrder.find((t) => t.slot === slot);
+        if (Math.random() < 0.35) {
+          pushChat(slot, team?.name ?? `Team ${slot}`, randomCpuChat(slot, team?.name ?? ''));
+        }
+      }
     },
-    [pool, config.teams, total, logPick],
+    [filteredPool, normalizedConfig, pickOwnership, slotOpts, total, logPick, pushChat],
   );
 
   const finalize = useCallback(() => {
@@ -130,12 +213,12 @@ export default function DraftRoomClient({
           grade: result.grade,
           avgTfo: result.avgTfo,
           agreementRate: result.agreementRate,
+          draftName: config.draftName,
         }),
       }).catch((err) => console.error('[draft] complete failed:', err));
     }
-  }, []);
+  }, [config.draftName]);
 
-  // Turn driver — runs the clock for the user, auto-picks for CPU teams.
   useEffect(() => {
     if (phase !== 'drafting') return;
     if (currentOverall > total) {
@@ -143,17 +226,18 @@ export default function DraftRoomClient({
       return;
     }
 
-    const { slot } = slotForOverall(currentOverall, config.teams);
-    const userTurn = slot === config.yourPick;
+    const userTurn = currentSlot === normalizedConfig.yourPick;
 
     if (userTurn) {
-      setClock(PICK_SECONDS);
+      setClock(pickSeconds);
       const iv = setInterval(() => {
         setClock((c) => {
           if (c <= 1) {
             clearInterval(iv);
-            const top = bestAvailable(pool, takenSet(picksRef.current));
-            if (top) makePick(top, true); // clock expired → auto-pick BOB's top
+            if (config.cpuAutopick) {
+              const top = bestAvailable(filteredPool, takenSet(picksRef.current));
+              if (top) makePick(top, true);
+            }
             return 0;
           }
           return c - 1;
@@ -163,24 +247,30 @@ export default function DraftRoomClient({
     }
 
     const t = setTimeout(() => {
-      const top = bestAvailable(pool, takenSet(picksRef.current));
+      const top = bestAvailable(filteredPool, takenSet(picksRef.current));
       if (top) makePick(top, false);
     }, CPU_DELAY_MS);
     return () => clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentOverall, phase]);
+  }, [currentOverall, phase, currentSlot]);
 
   const handleStart = useCallback(async () => {
     setStarting(true);
+    const nextConfig = normalizeDraftConfig(config);
+    setConfig(nextConfig);
     setPicks([]);
     picksRef.current = [];
     lastFilledRef.current = 0;
     setSummary(null);
+    setQueue([]);
+    setChat([]);
+    setPickOwnership(initPickOwnership(nextConfig));
+    setDraftStartedAt(Date.now());
     try {
       const res = await fetch('/api/draft/start', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...config, scoringContext }),
+        body: JSON.stringify({ ...nextConfig, scoringContext, draftName: nextConfig.draftName }),
       });
       const json = (await res.json().catch(() => ({}))) as { sessionId?: string | null };
       sessionIdRef.current = json?.sessionId ?? null;
@@ -193,62 +283,79 @@ export default function DraftRoomClient({
   }, [config, scoringContext]);
 
   const handleRestart = useCallback(() => {
-    setPhase('setup');
+    setPhase('landing');
     setPicks([]);
     picksRef.current = [];
     lastFilledRef.current = 0;
     setSummary(null);
     sessionIdRef.current = null;
+    setConfig(defaultDraftConfig());
   }, []);
 
-  const { slot: currentSlot } = slotForOverall(currentOverall, config.teams);
-  const isUserTurn = phase === 'drafting' && currentSlot === config.yourPick;
-  const round = Math.floor((Math.min(currentOverall, total) - 1) / config.teams) + 1;
+  const addToQueue = useCallback((p: DraftablePlayer) => {
+    setQueue((q) => (q.some((x) => x.playerId === p.playerId) ? q : [...q, p]));
+    setWatchlist((w) => new Set(w).add(p.playerId));
+  }, []);
 
   return (
     <>
-      {/* Top bar (spans all three columns) */}
       <header
-        className="row-start-1 col-span-3 flex items-center justify-between border-b border-border bg-bg px-5"
-        style={{ height: 66 }}
+        className="col-span-4 flex items-center justify-between border-b border-border bg-bg px-4"
+        style={{
+          height: phase === 'landing' || phase === 'drafting' ? 0 : 56,
+          gridColumn: '1 / -1',
+          overflow: 'hidden',
+          borderBottomWidth: phase === 'landing' || phase === 'drafting' ? 0 : 1,
+        }}
       >
+        {phase !== 'landing' && phase !== 'drafting' && (
+        <>
         <div>
-          <div className="font-figtree text-[18px] font-extrabold tracking-[-0.3px] text-text">
-            DRAFT ROOM
+          <div className="font-figtree text-[16px] font-extrabold text-text">
+            {phase === 'complete' ? 'DRAFT COMPLETE' : 'DRAFT ROOM'}
           </div>
-          <div className="font-figtree text-[10px] text-muted">
-            Mock smarter. Draft better.
-          </div>
+          <div className="font-mono text-[9px] text-muted">Mock smarter · Draft better</div>
         </div>
-        {phase === 'drafting' && (
-          <div className="flex items-center gap-6">
-            <TopStat label="Pick" value={`${Math.min(currentOverall, total)} / ${total}`} />
-            <TopStat label="Round" value={`${round} / ${config.rounds}`} />
-            <TopStat
-              label="Format"
-              value={`${config.teams}T ${config.superflex ? 'SF' : '1QB'}`}
-            />
-            <TopStat
-              label="On Clock"
-              value={isUserTurn ? 'YOU' : `Team ${currentSlot}`}
-              tone={isUserTurn ? 'boom' : undefined}
-            />
-          </div>
-        )}
         {phase === 'complete' && summary && (
-          <div className="flex items-center gap-6">
-            <TopStat label="Grade" value={summary.grade} tone="boom" />
-            <TopStat label="Avg TFO" value={summary.avgTfo.toFixed(1)} />
-          </div>
+          <TopStat label="Grade" value={summary.grade} tone="boom" />
+        )}
+        </>
         )}
       </header>
 
-      {/* Middle — phase-dependent */}
+      {phase === 'landing' && (
+        <main className="col-span-4 min-h-0 overflow-hidden" style={{ gridColumn: '1 / -1', gridRow: 2 }}>
+          <DraftLanding
+            sessions={sessions}
+            leagues={leagues}
+            ownedPicksByLeague={ownedPicksByLeague}
+            activeTab={landingTab}
+            onTabChange={setLandingTab}
+            onNewStartup={() => setPhase('setup')}
+            onOpenSettings={() => setPhase('setup')}
+            onResume={(id) => {
+              void fetch(`/api/draft/resume?id=${id}`)
+                .then((r) => r.json())
+                .then((data) => {
+                  const nextConfig = normalizeDraftConfig(data.config as DraftConfig);
+                  const restored = enrichPicks((data.picks as DraftPickRecord[]) ?? []);
+                  setConfig(nextConfig);
+                  setPicks(restored);
+                  picksRef.current = restored;
+                  lastFilledRef.current = restored.length;
+                  setPickOwnership(initPickOwnership(nextConfig));
+                  sessionIdRef.current = id;
+                  setDraftStartedAt(Date.now());
+                  setPhase('drafting');
+                })
+                .catch(console.error);
+            }}
+          />
+        </main>
+      )}
+
       {phase === 'setup' && (
-        <main
-          className="row-start-2 min-h-0 overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-          style={{ gridColumn: '2 / -1' }}
-        >
+        <main className="col-span-4 min-h-0 overflow-y-auto" style={{ gridColumn: '1 / -1', gridRow: 2 }}>
           <DraftSetup
             config={config}
             onChange={(next) => setConfig((c) => ({ ...c, ...next }))}
@@ -259,48 +366,146 @@ export default function DraftRoomClient({
       )}
 
       {phase === 'drafting' && (
-        <>
-          <DraftBoard
-            pool={pool}
-            picks={picks}
-            config={config}
+        <div
+          className="col-span-4 flex min-h-0 flex-col overflow-hidden"
+          style={{ gridColumn: '1 / -1', gridRow: 2 }}
+        >
+          <DraftHeader
+            config={normalizedConfig}
             currentOverall={currentOverall}
-            totalPicks={total}
+            picksRemaining={Math.max(0, total - picks.length)}
             isUserTurn={isUserTurn}
             clock={clock}
-            onPick={(p) => {
-              if (isUserTurn) makePick(p, true);
-            }}
+            draftStartedAt={draftStartedAt ?? undefined}
+            onSettings={() => setPhase('setup')}
           />
-          <DraftAssistantPanel pool={pool} picks={picks} config={config} />
-        </>
+          <div className="flex min-h-0 flex-1 flex-col md:flex-row">
+            <div className="hidden md:flex">
+              <DraftMyTeamPanel config={normalizedConfig} picks={picks} />
+            </div>
+            <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
+              <DraftGrid
+                config={normalizedConfig}
+                picks={picks}
+                currentOverall={currentOverall}
+              />
+              <div className="flex min-h-0 flex-1 flex-col border-t border-border">
+                <DraftPlayerPool
+                  pool={filteredPool}
+                  taken={takenSet(picks)}
+                  tierBreaks={tierBreaks}
+                  isUserTurn={isUserTurn}
+                  currentOverall={currentOverall}
+                  bobTopId={bobTop?.playerId ?? null}
+                  onPick={(p) => makePick(p, true)}
+                  onQueue={addToQueue}
+                  watchlist={watchlist}
+                />
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowMobileAssistant(true)}
+                className="shrink-0 border-t border-border bg-surface px-4 py-2.5 font-mono text-[10px] uppercase tracking-wide text-boom md:hidden"
+              >
+                Open BOB Assistant
+              </button>
+            </div>
+            <div className="hidden md:flex">
+              <DraftAssistantPanel
+                pool={filteredPool}
+                picks={picks}
+                config={normalizedConfig}
+                tierBreaks={tierBreaks}
+                currentOverall={currentOverall}
+                isUserTurn={isUserTurn}
+                onDraft={(p) => makePick(p, true)}
+              />
+            </div>
+          </div>
+          <DraftBottomStrip
+            config={normalizedConfig}
+            picks={picks}
+            currentOverall={currentOverall}
+            isUserTurn={isUserTurn}
+            chat={chat}
+            taken={takenSet(picks)}
+            poolLength={filteredPool.length}
+          />
+
+          {showMobileAssistant && (
+            <div className="fixed inset-0 z-50 flex flex-col bg-bg md:hidden">
+              <div className="flex shrink-0 items-center justify-between border-b border-border px-4 py-3">
+                <span className="font-mono text-[11px] uppercase text-boom">BOB Assistant</span>
+                <button
+                  type="button"
+                  onClick={() => setShowMobileAssistant(false)}
+                  className="border-none bg-transparent font-mono text-[12px] text-muted"
+                >
+                  Close
+                </button>
+              </div>
+              <div className="min-h-0 flex-1 overflow-hidden">
+                <DraftAssistantPanel
+                  pool={filteredPool}
+                  picks={picks}
+                  config={normalizedConfig}
+                  tierBreaks={tierBreaks}
+                  currentOverall={currentOverall}
+                  isUserTurn={isUserTurn}
+                  onDraft={(p) => makePick(p, true)}
+                />
+              </div>
+            </div>
+          )}
+        </div>
       )}
 
       {phase === 'complete' && summary && (
-        <DraftComplete summary={summary} config={config} onRestart={handleRestart} />
+        <DraftComplete
+          summary={summary}
+          config={config}
+          onRestart={handleRestart}
+          allPicks={picks}
+        />
       )}
 
-      {/* Footer (spans all three columns) */}
+      {tradeTargetSlot != null && (
+        <DraftTradeModal
+          config={config}
+          picks={picks}
+          pickOwnership={pickOwnership}
+          targetSlot={tradeTargetSlot}
+          pool={filteredPool}
+          onClose={() => setTradeTargetSlot(null)}
+          onApply={(nextOwnership, message) => {
+            setPickOwnership(nextOwnership);
+            pushChat(
+              tradeTargetSlot,
+              config.teamOrder.find((t) => t.slot === tradeTargetSlot)?.name ?? `Team ${tradeTargetSlot}`,
+              message,
+            );
+            setTradeTargetSlot(null);
+          }}
+        />
+      )}
+
       <footer
-        className="row-start-3 col-span-3 flex items-center gap-5 border-t border-border/50 bg-bg/[0.98] px-5"
-        style={{ height: 28 }}
+        className="col-span-4 flex items-center gap-4 border-t border-border/50 bg-bg px-4 font-mono text-[7.5px] uppercase tracking-wide text-muted"
+        style={{
+          height: phase === 'drafting' ? 0 : 28,
+          gridColumn: '1 / -1',
+          overflow: 'hidden',
+          borderTopWidth: phase === 'drafting' ? 0 : 1,
+        }}
       >
-        <span className="flex items-center gap-1.5">
-          <span className="h-1.5 w-1.5 rounded-full bg-boom" />
-          <span className="font-mono text-[7.5px] uppercase tracking-wide text-muted">
-            Draft Engine Optimal
-          </span>
-        </span>
-        <span className="font-mono text-[7.5px] uppercase tracking-wide text-muted">
-          Context: {scoringContext}
-        </span>
-        <span className="font-mono text-[7.5px] uppercase tracking-wide text-muted">
-          Pool: {pool.length} players
-        </span>
-        {phase === 'drafting' && (
-          <span className="ml-auto font-mono text-[7.5px] uppercase tracking-wide text-muted">
-            {picks.length} picks logged
-          </span>
+        {phase !== 'drafting' && (
+          <>
+            <span className="flex items-center gap-1.5">
+              <span className="h-1.5 w-1.5 rounded-full bg-boom" />
+              Engine Optimal
+            </span>
+            <span>Pool {filteredPool.length}</span>
+          </>
         )}
       </footer>
     </>
@@ -311,20 +516,19 @@ function TopStat({
   label,
   value,
   tone,
+  color,
 }: {
   label: string;
   value: string;
   tone?: 'boom';
+  color?: string;
 }) {
   return (
     <div className="text-right">
-      <div className="font-mono text-[7.5px] uppercase tracking-[1.5px] text-muted">
-        {label}
-      </div>
+      <div className="font-mono text-[7px] uppercase tracking-wide text-muted">{label}</div>
       <div
-        className={`font-figtree text-[15px] font-bold leading-tight ${
-          tone === 'boom' ? 'text-boom' : 'text-text'
-        }`}
+        className={`font-mono text-[14px] ${tone === 'boom' ? 'text-boom' : color ? '' : 'text-text'}`}
+        style={color ? { color } : undefined}
       >
         {value}
       </div>

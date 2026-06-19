@@ -21,11 +21,12 @@ export function normalizeVerdict(
 }
 
 export function getDynastyTier(score: number): string {
-  if (score >= 90) return 'Elite';
-  if (score >= 80) return 'Strong';
-  if (score >= 70) return 'Solid';
-  if (score >= 60) return 'Average';
-  return 'Weak';
+  if (score >= 90) return 'Elite Asset';
+  if (score >= 80) return 'Strong Asset';
+  if (score >= 70) return 'Stable Asset';
+  if (score >= 60) return 'Developing';
+  if (score >= 50) return 'Monitor';
+  return 'High Risk';
 }
 
 export function calcTrend(current: number, previous: number | null): TrendDirection {
@@ -46,7 +47,22 @@ type TfoRow = {
   sfs?: number | null;
   ffig?: number | null;
   sit?: number | null;
+  ops_score?: number | null;
+  sfs_score?: number | null;
+  yoysi_score?: number | null;
+  sit_score?: number | null;
 };
+
+export function hasRealSubScoreData(row: TfoRow): boolean {
+  const finite = (v: number | null | undefined) =>
+    typeof v === 'number' && Number.isFinite(v);
+  return (
+    finite(row.ops_score) ||
+    finite(row.sfs_score) ||
+    finite(row.yoysi_score) ||
+    finite(row.sit_score)
+  );
+}
 
 export function resolveSubScores(
   row: TfoRow,
@@ -60,10 +76,10 @@ export function resolveSubScores(
     return null;
   };
 
-  const opportunity = pick(row.opportunity, row.ops);
-  const situation = pick(row.situation, row.sfs);
-  const ageCurve = pick(row.age_curve);
-  const iq = pick(row.iq, row.ffig);
+  const opportunity = pick(row.opportunity, row.ops, row.ops_score);
+  const situation = pick(row.situation, row.sfs, row.sfs_score);
+  const ageCurve = pick(row.age_curve, row.yoysi_score);
+  const iq = pick(row.iq, row.ffig, row.sit_score);
   const upside = pick(row.upside, row.sit);
 
   if (

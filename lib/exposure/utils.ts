@@ -1,82 +1,75 @@
-import type { ExposureRiskLevel } from './types';
+import type { MarketVerdict } from '@/lib/verdict/marketVerdict';
+import type { ExposurePlayer, PositionConcentration } from './types';
+import { formatMarketVerdictLabel } from '@/lib/ui/labels';
 
-export function exposureRiskLevel(exposurePct: number): ExposureRiskLevel {
-  if (exposurePct >= 100) return 'DANGER';
-  if (exposurePct >= 60) return 'CAUTION';
-  return 'SAFE';
+/** Lower = surfaced first (BOOM/BUY opportunity lead). */
+export const VERDICT_SORT_ORDER: Record<MarketVerdict, number> = {
+  BOOM: 0,
+  BUY: 1,
+  HOLD: 2,
+  SELL: 3,
+  BUST: 4,
+};
+
+export type ExposureGroup = 'opportunity' | 'neutral' | 'review';
+
+export function exposureGroup(verdict: MarketVerdict): ExposureGroup {
+  if (verdict === 'BOOM' || verdict === 'BUY') return 'opportunity';
+  if (verdict === 'SELL' || verdict === 'BUST') return 'review';
+  return 'neutral';
 }
 
-export function concentrationLabel(pct: number): 'Low' | 'Moderate' | 'High' {
-  if (pct < 25) return 'Low';
-  if (pct <= 40) return 'Moderate';
-  return 'High';
+export function sortExposurePlayers(players: ExposurePlayer[]): ExposurePlayer[] {
+  return [...players].sort((a, b) => {
+    const va = VERDICT_SORT_ORDER[a.marketVerdict.verdict] ?? 5;
+    const vb = VERDICT_SORT_ORDER[b.marketVerdict.verdict] ?? 5;
+    if (va !== vb) return va - vb;
+    return b.leagueCount - a.leagueCount;
+  });
 }
 
-export function healthRiskLabel(
-  score: number,
-): 'Low Risk' | 'Moderate Risk' | 'High Risk' {
-  if (score < 20) return 'Low Risk';
-  if (score <= 40) return 'Moderate Risk';
-  return 'High Risk';
-}
-
-export function portfolioRiskLabel(
-  score: number,
-): 'Low Risk' | 'Moderate Risk' | 'High Risk' {
-  if (score <= 33) return 'Low Risk';
-  if (score <= 66) return 'Moderate Risk';
-  return 'High Risk';
-}
-
-export function healthRiskSub(label: 'Low Risk' | 'Moderate Risk' | 'High Risk'): string {
-  if (label === 'Low Risk') return 'Portfolio well diversified';
-  if (label === 'Moderate Risk') return 'Monitor closely';
-  return 'Action recommended';
-}
-
-export function riskBarColor(level: ExposureRiskLevel): string {
-  if (level === 'DANGER') return '#ef4444';
-  if (level === 'CAUTION') return '#FBBF24';
-  return '#36E7A1';
-}
-
-export function riskBadgeClass(level: ExposureRiskLevel): string {
-  if (level === 'DANGER') {
-    return 'bg-[rgba(239,68,68,0.1)] text-[#ef4444] border border-[rgba(239,68,68,0.3)]';
+export function opportunityFraming(p: ExposurePlayer): string {
+  const v = formatMarketVerdictLabel(p.marketVerdict.verdict);
+  if (p.marketVerdict.verdict === 'BOOM' || p.marketVerdict.verdict === 'BUY') {
+    return `You're well-positioned: ${p.fullName} in ${p.leagueCount} league${p.leagueCount === 1 ? '' : 's'}, BOB rates ${v}`;
   }
-  if (level === 'CAUTION') {
-    return 'bg-hold/10 text-hold border border-hold/30';
+  if (p.marketVerdict.verdict === 'SELL' || p.marketVerdict.verdict === 'BUST') {
+    return `Market divergence: ${p.fullName} in ${p.leagueCount} league${p.leagueCount === 1 ? '' : 's'}, BOB rates ${v}`;
   }
-  return 'bg-boom/10 text-boom border border-boom/30';
-}
-
-export function subScoreRiskLabel(
-  value: number,
-): { text: string; className: string } {
-  if (value >= 67) return { text: `${Math.round(value)}% High`, className: 'text-[#ef4444]' };
-  if (value >= 34) return { text: `${Math.round(value)}% Medium`, className: 'text-hold' };
-  return { text: `${Math.round(value)}% Low`, className: 'text-boom' };
-}
-
-export function isNflGameDay(): boolean {
-  const day = new Date().getDay();
-  return day === 0 || day === 1 || day === 4;
+  return `${p.fullName} in ${p.leagueCount} league${p.leagueCount === 1 ? '' : 's'}, BOB rates ${v}`;
 }
 
 const POSITION_COLORS: Record<string, string> = {
-  WR: '#A78BFA',
+  WR: '#22D3EE',
   RB: '#36E7A1',
   QB: '#FBBF24',
-  TE: '#6b7a99',
+  TE: '#A78BFA',
 };
 
-export function positionColor(position: string): string {
-  return POSITION_COLORS[position.toUpperCase()] ?? '#6b7a99';
+/** Bar colors for position concentration (Exposure page). */
+export const EXPOSURE_BAR_COLORS: Record<'QB' | 'RB' | 'WR' | 'TE', string> = {
+  QB: '#EF4444',
+  RB: '#22D3EE',
+  WR: '#3B82F6',
+  TE: '#F97316',
+};
+
+const CONCENTRATION_POSITIONS = ['QB', 'RB', 'WR', 'TE'] as const;
+
+export function computePositionConcentration(
+  players: ExposurePlayer[],
+): PositionConcentration[] {
+  return CONCENTRATION_POSITIONS.map((position) => {
+    const posPlayers = players.filter((p) => p.position.toUpperCase() === position);
+    return {
+      position,
+      playerCount: posPlayers.length,
+      leagueSlots: posPlayers.reduce((sum, p) => sum + p.leagueCount, 0),
+      color: EXPOSURE_BAR_COLORS[position],
+    };
+  });
 }
 
-export function formatLeaguesSummary(names: string[], total: number): string {
-  if (names.length >= total) return `All ${total} Leagues`;
-  if (names.length === 0) return '—';
-  if (names.length <= 2) return names.join(', ');
-  return `${names.length} Leagues`;
+export function positionAccent(position: string): string {
+  return POSITION_COLORS[position.toUpperCase()] ?? '#6b7a99';
 }

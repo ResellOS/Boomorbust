@@ -202,7 +202,7 @@ function RankingsTab({ prospects }: { prospects: RookieProspect[] }) {
     <div className="glass-card overflow-hidden">
       <div className="px-4 py-3 border-b border-white/[0.08]">
         <h2 className="text-[13px] font-bold text-white tracking-wide">DYNASTY ROOKIE RANKINGS</h2>
-        <p className="text-[11px] text-slate-500 mt-0.5">Overall dynasty value ranking weighted by RTS + TFO + F-FIG</p>
+        <p className="text-[11px] text-slate-500 mt-0.5">Overall dynasty value ranking weighted by rookie score, dynasty rating, and scouting profile</p>
       </div>
       <div className="divide-y divide-white/[0.04]">
         {prospects.map((p) => {

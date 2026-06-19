@@ -15,6 +15,7 @@ import PlayerAvatar from '@/components/PlayerAvatar';
 import PlayerBhsActions from './PlayerBhsActions';
 import { getPositionAccent, normalizePosition } from './radarMetrics';
 import { nflTeamPrimaryHex } from '@/lib/nfl/teamPrimaryHex';
+import { formatLegacyVerdictLabel } from '@/lib/ui/labels';
 
 // ─── Shared type (imported by radarMetrics.ts — keep stable) ─────────────────
 
@@ -67,7 +68,13 @@ const RADAR_R    = 42;
 const LABEL_R    = 55;
 const SVG_W      = 120;
 const SVG_H      = 124;
-const AXIS_LABELS: [string, string, string, string, string] = ['OPS', 'SFS', 'FIG', 'SIT', 'IRS'];
+const AXIS_LABELS: [string, string, string, string, string] = [
+  'Opportunity',
+  'Scheme Fit',
+  'Profile',
+  'Situation',
+  'Risk',
+];
 
 // ── Position colors ───────────────────────────────────────────────────────────
 
@@ -91,11 +98,13 @@ const VERDICT_STYLE: Record<Verdict, { border: string; shadow: string; valueColo
   SELL: { border: 'rgba(239,68,68,0.40)',  shadow: '0 0 24px rgba(239,68,68,0.15)',   valueColor: '#EF4444' },
 };
 
+// Colors mirror MARKET_VERDICT_COLORS (design-system canonical):
+// BOOM green · HOLD amber · SELL deep amber · BUST purple.
 const VERDICT_BADGE: Record<Verdict, { bg: string; color: string }> = {
-  BOOM: { bg: 'rgba(16,185,129,0.18)', color: '#34D399' },
-  BUST: { bg: 'rgba(239,68,68,0.18)',  color: '#F87171' },
-  HOLD: { bg: 'rgba(251,191,36,0.18)', color: '#FCD34D' },
-  SELL: { bg: 'rgba(220,38,38,0.22)',  color: '#F87171' },
+  BOOM: { bg: 'rgba(54,231,161,0.18)',  color: '#36E7A1' },
+  HOLD: { bg: 'rgba(251,191,36,0.18)',  color: '#FBBF24' },
+  SELL: { bg: 'rgba(245,158,11,0.18)',  color: '#f59e0b' },
+  BUST: { bg: 'rgba(167,139,250,0.18)', color: '#A78BFA' },
 };
 
 // ── Position-level benchmark traces ──────────────────────────────────────────
@@ -177,7 +186,7 @@ function VerdictBadge({ verdict }: { verdict: Verdict }) {
         fontFamily: 'var(--font-mono), JetBrains Mono, monospace',
       }}
     >
-      {verdict}
+      {formatLegacyVerdictLabel(verdict)}
     </span>
   );
 }
@@ -539,7 +548,7 @@ export function PlayerHubCardLegacy({
           {typeof tfoScore === 'number' && tfoGrade && (
             <>
               <p className="mt-1 text-[11px] leading-tight font-mono tracking-[0.04em]">
-                <span style={{ color: tfoAccentColor }}>TFO {Math.round(tfoScore)}</span>
+                <span style={{ color: tfoAccentColor }}>Rating {Math.round(tfoScore)}</span>
                 <span style={{ color: '#64748B' }}> · </span>
                 <span style={{ color: '#94A3B8' }}>{tfoGrade.replace(/_/g, ' ')}</span>
               </p>
