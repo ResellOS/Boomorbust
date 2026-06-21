@@ -94,4 +94,27 @@ export interface PerformancePageData {
   hallOfShame: BobCall[];
   modelTimeline: ModelEvolutionEntry[];
   leagues: { id: string; name: string }[];
+  trackRecordConsensus: TrackRecordConsensusData | null;
+}
+
+export interface TrackRecordConsensusRow {
+  playerId: string;
+  playerName: string;
+  position: string;
+  verdict: string;
+  bobRank: number;
+  consensusRank: number;
+  consensusRankDelta: number;
+  ktcRankDelta: number;
+}
+
+export interface TrackRecordConsensusData {
+  season: number;
+  source: string;
+  snapshotDate: string;
+  playersCompared: number;
+  meanAbsDelta: number;
+  pctWithin5: number;
+  byPosition: { QB: number; RB: number; WR: number; TE: number };
+  biggestDivergences: TrackRecordConsensusRow[];
 }

@@ -1,256 +1,99 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
-import { ArrowLeftRight, Check, Eye, X } from 'lucide-react';
+import Link from 'next/link';
+import { Check, ChevronRight, X } from 'lucide-react';
 import {
-  acceptancePillStyle,
-  isReviewTaskData,
-  isTradeTaskData,
-  urgencyFromScore,
-  type DailyTask,
-  type UrgencyLevel,
-} from '@/lib/dashboard/dailyTasks';
-import { truncateFeedHeadline as truncateReason } from '@/lib/dashboard/opportunityFeed';
+  buildMissionCards,
+  MISSION_GLOW_STYLES,
+  type MissionCardModel,
+} from '@/lib/dashboard/missionTasks';
+import type { DailyTask, UrgencyLevel } from '@/lib/dashboard/dailyTasks';
+import type { LineupOpportunity } from '@/lib/dashboard/rotation';
 
-const URGENCY_STYLES: Record<UrgencyLevel, { bg: string; text: string; label: string }> = {
-  HIGH: { bg: 'rgba(239,68,68,0.18)', text: '#EF4444', label: 'HIGH' },
-  MED: { bg: 'rgba(251,191,36,0.18)', text: '#FBBF24', label: 'MEDIUM' },
-  LOW: { bg: 'rgba(100,116,139,0.18)', text: '#64748B', label: 'LOW' },
+const URGENCY_LABEL: Record<UrgencyLevel, string> = {
+  HIGH: 'High Impact',
+  MED: 'Medium Impact',
+  LOW: 'Low Cost',
 };
 
-function UrgencyBadge({ level }: { level: UrgencyLevel }) {
-  const style = URGENCY_STYLES[level];
-  return (
-    <span
-      className="shrink-0 rounded px-1.5 py-0.5 font-mono text-[8px] uppercase tracking-[0.8px]"
-      style={{ background: style.bg, color: style.text }}
-    >
-      {style.label}
-    </span>
-  );
+interface FrontOfficeTasksProps {
+  initialTasks: DailyTask[];
+  lineupOpportunity: LineupOpportunity | null;
+  compact?: boolean;
 }
 
-function TaskActions({
-  taskId,
+function CompactTaskRow({
+  card,
   busy,
   onComplete,
   onDismiss,
 }: {
-  taskId: string;
+  card: MissionCardModel;
   busy: boolean;
-  onComplete: () => void;
-  onDismiss: () => void;
+  onComplete: (id: string) => void;
+  onDismiss: (id: string) => void;
 }) {
+  const glow = MISSION_GLOW_STYLES[card.glow];
+
   return (
-    <div className="flex shrink-0 items-center gap-1">
-      <button
-        type="button"
-        disabled={busy}
-        onClick={onComplete}
-        className="flex h-7 w-7 items-center justify-center rounded border border-boom/30 bg-boom/10 text-boom hover:bg-boom/20 disabled:opacity-50"
-        aria-label={`Mark task ${taskId} complete`}
+    <div
+      className="flex items-start gap-2.5 border-b border-[#1e2640]/50 px-3 py-2.5 last:border-b-0"
+      style={{ borderLeftWidth: 2, borderLeftColor: glow.border }}
+    >
+      <span
+        className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full font-mono text-[9px] font-semibold text-[#0a0d14]"
+        style={{ background: glow.accent }}
       >
-        <Check className="h-3.5 w-3.5" strokeWidth={2.5} />
-      </button>
-      <button
-        type="button"
-        disabled={busy}
-        onClick={onDismiss}
-        className="flex h-7 w-7 items-center justify-center rounded border border-white/10 text-muted hover:text-text disabled:opacity-50"
-        aria-label={`Dismiss task ${taskId}`}
-      >
-        <X className="h-3.5 w-3.5" strokeWidth={2} />
-      </button>
-    </div>
-  );
-}
-
-function TradeTaskCard({
-  task,
-  onComplete,
-  onDismiss,
-  busy,
-}: {
-  task: DailyTask;
-  onComplete: (id: string) => void;
-  onDismiss: (id: string) => void;
-  busy: string | null;
-}) {
-  const d = isTradeTaskData(task.taskData) ? task.taskData : null;
-  if (!d) return null;
-  const acceptStyle = acceptancePillStyle(d.acceptance_probability);
-  const urgency = urgencyFromScore(task.urgencyScore);
-  const isBusy = busy === task.id;
-
-  return (
-    <div
-      className="rounded-[10px] border border-border bg-[#0f1420] px-3.5 py-3"
-      style={{ borderLeft: '4px solid #36E7A1' }}
-    >
-      <div className="flex items-start justify-between gap-2">
-        <div className="flex min-w-0 flex-1 items-start gap-2">
-          <ArrowLeftRight className="mt-0.5 h-4 w-4 shrink-0 text-boom" strokeWidth={2} />
-          <div className="min-w-0 flex-1">
-            <p className="font-figtree text-[14px] leading-snug text-text">
-              Offer {d.give_player_name} for {d.get_player_name}
-            </p>
-            <p className="mt-0.5 truncate font-mono text-[10px] text-muted">
-              {d.league_name} · {d.target_manager_name}
-            </p>
-          </div>
+        {card.priority}
+      </span>
+      <div className="min-w-0 flex-1">
+        <Link href={card.ctaHref} className="font-figtree text-[12px] font-medium text-[#e8ecf4] no-underline hover:text-boom">
+          {card.title}
+        </Link>
+        <p className="font-mono text-[8px] text-[#6b7a99]">{card.leagueName}</p>
+        <div className="mt-1 flex flex-wrap items-center gap-2">
+          <span className="font-mono text-[7px] uppercase tracking-wide text-[#6b7a99]">
+            {URGENCY_LABEL[card.urgency]}
+          </span>
+          <span className="font-figtree text-[10px] text-[#6b7a99]">{card.reasonLine}</span>
         </div>
-        <UrgencyBadge level={urgency} />
       </div>
-
-      <div className="mt-2 flex flex-wrap items-center gap-2 pl-6">
-        <span
-          className="rounded px-2 py-0.5 font-mono text-[9px] tabular-nums"
-          style={{ background: acceptStyle.bg, color: acceptStyle.text }}
-        >
-          {Math.round(d.acceptance_probability)}% acceptance
-        </span>
-      </div>
-
-      {d.reason ? (
-        <p className="mt-2 line-clamp-2 pl-6 font-figtree text-[11px] text-muted">
-          {truncateReason(d.reason, 120)}
-        </p>
-      ) : null}
-
-      <div className="mt-2.5 flex justify-end pl-6">
-        <TaskActions
-          taskId={task.id}
-          busy={isBusy}
-          onComplete={() => onComplete(task.id)}
-          onDismiss={() => onDismiss(task.id)}
-        />
-      </div>
-    </div>
-  );
-}
-
-function ReviewTaskCard({
-  task,
-  onComplete,
-  onDismiss,
-  busy,
-}: {
-  task: DailyTask;
-  onComplete: (id: string) => void;
-  onDismiss: (id: string) => void;
-  busy: string | null;
-}) {
-  const d = isReviewTaskData(task.taskData) ? task.taskData : null;
-  if (!d) return null;
-  const urgency = urgencyFromScore(task.urgencyScore);
-  const isBusy = busy === task.id;
-  const verdictLabel = (d.verdict ?? 'BUST').toUpperCase();
-
-  return (
-    <div
-      className="rounded-[10px] border border-border bg-[#0f1420] px-3.5 py-3"
-      style={{ borderLeft: '4px solid #A78BFA' }}
-    >
-      <div className="flex items-start justify-between gap-2">
-        <div className="flex min-w-0 flex-1 items-start gap-2">
-          <Eye className="mt-0.5 h-4 w-4 shrink-0 text-bust" strokeWidth={2} />
-          <div className="min-w-0 flex-1">
-            <p className="font-figtree text-[14px] leading-snug text-text">
-              Consider selling {d.player_name}
-            </p>
-            <p className="mt-0.5 truncate font-mono text-[10px] text-muted">{d.league_name}</p>
-          </div>
+      {card.taskId ? (
+        <div className="flex shrink-0 gap-1">
+          <button
+            type="button"
+            disabled={busy}
+            onClick={() => onComplete(card.taskId!)}
+            className="flex h-6 w-6 items-center justify-center rounded border border-boom/25 bg-boom/10 text-boom disabled:opacity-50"
+            aria-label="Complete"
+          >
+            <Check className="h-3 w-3" strokeWidth={2.5} />
+          </button>
+          <button
+            type="button"
+            disabled={busy}
+            onClick={() => onDismiss(card.taskId!)}
+            className="flex h-6 w-6 items-center justify-center rounded border border-white/10 text-muted hover:text-text disabled:opacity-50"
+            aria-label="Dismiss"
+          >
+            <X className="h-3 w-3" strokeWidth={2} />
+          </button>
         </div>
-        <UrgencyBadge level={urgency} />
-      </div>
-
-      <div className="mt-2 pl-6">
-        <span
-          className="rounded px-2 py-0.5 font-mono text-[9px] uppercase tracking-wide"
-          style={{ background: 'rgba(167,139,250,0.15)', color: '#A78BFA' }}
-        >
-          {verdictLabel}
-        </span>
-      </div>
-
-      {d.reason ? (
-        <p className="mt-2 line-clamp-2 pl-6 font-figtree text-[11px] text-muted">
-          {truncateReason(d.reason, 120)}
-        </p>
-      ) : null}
-
-      <div className="mt-2.5 flex justify-end pl-6">
-        <TaskActions
-          taskId={task.id}
-          busy={isBusy}
-          onComplete={() => onComplete(task.id)}
-          onDismiss={() => onDismiss(task.id)}
-        />
-      </div>
+      ) : (
+        <Link href={card.ctaHref} className="shrink-0 font-mono text-[8px] text-boom no-underline hover:underline">
+          Go →
+        </Link>
+      )}
     </div>
   );
 }
 
-function GenericTaskCard({
-  task,
-  onComplete,
-  onDismiss,
-  busy,
-}: {
-  task: DailyTask;
-  onComplete: (id: string) => void;
-  onDismiss: (id: string) => void;
-  busy: string | null;
-}) {
-  const urgency = urgencyFromScore(task.urgencyScore);
-  const isBusy = busy === task.id;
-
-  return (
-    <div
-      className="rounded-[10px] border border-border bg-[#0f1420] px-3.5 py-3"
-      style={{ borderLeft: '4px solid #64748B' }}
-    >
-      <div className="flex items-start justify-between gap-2">
-        <p className="font-figtree text-[14px] text-text">{task.taskType} task</p>
-        <UrgencyBadge level={urgency} />
-      </div>
-      <div className="mt-2.5 flex justify-end">
-        <TaskActions
-          taskId={task.id}
-          busy={isBusy}
-          onComplete={() => onComplete(task.id)}
-          onDismiss={() => onDismiss(task.id)}
-        />
-      </div>
-    </div>
-  );
-}
-
-function TaskCard({
-  task,
-  busy,
-  onComplete,
-  onDismiss,
-}: {
-  task: DailyTask;
-  busy: string | null;
-  onComplete: (id: string) => void;
-  onDismiss: (id: string) => void;
-}) {
-  if (task.taskType === 'TRADE' && isTradeTaskData(task.taskData)) {
-    return (
-      <TradeTaskCard task={task} busy={busy} onComplete={onComplete} onDismiss={onDismiss} />
-    );
-  }
-  if (task.taskType === 'REVIEW' && isReviewTaskData(task.taskData)) {
-    return (
-      <ReviewTaskCard task={task} busy={busy} onComplete={onComplete} onDismiss={onDismiss} />
-    );
-  }
-  return <GenericTaskCard task={task} busy={busy} onComplete={onComplete} onDismiss={onDismiss} />;
-}
-
-export default function FrontOfficeTasks({ initialTasks }: { initialTasks: DailyTask[] }) {
+export default function FrontOfficeTasks({
+  initialTasks,
+  lineupOpportunity,
+  compact = false,
+}: FrontOfficeTasksProps) {
   const [tasks, setTasks] = useState(initialTasks);
   const [busyId, setBusyId] = useState<string | null>(null);
 
@@ -279,7 +122,6 @@ export default function FrontOfficeTasks({ initialTasks }: { initialTasks: Daily
       return prev.filter((t) => t.id !== id);
     });
     setBusyId(id);
-
     try {
       const res = await fetch(`/api/dashboard/tasks/${encodeURIComponent(id)}`, {
         method: 'PATCH',
@@ -300,37 +142,49 @@ export default function FrontOfficeTasks({ initialTasks }: { initialTasks: Daily
     }
   }, []);
 
-  const visibleTasks = tasks;
+  const missions = buildMissionCards(tasks, lineupOpportunity, 3);
+
+  const body =
+    missions.length === 0 ? (
+      <p className="px-3 py-4 font-mono text-[10px] text-[#6b7a99]">No tasks queued — you&apos;re caught up.</p>
+    ) : (
+      missions.map((card) => (
+        <CompactTaskRow
+          key={card.id}
+          card={card}
+          busy={busyId === card.taskId}
+          onComplete={(id) => void updateStatus(id, 'completed')}
+          onDismiss={(id) => void updateStatus(id, 'dismissed')}
+        />
+      ))
+    );
+
+  if (compact) {
+    return (
+      <div className="overflow-hidden rounded-[10px] border border-[#1e2640] bg-[#0f1420]">
+        <div className="border-b border-[#1e2640]/80 px-3 py-2">
+          <span className="font-figtree text-[9.5px] uppercase tracking-[1.5px] text-[#e8ecf4]">
+            Front Office Tasks
+          </span>
+          <span className="ml-2 font-mono text-[9px] tabular-nums text-boom">{missions.length}</span>
+        </div>
+        {body}
+      </div>
+    );
+  }
 
   return (
-    <section className="relative z-10 flex shrink-0 flex-col gap-[9px]">
-      <div className="px-0.5">
-        <span className="font-figtree text-[10px] font-normal uppercase tracking-[1.5px] text-text">
-          Front Office Tasks
-        </span>
-        <p className="font-mono text-[9px] text-muted">Highest-value moves today</p>
+    <section className="overflow-hidden rounded-[10px] border border-[#1e2640] bg-[#0f1420]">
+      <div className="flex items-center justify-between border-b border-[#1e2640]/80 px-3.5 py-2.5">
+        <div>
+          <h3 className="font-figtree text-[10px] uppercase tracking-[1.5px] text-[#e8ecf4]">Front Office Tasks</h3>
+          <p className="font-mono text-[8px] text-[#6b7a99]">Supporting priorities</p>
+        </div>
+        <Link href="/trade" className="flex items-center gap-0.5 font-mono text-[8px] text-boom no-underline hover:underline">
+          View All <ChevronRight className="h-3 w-3" />
+        </Link>
       </div>
-
-      {visibleTasks.length === 0 ? (
-        <div className="rounded-[10px] border border-dashed border-border bg-[#0f1420] px-4 py-6 text-center">
-          <p className="font-figtree text-[12px] leading-relaxed text-muted">
-            BOB is analyzing your leagues. Front Office Tasks appear here once League Intelligence
-            data is ready.
-          </p>
-        </div>
-      ) : (
-        <div className="flex flex-col gap-2">
-          {visibleTasks.map((task) => (
-            <TaskCard
-              key={task.id}
-              task={task}
-              busy={busyId}
-              onComplete={(id) => void updateStatus(id, 'completed')}
-              onDismiss={(id) => void updateStatus(id, 'dismissed')}
-            />
-          ))}
-        </div>
-      )}
+      {body}
     </section>
   );
 }

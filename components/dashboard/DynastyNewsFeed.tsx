@@ -11,6 +11,19 @@ interface DynastyNewsFeedProps {
   title?: string;
 }
 
+function impactLine(item: DashboardNewsItem): string | null {
+  if (item.headline.toLowerCase().includes('injur')) {
+    return `Impact: Monitor ${item.playerHighlight} availability and backups.`;
+  }
+  if (item.headline.toLowerCase().includes('sign') || item.headline.toLowerCase().includes('trade')) {
+    return `Impact: ${item.playerHighlight} projection may shift — review exposure.`;
+  }
+  if (item.playerHighlight) {
+    return `Impact: Review ${item.playerHighlight} role and target share.`;
+  }
+  return null;
+}
+
 function NewsModal({
   item,
   onClose,
@@ -89,32 +102,32 @@ export default function DynastyNewsFeed({
   items,
   rosterPlayerIds,
   allMode = false,
-  title = 'DYNASTY NEWS',
+  title = 'News That Matters',
 }: DynastyNewsFeedProps) {
   const [modalItem, setModalItem] = useState<DashboardNewsItem | null>(null);
 
   const visible = useMemo(() => {
-    if (allMode) return items.slice(0, 6);
-    // League mode: only players rostered anywhere in the selected league.
-    return items
-      .filter((i) => Boolean(i.playerId) && rosterPlayerIds?.has(i.playerId!))
-      .slice(0, 6);
+    const pool = allMode
+      ? items
+      : items.filter((i) => Boolean(i.playerId) && rosterPlayerIds?.has(i.playerId!));
+    return pool
+      .filter((item) => item.playerId || impactLine(item))
+      .slice(0, 4);
   }, [items, rosterPlayerIds, allMode]);
+
+  if (visible.length === 0) return null;
 
   return (
     <>
       <div className="flex shrink-0 flex-col overflow-hidden rounded-[7px] border border-border bg-surface">
         <div className="flex shrink-0 items-center justify-between border-b border-border bg-bg px-3 py-[7px]">
-          <span className="font-figtree text-[10px] uppercase tracking-[1.5px] text-text">
-            {title}
-          </span>
+          <span className="font-figtree text-[10px] uppercase tracking-[1.5px] text-text">{title}</span>
           <span className="font-mono text-[10px] text-boom">● LIVE</span>
         </div>
-        <div className="overflow-hidden">
-          {visible.length === 0 ? (
-            <div className="px-3 py-4 font-mono text-[11px] text-muted">No news for this league yet.</div>
-          ) : (
-            visible.map((item) => (
+        <div className="grid grid-cols-1 gap-0 md:grid-cols-2 lg:grid-cols-4">
+          {visible.map((item) => {
+            const impact = impactLine(item);
+            return (
               <button
                 key={item.id}
                 type="button"
@@ -122,23 +135,18 @@ export default function DynastyNewsFeed({
                   if (item.url.startsWith('http')) setModalItem(item);
                   else window.open(item.url, '_blank');
                 }}
-                className="grid w-full cursor-pointer grid-cols-[32px_1fr_auto] items-start gap-[5px] border-b border-border/40 px-3 py-[7px] text-left transition-colors last:border-b-0 hover:bg-white/[0.03]"
+                className="flex w-full cursor-pointer flex-col border-b border-r border-border/40 px-3 py-3 text-left transition-colors last:border-b-0 hover:bg-white/[0.03] md:border-b-0"
               >
-                <span className="pt-px font-mono text-[10px] text-muted">
-                  {formatTimeAgo(item.publishedAt)}
+                <span className="font-figtree text-[11px] font-semibold leading-snug text-text">
+                  {item.headline}
                 </span>
-                <span className="truncate font-figtree text-[11px] leading-snug text-text">
-                  <span className="font-semibold" style={{ color: item.highlightColor }}>
-                    {item.playerHighlight}
-                  </span>{' '}
-                  {item.headline.replace(item.playerHighlight, '').trim() || item.headline}
-                </span>
-                <span className="whitespace-nowrap rounded-full border border-border/60 bg-bg px-1.5 py-0.5 font-mono text-[8px] text-muted">
-                  {item.source}
-                </span>
+                {impact ? (
+                  <span className="mt-1.5 font-mono text-[9px] leading-snug text-muted">{impact}</span>
+                ) : null}
+                <span className="mt-2 font-mono text-[8px] text-muted">{formatTimeAgo(item.publishedAt)} ago</span>
               </button>
-            ))
-          )}
+            );
+          })}
         </div>
       </div>
       {modalItem && <NewsModal item={modalItem} onClose={() => setModalItem(null)} />}

@@ -2,8 +2,8 @@
 // Configured via FORMULA_ENGINE_URL + BOB_API_KEY (server-only env).
 
 // Strip any trailing slash so `${BASE}/api/...` can never produce a double slash.
-const BASE = (process.env.FORMULA_ENGINE_URL ?? '').replace(/\/+$/, '');
-const ENGINE_API_KEY = process.env.BOB_API_KEY;
+const BASE = (process.env.ENGINE_BASE_URL ?? process.env.FORMULA_ENGINE_URL ?? '').replace(/\/+$/, '');
+const ENGINE_API_KEY = process.env.CONSUMER_API_KEY ?? process.env.BOB_API_KEY;
 
 export type ScoringContext = 'dynasty' | 'redraft';
 export type RescoreContext = ScoringContext | 'both';
@@ -87,6 +87,35 @@ export async function getPlayerScores(
     return await safeJson(res, 'getPlayerScores');
   } catch (err) {
     console.error('[engine] getPlayerScores failed:', err);
+    return { ok: false, error: 'Engine unreachable' };
+  }
+}
+
+export interface TrackRecordConsensusParams {
+  season?: number;
+  limit?: number;
+  min_abs_delta?: number;
+  as_of?: string;
+  source?: string;
+}
+
+export async function getTrackRecordConsensus(params: TrackRecordConsensusParams = {}) {
+  if (!BASE) return notConfigured();
+  const qs = new URLSearchParams();
+  if (params.season != null) qs.set('season', String(params.season));
+  if (params.limit != null) qs.set('limit', String(params.limit));
+  if (params.min_abs_delta != null) qs.set('min_abs_delta', String(params.min_abs_delta));
+  if (params.as_of) qs.set('as_of', params.as_of);
+  if (params.source) qs.set('source', params.source);
+
+  const query = qs.toString();
+  const url = `${BASE}/api/v1/track-record/consensus${query ? `?${query}` : ''}`;
+  console.log('[engine] getTrackRecordConsensus →', url);
+  try {
+    const res = await fetch(url, { headers: authHeaders(), cache: 'no-store' });
+    return await safeJson(res, 'getTrackRecordConsensus');
+  } catch (err) {
+    console.error('[engine] getTrackRecordConsensus failed:', err);
     return { ok: false, error: 'Engine unreachable' };
   }
 }

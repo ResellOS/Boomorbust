@@ -17,6 +17,7 @@ import {
   parseResult,
   sortByOutcomeMagnitude,
 } from './utils';
+import { fetchTrackRecordConsensus } from './fetchTrackRecordConsensus';
 
 const EMPTY_CATEGORY: CategoryAccuracy = {
   buyNow: null,
@@ -291,6 +292,7 @@ export async function fetchPerformanceData(userId: string): Promise<PerformanceP
     hallOfShame: [],
     modelTimeline: SEED_MODEL_TIMELINE,
     leagues: [],
+    trackRecordConsensus: null,
   };
 
   let supabase;
@@ -314,6 +316,7 @@ export async function fetchPerformanceData(userId: string): Promise<PerformanceP
   }
 
   const calls = await fetchBobCalls(userId);
+  const trackRecordConsensus = await fetchTrackRecordConsensus();
   const stats = computeStats(calls);
   const categoryAccuracy: CategoryAccuracy = {
     buyNow: categoryPct(calls, 'Buy Now'),
@@ -352,5 +355,6 @@ export async function fetchPerformanceData(userId: string): Promise<PerformanceP
     hallOfShame,
     modelTimeline: SEED_MODEL_TIMELINE,
     leagues,
+    trackRecordConsensus,
   };
 }

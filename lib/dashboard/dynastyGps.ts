@@ -121,23 +121,47 @@ export function computeDynastyGps(
   const year = new Date().getFullYear();
   const window = `${year}–${year + 2}`;
 
+  const statusKey = isLeague
+    ? currentLeague!.status
+    : leagues.length > 0
+      ? [...leagues].sort((a, b) => {
+          const order = ['CHAMPIONSHIP', 'CONTENDER', 'TRANSITION', 'REBUILD', 'ORPHAN'];
+          return order.indexOf(a.status) - order.indexOf(b.status);
+        })[0]!.status
+      : 'ORPHAN';
+  const isRebuild = statusKey === 'REBUILD' || statusKey === 'ORPHAN';
+  const isWinNow = statusKey === 'CHAMPIONSHIP' || statusKey === 'CONTENDER';
+
   let playoffOdds: string | null = null;
   const withRecord = isLeague
     ? currentLeague!.winRate > 0
       ? [currentLeague!]
       : []
     : leagues.filter((l) => l.winRate > 0);
-  if (withRecord.length > 0) {
+  if (withRecord.length > 0 && !isRebuild) {
     const avgWin = withRecord.reduce((s, l) => s + l.winRate, 0) / withRecord.length;
-    playoffOdds = `${Math.round(Math.min(95, avgWin * 100 + 15))}%`;
+    let pct = Math.round(avgWin * 100 + (isWinNow ? 12 : 6));
+    pct = Math.min(isWinNow ? 85 : 65, Math.max(8, pct));
+    playoffOdds = `${pct}%`;
+  } else if (withRecord.length > 0 && isRebuild) {
+    const avgWin = withRecord.reduce((s, l) => s + l.winRate, 0) / withRecord.length;
+    const pct = Math.min(45, Math.max(5, Math.round(avgWin * 60)));
+    playoffOdds = `${pct}%`;
   }
+
+  const useChampionshipLabel = isWinNow && withRecord.length > 0;
+  const strengthLabel = useChampionshipLabel ? 'Championship Odds' : 'Portfolio Strength';
+  const strengthNumeric = useChampionshipLabel && playoffOdds
+    ? parseInt(playoffOdds, 10)
+    : empireRating;
+  const strengthValue = useChampionshipLabel && playoffOdds ? playoffOdds : empireRating.toFixed(1);
 
   return {
     portfolioStatus: isLeague ? LEAGUE_STATUS[currentLeague!.status].label.toUpperCase() : statusMeta.label,
     portfolioStatusColor: statusMeta.color,
-    strengthLabel: 'Portfolio Strength',
-    strengthValue: empireRating.toFixed(1),
-    strengthNumeric: empireRating,
+    strengthLabel,
+    strengthValue,
+    strengthNumeric,
     window,
     playoffOdds,
     biggestRisk: risk,

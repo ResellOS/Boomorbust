@@ -71,21 +71,35 @@ export default function ModeToggleBar({ leagues, mode, onSelect }: ModeToggleBar
 
         {leagues.map((lg) => {
           const active = mode === lg.id;
-          const color = LEAGUE_STATUS[lg.status].color;
+          const meta = LEAGUE_STATUS[lg.status];
           return (
             <button
               key={lg.id}
               type="button"
               onClick={() => onSelect(lg.id)}
-              title={lg.name}
+              title={`${lg.name} · ${meta.label}`}
               className={`${baseBtn} flex items-center gap-1.5 ${
                 active
-                  ? 'border-boom bg-boom/15 text-boom'
+                  ? 'border-boom bg-boom/20 text-boom font-semibold shadow-[0_0_12px_rgba(54,231,161,0.15)]'
                   : 'border-border bg-surface text-muted hover:text-text'
               }`}
             >
-              <span className="h-[6px] w-[6px] shrink-0 rounded-full" style={{ background: color }} />
-              <span className="max-w-[120px] truncate">{lg.name}</span>
+              <span
+                className="h-[6px] w-[6px] shrink-0 rounded-full"
+                style={{
+                  background: meta.color,
+                  boxShadow: active ? `0 0 6px ${meta.color}` : undefined,
+                }}
+              />
+              <span className="max-w-[100px] truncate">{lg.name}</span>
+              {active ? (
+                <span
+                  className="shrink-0 rounded px-1 py-0.5 font-mono text-[7px] uppercase tracking-wide"
+                  style={{ color: meta.color, background: `${meta.color}18` }}
+                >
+                  {meta.label}
+                </span>
+              ) : null}
             </button>
           );
         })}

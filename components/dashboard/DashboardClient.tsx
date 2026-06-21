@@ -7,17 +7,25 @@ import { empireRatingDelta } from '@/lib/dashboard/empireRating';
 import { computeDynastyGps } from '@/lib/dashboard/dynastyGps';
 import { computePortfolioExposure } from '@/lib/dashboard/portfolioExposure';
 import { computeLeagueCounts } from '@/lib/dashboard/leagueCounts';
-import { computeDashboardPortfolioOverview } from '@/lib/dashboard/portfolioOverview';
+import { computeLeagueIntel } from '@/lib/dashboard/leagueIntel';
+import {
+  breakdownForContext,
+  computeRosterConstructionGrades,
+} from '@/lib/dashboard/rosterConstruction';
+import { buildOpportunityFeed } from '@/lib/dashboard/opportunityFeed';
+import { buildMissionCards } from '@/lib/dashboard/missionTasks';
 import { LEAGUE_ROTATE_SECONDS } from '@/lib/dashboard/constants';
 import DashboardTopBar from './DashboardTopBar';
 import ModeToggleBar, { type DashboardMode } from './ModeToggleBar';
 import LeagueRotationHeader from './LeagueRotationHeader';
+import PageBriefingHeader from './PageBriefingHeader';
 import LiveScoreTicker from './LiveScoreTicker';
-import FrontOfficeCommandCenter from './FrontOfficeCommandCenter';
+import TodayTopPriority from './TodayTopPriority';
+import FrontOfficeTasks from './FrontOfficeTasks';
 import DynastyGpsCard from './DynastyGpsCard';
 import OpportunityFeed from './OpportunityFeed';
 import MarketSignalsCompact from './MarketSignalsCompact';
-import DashboardPortfolioOverview from './DashboardPortfolioOverview';
+import RosterConstruction from './RosterConstruction';
 import DynastyNewsFeed from './DynastyNewsFeed';
 import RightPanel from './RightPanel';
 import Footer from './Footer';
@@ -70,14 +78,39 @@ export default function DashboardClient({
     return leagues.find((l) => l.id === effectiveMode) ?? null;
   }, [isAll, effectiveMode, leagues, rotIndex]);
 
+  const contextLeagueId = currentLeague?.id;
+
   const players = useMemo(
     () => (isAll ? portfolio.players : currentLeague?.players ?? []),
     [isAll, portfolio.players, currentLeague?.players],
   );
-  const playersRostered = isAll ? portfolio.playersRostered : players.length;
-  const empireRating = empireRatingFromTfo(data.portfolio.teamTfo);
+
+  const scopedTradeTargets = useMemo(
+    () =>
+      isAll || !contextLeagueId
+        ? tradeTargets
+        : tradeTargets.filter((t) => t.leagueId === contextLeagueId),
+    [isAll, contextLeagueId, tradeTargets],
+  );
+
+  const scopedTasks = useMemo(() => {
+    if (isAll || !currentLeague) return dailyTasks;
+    return dailyTasks.filter((t) => {
+      const raw = t.taskData as { league_id?: string; league_name?: string };
+      return raw.league_id === currentLeague.id || raw.league_name === currentLeague.name;
+    });
+  }, [isAll, currentLeague, dailyTasks]);
+
+  const scopedLineup = useMemo(() => {
+    if (!lineupOpportunity) return null;
+    if (isAll) return lineupOpportunity;
+    return lineupOpportunity.leagueId === contextLeagueId ? lineupOpportunity : null;
+  }, [lineupOpportunity, isAll, contextLeagueId]);
+
+  const empireRating = empireRatingFromTfo(
+    isAll ? portfolio.teamTfo : currentLeague?.teamTfo ?? portfolio.teamTfo,
+  );
   const empireDelta = empireRatingDelta(empireRating, lastEmpireRating);
-  const dynastyEdge = Math.max(0, (isAll ? portfolio.teamTfo : currentLeague?.teamTfo ?? 0) - 70);
   const contextLabel = isAll ? 'All Leagues' : currentLeague?.name ?? '—';
 
   const gps = useMemo(
@@ -98,14 +131,24 @@ export default function DashboardClient({
 
   const leagueCounts = useMemo(() => computeLeagueCounts(rosterMap), [rosterMap]);
 
-  const portfolioOverview = useMemo(
-    () => computeDashboardPortfolioOverview(portfolio, leagues),
-    [portfolio, leagues],
+  const breakdown = useMemo(
+    () => breakdownForContext(portfolio, currentLeague),
+    [portfolio, currentLeague],
+  );
+
+  const rosterGrades = useMemo(
+    () => computeRosterConstructionGrades(breakdown, portfolio),
+    [breakdown, portfolio],
   );
 
   const exposure = useMemo(
-    () => computePortfolioExposure(rosterMap, portfolio.players, tradeTargets),
-    [rosterMap, portfolio.players, tradeTargets],
+    () => computePortfolioExposure(rosterMap, portfolio.players, scopedTradeTargets),
+    [rosterMap, portfolio.players, scopedTradeTargets],
+  );
+
+  const leagueIntel = useMemo(
+    () => computeLeagueIntel(currentLeague, leagues, scopedTasks, incomingTrades, scopedTradeTargets),
+    [currentLeague, leagues, scopedTasks, incomingTrades, scopedTradeTargets],
   );
 
   const signalPlayerIds = useMemo(
@@ -130,21 +173,39 @@ export default function DashboardClient({
     });
   }, [newsItems, newsRosterIds, signalPlayerIds]);
 
+  const opportunityItems = useMemo(
+    () =>
+      buildOpportunityFeed({
+        lineupOpportunity: scopedLineup,
+        players,
+        tradeTargets: scopedTradeTargets,
+      }),
+    [scopedLineup, players, scopedTradeTargets],
+  );
+
+  const fallbackFeedItem = opportunityItems[0] ?? null;
+  const pendingOffers = incomingTrades.filter((t) => t.status === 'PENDING' || t.status === 'NEW').length;
+  const todaysPriorities = buildMissionCards(scopedTasks, scopedLineup, 3).length;
+  const leagueIntelHref = currentLeague ? `/leagues/${currentLeague.id}` : '/leagues';
+
   return (
     <>
       <DashboardTopBar
         leagueCount={leagues.length}
-        playersRostered={playersRostered}
         tradeOffers={incomingTrades.length}
-        dynastyEdge={dynastyEdge}
+        pendingOffers={pendingOffers}
+        todaysPriorities={todaysPriorities}
         portfolioStrength={empireRating}
         portfolioDelta={empireDelta}
-        contextLabel={contextLabel}
+        strengthLabel={gps.strengthLabel}
+        strengthDisplay={gps.strengthValue}
       />
 
       <div className="col-start-1 row-start-2 flex min-h-0 min-w-0 flex-col overflow-hidden lg:col-start-2 lg:grid lg:grid-cols-[1fr_280px]">
         <div className="flex min-w-0 flex-col gap-3 overflow-y-auto overflow-x-hidden p-[11px_13px] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           <LiveScoreTicker inSeason={nflSeason.inSeason} />
+
+          <PageBriefingHeader contextLabel={contextLabel} isAll={isAll} />
 
           <ModeToggleBar leagues={leagues} mode={effectiveMode} onSelect={setMode} />
 
@@ -156,37 +217,51 @@ export default function DashboardClient({
             leagueCount={leagues.length}
           />
 
-          <FrontOfficeCommandCenter initialTasks={dailyTasks} lineupOpportunity={lineupOpportunity} />
+          <TodayTopPriority
+            tasks={scopedTasks}
+            tradeTargets={scopedTradeTargets}
+            lineupOpportunity={scopedLineup}
+            fallbackFeedItem={fallbackFeedItem}
+          />
 
-          <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3 lg:min-h-[300px]">
+          <FrontOfficeTasks initialTasks={scopedTasks} lineupOpportunity={scopedLineup} />
+
+          <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3 lg:min-h-[320px]">
             <DynastyGpsCard data={gps} />
             <OpportunityFeed
-              lineupOpportunity={lineupOpportunity}
+              lineupOpportunity={scopedLineup}
               players={players}
-              tradeTargets={tradeTargets}
+              tradeTargets={scopedTradeTargets}
             />
             <MarketSignalsCompact players={players} leagueCounts={leagueCounts} />
           </div>
 
-          <DashboardPortfolioOverview
-            data={portfolioOverview}
-            title={isAll ? 'Portfolio Overview (All Leagues)' : `Portfolio Overview · ${contextLabel}`}
+          <RosterConstruction
+            grades={rosterGrades}
+            title={isAll ? 'Roster Construction · Portfolio' : `Roster Construction · ${contextLabel}`}
           />
 
           <DynastyNewsFeed
             items={filteredNews.length > 0 ? filteredNews : newsItems.slice(0, 4)}
             rosterPlayerIds={newsRosterIds}
             allMode={isAll}
-            title="Latest News"
           />
         </div>
 
-        <RightPanel mostExposed={exposure.mostExposed} noExposure={exposure.noExposure} />
+        <RightPanel
+          mostExposed={exposure.mostExposed}
+          noExposure={exposure.noExposure}
+          leagueIntel={leagueIntel}
+          leagueIntelHref={leagueIntelHref}
+          dailyTasks={scopedTasks}
+          lineupOpportunity={scopedLineup}
+          showTasksInRail={false}
+        />
       </div>
 
       <Footer
         leagueCount={leagues.length}
-        edgeOpportunities={tradeTargets.length > 0 ? tradeTargets.length + 19 : 27}
+        edgeOpportunities={scopedTradeTargets.length > 0 ? scopedTradeTargets.length : 0}
       />
     </>
   );

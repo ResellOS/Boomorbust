@@ -176,7 +176,7 @@ export default function DynastyGpsCard({ data }: { data: DynastyGpsData }) {
 
           >
 
-            View Dynasty Outlook
+            View Full GPS
 
             <ChevronRight className="h-3 w-3" />
 

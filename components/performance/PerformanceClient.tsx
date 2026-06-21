@@ -9,6 +9,7 @@ import {
   WIN_DEFINITIONS,
 } from '@/lib/performance/constants';
 import BobVsConsensusChart from '@/components/performance/BobVsConsensusChart';
+import BobVsConsensusTrackRecord from '@/components/performance/BobVsConsensusTrackRecord';
 import AccuracyByCategory from '@/components/performance/AccuracyByCategory';
 import RecentCallsFeed from '@/components/performance/RecentCallsFeed';
 import HallOfFame from '@/components/performance/HallOfFame';
@@ -16,7 +17,7 @@ import HallOfAccountability from '@/components/performance/HallOfAccountability'
 import ModelTimeline from '@/components/performance/ModelTimeline';
 
 export default function PerformanceClient({ data }: { data: PerformancePageData }) {
-  const { stats, consensus, weeklyChart, categoryAccuracy, confidenceCalibration, calls, hallOfFame, hallOfShame, modelTimeline } = data;
+  const { stats, consensus, weeklyChart, categoryAccuracy, confidenceCalibration, calls, hallOfFame, hallOfShame, modelTimeline, trackRecordConsensus } = data;
   const hasData = stats.hasSeasonData;
 
   return (
@@ -34,7 +35,10 @@ export default function PerformanceClient({ data }: { data: PerformancePageData 
         </p>
       </div>
 
-      {/* Section 1 — BOB vs Consensus */}
+      {/* BOB vs Consensus — expert rank divergences (engine track record) */}
+      <BobVsConsensusTrackRecord data={trackRecordConsensus} />
+
+      {/* Season accuracy vs consensus baselines */}
       <BobVsConsensusChart
         consensus={consensus}
         weeklyChart={weeklyChart}

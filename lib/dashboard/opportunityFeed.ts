@@ -45,9 +45,9 @@ function lineupItem(o: LineupOpportunity): OpportunityFeedItem {
     id: `lineup-${o.benchPlayerId}`,
     minutesAgo: 8,
     category: 'LINEUP EDGE',
-    headline: truncateFeedHeadline(`Start ${o.benchName} over ${o.starterName}`),
+    headline: truncateFeedHeadline(`LINEUP EDGE — ${o.benchName}`),
     explanation: truncateFeedHeadline(
-      `${o.benchName} projected +${o.gap.toFixed(1)} at ${o.position} in ${o.leagueName}`,
+      `Projected +${o.gap.toFixed(1)} over current ${o.position} in ${o.leagueName}`,
     ),
     metricLabel: 'Projection Edge',
     metricValue: `+${o.gap.toFixed(1)} pts`,
@@ -63,33 +63,37 @@ function signalItem(p: RotationPlayer, idx: number): OpportunityFeedItem | null 
   const delta = mv.rankDelta != null ? Math.abs(Math.round(mv.rankDelta)) : null;
 
   if (v === 'BOOM' || v === 'BUY') {
+    const bob = mv.ktcRank != null && mv.rankDelta != null ? Math.round(mv.ktcRank - mv.rankDelta) : null;
     return {
       id: `buy-${p.playerId}-${idx}`,
       minutesAgo: 30 + idx * 45,
       category: 'BUY WINDOW',
-      headline: truncateFeedHeadline(`${p.name} — ${formatMarketVerdictLabel(v)}`),
+      headline: truncateFeedHeadline(`BUY WINDOW OPEN — ${p.name}`),
       explanation: truncateFeedHeadline(
-        delta != null
-          ? `BOB sees ${delta}-spot value gap vs market`
-          : `BOB ${formatMarketVerdictLabel(v)} signal active`,
+        delta != null ? 'Market cooling, BOB unchanged.' : `BOB ${formatMarketVerdictLabel(v)} signal active`,
       ),
-      metricLabel: 'Rank Gap',
-      metricValue: delta != null ? `${delta} spots` : '—',
+      metricLabel: 'BOB Rank',
+      metricValue: bob != null ? `#${bob}` : '—',
+      secondaryLabel: 'Market Rank',
+      secondaryValue: mv.ktcRank != null ? `#${mv.ktcRank}` : '—',
       href: `/players?highlight=${p.playerId}`,
       color: CATEGORY_COLORS['BUY WINDOW'],
     };
   }
   if (v === 'SELL' || v === 'BUST') {
+    const bob = mv.ktcRank != null && mv.rankDelta != null ? Math.round(mv.ktcRank - mv.rankDelta) : null;
     return {
       id: `sell-${p.playerId}-${idx}`,
       minutesAgo: 60 + idx * 30,
-      category: 'VALUE ALERT',
-      headline: truncateFeedHeadline(`${p.name} — ${formatMarketVerdictLabel(v)}`),
-      explanation: truncateFeedHeadline('Review exposure before market corrects'),
-      metricLabel: 'Rank Gap',
-      metricValue: delta != null ? `${delta} spots` : '—',
+      category: 'SELL WINDOW',
+      headline: truncateFeedHeadline(`SELL HIGH — ${p.name}`),
+      explanation: truncateFeedHeadline('Age + usage decline. Peak value now.'),
+      metricLabel: 'Rank Delta',
+      metricValue: delta != null ? `+${delta}` : '—',
+      secondaryLabel: 'BOB Rank',
+      secondaryValue: bob != null ? `#${bob}` : '—',
       href: `/trade?target=${p.playerId}`,
-      color: CATEGORY_COLORS['VALUE ALERT'],
+      color: CATEGORY_COLORS['SELL WINDOW'],
     };
   }
   return null;

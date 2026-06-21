@@ -12,9 +12,9 @@ function engineRank(ktcRank: number | null, rankDelta: number | null): number | 
 }
 
 function actionLabel(verdict: string): string {
-  if (verdict === 'BUST' || verdict === 'SELL') return 'Sell Now';
+  if (verdict === 'BUST' || verdict === 'SELL') return 'Sell High';
   if (verdict === 'BOOM' || verdict === 'BUY') return 'Buy Low';
-  return 'Monitor';
+  return 'Hold';
 }
 
 function confidenceTier(rankDelta: number | null): string {
@@ -40,9 +40,8 @@ function SignalRow({ player }: { player: RotationPlayer }) {
             <p className="truncate font-figtree text-[12px] font-medium text-[#e8ecf4]">
               {player.name}
             </p>
-            <span className="shrink-0 font-mono text-[8px] uppercase text-[#6b7a99]">
-              Action:{' '}
-              <span style={{ color: mv.color }}>{actionLabel(mv.verdict)}</span>
+            <span className="shrink-0 font-mono text-[8px] uppercase" style={{ color: mv.color }}>
+              {actionLabel(mv.verdict)}
             </span>
           </div>
           <p className="font-mono text-[8px] text-[#6b7a99]">
@@ -52,19 +51,19 @@ function SignalRow({ player }: { player: RotationPlayer }) {
       </div>
       <div className="mt-1.5 flex flex-wrap gap-x-3 gap-y-0.5 font-mono text-[8px] tabular-nums text-[#6b7a99]">
         <span>
-          Market: <span className="text-[#e8ecf4]">{ktc ?? '—'}</span>
+          Market Rank <span className="text-[#e8ecf4]">#{ktc ?? '—'}</span>
         </span>
         <span>
-          BOB: <span className="text-boom">{bob ?? '—'}</span>
+          BOB Rank <span className="text-boom">#{bob ?? '—'}</span>
         </span>
         <span>
-          Delta:{' '}
+          Rank Delta{' '}
           <span style={{ color: delta != null ? deltaColor : '#6b7a99' }}>
             {delta != null ? `${delta > 0 ? '+' : ''}${delta}` : '—'}
           </span>
         </span>
         <span>
-          Conf: <span className="text-[#e8ecf4]">{confidenceTier(mv.rankDelta)}</span>
+          Confidence: <span className="text-[#e8ecf4]">{confidenceTier(mv.rankDelta)}</span>
         </span>
       </div>
     </div>
@@ -86,9 +85,9 @@ export default function MarketSignalsCompact({
       <div className="flex items-center justify-between border-b border-[#1e2640]/80 px-3.5 py-2.5">
         <div>
           <h3 className="font-figtree text-[10px] uppercase tracking-[1.5px] text-[#e8ecf4]">
-            Market Signals
+            Mispriced Assets
           </h3>
-          <p className="font-mono text-[8px] text-[#6b7a99]">Mispricing · action rows</p>
+          <p className="font-mono text-[8px] text-[#6b7a99]">Buy low · sell high · hold</p>
         </div>
         <Link href="/players" className="font-mono text-[8px] text-boom no-underline hover:underline">
           View All →
@@ -97,7 +96,7 @@ export default function MarketSignalsCompact({
       <div className="flex-1 overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {sorted.length === 0 ? (
           <p className="px-4 py-5 font-mono text-[10px] text-[#6b7a99]">
-            No market signals yet — sync leagues to populate.
+            No mispriced assets yet — sync leagues to populate.
           </p>
         ) : (
           sorted.map((p) => <SignalRow key={p.playerId} player={p} />)

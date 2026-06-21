@@ -7,34 +7,32 @@ import { EMPIRE_RATING_TOOLTIP } from '@/lib/dashboard/empireRating';
 
 export interface DashboardTopBarProps {
   leagueCount: number;
-  playersRostered: number;
   tradeOffers: number;
-  dynastyEdge: number;
+  pendingOffers: number;
+  todaysPriorities: number;
   portfolioStrength: number;
   portfolioDelta: number | null;
-  contextLabel: string;
+  strengthLabel?: string;
+  strengthDisplay?: string;
 }
 
 const GLOW = { textShadow: '0 0 9px rgba(54,231,161,0.45)' } as const;
 
 export default function DashboardTopBar({
   leagueCount,
-  playersRostered,
   tradeOffers,
-  dynastyEdge,
+  pendingOffers,
+  todaysPriorities,
   portfolioStrength,
   portfolioDelta,
-  contextLabel,
+  strengthLabel = 'Portfolio Strength',
+  strengthDisplay,
 }: DashboardTopBarProps) {
-  const showEdge = dynastyEdge > 0;
+  const primaryStrength = strengthDisplay ?? portfolioStrength.toFixed(1);
 
   return (
-    <header
-      className="col-span-1 md:col-span-2 row-start-1 grid h-[66px] border-b border-border bg-bg grid-cols-1 md:grid-cols-[215px_1fr]"
-    >
-      <div
-        className="hidden md:flex items-center justify-center overflow-hidden bg-bg px-1.5 py-1 border-r border-[#1e2640]"
-      >
+    <header className="col-span-1 md:col-span-2 row-start-1 grid h-[66px] border-b border-border bg-bg grid-cols-1 md:grid-cols-[215px_1fr]">
+      <div className="hidden md:flex items-center justify-center overflow-hidden bg-bg px-1.5 py-1 border-r border-[#1e2640]">
         <Image
           src="/logo.png"
           alt="Boom or Bust"
@@ -51,18 +49,15 @@ export default function DashboardTopBar({
       </div>
 
       <div className="flex min-w-0 items-stretch overflow-x-auto scrollbar-hide">
-        <div className="flex min-w-[120px] shrink-0 flex-col justify-center border-r border-border px-3 py-1.5 md:px-[18px]">
-          <div
-            className="truncate font-figtree text-[16px] font-semibold leading-tight text-text"
-            title={contextLabel}
-          >
-            {contextLabel}
-          </div>
-        </div>
+        <Stat label={strengthLabel} value={primaryStrength} accent />
+        <Stat label="Today's Priorities" value={String(todaysPriorities)} />
         <Stat label="Leagues" value={String(leagueCount)} accent />
-        <Stat label="Players Rostered" value={String(playersRostered)} />
-        <Stat label="Trade Offers" value={String(tradeOffers)} hold />
-        {showEdge && <Stat label="Dynasty Edge" value={`+${dynastyEdge.toFixed(1)}`} accent />}
+        <Stat
+          label="Trade Offers"
+          value={String(tradeOffers)}
+          sub={pendingOffers > 0 ? `${pendingOffers} pending` : undefined}
+          hold={pendingOffers > 0}
+        />
         <PortfolioStrengthStat value={portfolioStrength} delta={portfolioDelta} />
       </div>
     </header>
@@ -83,8 +78,7 @@ function PortfolioStrengthStat({ value, delta }: { value: number; delta: number 
   }, [open]);
 
   const deltaColor = delta != null && delta > 0 ? '#36E7A1' : '#A78BFA';
-  const deltaLabel =
-    delta != null ? `${delta > 0 ? '+' : ''}${delta.toFixed(1)}` : null;
+  const deltaLabel = delta != null ? `${delta > 0 ? '+' : ''}${delta.toFixed(1)}` : null;
 
   return (
     <div
@@ -96,16 +90,13 @@ function PortfolioStrengthStat({ value, delta }: { value: number; delta: number 
         className="mb-[3px] flex items-center gap-1 font-figtree text-[10px] uppercase tracking-[1.2px] text-muted"
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
-        aria-label="Portfolio Strength info"
+        aria-label="Empire Rating info"
       >
-        Portfolio Strength
+        Empire Rating
         <Info className="h-3 w-3 opacity-60" strokeWidth={2} />
       </button>
       <div className="flex items-baseline gap-2">
-        <div
-          className="font-mono text-[22px] font-semibold leading-none tracking-[-0.5px] text-boom"
-          style={GLOW}
-        >
+        <div className="font-mono text-[22px] font-semibold leading-none tracking-[-0.5px] text-boom" style={GLOW}>
           {value.toFixed(1)}
         </div>
         {deltaLabel != null && (
@@ -137,11 +128,13 @@ function PortfolioStrengthStat({ value, delta }: { value: number; delta: number 
 function Stat({
   label,
   value,
+  sub,
   accent,
   hold,
 }: {
   label: string;
   value: string;
+  sub?: string;
   accent?: boolean;
   hold?: boolean;
 }) {
@@ -155,6 +148,7 @@ function Stat({
       >
         {value}
       </div>
+      {sub ? <div className="mt-0.5 font-mono text-[8px] text-hold">{sub}</div> : null}
     </div>
   );
 }

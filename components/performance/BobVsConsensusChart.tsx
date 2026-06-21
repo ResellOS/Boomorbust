@@ -145,7 +145,7 @@ export default function BobVsConsensusChart({
   return (
     <section className="mb-6 rounded-[10px] border border-border bg-surface/50 p-4 backdrop-blur-xl md:p-5">
       <div className="mb-1 font-figtree text-[11px] font-bold uppercase tracking-[1.5px] text-text">
-        BOB vs Consensus
+        Season Accuracy vs Consensus
       </div>
       <p className="mb-4 font-figtree text-[11px] text-muted">
         {hasData

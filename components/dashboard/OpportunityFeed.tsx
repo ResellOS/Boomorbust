@@ -80,6 +80,20 @@ function FeedRow({ item }: { item: OpportunityFeedItem }) {
         <p className="mt-0.5 font-figtree text-[10px] leading-snug text-[#6b7a99]">
           {item.explanation}
         </p>
+        {(item.metricValue || item.secondaryValue) && (
+          <div className="mt-1 flex flex-wrap gap-x-3 font-mono text-[8px] tabular-nums text-[#6b7a99]">
+            {item.metricLabel ? (
+              <span>
+                {item.metricLabel}: <span className="text-[#e8ecf4]">{item.metricValue ?? '—'}</span>
+              </span>
+            ) : null}
+            {item.secondaryLabel ? (
+              <span>
+                {item.secondaryLabel}: <span className="text-boom">{item.secondaryValue ?? '—'}</span>
+              </span>
+            ) : null}
+          </div>
+        )}
         {item.href ? (
           <span className="mt-1.5 inline-flex items-center gap-0.5 font-mono text-[8px] text-boom">
             View <ChevronRight className="h-3 w-3" />
