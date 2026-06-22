@@ -39,6 +39,8 @@ export default function OnboardingPage() {
   const [syncLoading, setSyncLoading] = useState(false);
   const [syncError, setSyncError] = useState('');
   const [termsAccepted, setTermsAccepted] = useState(false);
+  // True when the profile already has tos_accepted_at — we then skip the checkbox.
+  const [tosAlreadyAccepted, setTosAlreadyAccepted] = useState(false);
 
   const [authChecked, setAuthChecked] = useState(false);
 
@@ -54,11 +56,16 @@ export default function OnboardingPage() {
       }
       const { data } = await supabase
         .from('profiles')
-        .select('sleeper_user_id')
+        .select('sleeper_user_id, tos_accepted_at')
         .single();
       if (data?.sleeper_user_id) {
         router.replace('/dashboard');
         return;
+      }
+      // Already accepted (e.g. returning to onboarding) → don't re-prompt.
+      if (data?.tos_accepted_at) {
+        setTosAlreadyAccepted(true);
+        setTermsAccepted(true);
       }
       setAuthChecked(true);
     })();
@@ -93,12 +100,23 @@ export default function OnboardingPage() {
         return;
       }
 
+      const profileUpdate: {
+        sleeper_user_id: string;
+        username: string;
+        tos_accepted_at?: string;
+      } = {
+        sleeper_user_id: slUser.user_id,
+        username: slUser.username ?? name,
+      };
+      // Stamp active TOS/Privacy acceptance the first time only; preserve the
+      // original timestamp if the profile was already accepted.
+      if (!tosAlreadyAccepted) {
+        profileUpdate.tos_accepted_at = new Date().toISOString();
+      }
+
       const { error: saveErr } = await supabase
         .from('profiles')
-        .update({
-          sleeper_user_id: slUser.user_id,
-          username: slUser.username ?? name,
-        })
+        .update(profileUpdate)
         .eq('id', user.id);
 
       if (saveErr) {
@@ -214,27 +232,45 @@ export default function OnboardingPage() {
                     </p>
                   )}
 
-                  <label className="flex items-start gap-3 cursor-pointer group">
-                    <input
-                      type="checkbox"
-                      checked={termsAccepted}
-                      onChange={(e) => setTermsAccepted(e.target.checked)}
-                      className="mt-0.5 h-4 w-4 rounded border border-white/20 bg-[var(--bg-secondary)] accent-[var(--indigo)] cursor-pointer flex-shrink-0"
-                    />
-                    <span className="text-xs text-[var(--text-muted)] leading-relaxed group-hover:text-[var(--text-secondary)] transition">
-                      I agree that anonymized trade &amp; draft data may be used to improve dynasty value
-                      calculations.{' '}
-                      <a
-                        href="/terms"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-[var(--indigo-light)] hover:underline"
-                        onClick={(e) => e.stopPropagation()}
+                  {!tosAlreadyAccepted && (
+                    <label className="flex items-start gap-3 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={termsAccepted}
+                        onChange={(e) => setTermsAccepted(e.target.checked)}
+                        className="mt-0.5 h-4 w-4 rounded border border-white/20 bg-[var(--bg-secondary)] cursor-pointer flex-shrink-0"
+                        style={{ accentColor: '#36E7A1' }}
+                      />
+                      <span
+                        className="text-xs leading-relaxed"
+                        style={{ color: '#6b7a99', fontFamily: 'var(--font-figtree), Figtree, sans-serif' }}
                       >
-                        Full terms →
-                      </a>
-                    </span>
-                  </label>
+                        I agree to the{' '}
+                        <a
+                          href="/terms"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="hover:underline"
+                          style={{ color: '#36E7A1' }}
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          Terms of Service
+                        </a>{' '}
+                        and{' '}
+                        <a
+                          href="/privacy"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="hover:underline"
+                          style={{ color: '#36E7A1' }}
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          Privacy Policy
+                        </a>
+                        .
+                      </span>
+                    </label>
+                  )}
 
                   <button
                     type="submit"
