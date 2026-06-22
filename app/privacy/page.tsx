@@ -20,7 +20,7 @@ export default function PrivacyPage() {
             Privacy Policy
           </h1>
           <p className="mt-2 text-[13px] text-[#64748B]" style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}>
-            Last updated: May 2026
+            Last updated: June 22, 2026
           </p>
         </div>
 
@@ -49,7 +49,7 @@ export default function PrivacyPage() {
           </Section>
 
           <Section title="6. Data Retention">
-            <p>We retain your data for as long as your account is active. You may request deletion of your account and associated data by emailing kody@boomorbust.app.</p>
+            <p>We retain your data for as long as your account is active. You may request deletion of your account and associated data by emailing boombust@yahoo.com.</p>
           </Section>
 
           <Section title="7. Third-Party Services">
@@ -57,11 +57,11 @@ export default function PrivacyPage() {
           </Section>
 
           <Section title="8. Your Rights">
-            <p>You have the right to access, correct, or delete your personal data. Contact us at kody@boomorbust.app for any data requests.</p>
+            <p>You have the right to access, correct, or delete your personal data. Contact us at boombust@yahoo.com for any data requests.</p>
           </Section>
 
           <Section title="9. Contact">
-            <p>For privacy questions: <a href="mailto:kody@boomorbust.app" className="text-[#22D3EE] hover:underline">kody@boomorbust.app</a></p>
+            <p>For privacy questions: <a href="mailto:boombust@yahoo.com" className="text-[#22D3EE] hover:underline">boombust@yahoo.com</a></p>
           </Section>
         </div>
 
