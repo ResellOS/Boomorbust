@@ -11,7 +11,7 @@ const TEXT = '#e8ecf4';
 const MUTED = '#6b7a99';
 const ACCENT = '#36E7A1';
 const BG = '#0a0d14';
-const CONTACT = 'boombust@yahoo.com';
+const CONTACT = 'support@boomorbust.app';
 
 function Section({
   n,
