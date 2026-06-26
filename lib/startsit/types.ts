@@ -134,4 +134,81 @@ export interface StartSitPageData {
   allRecommendations: StartSitRecommendation[];
   leagueCount: number;
   hasRealData: boolean;
+  /** Player ids per league for lineup rendering */
+  rosterByLeague: Record<string, string[]>;
+}
+
+export type WeeklyDecisionKind =
+  | 'START'
+  | 'BENCH'
+  | 'ADD'
+  | 'DROP'
+  | 'TRADE'
+  | 'WEATHER'
+  | 'INJURY';
+
+export interface WeeklyDecisionCard {
+  id: string;
+  kind: WeeklyDecisionKind;
+  playerId: string;
+  playerName: string;
+  position: string;
+  team: string;
+  opponent: string;
+  leagueId: string;
+  leagueName: string;
+  projectedPoints: number | null;
+  impact: 'High' | 'Medium' | 'Low';
+  confidence: number;
+  whyBullets: string[];
+  whyOneLine: string;
+  isPreview: boolean;
+  relatedPlayerId?: string;
+  relatedPlayerName?: string;
+}
+
+export interface LineupSlotView {
+  slot: string;
+  playerId: string | null;
+  playerName: string;
+  position: string;
+  team: string;
+  opponent: string;
+  projectedPoints: number | null;
+  confidence: number;
+  recommendation: 'start' | 'sit' | 'flex' | 'neutral';
+}
+
+export interface LeagueMatchupView {
+  leagueId: string;
+  leagueName: string;
+  week: number;
+  yourTeamName: string;
+  opponentTeamName: string | null;
+  yourProjected: number;
+  opponentProjected: number | null;
+  yourWinPct: number | null;
+  opponentWinPct: number | null;
+  projectedMargin: number | null;
+  impliedTotal: number | null;
+  positionBreakdown: { slot: string; you: number; opp: number | null }[];
+  syncing: boolean;
+}
+
+export interface PortfolioMatchupSummary {
+  totalProjectedPoints: number;
+  projectedWins: number | null;
+  projectedLosses: number | null;
+  closestMatchup: string | null;
+  biggestEdge: string | null;
+  highestRiskMatchup: string | null;
+  leagueCount: number;
+}
+
+export interface WeeklyCompletion {
+  pct: number;
+  leaguesComplete: number;
+  leaguesTotal: number;
+  decisionsComplete: number;
+  decisionsTotal: number;
 }

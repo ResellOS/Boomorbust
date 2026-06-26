@@ -7,7 +7,7 @@ import TerminalShell from '@/components/dashboard/TerminalShell';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Start / Sit',
+  title: 'Weekly Decisions',
 };
 
 export default async function StartSitLayout({

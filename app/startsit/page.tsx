@@ -4,8 +4,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { fetchStartSitData } from '@/lib/startsit/fetchStartSitData';
 import Sidebar from '@/components/dashboard/Sidebar';
 import StartSitTopBar from '@/components/startsit/StartSitTopBar';
-import StartSitClient from '@/components/startsit/StartSitClient';
-import StartSitRightPanel from '@/components/startsit/StartSitRightPanel';
+import WeeklyDecisionsClient from '@/components/startsit/WeeklyDecisionsClient';
 import StartSitFooter from '@/components/startsit/StartSitFooter';
 import TerminalPageGrid from '@/components/dashboard/TerminalPageGrid';
 
@@ -83,26 +82,24 @@ export default async function StartSitPage({ searchParams }: PageProps) {
         bobConfidence={data.bobConfidence}
       />
 
-      <div className="col-start-1 md:col-start-2 row-start-2 flex min-h-0 flex-col overflow-hidden md:flex-row">
-        <StartSitClient
+      <div className="col-start-1 md:col-start-2 row-start-2 flex min-h-0 flex-col overflow-hidden">
+        <WeeklyDecisionsClient
           nflWeek={data.weekContext.nflWeek}
           isOffseason={data.weekContext.isOffseason}
           leagues={data.leagues}
+          initialLeagueId={selectedLeague}
           seasonRecord={data.seasonRecord}
           decisions={data.decisions}
           decisionsSummary={data.decisionsSummary}
           lineupOptimizer={data.lineupOptimizer}
-          flexDecisions={data.flexDecisions}
           hasRealData={data.hasRealData}
+          allRecommendations={data.allRecommendations}
+          alerts={data.alerts}
+          rosterByLeague={data.rosterByLeague}
+          weekContext={data.weekContext}
+          topbar={data.topbar}
+          leagueCount={data.leagueCount}
         />
-        <div className="hidden md:block md:shrink-0">
-          <StartSitRightPanel
-            seasonRecord={data.seasonRecord}
-            alerts={data.alerts}
-            weekContext={data.weekContext}
-            leagueCount={data.leagueCount}
-          />
-        </div>
       </div>
 
       <StartSitFooter

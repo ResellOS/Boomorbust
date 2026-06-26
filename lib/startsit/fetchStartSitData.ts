@@ -148,6 +148,7 @@ export async function fetchStartSitData(
     allRecommendations: [],
     leagueCount: 0,
     hasRealData: false,
+    rosterByLeague: {},
   };
 
   let supabase;
@@ -610,5 +611,6 @@ export async function fetchStartSitData(
     allRecommendations: recommendations,
     leagueCount: leagueList.length,
     hasRealData,
+    rosterByLeague: Object.fromEntries(leagueRosters),
   };
 }

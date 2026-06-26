@@ -72,7 +72,7 @@ const NAV_ITEMS: { label: string; href: string; icon: LucideIcon }[] = [
   { label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
   { label: 'Trade Hub', href: '/trade', icon: ArrowLeftRight },
   { label: 'Player Hub', href: '/players', icon: Users },
-  { label: 'Start / Sit', href: '/startsit', icon: Play },
+  { label: 'Weekly Decisions', href: '/startsit', icon: Play },
   { label: 'Draft Room', href: '/draft', icon: ClipboardList },
   { label: 'Exposure', href: '/exposure', icon: ShieldAlert },
   { label: 'BOB Record', href: '/performance', icon: Trophy },
