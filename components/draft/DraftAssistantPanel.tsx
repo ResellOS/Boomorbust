@@ -10,6 +10,7 @@ import {
 } from '@/lib/draft/analyst';
 import { bestAvailable, positionalNeed, positionColor } from '@/lib/draft/engine';
 import { valueGap } from '@/lib/draft/safeDisplay';
+import { pickConfidence } from '@/lib/draft/warRoomUi';
 import { tierForBobRank } from '@/lib/draft/tiers';
 import PlayerAvatar from '@/components/players/PlayerAvatar';
 
@@ -21,6 +22,8 @@ interface DraftAssistantPanelProps {
   currentOverall: number;
   isUserTurn: boolean;
   onDraft: (player: DraftablePlayer) => void;
+  onViewAnalysis?: (player: DraftablePlayer) => void;
+  compact?: boolean;
 }
 
 export default function DraftAssistantPanel({
@@ -31,6 +34,8 @@ export default function DraftAssistantPanel({
   currentOverall,
   isUserTurn,
   onDraft,
+  onViewAnalysis,
+  compact = false,
 }: DraftAssistantPanelProps) {
   const taken = useMemo(() => new Set(picks.map((p) => p.player.playerId)), [picks]);
   const userRoster = useMemo(
@@ -69,13 +74,15 @@ export default function DraftAssistantPanel({
     return avail[0] ?? null;
   }, [focusPlayer, pool, taken]);
 
+  const conf = focusPlayer ? pickConfidence(focusPlayer, currentOverall, tierStatus) : 0;
+
   return (
-    <aside className="flex min-h-0 w-full flex-col overflow-hidden border-l border-border bg-[#0f1420] md:w-[300px]">
+    <aside className={`flex min-h-0 w-full flex-col overflow-hidden bg-[#0f1420] ${compact ? '' : 'border-l border-border md:w-[300px]'}`}>
       <div className="shrink-0 border-b border-border px-3 py-2">
-        <div className="font-mono text-[10px] uppercase tracking-[2px] text-boom">
+        <div className="font-mono text-[10px] uppercase tracking-[2px] text-[#A78BFA]">
           BOB Draft Assistant
         </div>
-        <div className="font-mono text-[8px] text-muted">Beta</div>
+        <div className="font-mono text-[8px] text-muted">Mock draft · Simulated picks only</div>
       </div>
 
       <div className="min-h-0 flex-1 overflow-y-auto [scrollbar-width:thin]">
@@ -83,7 +90,10 @@ export default function DraftAssistantPanel({
           <>
             <section className="border-b border-border px-3 py-3">
               <div className="mb-2 font-mono text-[8px] uppercase tracking-[1.5px] text-muted">
-                Best Pick
+                Suggested Action
+              </div>
+              <div className="font-mono text-[11px] text-boom">
+                Draft {focusPlayer.name}
               </div>
               <div className="flex items-start gap-3">
                 <PlayerAvatar playerId={focusPlayer.playerId} name={focusPlayer.name} size={56} />
@@ -131,9 +141,22 @@ export default function DraftAssistantPanel({
               >
                 Draft {focusPlayer.name.split(' ').pop()}
               </button>
+              <div className="mt-2 flex items-center justify-between font-mono text-[9px]">
+                <span className="text-muted">Confidence</span>
+                <span className="text-boom">{conf}%</span>
+              </div>
+              {onViewAnalysis && (
+                <button
+                  type="button"
+                  onClick={() => onViewAnalysis(focusPlayer)}
+                  className="mt-2 w-full rounded border border-[#7c3aed]/40 py-2 font-mono text-[9px] uppercase text-[#A78BFA] hover:bg-[#7c3aed]/10"
+                >
+                  View Analysis →
+                </button>
+              )}
             </section>
 
-            {alternatives.length > 0 && (
+            {!compact && alternatives.length > 0 && (
               <section className="border-b border-border px-3 py-3">
                 <div className="mb-2 font-mono text-[8px] uppercase tracking-[1.5px] text-muted">
                   Top Alternatives
@@ -155,7 +178,7 @@ export default function DraftAssistantPanel({
               </section>
             )}
 
-            {(tierStatus.kind === 'last' || tierStatus.kind === 'warning') && (
+            {!compact && (tierStatus.kind === 'last' || tierStatus.kind === 'warning') && (
               <section className="mx-3 my-3 rounded border border-[#FBBF24]/30 bg-[#FBBF24]/[0.06] px-3 py-2.5">
                 <div className="font-mono text-[9px] uppercase tracking-wide text-[#FBBF24]">
                   Tier Break Alert
@@ -170,9 +193,10 @@ export default function DraftAssistantPanel({
             )}
           </>
         ) : (
-          <div className="px-3 py-6 font-mono text-[11px] text-muted">Board exhausted.</div>
+          <div className="px-3 py-6 font-mono text-[11px] text-muted">Assistant scanning board…</div>
         )}
 
+        {!compact && (
         <section className="px-3 py-3">
           <div className="mb-2 font-mono text-[8px] uppercase tracking-[1.5px] text-muted">
             Recent Picks
@@ -194,6 +218,7 @@ export default function DraftAssistantPanel({
             ))
           )}
         </section>
+        )}
       </div>
     </aside>
   );

@@ -78,11 +78,19 @@ export default function ModeToggleBar({ leagues, mode, onSelect }: ModeToggleBar
               type="button"
               onClick={() => onSelect(lg.id)}
               title={`${lg.name} · ${meta.label}`}
-              className={`${baseBtn} flex items-center gap-1.5 ${
-                active
-                  ? 'border-boom bg-boom/20 text-boom font-semibold shadow-[0_0_12px_rgba(54,231,161,0.15)]'
-                  : 'border-border bg-surface text-muted hover:text-text'
+              className={`${baseBtn} flex items-center gap-1.5 transition-all ${
+                active ? 'font-semibold' : 'border-border bg-surface text-muted hover:text-text'
               }`}
+              style={
+                active
+                  ? {
+                      borderColor: meta.color,
+                      background: `${meta.color}14`,
+                      color: meta.color,
+                      boxShadow: `0 0 12px ${meta.color}22`,
+                    }
+                  : undefined
+              }
             >
               <span
                 className="h-[6px] w-[6px] shrink-0 rounded-full"

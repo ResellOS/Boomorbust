@@ -3,6 +3,7 @@ import { Suspense } from 'react';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { fetchPlayerHubData } from '@/lib/players/fetchPlayerHubData';
+import { fetchTradePageData } from '@/lib/trade/fetchTradePageData';
 import { getUserTier } from '@/lib/access/gates';
 import Sidebar from '@/components/dashboard/Sidebar';
 import Footer from '@/components/dashboard/Footer';
@@ -53,9 +54,13 @@ export default async function PlayersPage() {
   if (needsOnboarding) redirect('/onboarding');
   if (!sleeperUserId) redirect('/login');
 
-  const hubData = await fetchPlayerHubData(userId, sleeperUserId);
+  const [hubData, tradeData] = await Promise.all([
+    fetchPlayerHubData(userId, sleeperUserId),
+    fetchTradePageData(userId).catch(() => null),
+  ]);
   const tier = await getUserTier(userId);
   const showAds = tier === 'free';
+  const tradeOpportunities = tradeData?.opportunities ?? [];
 
   return (
     <TerminalPageGrid>
@@ -74,6 +79,8 @@ export default async function PlayersPage() {
           players={hubData.players}
           leaguePresence={hubData.leaguePresence}
           portfolio={hubData.portfolio}
+          leagues={hubData.leagues}
+          tradeOpportunities={tradeOpportunities}
           showAds={showAds}
         />
       </Suspense>

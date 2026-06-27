@@ -15,8 +15,10 @@ import {
 import { buildOpportunityFeed } from '@/lib/dashboard/opportunityFeed';
 import { buildMissionCards } from '@/lib/dashboard/missionTasks';
 import { LEAGUE_ROTATE_SECONDS } from '@/lib/dashboard/constants';
+import DashboardKeyboardShortcuts from './DashboardKeyboardShortcuts';
 import DashboardTopBar from './DashboardTopBar';
 import ModeToggleBar, { type DashboardMode } from './ModeToggleBar';
+import ViewModeToggle, { type DashboardViewMode } from './ViewModeToggle';
 import LeagueRotationHeader from './LeagueRotationHeader';
 import PageBriefingHeader from './PageBriefingHeader';
 import LiveScoreTicker from './LiveScoreTicker';
@@ -107,11 +109,39 @@ export default function DashboardClient({
     return lineupOpportunity.leagueId === contextLeagueId ? lineupOpportunity : null;
   }, [lineupOpportunity, isAll, contextLeagueId]);
 
+  const ownedInLeagueIds = useMemo(() => {
+    const ids = new Set<string>();
+    for (const lg of leagues) {
+      for (const p of lg.players) ids.add(p.playerId);
+    }
+    return ids;
+  }, [leagues]);
+
   const empireRating = empireRatingFromTfo(
     isAll ? portfolio.teamTfo : currentLeague?.teamTfo ?? portfolio.teamTfo,
   );
   const empireDelta = empireRatingDelta(empireRating, lastEmpireRating);
   const contextLabel = isAll ? 'All Leagues' : currentLeague?.name ?? '—';
+  const viewMode: DashboardViewMode = isAll ? 'global' : 'league';
+  const viewSubtitle = isAll ? 'Portfolio command center' : 'League war room';
+
+  const handleViewMode = (next: DashboardViewMode) => {
+    if (next === 'global') {
+      setMode('all');
+      return;
+    }
+    if (mode === 'all' && leagues.length > 0) {
+      setMode(leagues[0]!.id);
+    }
+  };
+
+  const handleLeagueView = () => {
+    if (mode === 'all' && leagues.length > 0) {
+      setMode(leagues[0]!.id);
+    }
+  };
+
+  const leagueSwitchKey = `${effectiveMode}-${contextLeagueId ?? 'all'}`;
 
   const gps = useMemo(
     () => computeDynastyGps(portfolio, leagues, currentLeague, empireRating),
@@ -190,6 +220,11 @@ export default function DashboardClient({
 
   return (
     <>
+      <DashboardKeyboardShortcuts
+        onGlobalView={() => handleViewMode('global')}
+        onLeagueView={handleLeagueView}
+      />
+
       <DashboardTopBar
         leagueCount={leagues.length}
         tradeOffers={incomingTrades.length}
@@ -205,7 +240,9 @@ export default function DashboardClient({
         <div className="flex min-w-0 flex-col gap-3 overflow-y-auto overflow-x-hidden p-[11px_13px] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           <LiveScoreTicker inSeason={nflSeason.inSeason} />
 
-          <PageBriefingHeader contextLabel={contextLabel} isAll={isAll} />
+          <PageBriefingHeader contextLabel={contextLabel} isAll={isAll} viewSubtitle={viewSubtitle} />
+
+          <ViewModeToggle mode={viewMode} onChange={handleViewMode} leagueName={currentLeague?.name} />
 
           <ModeToggleBar leagues={leagues} mode={effectiveMode} onSelect={setMode} />
 
@@ -217,45 +254,47 @@ export default function DashboardClient({
             leagueCount={leagues.length}
           />
 
-          <TodayTopPriority
-            tasks={scopedTasks}
-            tradeTargets={scopedTradeTargets}
-            lineupOpportunity={scopedLineup}
-            fallbackFeedItem={fallbackFeedItem}
-          />
+          <div key={leagueSwitchKey} className="dash-league-switch-enter flex flex-col gap-3">
+            <TodayTopPriority
+              tasks={scopedTasks}
+              tradeTargets={scopedTradeTargets}
+              lineupOpportunity={scopedLineup}
+              fallbackFeedItem={fallbackFeedItem}
+            />
 
-          <FrontOfficeTasks initialTasks={scopedTasks} lineupOpportunity={scopedLineup} />
+            <FrontOfficeTasks initialTasks={scopedTasks} lineupOpportunity={scopedLineup} />
 
-          <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3 lg:min-h-[320px]">
-            <DynastyGpsCard data={gps} />
+            <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3 lg:min-h-[280px]">
+              <DynastyGpsCard data={gps} leagueId={contextLeagueId} />
+              <RosterConstruction grades={rosterGrades} compact leagueId={contextLeagueId} />
+              <MarketSignalsCompact
+                players={players}
+                leagueCounts={leagueCounts}
+                isAll={isAll}
+                currentLeague={currentLeague}
+                ownedInLeagueIds={ownedInLeagueIds}
+                tradeTargets={scopedTradeTargets}
+              />
+            </div>
+
             <OpportunityFeed
               lineupOpportunity={scopedLineup}
               players={players}
               tradeTargets={scopedTradeTargets}
             />
-            <MarketSignalsCompact players={players} leagueCounts={leagueCounts} />
+
+            <DynastyNewsFeed
+              items={filteredNews.length > 0 ? filteredNews : newsItems.slice(0, 4)}
+              rosterPlayerIds={newsRosterIds}
+              allMode={isAll}
+            />
           </div>
-
-          <RosterConstruction
-            grades={rosterGrades}
-            title={isAll ? 'Roster Construction · Portfolio' : `Roster Construction · ${contextLabel}`}
-          />
-
-          <DynastyNewsFeed
-            items={filteredNews.length > 0 ? filteredNews : newsItems.slice(0, 4)}
-            rosterPlayerIds={newsRosterIds}
-            allMode={isAll}
-          />
         </div>
 
         <RightPanel
           mostExposed={exposure.mostExposed}
-          noExposure={exposure.noExposure}
           leagueIntel={leagueIntel}
           leagueIntelHref={leagueIntelHref}
-          dailyTasks={scopedTasks}
-          lineupOpportunity={scopedLineup}
-          showTasksInRail={false}
         />
       </div>
 

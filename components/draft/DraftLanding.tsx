@@ -21,6 +21,8 @@ interface DraftLandingProps {
   activeTab: 'mocks' | 'capital';
   onTabChange: (tab: 'mocks' | 'capital') => void;
   onNewStartup: () => void;
+  onNewRookie: () => void;
+  onNewRedraft: () => void;
   onOpenSettings: () => void;
   onResume: (sessionId: string) => void;
 }
@@ -32,6 +34,8 @@ export default function DraftLanding({
   activeTab,
   onTabChange,
   onNewStartup,
+  onNewRookie,
+  onNewRedraft,
   onOpenSettings,
   onResume,
 }: DraftLandingProps) {
@@ -101,9 +105,10 @@ export default function DraftLanding({
         {/* Main column */}
         <div className="min-w-0 flex-1 space-y-6">
           {/* Mode cards */}
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
             <StartupModeCard onStart={onNewStartup} />
-            <RookieModeCard />
+            <RookieModeCard onStart={onNewRookie} />
+            <RedraftModeCard onStart={onNewRedraft} />
             <CapitalModeCard onEnter={() => onTabChange('capital')} />
           </div>
 
@@ -236,18 +241,44 @@ function StartupModeCard({ onStart }: { onStart: () => void }) {
   );
 }
 
-function RookieModeCard() {
+function RookieModeCard({ onStart }: { onStart: () => void }) {
   return (
-    <div className="relative flex min-h-[200px] flex-col overflow-hidden rounded-[12px] border border-bust/25 bg-[#0f1420] p-5 opacity-80">
-      <div className="absolute inset-0 z-[1] bg-bg/40 backdrop-blur-[1px]" />
-      <div className="relative z-[2]">
-        <div className="font-figtree text-[18px] font-bold text-text">Rookie Mock</div>
-        <p className="mt-1 font-mono text-[10px] text-muted">Rookie-only draft</p>
-        <p className="mt-1 font-mono text-[9px] text-bust">1QB / SF / 2QB</p>
+    <div className="relative flex min-h-[200px] flex-col rounded-[12px] border border-[#A78BFA]/30 bg-[#0f1420] p-5">
+      <div className="font-figtree text-[18px] font-bold text-text">Rookie Mock</div>
+      <p className="mt-1 font-mono text-[10px] text-muted">Rookie-only mock draft</p>
+      <div className="mt-4 flex flex-wrap gap-3 font-mono text-[9px] text-muted">
+        <span>12 Teams</span>
+        <span>4 Rounds</span>
+        <span className="text-[#A78BFA]">College Pool</span>
       </div>
-      <span className="relative z-[2] mt-auto inline-block w-fit rounded border border-bust/40 bg-bust/10 px-3 py-1.5 font-mono text-[10px] uppercase text-bust">
-        Coming Soon
-      </span>
+      <button
+        type="button"
+        onClick={onStart}
+        className="mt-auto cursor-pointer rounded-md border border-[#A78BFA]/50 bg-[#7c3aed]/15 px-4 py-3 font-mono text-[11px] uppercase tracking-wide text-[#A78BFA] transition-opacity hover:opacity-90"
+      >
+        Start Rookie Mock →
+      </button>
+    </div>
+  );
+}
+
+function RedraftModeCard({ onStart }: { onStart: () => void }) {
+  return (
+    <div className="flex min-h-[200px] flex-col rounded-[12px] border border-[#22D3EE]/25 bg-[#0f1420] p-5">
+      <div className="font-figtree text-[18px] font-bold text-text">Redraft Mock</div>
+      <p className="mt-1 font-mono text-[10px] text-muted">Season-long redraft simulator</p>
+      <div className="mt-4 flex flex-wrap gap-3 font-mono text-[9px] text-muted">
+        <span>10–12 Teams</span>
+        <span>15 Rounds</span>
+        <span className="text-[#22D3EE]">Weekly Upside</span>
+      </div>
+      <button
+        type="button"
+        onClick={onStart}
+        className="mt-auto w-fit cursor-pointer font-mono text-[11px] uppercase tracking-wide text-[#22D3EE] hover:underline"
+      >
+        Start Redraft Mock →
+      </button>
     </div>
   );
 }

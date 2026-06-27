@@ -18,6 +18,8 @@ interface DraftPlayerPoolProps {
   onPick: (player: DraftablePlayer) => void;
   onQueue: (player: DraftablePlayer) => void;
   watchlist: Set<string>;
+  selectedId?: string | null;
+  onSelect?: (player: DraftablePlayer) => void;
 }
 
 const POS_TABS = ['ALL', 'QB', 'RB', 'WR', 'TE', 'FLEX', 'K', 'DEF'] as const;
@@ -44,6 +46,8 @@ export default function DraftPlayerPool({
   onPick,
   onQueue,
   watchlist,
+  selectedId,
+  onSelect,
 }: DraftPlayerPoolProps) {
   const [filter, setFilter] = useState<(typeof POS_TABS)[number]>('ALL');
   const [query, setQuery] = useState('');
@@ -132,6 +136,9 @@ export default function DraftPlayerPool({
 
   return (
     <div className="relative flex min-h-0 flex-1 flex-col">
+      <div className="shrink-0 border-b border-border px-3 py-1.5">
+        <div className="font-mono text-[8px] uppercase tracking-[1.5px] text-muted">Big Board / Player Pool</div>
+      </div>
       <div className="shrink-0 space-y-2 border-b border-border px-3 py-2">
         <input
           value={query}
@@ -185,7 +192,7 @@ export default function DraftPlayerPool({
           }
         }}
       >
-        <div className="sticky top-0 z-[1] grid grid-cols-[36px_minmax(120px,1fr)_40px_44px_56px_44px_48px_36px] gap-1 border-b border-border bg-bg px-2 py-1.5 font-mono text-[7px] uppercase tracking-wide text-muted">
+        <div className="sticky top-0 z-[1] grid grid-cols-[36px_minmax(120px,1fr)_40px_44px_56px_44px_48px_36px_28px] gap-1 border-b border-border bg-bg px-2 py-1.5 font-mono text-[7px] uppercase tracking-wide text-muted">
           <span>Rank</span>
           <span>Player</span>
           <span>Pos</span>
@@ -194,6 +201,7 @@ export default function DraftPlayerPool({
           <span className="text-right">ADP</span>
           <span className="text-right">Value</span>
           <span className="text-center">Trend</span>
+          <span />
         </div>
 
         {rows.map((p) => {
@@ -214,13 +222,16 @@ export default function DraftPlayerPool({
                 </div>
               )}
               <div
-                className={`relative grid grid-cols-[36px_minmax(120px,1fr)_40px_44px_56px_44px_48px_36px] items-center gap-1 border-b border-border/30 px-2 py-2 ${
+                className={`relative grid grid-cols-[36px_minmax(120px,1fr)_40px_44px_56px_44px_48px_36px_28px] items-center gap-1 border-b border-border/30 px-2 py-2 ${
                   drafted ? 'opacity-40' : isUserTurn ? 'hover:bg-boom/[0.05]' : ''
-                } ${bobTopId === p.playerId && !drafted ? 'bg-boom/[0.04] shadow-[inset_0_0_0_1px_rgba(54,231,161,0.2)]' : ''}`}
+                } ${selectedId === p.playerId ? 'bg-[#7c3aed]/10 ring-1 ring-[#7c3aed]/30' : ''} ${
+                  bobTopId === p.playerId && !drafted ? 'bg-boom/[0.04] shadow-[inset_0_0_0_1px_rgba(54,231,161,0.2)]' : ''
+                }`}
                 onMouseEnter={(e) => !drafted && showHover(p, e.currentTarget)}
                 onMouseLeave={hideHover}
                 onClick={(e) => {
                   e.stopPropagation();
+                  onSelect?.(p);
                   if (window.matchMedia('(max-width: 767px)').matches && !drafted) {
                     handleRowTap(p, e.currentTarget);
                   }
@@ -253,7 +264,7 @@ export default function DraftPlayerPool({
                     e.stopPropagation();
                     onQueue(p);
                   }}
-                  className="absolute right-1 top-1/2 flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded border border-border text-muted hover:border-boom/40 hover:text-boom md:hidden"
+                  className="flex h-6 w-6 items-center justify-center rounded border border-border text-muted hover:border-boom/40 hover:text-boom"
                   aria-label="Add to queue"
                 >
                   <Plus size={12} />

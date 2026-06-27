@@ -1,5 +1,7 @@
 'use client';
 
+import { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import type { BobSuggestion, OwnedPick } from '@/lib/trade/types';
 import { initialAssetsFromSuggestion } from '@/lib/trade/calculatorAssets';
 import TradeCalculator from '@/components/trade/TradeCalculator';
@@ -11,9 +13,14 @@ interface TradePreviewModalProps {
 }
 
 export default function TradePreviewModal({ suggestion, givePicks, onClose }: TradePreviewModalProps) {
+  const [mounted, setMounted] = useState(false);
   const { give, get } = initialAssetsFromSuggestion(suggestion);
 
-  return (
+  useEffect(() => setMounted(true), []);
+
+  if (!mounted) return null;
+
+  return createPortal(
     <div
       className="fixed inset-0 z-[10000] flex items-center justify-center bg-black/70 p-4"
       onClick={onClose}
@@ -68,6 +75,7 @@ export default function TradePreviewModal({ suggestion, givePicks, onClose }: Tr
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }

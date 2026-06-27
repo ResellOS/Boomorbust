@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 function Sparkline({ values, color }: { values: number[]; color: string }) {
   if (values.length < 2) return null;
@@ -28,8 +28,39 @@ export function TrendSparkline({ values, color }: { values: number[]; color: str
   return <Sparkline values={values} color={color} />;
 }
 
-export function RatingGauge({ score, color }: { score: number; color: string }) {
-  const pct = Math.min(100, Math.max(0, score));
+export function RatingGauge({
+  score,
+  color,
+  animateKey,
+}: {
+  score: number;
+  color: string;
+  /** When set, ring + number count up on key change */
+  animateKey?: string;
+}) {
+  const [displayScore, setDisplayScore] = useState(animateKey ? 0 : score);
+  const raf = useRef(0);
+
+  useEffect(() => {
+    if (!animateKey) {
+      setDisplayScore(score);
+      return;
+    }
+    cancelAnimationFrame(raf.current);
+    setDisplayScore(0);
+    const start = performance.now();
+    const duration = 650;
+    const tick = (now: number) => {
+      const t = Math.min(1, (now - start) / duration);
+      const eased = 1 - (1 - t) ** 3;
+      setDisplayScore(score * eased);
+      if (t < 1) raf.current = requestAnimationFrame(tick);
+    };
+    raf.current = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf.current);
+  }, [animateKey, score]);
+
+  const pct = Math.min(100, Math.max(0, displayScore));
   const r = 54;
   const c = 2 * Math.PI * r;
   const offset = c - (pct / 100) * c;
@@ -48,13 +79,13 @@ export function RatingGauge({ score, color }: { score: number; color: string }) 
           strokeLinecap="round"
           strokeDasharray={c}
           strokeDashoffset={offset}
-          style={{ filter: `drop-shadow(0 0 8px ${color}88)` }}
+          style={{ filter: `drop-shadow(0 0 8px ${color}88)`, transition: 'stroke-dashoffset 80ms linear' }}
         />
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center">
         <div className="font-mono text-[8px] uppercase tracking-[2px] text-muted">OVR</div>
         <div className="font-mono text-[32px] leading-none tabular-nums" style={{ color }}>
-          {score.toFixed(1)}
+          {displayScore.toFixed(1)}
         </div>
       </div>
     </div>
@@ -118,7 +149,7 @@ export function RatingHistoryChart({
   if (values.length < 2) {
     return (
       <p className="py-4 text-center font-figtree text-[11px] text-muted">
-        Rating history builds as BOB tracks this player over time.
+        Historical tracking begins today — BOB will chart this player&apos;s rating over time.
       </p>
     );
   }

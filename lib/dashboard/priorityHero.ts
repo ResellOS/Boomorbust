@@ -1,6 +1,7 @@
 import type { DailyTask } from './dailyTasks';
 import { isTradeTaskData } from './dailyTasks';
 import { buildMissionCards, type MissionCardModel } from './missionTasks';
+import { tradeDetailHref, tradeStageHref } from './dashboardRoutes';
 import type { LineupOpportunity, TradeTargetItem } from './rotation';
 
 export interface HeroTarget {
@@ -12,44 +13,65 @@ export interface HeroTarget {
   position?: string;
   team?: string;
   why: string;
-  championshipImpact: string;
+  portfolioImpact: string;
   acceptanceChance: string;
   tradeWindow: string;
   confidence: string;
+  offerLabel: string;
   suggestedOffer: string;
   ctaHref: string;
+  stageHref: string;
+  detailHref: string;
   impactLevel: 'HIGH' | 'MEDIUM' | 'LOW';
+  isSell: boolean;
 }
 
 function confidenceLabel(task: DailyTask | null, urgency: 'HIGH' | 'MED' | 'LOW'): string {
-  if (task && task.confidenceScore > 0) {
-    if (task.confidenceScore >= 70) return 'High';
-    if (task.confidenceScore >= 45) return 'Medium';
-    return 'Low';
-  }
-  if (urgency === 'HIGH') return 'High';
+  if (task && task.confidenceScore >= 70) return 'Strong';
+  if (task && task.confidenceScore >= 45) return 'Medium';
+  if (task && task.confidenceScore > 0) return 'Low';
+  if (urgency === 'HIGH') return 'Strong';
   if (urgency === 'MED') return 'Medium';
   return 'Low';
 }
 
+function formatPortfolioImpact(task: DailyTask | null, card: MissionCardModel): string {
+  if (task?.impactScore && task.impactScore > 0) return `+${task.impactScore.toFixed(1)}`;
+  const valueMetric = card.metrics.find((m) => m.label.includes('Value') || m.label.includes('Gain'));
+  if (valueMetric && valueMetric.value !== '—') return valueMetric.value;
+  if (card.urgency === 'HIGH') return 'Impact: High';
+  if (card.urgency === 'MED') return 'Impact: Medium';
+  return 'Impact: Low';
+}
+
 function missionToHero(card: MissionCardModel, task: DailyTask | null): HeroTarget {
-  const impactMetric = card.metrics.find((m) => m.label.includes('Champ') || m.label.includes('Impact'));
   const acceptMetric = card.metrics.find((m) => m.label.includes('Acceptance'));
   const urgency = card.urgency;
+  const isSell = card.glow === 'sell';
 
   let suggestedOffer = '—';
+  const offerLabel = isSell ? 'Suggested Return' : 'Suggested Offer';
   if (task && isTradeTaskData(task.taskData)) {
     suggestedOffer = task.taskData.give_player_name;
-  } else if (card.glow === 'sell') {
+  } else if (isSell) {
     suggestedOffer = card.metrics.find((m) => m.label.includes('Return'))?.value ?? '—';
   }
 
   const actionVerb =
-    card.glow === 'sell' && card.playerName
-      ? `Sell ${card.playerName}`
+    isSell && card.playerName
+      ? `SELL ${card.playerName.toUpperCase()}`
       : card.glow === 'lineup'
-        ? card.title
-        : card.title.replace(/^Send Offer for /, 'Acquire ');
+        ? card.title.toUpperCase()
+        : card.title.replace(/^Send Offer for /i, 'ACQUIRE ').toUpperCase();
+
+  const leagueId =
+    task && isTradeTaskData(task.taskData) ? task.taskData.league_id : undefined;
+  const stageHref = card.playerId
+    ? tradeStageHref(card.playerId, leagueId)
+    : card.ctaHref;
+  const detailHref = card.playerId && (card.glow === 'buy' || card.glow === 'sell')
+    ? tradeDetailHref(card.playerId, leagueId)
+    : card.ctaHref;
 
   return {
     id: card.id,
@@ -58,53 +80,66 @@ function missionToHero(card: MissionCardModel, task: DailyTask | null): HeroTarg
     playerId: card.playerId,
     playerName: card.playerName,
     position: card.position,
+    team: card.team,
     why: card.reasonLine,
-    championshipImpact: impactMetric?.value ?? '—',
+    portfolioImpact: formatPortfolioImpact(task, card),
     acceptanceChance: acceptMetric?.value ?? '—',
     tradeWindow: card.glow === 'lineup' ? 'This Week' : 'Open',
     confidence: confidenceLabel(task, urgency),
+    offerLabel,
     suggestedOffer,
-    ctaHref: card.ctaHref,
+    ctaHref: stageHref,
+    stageHref,
+    detailHref,
     impactLevel: urgency === 'HIGH' ? 'HIGH' : urgency === 'MED' ? 'MEDIUM' : 'LOW',
+    isSell,
   };
 }
 
 function tradeTargetToHero(t: TradeTargetItem, idx: number): HeroTarget {
   return {
     id: `target-${t.playerId}-${idx}`,
-    title: `Acquire ${t.playerName}`,
+    title: `ACQUIRE ${t.playerName.toUpperCase()}`,
     leagueName: t.leagueName,
     playerId: t.playerId,
     playerName: t.playerName,
     position: t.position,
     team: t.team,
-    why: t.reason || `Trade target in ${t.leagueName}.`,
-    championshipImpact: '—',
+    why: t.reason || `Trade target surfaced in ${t.leagueName}.`,
+    portfolioImpact: 'Impact: Medium',
     acceptanceChance: '—',
     tradeWindow: 'Open',
     confidence: 'Medium',
+    offerLabel: 'Suggested Offer',
     suggestedOffer: t.acquireCost || '—',
-    ctaHref: `/trade?target=${t.playerId}`,
+    ctaHref: tradeStageHref(t.playerId),
+    stageHref: tradeStageHref(t.playerId),
+    detailHref: tradeDetailHref(t.playerId),
     impactLevel: idx === 0 ? 'HIGH' : 'MEDIUM',
+    isSell: false,
   };
 }
 
 function lineupToHero(o: LineupOpportunity): HeroTarget {
   return {
     id: `lineup-hero-${o.benchPlayerId}`,
-    title: `Start ${o.benchName}`,
+    title: `START ${o.benchName.toUpperCase()}`,
     leagueName: o.leagueName,
     playerId: o.benchPlayerId,
     playerName: o.benchName,
     position: o.position,
     why: `Projected +${o.gap.toFixed(1)} pts over ${o.starterName} at ${o.position}.`,
-    championshipImpact: '—',
+    portfolioImpact: `+${o.gap.toFixed(1)} pts`,
     acceptanceChance: '—',
     tradeWindow: 'This Week',
-    confidence: o.gap >= 5 ? 'High' : 'Medium',
-    suggestedOffer: '—',
+    confidence: o.gap >= 5 ? 'Strong' : 'Medium',
+    offerLabel: 'Lineup Move',
+    suggestedOffer: `Bench ${o.starterName}`,
     ctaHref: '/startsit',
+    stageHref: '/startsit',
+    detailHref: '/startsit',
     impactLevel: o.gap >= 5 ? 'HIGH' : 'MEDIUM',
+    isSell: false,
   };
 }
 
@@ -130,7 +165,7 @@ export function buildHeroTargets(
     heroes.push(tradeTargetToHero(t, i));
   }
 
-  if (heroes.length === 0 && lineupOpportunity) {
+  if (lineupOpportunity && !heroes.some((h) => h.playerId === lineupOpportunity.benchPlayerId)) {
     heroes.push(lineupToHero(lineupOpportunity));
   }
 

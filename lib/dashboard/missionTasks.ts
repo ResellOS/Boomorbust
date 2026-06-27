@@ -92,8 +92,12 @@ function tradeMission(task: DailyTask, priority: number): MissionCardModel | nul
       { label: 'Value Gain', value: formatValueGain(task) },
       { label: 'Champ Impact', value: task.impactScore > 0 ? `+${task.impactScore.toFixed(1)}%` : '—' },
     ].slice(0, 3),
-    ctaLabel: 'View Trade Details',
-    ctaHref: d.get_player_id ? `/trade?target=${d.get_player_id}` : '/trade',
+    ctaLabel: 'Stage Offer',
+    ctaHref: d.league_id
+      ? `/trade?target=${d.get_player_id ?? ''}&league=${d.league_id}`
+      : d.get_player_id
+        ? `/trade?target=${d.get_player_id}`
+        : '/trade',
   };
 }
 
@@ -129,8 +133,12 @@ function reviewMission(task: DailyTask, priority: number): MissionCardModel | nu
       { label: 'Rank Delta', value: delta != null ? `${delta > 0 ? '+' : ''}${delta}` : '—' },
       { label: 'Value Gain', value: formatValueGain(task) },
     ],
-    ctaLabel: isSell ? 'Send Offer' : 'View Trade',
-    ctaHref: d.player_id ? `/trade?target=${d.player_id}` : '/trade',
+    ctaLabel: isSell ? 'Stage Offer' : 'View Trade',
+    ctaHref: d.league_id
+      ? `/trade?target=${d.player_id ?? ''}&league=${d.league_id}`
+      : d.player_id
+        ? `/trade?target=${d.player_id}`
+        : '/trade',
   };
 }
 

@@ -2,17 +2,15 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import PlayerAvatar from '@/components/players/PlayerAvatar';
-import {
-  buildHeroTargets,
-  impactBadgeStyle,
-  type HeroTarget,
-} from '@/lib/dashboard/priorityHero';
+import { buildHeroTargets, impactBadgeStyle } from '@/lib/dashboard/priorityHero';
 import type { DailyTask } from '@/lib/dashboard/dailyTasks';
 import type { LineupOpportunity, TradeTargetItem } from '@/lib/dashboard/rotation';
 import type { OpportunityFeedItem } from '@/lib/dashboard/opportunityFeed';
 
-const ROTATE_MS = 5000;
+const ROTATE_MS = 6500;
 
 interface TodayTopPriorityProps {
   tasks: DailyTask[];
@@ -27,6 +25,7 @@ export default function TodayTopPriority({
   lineupOpportunity,
   fallbackFeedItem,
 }: TodayTopPriorityProps) {
+  const router = useRouter();
   const targets = useMemo(
     () => buildHeroTargets(tasks, tradeTargets, lineupOpportunity),
     [tasks, tradeTargets, lineupOpportunity],
@@ -36,14 +35,19 @@ export default function TodayTopPriority({
   const [paused, setPaused] = useState(false);
   const [visible, setVisible] = useState(true);
 
-  const rotate = useCallback(() => {
-    if (targets.length <= 1) return;
-    setVisible(false);
-    window.setTimeout(() => {
-      setIndex((i) => (i + 1) % targets.length);
-      setVisible(true);
-    }, 280);
-  }, [targets.length]);
+  const goTo = useCallback(
+    (next: number) => {
+      if (targets.length <= 1) return;
+      setVisible(false);
+      window.setTimeout(() => {
+        setIndex((next + targets.length) % targets.length);
+        setVisible(true);
+      }, 220);
+    },
+    [targets.length],
+  );
+
+  const rotate = useCallback(() => goTo(index + 1), [goTo, index]);
 
   useEffect(() => {
     setIndex(0);
@@ -57,30 +61,23 @@ export default function TodayTopPriority({
 
   if (targets.length === 0) {
     return (
-      <section className="rounded-[10px] border border-[#1e2640] bg-[#0f1420] p-5">
+      <section className="rounded-[10px] border border-[#1e2640] bg-[#0f1420] px-3 py-2.5">
         <h2 className="font-figtree text-[10px] uppercase tracking-[1.8px] text-[#e8ecf4]">
           Today&apos;s Top Priority
         </h2>
-        <p className="mt-3 font-figtree text-[14px] text-[#e8ecf4]">No critical move today</p>
+        <p className="mt-1.5 font-figtree text-[13px] text-[#e8ecf4]">No critical move today</p>
         {fallbackFeedItem ? (
-          <div className="mt-3 rounded-md border border-[#1e2640]/60 bg-[#141929]/60 px-3 py-2.5">
-            <span
-              className="rounded px-1.5 py-0.5 font-mono text-[7px] uppercase"
-              style={{ color: fallbackFeedItem.color, background: `${fallbackFeedItem.color}14` }}
-            >
-              {fallbackFeedItem.category}
-            </span>
-            <p className="mt-1.5 font-figtree text-[13px] text-[#e8ecf4]">{fallbackFeedItem.headline}</p>
-            <p className="mt-0.5 font-figtree text-[11px] text-[#6b7a99]">{fallbackFeedItem.explanation}</p>
-            {fallbackFeedItem.href ? (
-              <Link href={fallbackFeedItem.href} className="mt-2 inline-block font-mono text-[9px] text-boom no-underline hover:underline">
-                View →
-              </Link>
-            ) : null}
-          </div>
+          <button
+            type="button"
+            onClick={() => fallbackFeedItem.href && router.push(fallbackFeedItem.href)}
+            className="mt-2 w-full rounded-md border border-[#1e2640]/60 bg-[#141929]/60 px-2.5 py-2 text-left dash-clickable-row"
+          >
+            <p className="font-figtree text-[12px] text-[#e8ecf4]">{fallbackFeedItem.headline}</p>
+            <p className="mt-0.5 font-figtree text-[11px] text-[#9aa8c4]">{fallbackFeedItem.explanation}</p>
+          </button>
         ) : (
-          <p className="mt-2 font-mono text-[10px] text-[#6b7a99]">
-            BOB is analyzing your leagues — priorities appear once intelligence data is ready.
+          <p className="mt-1 font-mono text-[10px] text-[#6b7a99]">
+            Priorities appear once intelligence data is ready.
           </p>
         )}
       </section>
@@ -89,96 +86,125 @@ export default function TodayTopPriority({
 
   const target = targets[index] ?? targets[0]!;
   const badge = impactBadgeStyle(target.impactLevel);
+  const posTeam =
+    target.position && target.team
+      ? `${target.position} · ${target.team}`
+      : target.position ?? target.team ?? '';
+  const glowClass = target.isSell ? 'dash-bust-glow' : target.impactLevel === 'HIGH' ? 'dash-boom-glow' : '';
+
+  const openPrimary = () => router.push(target.stageHref);
 
   return (
     <section
-      className="relative overflow-hidden rounded-[10px] border border-[#A78BFA]/35 bg-[#0f1420] p-4 md:p-5"
-      style={{ boxShadow: '0 0 28px rgba(167,139,250,0.1), 0 0 12px rgba(54,231,161,0.06)' }}
+      className={`dash-clickable-card overflow-hidden rounded-[10px] border border-[#A78BFA]/35 bg-[#0f1420] ${glowClass}`}
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
+      onClick={openPrimary}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          openPrimary();
+        }
+      }}
+      role="button"
+      tabIndex={0}
+      aria-label={`Top priority: ${target.title}. Click to open action.`}
     >
-      <div className="mb-3 flex items-start justify-between gap-2">
-        <div>
+      <div className="flex items-center justify-between border-b border-[#1e2640]/80 px-3 py-1.5">
+        <div className="flex items-center gap-2">
           <h2 className="font-figtree text-[10px] uppercase tracking-[1.8px] text-[#e8ecf4]">
             Today&apos;s Top Priority
           </h2>
           {targets.length > 1 ? (
-            <p className="mt-0.5 font-mono text-[8px] text-[#6b7a99]">
-              Rotating {index + 1}/{targets.length} targets
-            </p>
+            <div className="flex items-center gap-0.5" onClick={(e) => e.stopPropagation()}>
+              <button
+                type="button"
+                onClick={() => goTo(index - 1)}
+                className="rounded p-0.5 text-[#6b7a99] hover:text-boom"
+                aria-label="Previous priority"
+              >
+                <ChevronLeft className="h-3.5 w-3.5" />
+              </button>
+              <span className="font-mono text-[8px] tabular-nums text-[#8b9bb8]">
+                {index + 1}/{targets.length}
+              </span>
+              <button
+                type="button"
+                onClick={() => goTo(index + 1)}
+                className="rounded p-0.5 text-[#6b7a99] hover:text-boom"
+                aria-label="Next priority"
+              >
+                <ChevronRight className="h-3.5 w-3.5" />
+              </button>
+            </div>
           ) : null}
         </div>
         <span
-          className="shrink-0 rounded px-2 py-0.5 font-mono text-[7px] uppercase tracking-wide"
+          className="shrink-0 rounded px-1.5 py-0.5 font-mono text-[7px] uppercase tracking-wide"
           style={{ background: badge.bg, color: badge.text }}
         >
           {badge.label}
         </span>
       </div>
 
-      <div
-        className="grid grid-cols-1 gap-4 transition-opacity duration-300 md:grid-cols-[1fr_240px]"
-        style={{ opacity: visible ? 1 : 0 }}
-      >
-        <div className="flex min-w-0 gap-4">
-          {target.playerId ? (
-            <PlayerAvatar playerId={target.playerId} name={target.playerName ?? target.title} size={72} />
-          ) : (
-            <div className="h-[72px] w-[72px] shrink-0 rounded-full bg-[#141929]" />
-          )}
-          <div className="min-w-0 flex-1">
-            <h3 className="font-figtree text-[22px] font-semibold leading-tight text-[#e8ecf4] md:text-[24px]">
-              {target.title}
-            </h3>
-            {target.position ? (
-              <p className="mt-0.5 font-mono text-[10px] text-[#6b7a99]">
-                {target.position}
-                {target.team ? ` · ${target.team}` : ''}
+      <div className={`dash-priority-fade px-3 py-2.5 ${visible ? 'opacity-100' : 'opacity-0'}`}>
+        <div className="flex flex-col gap-2 lg:flex-row lg:items-center">
+          <div className="flex min-w-0 flex-1 items-start gap-2.5">
+            {target.playerId ? (
+              <PlayerAvatar playerId={target.playerId} name={target.playerName ?? target.title} size={52} />
+            ) : (
+              <div className="h-[52px] w-[52px] shrink-0 rounded-full bg-[#141929]" />
+            )}
+            <div className="min-w-0 flex-1">
+              <h3 className="font-figtree text-[16px] font-semibold leading-tight text-[#e8ecf4]">
+                {target.title}
+              </h3>
+              {posTeam ? (
+                <p className="font-mono text-[9px] uppercase text-[#8b9bb8]">{posTeam}</p>
+              ) : null}
+              <p className="font-mono text-[9px] text-[#6b7a99]">{target.leagueName}</p>
+              <p className="mt-1 line-clamp-2 font-figtree text-[11px] leading-snug text-[#b8c4dc]">
+                <span className="text-[#e8ecf4]">Why: </span>
+                {target.why}
               </p>
-            ) : null}
-            <p className="mt-1 font-mono text-[10px] text-[#6b7a99]">
-              League: <span className="text-[#e8ecf4]">{target.leagueName}</span>
-            </p>
-            <p className="mt-2 font-figtree text-[12px] leading-relaxed text-[#6b7a99]">
-              <span className="font-medium text-[#e8ecf4]">Why: </span>
-              {target.why}
-            </p>
-
-            <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
-              <HeroMetric label="Championship Impact" value={target.championshipImpact} accent />
-              <HeroMetric label="Acceptance Chance" value={target.acceptanceChance} />
-              <HeroMetric label="Trade Window" value={target.tradeWindow} accent />
-              <HeroMetric label="Confidence" value={target.confidence} />
             </div>
           </div>
-        </div>
 
-        <div className="flex flex-col rounded-[8px] border border-[#1e2640] bg-[#141929]/80 p-3">
-          <div className="font-mono text-[7px] uppercase tracking-wide text-[#6b7a99]">Suggested Offer</div>
-          <p className="mt-1 flex-1 font-figtree text-[13px] leading-snug text-[#e8ecf4]">{target.suggestedOffer}</p>
-          <Link
-            href={target.ctaHref}
-            className="mt-3 flex w-full items-center justify-center rounded-md bg-bust px-3 py-2.5 font-figtree text-[11px] font-semibold text-white no-underline hover:brightness-110"
-          >
-            Create Offer
-          </Link>
-          <Link
-            href={target.ctaHref}
-            className="mt-2 text-center font-mono text-[9px] text-boom no-underline hover:underline"
-          >
-            View Details →
-          </Link>
+          <div className="flex shrink-0 flex-wrap gap-x-3 gap-y-1 border-[#1e2640]/60 lg:border-l lg:pl-3">
+            <MiniMetric label={target.offerLabel} value={target.suggestedOffer} />
+            <MiniMetric label="Accept" value={target.acceptanceChance} />
+            <MiniMetric label="Impact" value={target.portfolioImpact} accent />
+            <MiniMetric label="Conf." value={target.confidence} />
+            <MiniMetric label="Window" value={target.tradeWindow} />
+          </div>
+
+          <div className="flex shrink-0 gap-1.5 lg:flex-col" onClick={(e) => e.stopPropagation()}>
+            <Link
+              href={target.stageHref}
+              className={`dash-action-btn inline-flex items-center justify-center rounded-md px-3 py-1.5 font-figtree text-[10px] font-semibold no-underline ${
+                target.isSell ? 'dash-action-btn-bust bg-[#EF4444] text-white' : 'bg-bust text-white'
+              }`}
+            >
+              {target.isSell ? 'View Trade' : 'Stage Offer'}
+            </Link>
+            <Link
+              href={target.detailHref}
+              className="dash-action-btn inline-flex items-center justify-center rounded-md border border-[#1e2640] px-3 py-1.5 font-mono text-[9px] text-boom no-underline"
+            >
+              View Details
+            </Link>
+          </div>
         </div>
       </div>
     </section>
   );
 }
 
-function HeroMetric({ label, value, accent }: { label: string; value: string; accent?: boolean }) {
+function MiniMetric({ label, value, accent }: { label: string; value: string; accent?: boolean }) {
   return (
-    <div className="rounded-md border border-[#1e2640]/60 bg-[#141929]/50 px-2 py-1.5">
-      <div className="font-mono text-[7px] uppercase tracking-wide text-[#6b7a99]">{label}</div>
-      <div className={`mt-0.5 font-mono text-[12px] tabular-nums ${accent ? 'text-boom' : 'text-[#e8ecf4]'}`}>
+    <div className="min-w-[72px]">
+      <div className="font-mono text-[6px] uppercase tracking-wide text-[#6b7a99]">{label}</div>
+      <div className={`font-mono text-[10px] tabular-nums leading-tight ${accent ? 'text-boom' : 'text-[#e8ecf4]'}`}>
         {value}
       </div>
     </div>

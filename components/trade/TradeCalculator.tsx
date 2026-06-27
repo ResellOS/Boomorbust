@@ -23,6 +23,7 @@ export interface TradeCalculatorProps {
   initialGet?: CalculatorAsset[];
   /** Strip outer card chrome when embedded in a modal. */
   embedded?: boolean;
+  onTotalsChange?: (totals: import('@/lib/trade/tradeHubUi').TradeValueTotals) => void;
 }
 
 // Nominal TFO / KTC weight of a rookie pick by round (no per-pick value source).
@@ -204,6 +205,7 @@ export default function TradeCalculator({
   initialGive = [],
   initialGet = [],
   embedded = false,
+  onTotalsChange,
 }: TradeCalculatorProps) {
   const [give, setGive] = useState<CalculatorAsset[]>(initialGive);
   const [get, setGet] = useState<CalculatorAsset[]>(initialGet);
@@ -242,6 +244,10 @@ export default function TradeCalculator({
   const delta = Math.round((getTfo - giveTfo) * 10) / 10;
   // Diverging meter: segment grows from center toward the favored side.
   const meterMag = Math.min(Math.abs(diffPct), 100) / 2; // 0–50 (% of track)
+
+  useEffect(() => {
+    onTotalsChange?.({ giveTfo, getTfo, delta, diffPct });
+  }, [giveTfo, getTfo, delta, diffPct, onTotalsChange]);
 
   const inner = (
     <>

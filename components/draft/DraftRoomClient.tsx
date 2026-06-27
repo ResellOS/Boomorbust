@@ -24,12 +24,12 @@ import {
 import { computeTierBreaks } from '@/lib/draft/tiers';
 import DraftSetup from './DraftSetup';
 import DraftLanding from './DraftLanding';
-import DraftGrid from './DraftGrid';
-import DraftHeader from './DraftHeader';
-import DraftMyTeamPanel from './DraftMyTeamPanel';
-import DraftBottomStrip from './DraftBottomStrip';
+import DraftBoardMatrix from './DraftBoardMatrix';
+import DraftWarRoomHeader from './DraftWarRoomHeader';
+import DraftWarRoomRightRail from './DraftWarRoomRightRail';
+import DraftTrendsFooter from './DraftTrendsFooter';
+import DraftScoutingCard from './DraftScoutingCard';
 import DraftPlayerPool from './DraftPlayerPool';
-import DraftAssistantPanel from './DraftAssistantPanel';
 import DraftComplete from './DraftComplete';
 import DraftTradeModal from './DraftTradeModal';
 import { normalizeDraftConfig } from '@/lib/draft/normalizeConfig';
@@ -63,7 +63,9 @@ export default function DraftRoomClient({
   const [clock, setClock] = useState(pickSeconds);
   const [summary, setSummary] = useState<DraftGradeSummary | null>(null);
   const [starting, setStarting] = useState(false);
-  const [, setQueue] = useState<DraftablePlayer[]>([]);
+  const [queue, setQueue] = useState<DraftablePlayer[]>([]);
+  const [selectedPlayer, setSelectedPlayer] = useState<DraftablePlayer | null>(null);
+  const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
   const [watchlist, setWatchlist] = useState<Set<string>>(new Set());
   const [chat, setChat] = useState<ChatMessage[]>([]);
   const [pickOwnership, setPickOwnership] = useState<Map<number, number>>(() =>
@@ -71,7 +73,6 @@ export default function DraftRoomClient({
   );
   const [tradeTargetSlot, setTradeTargetSlot] = useState<number | null>(null);
   const [sessions] = useState(initialSessions);
-  const [showMobileAssistant, setShowMobileAssistant] = useState(false);
   const [landingTab, setLandingTab] = useState<'mocks' | 'capital'>('mocks');
   const [draftStartedAt, setDraftStartedAt] = useState<number | null>(null);
 
@@ -282,6 +283,31 @@ export default function DraftRoomClient({
     setStarting(false);
   }, [config, scoringContext]);
 
+  const handleNewMock = useCallback((type: 'startup' | 'rookie' | 'redraft') => {
+    const base = defaultDraftConfig();
+    if (type === 'rookie') {
+      setConfig({
+        ...base,
+        draftType: 'rookie',
+        draftName: 'Rookie Mock Draft',
+        playerPool: 'rookies',
+        rounds: 4,
+      });
+    } else if (type === 'redraft') {
+      setConfig({
+        ...base,
+        draftType: 'redraft',
+        draftName: 'Redraft Mock',
+        scoring: 'ppr',
+        rounds: 15,
+        playerPool: 'all',
+      });
+    } else {
+      setConfig({ ...base, draftType: 'startup', draftName: 'Startup Mock Draft' });
+    }
+    setPhase('setup');
+  }, []);
+
   const handleRestart = useCallback(() => {
     setPhase('landing');
     setPicks([]);
@@ -290,12 +316,20 @@ export default function DraftRoomClient({
     setSummary(null);
     sessionIdRef.current = null;
     setConfig(defaultDraftConfig());
+    setQueue([]);
+    setSelectedPlayer(null);
   }, []);
 
   const addToQueue = useCallback((p: DraftablePlayer) => {
     setQueue((q) => (q.some((x) => x.playerId === p.playerId) ? q : [...q, p]));
     setWatchlist((w) => new Set(w).add(p.playerId));
   }, []);
+
+  const removeFromQueue = useCallback((playerId: string) => {
+    setQueue((q) => q.filter((x) => x.playerId !== playerId));
+  }, []);
+
+  const userPicks = useMemo(() => picks.filter((p) => p.isUser), [picks]);
 
   return (
     <>
@@ -331,7 +365,9 @@ export default function DraftRoomClient({
             ownedPicksByLeague={ownedPicksByLeague}
             activeTab={landingTab}
             onTabChange={setLandingTab}
-            onNewStartup={() => setPhase('setup')}
+            onNewStartup={() => handleNewMock('startup')}
+            onNewRookie={() => handleNewMock('rookie')}
+            onNewRedraft={() => handleNewMock('redraft')}
             onOpenSettings={() => setPhase('setup')}
             onResume={(id) => {
               void fetch(`/api/draft/resume?id=${id}`)
@@ -370,25 +406,37 @@ export default function DraftRoomClient({
           className="col-span-4 flex min-h-0 flex-col overflow-hidden"
           style={{ gridColumn: '1 / -1', gridRow: 2 }}
         >
-          <DraftHeader
+          <DraftWarRoomHeader
             config={normalizedConfig}
             currentOverall={currentOverall}
-            picksRemaining={Math.max(0, total - picks.length)}
-            isUserTurn={isUserTurn}
+            currentSlot={currentSlot}
             clock={clock}
-            draftStartedAt={draftStartedAt ?? undefined}
+            poolCount={filteredPool.filter((p) => !takenSet(picks).has(p.playerId)).length}
+            userPickCount={userPicks.length}
             onSettings={() => setPhase('setup')}
+            onLeave={() => setShowLeaveConfirm(true)}
           />
-          <div className="flex min-h-0 flex-1 flex-col md:flex-row">
-            <div className="hidden md:flex">
-              <DraftMyTeamPanel config={normalizedConfig} picks={picks} />
-            </div>
+          <div className="flex min-h-0 flex-1 flex-col overflow-hidden lg:flex-row">
             <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
-              <DraftGrid
+              <DraftBoardMatrix
                 config={normalizedConfig}
                 picks={picks}
                 currentOverall={currentOverall}
+                onCellClick={(pk) => {
+                  if (pk?.player) setSelectedPlayer(pk.player);
+                }}
               />
+              <div className="hidden shrink-0 border-t border-border p-2 md:block">
+                <DraftScoutingCard
+                  player={selectedPlayer}
+                  pool={filteredPool}
+                  currentOverall={currentOverall}
+                  draftType={normalizedConfig.draftType}
+                  onDraft={(p) => makePick(p, true)}
+                  onQueue={addToQueue}
+                  isUserTurn={isUserTurn}
+                />
+              </div>
               <div className="flex min-h-0 flex-1 flex-col border-t border-border">
                 <DraftPlayerPool
                   pool={filteredPool}
@@ -400,60 +448,64 @@ export default function DraftRoomClient({
                   onPick={(p) => makePick(p, true)}
                   onQueue={addToQueue}
                   watchlist={watchlist}
+                  selectedId={selectedPlayer?.playerId}
+                  onSelect={setSelectedPlayer}
                 />
               </div>
-              <button
-                type="button"
-                onClick={() => setShowMobileAssistant(true)}
-                className="shrink-0 border-t border-border bg-surface px-4 py-2.5 font-mono text-[10px] uppercase tracking-wide text-boom md:hidden"
-              >
-                Open BOB Assistant
-              </button>
             </div>
-            <div className="hidden md:flex">
-              <DraftAssistantPanel
-                pool={filteredPool}
-                picks={picks}
-                config={normalizedConfig}
-                tierBreaks={tierBreaks}
-                currentOverall={currentOverall}
-                isUserTurn={isUserTurn}
-                onDraft={(p) => makePick(p, true)}
-              />
-            </div>
+            <DraftWarRoomRightRail
+              pool={filteredPool}
+              picks={picks}
+              config={normalizedConfig}
+              tierBreaks={tierBreaks}
+              currentOverall={currentOverall}
+              currentSlot={currentSlot}
+              isUserTurn={isUserTurn}
+              clock={clock}
+              queue={queue}
+              chat={chat}
+              onDraft={(p) => makePick(p, true)}
+              onRemoveQueue={removeFromQueue}
+              onViewAnalysis={setSelectedPlayer}
+            />
           </div>
-          <DraftBottomStrip
+          <DraftTrendsFooter
             config={normalizedConfig}
             picks={picks}
             currentOverall={currentOverall}
-            isUserTurn={isUserTurn}
             chat={chat}
+            pool={filteredPool}
             taken={takenSet(picks)}
-            poolLength={filteredPool.length}
+            watchlist={watchlist}
+            onSelectPlayer={setSelectedPlayer}
           />
 
-          {showMobileAssistant && (
-            <div className="fixed inset-0 z-50 flex flex-col bg-bg md:hidden">
-              <div className="flex shrink-0 items-center justify-between border-b border-border px-4 py-3">
-                <span className="font-mono text-[11px] uppercase text-boom">BOB Assistant</span>
-                <button
-                  type="button"
-                  onClick={() => setShowMobileAssistant(false)}
-                  className="border-none bg-transparent font-mono text-[12px] text-muted"
-                >
-                  Close
-                </button>
-              </div>
-              <div className="min-h-0 flex-1 overflow-hidden">
-                <DraftAssistantPanel
-                  pool={filteredPool}
-                  picks={picks}
-                  config={normalizedConfig}
-                  tierBreaks={tierBreaks}
-                  currentOverall={currentOverall}
-                  isUserTurn={isUserTurn}
-                  onDraft={(p) => makePick(p, true)}
-                />
+          {showLeaveConfirm && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
+              <div className="w-full max-w-sm rounded-lg border border-border bg-[#0f1420] p-4">
+                <div className="font-mono text-[12px] uppercase text-text">Leave Draft Room?</div>
+                <p className="mt-2 font-mono text-[10px] text-muted">
+                  Mock progress is saved if a session exists. You can resume from the lobby.
+                </p>
+                <div className="mt-4 flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setShowLeaveConfirm(false)}
+                    className="flex-1 rounded border border-border py-2 font-mono text-[10px] uppercase text-muted"
+                  >
+                    Stay
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowLeaveConfirm(false);
+                      setPhase('landing');
+                    }}
+                    className="flex-1 rounded bg-[#7c3aed] py-2 font-mono text-[10px] uppercase text-white"
+                  >
+                    Leave
+                  </button>
+                </div>
               </div>
             </div>
           )}

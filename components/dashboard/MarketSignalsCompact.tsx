@@ -1,10 +1,14 @@
 'use client';
 
+import { useMemo } from 'react';
 import Link from 'next/link';
 import PlayerAvatar from '@/components/players/PlayerAvatar';
+import CountUpDelta from '@/components/dashboard/CountUpDelta';
 import { formatStartSitConfidence } from '@/lib/ui/labels';
-import type { RotationPlayer } from '@/lib/dashboard/rotation';
+import { playerHubHref } from '@/lib/dashboard/dashboardRoutes';
+import type { LeagueBundle, RotationPlayer, TradeTargetItem } from '@/lib/dashboard/rotation';
 import { sortByMarketSignal } from '@/lib/dashboard/sortPlayers';
+import { computeAssetActionability } from '@/lib/dashboard/assetActionability';
 
 function engineRank(ktcRank: number | null, rankDelta: number | null): number | null {
   if (ktcRank == null || rankDelta == null) return null;
@@ -12,9 +16,9 @@ function engineRank(ktcRank: number | null, rankDelta: number | null): number | 
 }
 
 function actionLabel(verdict: string): string {
-  if (verdict === 'BUST' || verdict === 'SELL') return 'Sell High';
-  if (verdict === 'BOOM' || verdict === 'BUY') return 'Buy Low';
-  return 'Hold';
+  if (verdict === 'BUST' || verdict === 'SELL') return 'SELL HIGH';
+  if (verdict === 'BOOM' || verdict === 'BUY') return 'BUY LOW';
+  return 'HOLD';
 }
 
 function confidenceTier(rankDelta: number | null): string {
@@ -22,7 +26,19 @@ function confidenceTier(rankDelta: number | null): string {
   return formatStartSitConfidence(raw);
 }
 
-function SignalRow({ player }: { player: RotationPlayer }) {
+function SignalRow({
+  player,
+  isAll,
+  currentLeague,
+  ownedInLeagueIds,
+  tradeTargetIds,
+}: {
+  player: RotationPlayer;
+  isAll: boolean;
+  currentLeague: LeagueBundle | null;
+  ownedInLeagueIds: Set<string>;
+  tradeTargetIds: Set<string>;
+}) {
   const mv = player.marketVerdict;
   if (!mv || mv.noMarketData) return null;
 
@@ -30,16 +46,27 @@ function SignalRow({ player }: { player: RotationPlayer }) {
   const bob = engineRank(mv.ktcRank ?? null, mv.rankDelta);
   const delta = mv.rankDelta != null ? Math.round(mv.rankDelta) : null;
   const deltaColor = delta != null && delta < 0 ? '#A78BFA' : '#36E7A1';
+  const isSell = mv.verdict === 'SELL' || mv.verdict === 'BUST';
+  const isBuy = mv.verdict === 'BOOM' || mv.verdict === 'BUY';
+  const glowClass = isBuy ? 'dash-boom-glow' : isSell ? 'dash-bust-glow' : '';
+  const action = computeAssetActionability(player, {
+    isAll,
+    currentLeague,
+    ownedInLeagueIds,
+    tradeTargetIds,
+  });
+  const href = playerHubHref(player.playerId);
 
   return (
-    <div className="border-b border-[#1e2640]/50 px-3 py-2 last:border-b-0 hover:bg-white/[0.02]">
+    <Link
+      href={href}
+      className={`dash-clickable-row block border-b border-[#1e2640]/50 px-3 py-2 no-underline last:border-b-0 ${glowClass}`}
+    >
       <div className="flex items-center gap-2">
         <PlayerAvatar playerId={player.playerId} name={player.name} size={32} />
         <div className="min-w-0 flex-1">
           <div className="flex items-baseline justify-between gap-2">
-            <p className="truncate font-figtree text-[12px] font-medium text-[#e8ecf4]">
-              {player.name}
-            </p>
+            <p className="truncate font-figtree text-[12px] font-medium text-[#e8ecf4]">{player.name}</p>
             <span className="shrink-0 font-mono text-[8px] uppercase" style={{ color: mv.color }}>
               {actionLabel(mv.verdict)}
             </span>
@@ -49,7 +76,7 @@ function SignalRow({ player }: { player: RotationPlayer }) {
           </p>
         </div>
       </div>
-      <div className="mt-1.5 flex flex-wrap gap-x-3 gap-y-0.5 font-mono text-[8px] tabular-nums text-[#6b7a99]">
+      <div className="mt-1.5 flex flex-wrap gap-x-3 gap-y-0.5 font-mono text-[8px] tabular-nums text-[#8b9bb8]">
         <span>
           Market Rank <span className="text-[#e8ecf4]">#{ktc ?? '—'}</span>
         </span>
@@ -58,24 +85,44 @@ function SignalRow({ player }: { player: RotationPlayer }) {
         </span>
         <span>
           Rank Delta{' '}
-          <span style={{ color: delta != null ? deltaColor : '#6b7a99' }}>
-            {delta != null ? `${delta > 0 ? '+' : ''}${delta}` : '—'}
-          </span>
+          {delta != null ? (
+            <CountUpDelta value={delta} style={{ color: deltaColor }} />
+          ) : (
+            <span style={{ color: '#6b7a99' }}>—</span>
+          )}
         </span>
         <span>
           Confidence: <span className="text-[#e8ecf4]">{confidenceTier(mv.rankDelta)}</span>
         </span>
       </div>
-    </div>
+      <div className="mt-1 flex items-center gap-1.5 font-mono text-[7px] uppercase tracking-wide">
+        <span className="h-1.5 w-1.5 rounded-full" style={{ background: action.dotColor }} />
+        <span style={{ color: action.dotColor }}>{action.key}</span>
+        <span className="normal-case text-[#8b9bb8]">· {action.hint}</span>
+      </div>
+    </Link>
   );
 }
 
 export default function MarketSignalsCompact({
   players,
+  isAll,
+  currentLeague,
+  ownedInLeagueIds,
+  tradeTargets,
 }: {
   players: RotationPlayer[];
   leagueCounts?: Map<string, number>;
+  isAll: boolean;
+  currentLeague: LeagueBundle | null;
+  ownedInLeagueIds: Set<string>;
+  tradeTargets: TradeTargetItem[];
 }) {
+  const tradeTargetIds = useMemo(
+    () => new Set(tradeTargets.map((t) => t.playerId)),
+    [tradeTargets],
+  );
+
   const sorted = sortByMarketSignal(players)
     .filter((p) => p.marketVerdict && !p.marketVerdict.noMarketData)
     .slice(0, 5);
@@ -87,9 +134,9 @@ export default function MarketSignalsCompact({
           <h3 className="font-figtree text-[10px] uppercase tracking-[1.5px] text-[#e8ecf4]">
             Mispriced Assets
           </h3>
-          <p className="font-mono text-[8px] text-[#6b7a99]">Buy low · sell high · hold</p>
+          <p className="font-mono text-[8px] text-[#8b9bb8]">Buy low · sell high · hold</p>
         </div>
-        <Link href="/players" className="font-mono text-[8px] text-boom no-underline hover:underline">
+        <Link href="/players" className="dash-action-btn font-mono text-[8px] text-boom no-underline">
           View All →
         </Link>
       </div>
@@ -99,7 +146,16 @@ export default function MarketSignalsCompact({
             No mispriced assets yet — sync leagues to populate.
           </p>
         ) : (
-          sorted.map((p) => <SignalRow key={p.playerId} player={p} />)
+          sorted.map((p) => (
+            <SignalRow
+              key={p.playerId}
+              player={p}
+              isAll={isAll}
+              currentLeague={currentLeague}
+              ownedInLeagueIds={ownedInLeagueIds}
+              tradeTargetIds={tradeTargetIds}
+            />
+          ))
         )}
       </div>
     </section>

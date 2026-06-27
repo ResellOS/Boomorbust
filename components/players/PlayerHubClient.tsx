@@ -4,6 +4,7 @@ import { useMemo, useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Search } from 'lucide-react';
 import type { HubPlayer, PlayerHubPortfolio } from '@/lib/players/types';
+import type { TradeOpportunity } from '@/lib/trade/types';
 import {
   findSimilarPlayers,
   isBoomVerdict,
@@ -32,6 +33,8 @@ interface PlayerHubClientProps {
   players: HubPlayer[];
   leaguePresence: Record<string, string[]>;
   portfolio: PlayerHubPortfolio;
+  leagues: { id: string; name: string }[];
+  tradeOpportunities: TradeOpportunity[];
   showAds?: boolean;
 }
 
@@ -39,6 +42,8 @@ export default function PlayerHubClient({
   players,
   leaguePresence,
   portfolio,
+  leagues,
+  tradeOpportunities,
   showAds = false,
 }: PlayerHubClientProps) {
   const searchParams = useSearchParams();
@@ -46,6 +51,8 @@ export default function PlayerHubClient({
     searchParams.get('player') ??
     searchParams.get('target') ??
     searchParams.get('highlight');
+  const deepLinkPosition = searchParams.get('position')?.toUpperCase();
+  const deepLinkSort = searchParams.get('sort') as SortKey | null;
   const defaultId = players.find((p) => p.playerId === deepLinkId)?.playerId ?? players[0]?.playerId ?? '';
   const [selectedId, setSelectedId] = useState(defaultId);
   const [mobileDetailOpen, setMobileDetailOpen] = useState(false);
@@ -55,9 +62,18 @@ export default function PlayerHubClient({
       setSelectedId(deepLinkId);
     }
   }, [deepLinkId, players]);
-  const [filter, setFilter] = useState<FilterKey>('ALL');
+  const [filter, setFilter] = useState<FilterKey>(() => {
+    if (deepLinkPosition && ['QB', 'RB', 'WR', 'TE'].includes(deepLinkPosition)) {
+      return deepLinkPosition as FilterKey;
+    }
+    return 'ALL';
+  });
   const [search, setSearch] = useState('');
-  const [sort, setSort] = useState<SortKey>('rating');
+  const [sort, setSort] = useState<SortKey>(
+    deepLinkSort === 'name' || deepLinkSort === 'position' || deepLinkSort === 'rating'
+      ? deepLinkSort
+      : 'rating',
+  );
   const [page, setPage] = useState(1);
 
   const filtered = useMemo(() => {
@@ -108,7 +124,7 @@ export default function PlayerHubClient({
 
   return (
     <div
-      className="col-start-1 md:col-start-2 row-start-2 min-h-0 overflow-hidden flex flex-col md:grid md:grid-cols-[1fr_minmax(580px,42%)]"
+      className="col-start-1 md:col-start-2 row-start-2 min-h-0 overflow-hidden flex flex-col md:grid md:grid-cols-[minmax(0,1fr)_minmax(620px,48%)]"
     >
       <div className="flex min-w-0 flex-col gap-2.5 overflow-y-auto overflow-x-hidden p-3 px-3.5 [scrollbar-width:thin]">
         <div>
@@ -183,10 +199,10 @@ export default function PlayerHubClient({
                     setSelectedId(p.playerId);
                     setMobileDetailOpen(true);
                   }}
-                  className={`grid w-full cursor-pointer items-center gap-2 border-b border-border/50 px-3 py-[7px] text-left transition-colors last:border-b-0 hover:bg-white/[0.015] ${
+                  className={`grid w-full cursor-pointer items-center gap-2 border-b border-border/50 px-3 py-[7px] text-left transition-all duration-150 last:border-b-0 hover:bg-boom/[0.03] hover:border-l-boom/30 ${
                     sel
-                      ? 'border-l-2 border-l-boom bg-boom/[0.04] pl-[10px]'
-                      : 'border-l-2 border-l-transparent'
+                      ? 'border-l-[3px] border-l-boom bg-boom/[0.06] pl-[9px] shadow-[inset_0_0_20px_rgba(54,231,161,0.06)]'
+                      : 'border-l-[3px] border-l-transparent'
                   }`}
                   style={{ gridTemplateColumns: '2fr 70px 110px' }}
                 >
@@ -257,6 +273,8 @@ export default function PlayerHubClient({
             portfolio={portfolio}
             allPlayers={players}
             comparables={similar}
+            leagues={leagues}
+            tradeOpportunities={tradeOpportunities}
             onSelectPlayer={setSelectedId}
           />
         ) : (
@@ -282,6 +300,8 @@ export default function PlayerHubClient({
               portfolio={portfolio}
               allPlayers={players}
               comparables={similar}
+              leagues={leagues}
+              tradeOpportunities={tradeOpportunities}
               onSelectPlayer={setSelectedId}
             />
           </div>

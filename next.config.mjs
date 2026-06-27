@@ -1,5 +1,9 @@
+import { withSentryConfig } from '@sentry/nextjs';
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Required on Next 14 so instrumentation.ts (Sentry server init) runs.
+  experimental: { instrumentationHook: true },
   // Deploy gate is `tsc --noEmit` (per CLAUDE.md), not ESLint. Lint warnings/unused-var
   // errors should not freeze production deploys — type-checking still runs and blocks.
   eslint: { ignoreDuringBuilds: true },
@@ -42,9 +46,11 @@ const nextConfig = {
       { source: '/login', destination: '/auth/login', permanent: false },
       { source: '/dashboard/lineup', destination: '/lineup', permanent: false },
       { source: '/dashboard/lineup/:path*', destination: '/lineup', permanent: false },
-      { source: '/dashboard/trade-hub', destination: '/trade-hub', permanent: false },
-      { source: '/dashboard/trade', destination: '/trade-hub', permanent: false },
-      { source: '/dashboard/trade/:path*', destination: '/trade-hub', permanent: false },
+      { source: '/dashboard/trade-hub', destination: '/trade', permanent: false },
+      { source: '/dashboard/trade', destination: '/trade', permanent: false },
+      { source: '/dashboard/trade/:path*', destination: '/trade', permanent: false },
+      { source: '/trade-hub', destination: '/trade', permanent: false },
+      { source: '/trade-hub/:path*', destination: '/trade', permanent: false },
       { source: '/dashboard/scouting', destination: '/scouting', permanent: false },
       { source: '/dashboard/scouting/:path*', destination: '/scouting', permanent: false },
       { source: '/dashboard/rookies', destination: '/rookies', permanent: false },
@@ -60,4 +66,9 @@ const nextConfig = {
   },
 };
 
-export default nextConfig;
+// Sentry: server-only error monitoring (no client config → frontend not instrumented).
+// Source-map upload disabled (no auth token needed; build never fails on its absence).
+export default withSentryConfig(nextConfig, {
+  silent: true,
+  sourcemaps: { disable: true },
+});

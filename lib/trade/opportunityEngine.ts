@@ -53,8 +53,8 @@ function acceptanceFromManager(
     if (mgr.archetype === 'contender' && suggestion.type === 'buy') base += 5;
 
     const pos = suggestion.position?.toUpperCase();
-    if (pos && mgr.needs.includes(pos)) base += 10;
-    if (pos && mgr.surplus.includes(pos)) base += 8;
+    if (pos && (mgr.needs ?? []).includes(pos)) base += 10;
+    if (pos && (mgr.surplus ?? []).includes(pos)) base += 8;
   }
   const gapBoost = Math.min(15, Math.abs(suggestion.rankDelta ?? 0) / 20);
   return Math.min(95, Math.max(25, Math.round(base + gapBoost)));
@@ -116,7 +116,7 @@ export function displayArchetypeLabel(mgr: ManagerProfileData): string {
     contender: 'THE WIN-NOW',
     balanced: 'THE COLLECTOR',
   };
-  return map[mgr.archetype] ?? mgr.archetype_label.toUpperCase();
+  return map[mgr.archetype] ?? mgr.archetype_label?.toUpperCase() ?? 'MANAGER';
 }
 
 export function tradeConfidenceTier(
@@ -156,10 +156,10 @@ function portfolioImpactNote(
 ): string {
   const pos = s.position?.toUpperCase();
   if (mgr && pos) {
-    if (mgr.needs.includes(pos)) {
+    if ((mgr.needs ?? []).includes(pos)) {
       return `Fills ${pos} need — moves roster toward balanced contender.`;
     }
-    if (mgr.surplus.includes(pos) && s.type === 'sell') {
+    if ((mgr.surplus ?? []).includes(pos) && s.type === 'sell') {
       return `Monetizes ${pos} surplus before the market corrects.`;
     }
   }
@@ -174,8 +174,8 @@ export function buildReasonChips(mgr: ManagerProfileData | null, s: BobSuggestio
     if (mgr.trade_frequency === 'active') chips.push('Trades frequently');
     if (mgr.prefers_youth) chips.push('Values youth');
     const pos = s.position?.toUpperCase();
-    if (pos && mgr.needs.includes(pos)) chips.push(`Needs ${pos} help`);
-    if (pos && mgr.surplus.includes(pos)) chips.push(`${pos} surplus`);
+    if (pos && (mgr.needs ?? []).includes(pos)) chips.push(`Needs ${pos} help`);
+    if (pos && (mgr.surplus ?? []).includes(pos)) chips.push(`${pos} surplus`);
     if (mgr.trade_frequency === 'active') chips.push('Responds quickly');
   }
   for (const r of s.whyReasons ?? []) {
@@ -232,10 +232,10 @@ export function suggestionToOpportunity(
   const champ = champImpact(tfoDelta);
   const why = [...(s.whyReasons ?? [])];
   if (mgr) {
-    if (s.position && mgr.needs.includes(s.position.toUpperCase())) {
+    if (s.position && (mgr.needs ?? []).includes(s.position.toUpperCase())) {
       why.unshift(`Manager has ${s.position} need — trade window open.`);
     }
-    if (s.position && mgr.surplus.includes(s.position.toUpperCase())) {
+    if (s.position && (mgr.surplus ?? []).includes(s.position.toUpperCase())) {
       why.unshift(`Manager overloaded at ${s.position}.`);
     }
   }

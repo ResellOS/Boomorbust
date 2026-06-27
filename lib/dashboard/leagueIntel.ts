@@ -112,7 +112,6 @@ export function computeLeagueIntel(
 
   if (leagues.length === 0) return null;
 
-  const bestLeague = [...leagues].sort((a, b) => b.teamTfo - a.teamTfo)[0]!;
   return {
     managerName: 'Portfolio view',
     leagueName: `${leagues.length} leagues`,

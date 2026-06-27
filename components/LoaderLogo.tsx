@@ -143,7 +143,7 @@ const LoaderLogo = forwardRef<HTMLDivElement, LoaderLogoProps>(function LoaderLo
 
       <div
         ref={ref}
-        className={`relative mx-auto w-[min(220px,70vw)] max-w-[340px] bg-transparent sm:w-[min(320px,82vw)] ${pulse ? 'wr-logo-activate' : ''} ${activated ? 'wr-logo-activate' : ''}`}
+        className={`relative mx-auto w-[min(360px,88vw)] max-w-[560px] bg-transparent sm:w-[min(520px,78vw)] ${pulse ? 'wr-logo-activate' : ''} ${activated ? 'wr-logo-activate' : ''}`}
         style={{
           mixBlendMode: 'screen',
         }}
@@ -173,7 +173,7 @@ const LoaderLogo = forwardRef<HTMLDivElement, LoaderLogoProps>(function LoaderLo
             alt=""
             width={320}
             height={320}
-            className="block h-auto w-full bg-transparent sm:max-w-[320px]"
+            className="block h-auto w-full bg-transparent"
             style={{
               mixBlendMode: 'screen',
               filter: 'brightness(0.55) saturate(0.25) contrast(1.1)',
@@ -243,7 +243,7 @@ const LoaderLogo = forwardRef<HTMLDivElement, LoaderLogoProps>(function LoaderLo
             alt="Boom or Bust"
             width={320}
             height={320}
-            className="block h-auto w-full bg-transparent sm:max-w-[320px]"
+            className="block h-auto w-full bg-transparent"
             style={{
               mixBlendMode: 'screen',
               filter: fullColor

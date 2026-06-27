@@ -1,7 +1,9 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import Link from 'next/link';
 import { formatTimeAgo } from '@/lib/dashboard/fetchDashboardNews';
+import { playerHubHref } from '@/lib/dashboard/dashboardRoutes';
 import type { DashboardNewsItem } from '@/lib/dashboard/rotation';
 
 interface DynastyNewsFeedProps {
@@ -24,6 +26,12 @@ function impactLine(item: DashboardNewsItem): string | null {
   return null;
 }
 
+function affectedAssets(item: DashboardNewsItem): string[] {
+  const names: string[] = [];
+  if (item.playerHighlight) names.push(item.playerHighlight);
+  return names;
+}
+
 function NewsModal({
   item,
   onClose,
@@ -32,6 +40,14 @@ function NewsModal({
   onClose: () => void;
 }) {
   const [iframeBlocked, setIframeBlocked] = useState(false);
+  const impact = impactLine(item);
+  const assets = affectedAssets(item);
+
+  useEffect(() => {
+    const onEsc = () => onClose();
+    window.addEventListener('dashboard:escape', onEsc);
+    return () => window.removeEventListener('dashboard:escape', onEsc);
+  }, [onClose]);
 
   return (
     <div
@@ -46,7 +62,35 @@ function NewsModal({
       >
         <div className="border-b border-border px-4 py-3">
           <div className="font-figtree text-[13px] font-semibold text-text">{item.headline}</div>
-          <div className="mt-1 flex items-center gap-2 font-mono text-[10px] text-muted">
+          {impact ? (
+            <p className="mt-1.5 font-mono text-[10px] leading-snug text-[#9aa8c4]">{impact}</p>
+          ) : null}
+          {assets.length > 0 ? (
+            <div className="mt-2">
+              <div className="font-mono text-[8px] uppercase tracking-wide text-muted">Affected Assets</div>
+              <div className="mt-1 flex flex-wrap gap-2">
+                {assets.map((name) =>
+                  item.playerId ? (
+                    <Link
+                      key={name}
+                      href={playerHubHref(item.playerId)}
+                      className="rounded border border-boom/30 bg-boom/10 px-2 py-0.5 font-figtree text-[10px] text-boom no-underline hover:border-boom/50"
+                    >
+                      {name}
+                    </Link>
+                  ) : (
+                    <span
+                      key={name}
+                      className="rounded border border-border px-2 py-0.5 font-figtree text-[10px] text-text"
+                    >
+                      {name}
+                    </span>
+                  ),
+                )}
+              </div>
+            </div>
+          ) : null}
+          <div className="mt-2 flex items-center gap-2 font-mono text-[10px] text-muted">
             <span>{item.source}</span>
             <span>·</span>
             <span>{formatTimeAgo(item.publishedAt)} ago</span>
@@ -69,7 +113,7 @@ function NewsModal({
                 href={item.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="rounded-md border border-boom/40 px-4 py-2 font-figtree text-[12px] text-boom no-underline hover:bg-boom/10"
+                className="dash-action-btn rounded-md border border-boom/40 px-4 py-2 font-figtree text-[12px] text-boom no-underline"
               >
                 Read full article
               </a>
@@ -90,7 +134,7 @@ function NewsModal({
             onClick={onClose}
             className="rounded border border-border px-3 py-1 font-figtree text-[11px] text-muted hover:text-text"
           >
-            Close
+            Close (Esc)
           </button>
         </div>
       </div>
@@ -105,6 +149,8 @@ export default function DynastyNewsFeed({
   title = 'News That Matters',
 }: DynastyNewsFeedProps) {
   const [modalItem, setModalItem] = useState<DashboardNewsItem | null>(null);
+
+  const closeModal = useCallback(() => setModalItem(null), []);
 
   const visible = useMemo(() => {
     const pool = allMode
@@ -127,6 +173,7 @@ export default function DynastyNewsFeed({
         <div className="grid grid-cols-1 gap-0 md:grid-cols-2 lg:grid-cols-4">
           {visible.map((item) => {
             const impact = impactLine(item);
+            const assets = affectedAssets(item);
             return (
               <button
                 key={item.id}
@@ -135,13 +182,19 @@ export default function DynastyNewsFeed({
                   if (item.url.startsWith('http')) setModalItem(item);
                   else window.open(item.url, '_blank');
                 }}
-                className="flex w-full cursor-pointer flex-col border-b border-r border-border/40 px-3 py-3 text-left transition-colors last:border-b-0 hover:bg-white/[0.03] md:border-b-0"
+                className="group dash-clickable-row flex w-full cursor-pointer flex-col border-b border-r border-border/40 px-3 py-3 text-left last:border-b-0 md:border-b-0"
               >
                 <span className="font-figtree text-[11px] font-semibold leading-snug text-text">
                   {item.headline}
                 </span>
                 {impact ? (
-                  <span className="mt-1.5 font-mono text-[9px] leading-snug text-muted">{impact}</span>
+                  <span className="mt-1.5 font-mono text-[9px] leading-snug text-[#9aa8c4]">{impact}</span>
+                ) : null}
+                {assets.length > 0 ? (
+                  <div className="dash-news-hover-reveal">
+                    <div className="font-mono text-[7px] uppercase tracking-wide text-muted">Affected</div>
+                    <div className="font-figtree text-[10px] text-boom">{assets.join(' · ')}</div>
+                  </div>
                 ) : null}
                 <span className="mt-2 font-mono text-[8px] text-muted">{formatTimeAgo(item.publishedAt)} ago</span>
               </button>
@@ -149,7 +202,7 @@ export default function DynastyNewsFeed({
           })}
         </div>
       </div>
-      {modalItem && <NewsModal item={modalItem} onClose={() => setModalItem(null)} />}
+      {modalItem && <NewsModal item={modalItem} onClose={closeModal} />}
     </>
   );
 }

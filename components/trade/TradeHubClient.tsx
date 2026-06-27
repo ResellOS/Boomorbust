@@ -1,31 +1,22 @@
 'use client';
 
-import { useMemo, useState } from 'react';
-import type { ManagerTradeCard, TradeOffer, TradeOpportunity, TradePageData } from '@/lib/trade/types';
-import { calculatorAssetsFromOpportunity } from '@/lib/trade/tradeHubUi';
-import BestTradeHero from '@/components/trade/BestTradeHero';
-import LeagueWinningMoves from '@/components/trade/LeagueWinningMoves';
-import SuggestedTradesTable from '@/components/trade/SuggestedTradesTable';
-import TradeHubRightSidebar from '@/components/trade/TradeHubRightSidebar';
-import TradeOfferCard from '@/components/trade/TradeOfferCard';
-import TradeHistoryBox from '@/components/trade/TradeHistoryBox';
-import TradeCalculator from '@/components/trade/TradeCalculator';
-import { TradeHubInsightCards } from '@/components/trade/TradeHubInsightCards';
-import TradePreviewModal from '@/components/trade/TradePreviewModal';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import type { BlockPlayer, ManagerTradeCard, TradeOpportunity, TradePageData } from '@/lib/trade/types';
 import { opportunityToSuggestion } from '@/lib/trade/tradeHubUi';
+import { findManagerForOpportunity, resolveTradePartners } from '@/lib/trade/resolvePartners';
+import { playerHubHref } from '@/lib/dashboard/dashboardRoutes';
+import TradeHubHeader, { type TradeViewMode } from '@/components/trade/TradeHubHeader';
+import TradeOfTheDayHero from '@/components/trade/TradeOfTheDayHero';
+import BestTradePartners from '@/components/trade/BestTradePartners';
+import TradeStagingArea from '@/components/trade/TradeStagingArea';
+import LeagueWinningMoves from '@/components/trade/LeagueWinningMoves';
+import PositionalMarketReport from '@/components/trade/PositionalMarketReport';
+import TradeDatabase, { type TradeTypeFilter } from '@/components/trade/TradeDatabase';
+import TradeHubRightSidebar from '@/components/trade/TradeHubRightSidebar';
+import AiTradeAssistant, { type TradeQuickAction } from '@/components/trade/AiTradeAssistant';
+import TradePreviewModal from '@/components/trade/TradePreviewModal';
 import AdSlot from '@/components/ads/AdSlot';
-
-type TabId = 'overview' | 'suggested' | 'blocks' | 'incoming' | 'outgoing' | 'completed' | 'calculator';
-
-const TABS: { id: TabId; label: string }[] = [
-  { id: 'overview', label: 'Overview' },
-  { id: 'suggested', label: 'Suggested Trades' },
-  { id: 'blocks', label: 'Trade Blocks' },
-  { id: 'incoming', label: 'Incoming' },
-  { id: 'outgoing', label: 'Outgoing' },
-  { id: 'completed', label: 'Completed' },
-  { id: 'calculator', label: 'Calculator' },
-];
 
 const ALL = 'all';
 
@@ -42,226 +33,268 @@ export default function TradeHubClient({
   showAds = false,
   initialTargetPlayerId,
   initialLeagueId,
-  initialOfferId,
 }: TradeHubClientProps) {
-  const [tab, setTab] = useState<TabId>('overview');
-  const [league, setLeague] = useState<string>(initialLeagueId ?? ALL);
-  const [activeOpp, setActiveOpp] = useState<TradeOpportunity | null>(
-    data.opportunities[0] ?? null,
+  const router = useRouter();
+  const initialView: TradeViewMode = initialLeagueId ? 'league' : 'global';
+  const [viewMode, setViewMode] = useState<TradeViewMode>(initialView);
+  const [leagueId, setLeagueId] = useState(
+    initialLeagueId ?? data.leagues[0]?.id ?? ALL,
   );
+  const [positionFilter, setPositionFilter] = useState<string | undefined>();
+  const [dbTier, setDbTier] = useState<'all' | 'smash' | 'high' | 'speculative' | 'long'>('all');
+  const [tradeTypeFilter, setTradeTypeFilter] = useState<TradeTypeFilter>('all');
   const [previewSuggestion, setPreviewSuggestion] = useState<ReturnType<
     typeof opportunityToSuggestion
   > | null>(null);
-  const [selectedId, setSelectedId] = useState<string | null>(
-    initialOfferId ??
-      data.incomingOffers.find((o) =>
-        initialTargetPlayerId ? o.offeredPlayerIds?.includes(initialTargetPlayerId) : false,
-      )?.id ??
-      data.incomingOffers[0]?.id ??
-      null,
-  );
 
-  const inLeague = <T extends { leagueId?: string }>(items: T[]): T[] =>
-    league === ALL ? items : items.filter((i) => i.leagueId === league);
+  const effectiveLeagueId = viewMode === 'global' ? ALL : leagueId;
 
   const filteredOpportunities = useMemo(() => {
-    if (league === ALL) return data.opportunities;
-    return data.opportunities.filter((o) => o.leagueId === league);
-  }, [data.opportunities, league]);
+    if (effectiveLeagueId === ALL) return data.opportunities;
+    return data.opportunities.filter((o) => o.leagueId === effectiveLeagueId);
+  }, [data.opportunities, effectiveLeagueId]);
 
-  const heroOpp = filteredOpportunities[0] ?? null;
+  const filteredManagers = useMemo(() => {
+    if (effectiveLeagueId === ALL) return data.managerCards;
+    return data.managerCards.filter((m) => m.leagueId === effectiveLeagueId);
+  }, [data.managerCards, effectiveLeagueId]);
 
-  const tabOffers = useMemo((): TradeOffer[] => {
-    const base =
-      tab === 'incoming'
-        ? data.incomingOffers
-        : tab === 'outgoing'
-          ? data.outgoingOffers
-          : tab === 'completed'
-            ? data.completedOffers
-            : [];
-    return inLeague(base);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tab, data, league]);
+  const resolvedPartners = useMemo(
+    () => resolveTradePartners(filteredManagers, filteredOpportunities, 3),
+    [filteredManagers, filteredOpportunities],
+  );
+
+  const [selectedManager, setSelectedManager] = useState<ManagerTradeCard | null>(
+    resolvedPartners.find((p) => !p.isSkeleton)?.manager ?? null,
+  );
+
+  const filteredBlocks = useMemo(() => {
+    if (effectiveLeagueId === ALL) return data.blockPlayers;
+    return data.blockPlayers.filter((p) => p.leagueId === effectiveLeagueId);
+  }, [data.blockPlayers, effectiveLeagueId]);
+
+  const filteredHistory = useMemo(() => {
+    if (effectiveLeagueId === ALL) return data.history;
+    return data.history.filter((h) => h.leagueId === effectiveLeagueId);
+  }, [data.history, effectiveLeagueId]);
+
+  const initialOpp = useMemo(() => {
+    if (initialTargetPlayerId) {
+      return (
+        filteredOpportunities.find((o) => o.playerId === initialTargetPlayerId) ??
+        data.opportunities.find((o) => o.playerId === initialTargetPlayerId) ??
+        null
+      );
+    }
+    return filteredOpportunities[0] ?? null;
+  }, [initialTargetPlayerId, filteredOpportunities, data.opportunities]);
+
+  const [activeOpp, setActiveOpp] = useState<TradeOpportunity | null>(initialOpp);
+
+  useEffect(() => {
+    setActiveOpp((prev) => {
+      if (prev && filteredOpportunities.some((o) => o.id === prev.id)) return prev;
+      return filteredOpportunities[0] ?? null;
+    });
+  }, [filteredOpportunities, effectiveLeagueId]);
+
+  useEffect(() => {
+    setSelectedManager((prev) => {
+      if (
+        prev &&
+        resolvedPartners.some(
+          (p) =>
+            !p.isSkeleton &&
+            p.manager.leagueId === prev.leagueId &&
+            p.manager.displayName === prev.displayName,
+        )
+      ) {
+        return prev;
+      }
+      return resolvedPartners.find((p) => !p.isSkeleton)?.manager ?? null;
+    });
+  }, [resolvedPartners, effectiveLeagueId]);
 
   const givePicks = useMemo(() => {
     const byLeague = data.ownedPicksByLeague ?? {};
-    const lid = activeOpp?.leagueId ?? (league === ALL ? Object.keys(byLeague)[0] : league);
-    if (!lid) return Object.values(byLeague).flat();
+    const lid = activeOpp?.leagueId ?? (effectiveLeagueId === ALL ? Object.keys(byLeague)[0] : effectiveLeagueId);
+    if (!lid || lid === ALL) return Object.values(byLeague).flat();
     return byLeague[lid] ?? [];
-  }, [data.ownedPicksByLeague, activeOpp, league]);
+  }, [data.ownedPicksByLeague, activeOpp, effectiveLeagueId]);
 
-  const calcAssets = useMemo(() => {
-    if (!activeOpp) return { give: [], get: [], leagueId: '' };
-    return calculatorAssetsFromOpportunity(activeOpp);
-  }, [activeOpp]);
+  const selectTrade = useCallback(
+    (opp: TradeOpportunity) => {
+      setActiveOpp(opp);
+      const mgr =
+        findManagerForOpportunity(opp, data.managerCards, data.opportunities) ??
+        resolvedPartners.find(
+          (p) =>
+            !p.isSkeleton &&
+            p.manager.leagueId === opp.leagueId &&
+            p.manager.displayName === opp.managerName,
+        )?.manager ??
+        null;
+      if (mgr) setSelectedManager(mgr);
+    },
+    [data.managerCards, data.opportunities, resolvedPartners],
+  );
 
-  const history = useMemo(() => inLeague(data.history), [data.history, league]);
+  const handleViewTrade = useCallback(
+    (opp: TradeOpportunity) => {
+      selectTrade(opp);
+      setPreviewSuggestion(opportunityToSuggestion(opp));
+    },
+    [selectTrade],
+  );
 
-  const handleViewTrade = (opp: TradeOpportunity) => {
-    setActiveOpp(opp);
-    setPreviewSuggestion(opportunityToSuggestion(opp));
+  const handleStageOffer = useCallback(
+    (opp: TradeOpportunity) => selectTrade(opp),
+    [selectTrade],
+  );
+
+  const handleBlockClick = useCallback(
+    (p: BlockPlayer) => {
+      const match = filteredOpportunities.find(
+        (o) => o.playerId === p.playerId && o.leagueId === p.leagueId,
+      );
+      if (match) {
+        selectTrade(match);
+        return;
+      }
+      router.push(playerHubHref(p.playerId));
+    },
+    [filteredOpportunities, selectTrade, router],
+  );
+
+  const handleViewMode = (mode: TradeViewMode) => {
+    setViewMode(mode);
+    if (mode === 'league' && leagueId === ALL && data.leagues[0]) {
+      setLeagueId(data.leagues[0].id);
+    }
   };
 
+  const scrollToDatabase = () => {
+    document.getElementById('trade-database')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
+  const handleQuickAction = useCallback(
+    (action: TradeQuickAction) => {
+      scrollToDatabase();
+      switch (action) {
+        case 'buy_low':
+          setTradeTypeFilter('buy');
+          setDbTier('all');
+          setPositionFilter(undefined);
+          break;
+        case 'sell_high':
+          setTradeTypeFilter('sell');
+          setDbTier('all');
+          setPositionFilter(undefined);
+          break;
+        case 'contender': {
+          setTradeTypeFilter('all');
+          setDbTier('high');
+          setPositionFilter(undefined);
+          const top = [...filteredOpportunities].sort(
+            (a, b) => b.championshipImpact - a.championshipImpact,
+          )[0];
+          if (top) selectTrade(top);
+          break;
+        }
+        case 'rebuild': {
+          setTradeTypeFilter('buy');
+          setDbTier('speculative');
+          setPositionFilter(undefined);
+          const pick = filteredOpportunities.find((o) => o.suggestedPrice?.includes('1st')) ?? filteredOpportunities[0];
+          if (pick) selectTrade(pick);
+          break;
+        }
+        case 'target_wr':
+          setPositionFilter('WR');
+          setTradeTypeFilter('all');
+          break;
+        case 'target_rb':
+          setPositionFilter('RB');
+          setTradeTypeFilter('all');
+          break;
+        default:
+          break;
+      }
+    },
+    [filteredOpportunities, selectTrade],
+  );
+
   return (
-    <div className="col-start-1 md:col-start-2 row-start-2 flex min-h-0 flex-col overflow-hidden md:grid md:grid-cols-[1fr_310px]">
-      <div className="flex min-h-0 flex-col gap-3 overflow-y-auto px-4 py-3.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-        <div className="mb-0.5">
-          <h1 className="font-figtree text-2xl leading-none tracking-[-1px] text-text md:text-4xl">
-            TRADE HUB
-          </h1>
-          <p className="mt-0.5 font-mono text-[9px] text-muted">
-            Find edges. Win trades. Win leagues.
-          </p>
-        </div>
-
-        <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5 scrollbar-hide">
-          <button
-            type="button"
-            onClick={() => setLeague(ALL)}
-            className={`shrink-0 rounded-[6px] border px-3 py-1.5 font-figtree text-[11px] ${
-              league === ALL
-                ? 'border-boom bg-boom/15 text-boom'
-                : 'border-border bg-surface text-muted hover:text-text'
-            }`}
-          >
-            ALL LEAGUES
-          </button>
-          {data.leagues.map((lg) => (
-            <button
-              key={lg.id}
-              type="button"
-              onClick={() => setLeague(lg.id)}
-              className={`flex shrink-0 items-center gap-1.5 rounded-[6px] border px-3 py-1.5 font-figtree text-[11px] ${
-                league === lg.id
-                  ? 'border-boom bg-boom/15 text-boom'
-                  : 'border-border bg-surface text-muted hover:text-text'
-              }`}
-            >
-              <span className="h-[6px] w-[6px] shrink-0 rounded-full" style={{ background: lg.dotColor }} />
-              <span className="max-w-[120px] truncate">{lg.name}</span>
-            </button>
-          ))}
-        </div>
-
-        <div className="flex overflow-x-auto border-b border-border scrollbar-hide">
-          {TABS.map((t) => (
-            <button
-              key={t.id}
-              type="button"
-              onClick={() => setTab(t.id)}
-              className={`mb-[-1px] shrink-0 border-b-2 px-4 py-2 font-figtree text-[10px] uppercase tracking-wide ${
-                tab === t.id ? 'border-boom text-boom' : 'border-transparent text-muted hover:text-text'
-              }`}
-            >
-              {t.label}
-            </button>
-          ))}
-        </div>
-
-        {(tab === 'overview' || tab === 'suggested') && (
-          <>
-            {tab === 'overview' ? (
-              <>
-                <BestTradeHero
-                  opportunity={heroOpp}
-                  onViewTrade={handleViewTrade}
-                  onSendCalculator={(o) => {
-                    setActiveOpp(o);
-                    setTab('calculator');
-                  }}
-                />
-                <LeagueWinningMoves opportunities={filteredOpportunities} onSelect={handleViewTrade} />
-              </>
-            ) : null}
-            <TradeHubInsightCards
-              marketTemperature={data.marketTemperature}
-              managerCards={data.managerCards}
-            />
-            <SuggestedTradesTable
-              opportunities={filteredOpportunities}
-              leagues={data.leagues}
-              onViewTrade={handleViewTrade}
-            />
-          </>
-        )}
-
-        {tab === 'blocks' && (
-          <div className="rounded-[10px] border border-border bg-[#0f1420] p-4">
-            <div className="mb-3 font-figtree text-[10px] uppercase tracking-[1.5px] text-text">
-              Trade Blocks
-            </div>
-            {data.blockPlayers.length === 0 ? (
-              <p className="font-figtree text-[12px] text-muted">No players flagged on the block yet.</p>
-            ) : (
-              data.blockPlayers.map((p) => (
-                <div
-                  key={p.playerId}
-                  className="flex items-center justify-between border-b border-border/40 py-2 last:border-b-0"
-                >
-                  <div>
-                    <div className="font-figtree text-[12px] text-text">{p.playerName}</div>
-                    <div className="font-mono text-[9px] text-muted">
-                      {p.position} · {p.ownerName} · {p.leagueName}
-                    </div>
-                  </div>
-                  <span className="rounded bg-bust/15 px-1.5 py-0.5 font-mono text-[8px] uppercase text-bust">
-                    {p.verdictLabel}
-                  </span>
-                </div>
-              ))
-            )}
-          </div>
-        )}
-
-        {(tab === 'incoming' || tab === 'outgoing' || tab === 'completed') && (
-          <>
-            {tabOffers.length === 0 ? (
-              <div className="rounded-lg border border-border bg-surface px-4 py-6 text-center font-figtree text-[11px] text-muted">
-                No trades in this category yet.
-              </div>
-            ) : (
-              tabOffers.map((offer) => (
-                <TradeOfferCard
-                  key={offer.id}
-                  offer={offer}
-                  active={selectedId === offer.id}
-                  onSelect={() => setSelectedId(offer.id)}
-                />
-              ))
-            )}
-            <TradeHistoryBox history={history} />
-          </>
-        )}
-
-        {tab === 'calculator' && (
-        <TradeCalculator
-          key={activeOpp?.id ?? 'calc'}
-          givePicks={givePicks}
-          initialGive={calcAssets.give}
-          initialGet={calcAssets.get}
+    <div className="col-start-1 row-start-2 flex min-h-0 min-w-0 flex-col overflow-hidden md:col-start-2 md:grid md:grid-cols-[1fr_280px]">
+      <div className="flex min-h-0 min-w-0 flex-col gap-3 overflow-y-auto px-4 py-3.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <TradeHubHeader
+          viewMode={viewMode}
+          onViewModeChange={handleViewMode}
+          leagues={data.leagues}
+          selectedLeagueId={leagueId === ALL ? (data.leagues[0]?.id ?? '') : leagueId}
+          onLeagueChange={setLeagueId}
         />
-        )}
 
-        {tab === 'overview' ? <AdSlot placement="trade-history" showAds={showAds} /> : null}
+        <div className="grid grid-cols-1 gap-3 xl:grid-cols-[1.2fr_1fr_300px]">
+          <TradeOfTheDayHero
+            opportunities={filteredOpportunities}
+            onStageOffer={handleStageOffer}
+            onViewTrade={handleViewTrade}
+            onSendCalculator={handleStageOffer}
+          />
+          <BestTradePartners
+            managers={filteredManagers}
+            opportunities={filteredOpportunities}
+            onSelectManager={setSelectedManager}
+          />
+          <div className="xl:sticky xl:top-0 xl:self-start">
+            <TradeStagingArea
+              activeOpportunity={activeOpp}
+              givePicks={givePicks}
+              selectedManager={selectedManager}
+            />
+          </div>
+        </div>
+
+        <LeagueWinningMoves opportunities={filteredOpportunities} onSelect={selectTrade} />
+
+        <PositionalMarketReport
+          rows={data.marketTemperature}
+          onPositionClick={(pos) => {
+            setPositionFilter(pos);
+            scrollToDatabase();
+          }}
+        />
+
+        <TradeDatabase
+          opportunities={filteredOpportunities}
+          leagues={data.leagues}
+          positionFilter={positionFilter}
+          tier={dbTier}
+          onTierChange={setDbTier}
+          tradeTypeFilter={tradeTypeFilter}
+          onRowClick={selectTrade}
+        />
+
+        <AiTradeAssistant onQuickAction={handleQuickAction} />
+
+        {showAds ? <AdSlot placement="trade-history" showAds={showAds} /> : null}
       </div>
 
-      {previewSuggestion && (
+      <TradeHubRightSidebar
+        selectedManager={selectedManager}
+        blockPlayers={filteredBlocks}
+        history={filteredHistory}
+        onSelectBlock={handleBlockClick}
+      />
+
+      {previewSuggestion ? (
         <TradePreviewModal
           suggestion={previewSuggestion}
           givePicks={givePicks}
           onClose={() => setPreviewSuggestion(null)}
         />
-      )}
-
-      <TradeHubRightSidebar
-        managerCards={data.managerCards}
-        blockPlayers={data.blockPlayers}
-        givePicks={givePicks}
-        activeOpportunity={activeOpp}
-        baseChampionshipOdds={data.stats.championshipOdds}
-        onSelectManager={(_m: ManagerTradeCard) => undefined}
-      />
+      ) : null}
     </div>
   );
 }

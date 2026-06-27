@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import * as Sentry from '@sentry/nextjs';
 import Stripe from 'stripe';
 import { handleStripeWebhookEvent } from '@/lib/stripe/webhook-handler';
 
@@ -23,6 +24,7 @@ export async function POST(request: NextRequest) {
     await handleStripeWebhookEvent(event);
   } catch (err) {
     console.error(`[webhooks/stripe] DB error [${event.type}]:`, err);
+    Sentry.captureException(err, { tags: { area: 'stripe_webhook' }, extra: { eventType: event.type } });
     try {
       const supabase = (await import('@/lib/supabase/admin')).createAdminClient();
       await supabase.from('error_logs').insert({

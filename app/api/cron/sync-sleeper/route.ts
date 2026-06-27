@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import * as Sentry from '@sentry/nextjs';
 import { createAdminClient } from '@/lib/supabase/admin';
 import {
   fetchUserLeagues,
@@ -50,6 +51,10 @@ export async function GET(request: Request) {
   const redis = getRedis();
 
   async function logError(source: string, message: string, userId: string, meta: Record<string, unknown>) {
+    Sentry.captureException(new Error(`[sleeper-sync] ${source}: ${message}`), {
+      tags: { area: 'sleeper_sync', source },
+      extra: { userId, ...meta },
+    });
     try { await db.from('error_logs').insert({ source, message, user_id: userId, metadata: meta }); }
     catch { /* non-fatal */ }
   }

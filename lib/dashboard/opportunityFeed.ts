@@ -15,6 +15,7 @@ export interface OpportunityFeedItem {
   category: FeedCategory;
   headline: string;
   explanation: string;
+  actionHint?: string;
   metricLabel?: string;
   metricValue?: string;
   secondaryLabel?: string;
@@ -51,6 +52,7 @@ function lineupItem(o: LineupOpportunity): OpportunityFeedItem {
     ),
     metricLabel: 'Projection Edge',
     metricValue: `+${o.gap.toFixed(1)} pts`,
+    actionHint: 'Action: Set lineup edge.',
     href: '/startsit',
     color: CATEGORY_COLORS['LINEUP EDGE'],
   };
@@ -76,6 +78,7 @@ function signalItem(p: RotationPlayer, idx: number): OpportunityFeedItem | null 
       metricValue: bob != null ? `#${bob}` : '—',
       secondaryLabel: 'Market Rank',
       secondaryValue: mv.ktcRank != null ? `#${mv.ktcRank}` : '—',
+      actionHint: 'Action: Explore buy-low offer.',
       href: `/players?highlight=${p.playerId}`,
       color: CATEGORY_COLORS['BUY WINDOW'],
     };
@@ -92,6 +95,7 @@ function signalItem(p: RotationPlayer, idx: number): OpportunityFeedItem | null 
       metricValue: delta != null ? `+${delta}` : '—',
       secondaryLabel: 'BOB Rank',
       secondaryValue: bob != null ? `#${bob}` : '—',
+      actionHint: 'Action: Review sell-high window.',
       href: `/trade?target=${p.playerId}`,
       color: CATEGORY_COLORS['SELL WINDOW'],
     };
@@ -110,6 +114,7 @@ function tradeTargetItem(t: TradeTargetItem, idx: number): OpportunityFeedItem {
     metricValue: t.acquireCost,
     secondaryLabel: 'BOB Rating',
     secondaryValue: t.tfoScore > 0 ? t.tfoScore.toFixed(0) : '—',
+    actionHint: 'Action: Stage trade offer.',
     href: `/trade?target=${t.playerId}`,
     color: CATEGORY_COLORS['NEW EDGE'],
   };

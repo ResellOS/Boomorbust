@@ -5,6 +5,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import * as Sentry from '@sentry/nextjs';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { fetchLeagueRosters, fetchLeagueFull } from '@/lib/sleeper';
 import { mergeSleeperRosterSettings } from '@/lib/sleeper/leagueCardLogo';
@@ -108,6 +109,7 @@ export async function POST(request: NextRequest) {
       rosters_synced: rosters?.length ?? 0,
     });
   } catch (err) {
+    Sentry.captureException(err, { tags: { area: 'sleeper_sync', source: 'webhook' } });
     return NextResponse.json({ error: String(err) }, { status: 500 });
   }
 }

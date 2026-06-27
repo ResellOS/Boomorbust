@@ -6,6 +6,7 @@ export interface RosterConstructionGrade {
   letter: string;
   descriptor: string;
   color: string;
+  barFill: number;
 }
 
 function letterGrade(grade: GradeLabel, avgTfo: number): { letter: string; descriptor: string } {
@@ -24,8 +25,18 @@ function letterGrade(grade: GradeLabel, avgTfo: number): { letter: string; descr
 function gradeColor(letter: string): string {
   if (letter.startsWith('A')) return '#36E7A1';
   if (letter.startsWith('B')) return '#60a5fa';
-  if (letter === 'C') return '#FBBF24';
+  if (letter === 'C' || letter === 'C+') return '#FBBF24';
   return '#EF4444';
+}
+
+function barFillFromLetter(letter: string, avgTfo: number): number {
+  if (letter === '—') return 0;
+  if (letter.startsWith('A')) return letter === 'A' ? 92 : 85;
+  if (letter === 'B+') return 72;
+  if (letter === 'B') return 62;
+  if (letter === 'C+') return 48;
+  if (letter === 'C') return 38;
+  return Math.min(30, Math.max(8, Math.round(avgTfo * 0.4)));
 }
 
 const ROOM_LABEL: Record<PositionKey, string> = {
@@ -47,6 +58,7 @@ export function computeRosterConstructionGrades(
       letter,
       descriptor,
       color: gradeColor(letter),
+      barFill: barFillFromLetter(letter, pg.avgTfo),
     };
   });
 
@@ -84,6 +96,7 @@ export function computeRosterConstructionGrades(
       letter: ageLetter,
       descriptor: ageDesc,
       color: gradeColor(ageLetter),
+      barFill: barFillFromLetter(ageLetter, strongCount >= 3 ? 72 : 55),
     },
     {
       key: 'draft',
@@ -91,6 +104,7 @@ export function computeRosterConstructionGrades(
       letter: draftLetter,
       descriptor: draftDesc,
       color: draftLetter === '—' ? '#6b7a99' : gradeColor(draftLetter),
+      barFill: draftLetter === '—' ? 0 : barFillFromLetter(draftLetter, tfo),
     },
   ];
 }

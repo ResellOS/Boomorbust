@@ -2,6 +2,7 @@ import { Redis } from '@upstash/redis';
 
 const REDIS_KEY = 'sleeper:players:nfl';
 const TTL = 86400; // 24 hours
+const MEMORY_TTL_MS = 5 * 60 * 1000; // 5 min — keeps localhost snappy between reloads
 
 export interface SleeperPlayer {
   player_id: string;
@@ -19,6 +20,8 @@ export type PlayerMap = Record<string, SleeperPlayer>;
 export type PlayerSummary = Pick<SleeperPlayer, 'full_name' | 'position' | 'team' | 'age' | 'injury_status'>;
 
 let _redis: Redis | null = null;
+let _memoryCache: { map: PlayerMap; at: number } | null = null;
+
 function getRedis(): Redis | null {
   if (!process.env.UPSTASH_REDIS_REST_URL || !process.env.UPSTASH_REDIS_REST_TOKEN) return null;
   if (!_redis) {
@@ -30,11 +33,39 @@ function getRedis(): Redis | null {
   return _redis;
 }
 
+/** Strip Sleeper's 14MB raw payload to essential fields (~2MB) so Redis + localhost stay fast. */
+function slimPlayerMap(raw: Record<string, unknown>): PlayerMap {
+  const out: PlayerMap = {};
+  for (const [id, row] of Object.entries(raw)) {
+    if (!row || typeof row !== 'object') continue;
+    const p = row as Record<string, unknown>;
+    const fullName = typeof p.full_name === 'string' ? p.full_name.trim() : '';
+    if (!fullName) continue;
+    out[id] = {
+      player_id: id,
+      full_name: fullName,
+      position: typeof p.position === 'string' ? p.position : '',
+      team: typeof p.team === 'string' ? p.team : null,
+      age: typeof p.age === 'number' ? p.age : null,
+      injury_status: typeof p.injury_status === 'string' ? p.injury_status : null,
+      status: typeof p.status === 'string' ? p.status : '',
+      depth_chart_order:
+        typeof p.depth_chart_order === 'number' ? p.depth_chart_order : null,
+      depth_chart_position:
+        typeof p.depth_chart_position === 'string' ? p.depth_chart_position : null,
+    };
+  }
+  return out;
+}
+
 async function fetchFresh(): Promise<PlayerMap | null> {
   try {
-    const res = await fetch('https://api.sleeper.app/v1/players/nfl');
+    const res = await fetch('https://api.sleeper.app/v1/players/nfl', {
+      signal: AbortSignal.timeout(25_000),
+    });
     if (!res.ok) return null;
-    return res.json();
+    const raw = (await res.json()) as Record<string, unknown>;
+    return slimPlayerMap(raw);
   } catch (err) {
     console.error('Failed to fetch Sleeper player database:', err);
     return null;
@@ -42,22 +73,32 @@ async function fetchFresh(): Promise<PlayerMap | null> {
 }
 
 export async function fetchAllPlayers(): Promise<PlayerMap | null> {
+  if (_memoryCache && Date.now() - _memoryCache.at < MEMORY_TTL_MS) {
+    return _memoryCache.map;
+  }
+
   const redis = getRedis();
   if (redis) {
     try {
       const cached = await redis.get<PlayerMap>(REDIS_KEY);
-      if (cached) return cached;
+      if (cached && Object.keys(cached).length > 0) {
+        _memoryCache = { map: cached, at: Date.now() };
+        return cached;
+      }
     } catch (err) {
       console.error('Redis get failed:', err);
     }
   }
 
   const players = await fetchFresh();
-  if (players && redis) {
-    try {
-      await redis.set(REDIS_KEY, players, { ex: TTL });
-    } catch (err) {
-      console.error('Redis set failed:', err);
+  if (players) {
+    _memoryCache = { map: players, at: Date.now() };
+    if (redis) {
+      try {
+        await redis.set(REDIS_KEY, players, { ex: TTL });
+      } catch (err) {
+        console.error('Redis set failed:', err);
+      }
     }
   }
   return players;

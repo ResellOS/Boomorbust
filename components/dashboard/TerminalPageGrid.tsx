@@ -1,4 +1,7 @@
+'use client';
+
 import type { ReactNode } from 'react';
+import { SidebarCollapseProvider, useSidebarCollapse } from './SidebarCollapseContext';
 
 type GridVariant = 'default' | 'startsit';
 
@@ -7,6 +10,18 @@ const ROWS: Record<GridVariant, string> = {
   startsit: '58px 1fr 28px',
 };
 
+function GridInner({ children, variant }: { children: ReactNode; variant: GridVariant }) {
+  const { collapsed } = useSidebarCollapse();
+  return (
+    <div
+      className={`terminal-page-grid h-full overflow-hidden${collapsed ? ' sidebar-collapsed' : ''}`}
+      style={{ gridTemplateRows: ROWS[variant] }}
+    >
+      {children}
+    </div>
+  );
+}
+
 interface TerminalPageGridProps {
   children: ReactNode;
   variant?: GridVariant;
@@ -14,11 +29,8 @@ interface TerminalPageGridProps {
 
 export default function TerminalPageGrid({ children, variant = 'default' }: TerminalPageGridProps) {
   return (
-    <div
-      className="terminal-page-grid h-full overflow-hidden"
-      style={{ gridTemplateRows: ROWS[variant] }}
-    >
-      {children}
-    </div>
+    <SidebarCollapseProvider>
+      <GridInner variant={variant}>{children}</GridInner>
+    </SidebarCollapseProvider>
   );
 }

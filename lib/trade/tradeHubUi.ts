@@ -1,6 +1,144 @@
 import { initialAssetsFromSuggestion } from '@/lib/trade/calculatorAssets';
-import type { BobSuggestion, TradeOpportunity } from '@/lib/trade/types';
+import type { BobSuggestion, ManagerTradeCard, TradeOpportunity } from '@/lib/trade/types';
 import type { CalculatorAsset } from '@/components/trade/TradeCalculator';
+
+export interface TradeValueTotals {
+  giveTfo: number;
+  getTfo: number;
+  delta: number;
+  diffPct: number;
+}
+
+export function whyThisMattersBullets(opp: TradeOpportunity): string[] {
+  const bullets: string[] = [];
+  if (opp.championshipImpact > 0) {
+    bullets.push(`Increases championship odds by +${opp.championshipImpact.toFixed(1)}%`);
+  }
+  if (opp.valueGap != null && opp.valueGap >= 50) {
+    bullets.push(`Exploits market inefficiency of ${Math.round(opp.valueGap)} rank spots`);
+  }
+  if (opp.managerName && opp.managerName !== 'Manager') {
+    bullets.push(`${opp.managerName} is a likely trade partner for this move`);
+  }
+  if (opp.portfolioImpactNote) bullets.push(opp.portfolioImpactNote);
+  for (const r of opp.whyReasons.slice(0, 3)) {
+    if (!bullets.includes(r)) bullets.push(r);
+  }
+  for (const c of opp.reasonChips.slice(0, 2)) {
+    if (!bullets.some((b) => b.includes(c.slice(0, 20)))) bullets.push(c);
+  }
+  if (opp.type === 'buy_window') bullets.push('Player is entering acquisition window');
+  return bullets.slice(0, 5);
+}
+
+export function interpretTradePackage(
+  totals: TradeValueTotals | null,
+  opp: TradeOpportunity | null,
+): { label: string; detail: string; color: string } {
+  if (!totals || (totals.giveTfo === 0 && totals.getTfo === 0)) {
+    if (opp) {
+      if (opp.type === 'buy_low' || opp.type === 'buy_window') {
+        return {
+          label: 'Market Inefficiency',
+          detail: 'BOB sees value the market is sleeping on — worth pursuing.',
+          color: '#36E7A1',
+        };
+      }
+      return {
+        label: 'Strategic Move',
+        detail: opp.portfolioImpactNote || 'Aligns with roster construction goals.',
+        color: '#36E7A1',
+      };
+    }
+    return { label: 'Build Package', detail: 'Select a trade to analyze the offer.', color: '#6b7a99' };
+  }
+
+  const { diffPct, delta } = totals;
+  const accept = opp?.acceptanceProbability ?? 0;
+
+  if (diffPct > 10) {
+    return {
+      label: 'Strong Value',
+      detail: `You gain +${delta.toFixed(1)} TFO — market would call this a win.`,
+      color: '#36E7A1',
+    };
+  }
+  if (Math.abs(diffPct) <= 10) {
+    return {
+      label: 'Fair Deal',
+      detail: 'Fair value exchange — high chance both sides feel good about it.',
+      color: '#FBBF24',
+    };
+  }
+  if (accept >= 65 && opp && opp.championshipImpact >= 2) {
+    return {
+      label: 'Strategic Overpay',
+      detail: `Strategic overpay to close a roster need — +${opp.championshipImpact.toFixed(1)}% title equity, ${accept}% likely to land.`,
+      color: '#A78BFA',
+    };
+  }
+  if (diffPct < -25 && accept < 55) {
+    return {
+      label: 'Bad Deal',
+      detail: 'Raw value loss with low acceptance odds — rework the package before sending.',
+      color: '#EF4444',
+    };
+  }
+  return {
+    label: 'Strategic Overpay',
+    detail: 'You give up raw value — only pursue if the roster fit is critical.',
+    color: '#FBBF24',
+  };
+}
+
+export function confidenceScore(level: TradeOpportunity['tradeConfidence']): number {
+  switch (level) {
+    case 'Elite':
+      return 99;
+    case 'High':
+      return 85;
+    case 'Medium':
+      return 65;
+    default:
+      return 40;
+  }
+}
+
+export function whyItWorks(
+  opp: TradeOpportunity | null,
+  interpretation: { label: string; detail: string },
+): string {
+  if (!opp) return 'Select a trade to see why this package works.';
+  if (interpretation.label === 'Strategic Overpay') {
+    return opp.portfolioImpactNote || interpretation.detail;
+  }
+  const reason = opp.whyReasons[0] ?? opp.reasonChips[0];
+  if (reason) return reason;
+  return interpretation.detail;
+}
+
+export function recommendedOpeningOffer(m: ManagerTradeCard): string {
+  const pick = m.pickHoarderScore >= 60 ? '2027 1st' : '2027 2nd';
+  const need = m.profile.needs?.[0] ?? 'depth';
+  const surplus = m.profile.surplus?.[0];
+  if (surplus) return `${pick} + ${surplus} depth`;
+  return `${pick} + ${need} help`;
+}
+
+export function managerBestAsset(m: ManagerTradeCard): string {
+  const assets = m.profile.top_assets ?? [];
+  return assets[0]?.name ?? '—';
+}
+
+export function managerTendencies(m: ManagerTradeCard): string[] {
+  const chips: string[] = [];
+  if (m.profile.prefers_youth) chips.push('Overpays for youth');
+  if (m.pickHoarderScore >= 60) chips.push('Loves rookie picks');
+  if (m.profile.trade_frequency === 'active') chips.push('High trade volume');
+  if (m.profile.trade_frequency === 'inactive') chips.push('Rarely engages');
+  chips.push(m.negotiationStyle);
+  return chips.slice(0, 3);
+}
 
 export function opportunityToSuggestion(opp: TradeOpportunity): BobSuggestion {
   return {
