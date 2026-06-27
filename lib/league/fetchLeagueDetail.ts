@@ -110,7 +110,11 @@ export async function fetchLeagueDetail(
     fetchNflState(),
   ]);
 
-  const currentWeek = nflState?.week ?? nflState?.display_week ?? 14;
+  // Sleeper returns week 0 during the offseason. `??` only guards null/undefined,
+  // so a literal 0 would slip through and collapse every week-based scan to nothing.
+  // Use `||` and treat a full 18-week season as the scan window when off-season.
+  const liveWeek = nflState?.week || nflState?.display_week || 0;
+  const currentWeek = liveWeek > 0 ? liveWeek : 18;
   const rosterOwnerMap = new Map<number, string>();
   const rosterPlayerMap = new Map<number, string[]>();
   let myRoster: SleeperRoster | null = null;
@@ -296,7 +300,16 @@ export async function fetchLeagueDetail(
       .eq('league_id', sleeperLeagueId)
       .gte('calculated_at', new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString());
 
-    if (cached?.length) {
+    // The week-0 offseason bug previously cached degenerate rows (every manager
+    // with zero trades → identical LI score, all "Rare"). Treat that fingerprint
+    // as a cache miss so the repaired scan recomputes real signal instead of
+    // serving stale junk for up to 24h.
+    const cachedIsDegenerate =
+      !!cached?.length &&
+      cached.every((row) => (row.trade_tendency ?? 'Rare') === 'Rare') &&
+      new Set(cached.map((row) => row.li_score)).size <= 1;
+
+    if (cached?.length && !cachedIsDegenerate) {
       leagueIntel = cached.map((row) => ({
         managerId: row.manager_user_id as string,
         handle: `@${String(row.manager_user_id).slice(-8)}`,
@@ -317,14 +330,39 @@ export async function fetchLeagueDetail(
         };
       });
     } else {
-      const allTx = [];
-      for (let w = 1; w <= currentWeek; w++) {
-        const tx = await fetchTransactions(sleeperLeagueId, w);
-        if (tx?.length) allTx.push(...tx);
+      // Scan a full season in parallel rather than a sequential per-week loop
+      // (the old loop also silently did nothing when currentWeek was 0).
+      const scanWeeks = 18;
+      const collectSeasonTx = async (lid: string) => {
+        const results = await Promise.all(
+          Array.from({ length: scanWeeks }, (_, i) => fetchTransactions(lid, i + 1)),
+        );
+        return results.flatMap((tx) => tx ?? []);
+      };
+
+      let allTx = await collectSeasonTx(sleeperLeagueId);
+      let scanOwnerMap = rosterOwnerMap;
+
+      // Offseason / season rollover: the current league has little-to-no history,
+      // so manager tendencies must come from the prior season's league. Use that
+      // league's own roster→owner map (roster_ids in old transactions map to it).
+      if (allTx.length === 0 && sleeperLeague?.previous_league_id) {
+        const prevLeagueId = sleeperLeague.previous_league_id;
+        const prevTx = await collectSeasonTx(prevLeagueId);
+        if (prevTx.length > 0) {
+          const prevRosters = await fetchLeagueRosters(prevLeagueId);
+          const prevMap = new Map<number, string>();
+          for (const r of prevRosters ?? []) {
+            if (r.owner_id) prevMap.set(r.roster_id, r.owner_id);
+          }
+          allTx = prevTx;
+          scanOwnerMap = prevMap;
+        }
       }
+
       leagueIntel = computeLeagueIntelFromTx(
         sleeperUsers ?? [],
-        rosterOwnerMap,
+        scanOwnerMap,
         allTx,
         sleeperUserId,
         currentWeek,

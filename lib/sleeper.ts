@@ -117,6 +117,8 @@ export async function fetchLeagueUsers(leagueId: string): Promise<SleeperUser[] 
 export interface SleeperLeagueFull extends SleeperLeague {
   roster_positions: string[];
   draft_id: string;
+  /** Sleeper league id for the prior season (dynasty leagues roll over each year). */
+  previous_league_id: string | null;
 }
 
 export async function fetchLeagueFull(leagueId: string): Promise<SleeperLeagueFull | null> {
