@@ -62,21 +62,21 @@ export default function TodayTopPriority({
   if (targets.length === 0) {
     return (
       <section className="rounded-[10px] border border-[#1e2640] bg-[#0f1420] px-3 py-2.5">
-        <h2 className="font-figtree text-[10px] uppercase tracking-[1.8px] text-[#e8ecf4]">
+        <h2 className="font-figtree text-[11px] uppercase tracking-[1.8px] text-[#e8ecf4]">
           Today&apos;s Top Priority
         </h2>
-        <p className="mt-1.5 font-figtree text-[13px] text-[#e8ecf4]">No critical move today</p>
+        <p className="mt-1.5 font-figtree text-[14px] text-[#e8ecf4]">No critical move today</p>
         {fallbackFeedItem ? (
           <button
             type="button"
             onClick={() => fallbackFeedItem.href && router.push(fallbackFeedItem.href)}
             className="mt-2 w-full rounded-md border border-[#1e2640]/60 bg-[#141929]/60 px-2.5 py-2 text-left dash-clickable-row"
           >
-            <p className="font-figtree text-[12px] text-[#e8ecf4]">{fallbackFeedItem.headline}</p>
-            <p className="mt-0.5 font-figtree text-[11px] text-[#9aa8c4]">{fallbackFeedItem.explanation}</p>
+            <p className="font-figtree text-[13px] text-[#e8ecf4]">{fallbackFeedItem.headline}</p>
+            <p className="mt-0.5 font-figtree text-[12px] text-[#9aa8c4]">{fallbackFeedItem.explanation}</p>
           </button>
         ) : (
-          <p className="mt-1 font-mono text-[10px] text-[#6b7a99]">
+          <p className="mt-1 font-mono text-[11px] text-[#6b7a99]">
             Priorities appear once intelligence data is ready.
           </p>
         )}
@@ -112,7 +112,7 @@ export default function TodayTopPriority({
     >
       <div className="flex items-center justify-between border-b border-[#1e2640]/80 px-3 py-1.5">
         <div className="flex items-center gap-2">
-          <h2 className="font-figtree text-[10px] uppercase tracking-[1.8px] text-[#e8ecf4]">
+          <h2 className="font-figtree text-[11px] uppercase tracking-[1.8px] text-[#e8ecf4]">
             Today&apos;s Top Priority
           </h2>
           {targets.length > 1 ? (
@@ -125,7 +125,7 @@ export default function TodayTopPriority({
               >
                 <ChevronLeft className="h-3.5 w-3.5" />
               </button>
-              <span className="font-mono text-[8px] tabular-nums text-[#8b9bb8]">
+              <span className="font-mono text-[9px] tabular-nums text-[#8b9bb8]">
                 {index + 1}/{targets.length}
               </span>
               <button
@@ -140,7 +140,7 @@ export default function TodayTopPriority({
           ) : null}
         </div>
         <span
-          className="shrink-0 rounded px-1.5 py-0.5 font-mono text-[7px] uppercase tracking-wide"
+          className="shrink-0 rounded px-1.5 py-0.5 font-mono text-[8px] uppercase tracking-wide"
           style={{ background: badge.bg, color: badge.text }}
         >
           {badge.label}
@@ -156,14 +156,14 @@ export default function TodayTopPriority({
               <div className="h-[52px] w-[52px] shrink-0 rounded-full bg-[#141929]" />
             )}
             <div className="min-w-0 flex-1">
-              <h3 className="font-figtree text-[16px] font-semibold leading-tight text-[#e8ecf4]">
+              <h3 className="font-figtree text-[17px] font-semibold leading-tight text-[#e8ecf4]">
                 {target.title}
               </h3>
               {posTeam ? (
-                <p className="font-mono text-[9px] uppercase text-[#8b9bb8]">{posTeam}</p>
+                <p className="font-mono text-[10px] uppercase text-[#8b9bb8]">{posTeam}</p>
               ) : null}
-              <p className="font-mono text-[9px] text-[#6b7a99]">{target.leagueName}</p>
-              <p className="mt-1 line-clamp-2 font-figtree text-[11px] leading-snug text-[#b8c4dc]">
+              <p className="font-mono text-[10px] text-[#6b7a99]">{target.leagueName}</p>
+              <p className="mt-1 line-clamp-2 font-figtree text-[12px] leading-snug text-[#b8c4dc]">
                 <span className="text-[#e8ecf4]">Why: </span>
                 {target.why}
               </p>
@@ -181,7 +181,7 @@ export default function TodayTopPriority({
           <div className="flex shrink-0 gap-1.5 lg:flex-col" onClick={(e) => e.stopPropagation()}>
             <Link
               href={target.stageHref}
-              className={`dash-action-btn inline-flex items-center justify-center rounded-md px-3 py-1.5 font-figtree text-[10px] font-semibold no-underline ${
+              className={`dash-action-btn inline-flex items-center justify-center rounded-md px-3 py-1.5 font-figtree text-[11px] font-semibold no-underline ${
                 target.isSell ? 'dash-action-btn-bust bg-[#EF4444] text-white' : 'bg-bust text-white'
               }`}
             >
@@ -189,7 +189,7 @@ export default function TodayTopPriority({
             </Link>
             <Link
               href={target.detailHref}
-              className="dash-action-btn inline-flex items-center justify-center rounded-md border border-[#1e2640] px-3 py-1.5 font-mono text-[9px] text-boom no-underline"
+              className="dash-action-btn inline-flex items-center justify-center rounded-md border border-[#1e2640] px-3 py-1.5 font-mono text-[10px] text-boom no-underline"
             >
               View Details
             </Link>
@@ -203,8 +203,8 @@ export default function TodayTopPriority({
 function MiniMetric({ label, value, accent }: { label: string; value: string; accent?: boolean }) {
   return (
     <div className="min-w-[72px]">
-      <div className="font-mono text-[6px] uppercase tracking-wide text-[#6b7a99]">{label}</div>
-      <div className={`font-mono text-[10px] tabular-nums leading-tight ${accent ? 'text-boom' : 'text-[#e8ecf4]'}`}>
+      <div className="font-mono text-[7px] uppercase tracking-wide text-[#6b7a99]">{label}</div>
+      <div className={`font-mono text-[11px] tabular-nums leading-tight ${accent ? 'text-boom' : 'text-[#e8ecf4]'}`}>
         {value}
       </div>
     </div>

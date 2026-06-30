@@ -49,13 +49,13 @@ const CARDS = [
 export default function WhyTheseCards() {
   return (
     <div className="glass-card p-4">
-      <h2 className="text-[12px] font-bold text-white tracking-wide mb-4 uppercase">Why These Players?</h2>
+      <h2 className="text-[13px] font-bold text-white tracking-wide mb-4 uppercase">Why These Players?</h2>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {CARDS.map(({ icon, title, body }) => (
           <div key={title} className="flex flex-col items-center text-center gap-2">
             <div className="mb-1">{icon}</div>
-            <p className="text-[11px] font-bold text-white">{title}</p>
-            <p className="text-[10px] text-slate-400 leading-relaxed">{body}</p>
+            <p className="text-[12px] font-bold text-white">{title}</p>
+            <p className="text-[11px] text-slate-400 leading-relaxed">{body}</p>
           </div>
         ))}
       </div>

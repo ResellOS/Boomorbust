@@ -34,21 +34,21 @@ export default function DraftPlayerHoverCard({
       <div className="flex items-start gap-2.5">
         <PlayerAvatar playerId={player.playerId} name={player.name} size={44} />
         <div className="min-w-0 flex-1">
-          <div className="font-mono text-[12px] uppercase text-text">{player.name}</div>
-          <div className="font-mono text-[10px] text-muted">
+          <div className="font-mono text-[13px] uppercase text-text">{player.name}</div>
+          <div className="font-mono text-[11px] text-muted">
             {player.position} · {player.team}
           </div>
         </div>
       </div>
 
       <div className="mt-3 flex items-baseline justify-between gap-2">
-        <span className="font-mono text-[16px] text-text">OVR: {player.tfoScore.toFixed(1)}</span>
-        <span className="font-mono text-[8px] uppercase tracking-wide" style={{ color: tier.color }}>
+        <span className="font-mono text-[17px] text-text">OVR: {player.tfoScore.toFixed(1)}</span>
+        <span className="font-mono text-[9px] uppercase tracking-wide" style={{ color: tier.color }}>
           {tier.label}
         </span>
       </div>
 
-      <div className="mt-3 space-y-1 border-t border-[#1e2640] pt-2 font-mono text-[9px]">
+      <div className="mt-3 space-y-1 border-t border-[#1e2640] pt-2 font-mono text-[10px]">
         <div className="flex justify-between">
           <span className="text-muted">Dynasty Rank</span>
           <span className="text-text">{dynastyRank}</span>

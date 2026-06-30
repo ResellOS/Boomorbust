@@ -102,7 +102,7 @@ export default function DraftTrendsFooter({
         </Panel>
 
         <Panel title="League Settings">
-          <div className="space-y-0.5 font-mono text-[9px] text-muted">
+          <div className="space-y-0.5 font-mono text-[10px] text-muted">
             <div>{config.draftType} · {teams} teams</div>
             <div>{config.rounds} rounds · {config.draftOrderType}</div>
             <div>Timer: {config.pickTimer === 'none' ? 'Off' : `${config.pickTimer}s`}</div>
@@ -111,7 +111,7 @@ export default function DraftTrendsFooter({
         </Panel>
 
         <Panel title="Draft Queue / Feed">
-          <div className="font-mono text-[9px] text-muted">
+          <div className="font-mono text-[10px] text-muted">
             {chat.length > 0 ? (
               <span className="text-text">{chat[chat.length - 1]!.teamName}: {chat[chat.length - 1]!.text}</span>
             ) : posRun && posRun.kind === 'position_run' ? (
@@ -128,7 +128,7 @@ export default function DraftTrendsFooter({
             {nextPicks.map((p) => (
               <span
                 key={p.overall}
-                className="rounded border border-border bg-[#141929] px-1 py-0.5 font-mono text-[7px] text-text"
+                className="rounded border border-border bg-[#141929] px-1 py-0.5 font-mono text-[8px] text-text"
               >
                 {p.label} {p.team}
               </span>
@@ -143,14 +143,14 @@ export default function DraftTrendsFooter({
 function Panel({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div className="rounded border border-border/60 bg-[#0f1420] p-2">
-      <div className="mb-1 font-mono text-[7px] uppercase tracking-wide text-muted">{title}</div>
+      <div className="mb-1 font-mono text-[8px] uppercase tracking-wide text-muted">{title}</div>
       {children}
     </div>
   );
 }
 
 function Empty({ children }: { children: React.ReactNode }) {
-  return <p className="font-mono text-[9px] text-muted">{children}</p>;
+  return <p className="font-mono text-[10px] text-muted">{children}</p>;
 }
 
 function TrendRow({
@@ -168,7 +168,7 @@ function TrendRow({
     <button
       type="button"
       onClick={onClick}
-      className="mb-0.5 flex w-full items-center justify-between border-none bg-transparent p-0 text-left font-mono text-[9px] hover:text-boom"
+      className="mb-0.5 flex w-full items-center justify-between border-none bg-transparent p-0 text-left font-mono text-[10px] hover:text-boom"
     >
       <span className="truncate text-text">{name.split(' ').pop()}</span>
       <span className={up ? 'text-boom' : 'text-bust'}>{detail}</span>

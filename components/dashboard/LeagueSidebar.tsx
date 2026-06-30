@@ -149,7 +149,7 @@ export default function LeagueSidebar({ className }: LeagueSidebarProps) {
           {/* Empty state */}
           {myLeagues.length === 0 && otherLeagues.length === 0 && (
             <p
-              className="px-3 text-[12px] text-slate-600 mt-4"
+              className="px-3 text-[13px] text-slate-600 mt-4"
               style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}
             >
               No leagues found.

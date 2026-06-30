@@ -25,7 +25,7 @@ function TfoCircle({ score }: { score: number }) {
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center">
         <div className="font-mono text-2xl leading-none text-boom">{score.toFixed(1)}</div>
-        <div className="mt-0.5 text-center text-[8px] leading-snug tracking-wide text-muted">
+        <div className="mt-0.5 text-center text-[9px] leading-snug tracking-wide text-muted">
           TEAM
           <br />
           RATING
@@ -67,7 +67,7 @@ export default function LeagueDetailPanels({ data }: { data: LeagueDetailData })
       <div className="flex shrink-0 items-center border-b border-border px-[18px] py-2.5">
         <Link
           href="/dashboard"
-          className="mr-4 flex shrink-0 items-center gap-1 text-[11px] text-muted no-underline hover:text-text"
+          className="mr-4 flex shrink-0 items-center gap-1 text-[12px] text-muted no-underline hover:text-text"
         >
           ← LEAGUE DETAIL
         </Link>
@@ -78,17 +78,17 @@ export default function LeagueDetailPanels({ data }: { data: LeagueDetailData })
           <div>
             <div className="flex items-center gap-2">
               <span className="text-sm font-bold text-text">{header.name}</span>
-              <span className="rounded-[3px] border border-boom/20 bg-boom/10 px-2 py-0.5 text-[9px] font-medium text-boom">
+              <span className="rounded-[3px] border border-boom/20 bg-boom/10 px-2 py-0.5 text-[10px] font-medium text-boom">
                 {header.badge}
               </span>
             </div>
-            <div className="mt-px text-[9px] text-muted">{header.subtitle}</div>
+            <div className="mt-px text-[10px] text-muted">{header.subtitle}</div>
           </div>
         </div>
         <div className="ml-auto flex items-center">
           {headerStats.map((s) => (
             <div key={s.label} className="flex flex-col border-l border-border px-[18px]">
-              <div className="text-[8px] uppercase tracking-wide text-muted">{s.label}</div>
+              <div className="text-[9px] uppercase tracking-wide text-muted">{s.label}</div>
               <div
                 className={`mt-px font-mono ${
                   s.grade ? 'text-[22px] text-boom' : s.small ? 'text-sm text-text' : 'text-base text-boom'
@@ -96,7 +96,7 @@ export default function LeagueDetailPanels({ data }: { data: LeagueDetailData })
               >
                 {s.val}
               </div>
-              <div className="text-[9px] text-muted">{s.sub}</div>
+              <div className="text-[10px] text-muted">{s.sub}</div>
             </div>
           ))}
         </div>
@@ -107,8 +107,8 @@ export default function LeagueDetailPanels({ data }: { data: LeagueDetailData })
           {/* YOUR TEAM */}
           <div className="overflow-hidden rounded-md border border-border bg-surface">
             <div className="border-b border-border px-3 py-2">
-              <div className="text-[11px] font-semibold uppercase tracking-wide text-text">Your Team</div>
-              <div className="text-[9px] text-muted">Roster overview with dynasty ratings and analysis</div>
+              <div className="text-[12px] font-semibold uppercase tracking-wide text-text">Your Team</div>
+              <div className="text-[10px] text-muted">Roster overview with dynasty ratings and analysis</div>
             </div>
             <div className="p-3">
               <div className="mb-2.5 grid grid-cols-[114px_1fr] items-center gap-3.5">
@@ -122,49 +122,49 @@ export default function LeagueDetailPanels({ data }: { data: LeagueDetailData })
                     ['Championship Odds', `${yourTeam.championshipOdds}%`, 'text-hold'],
                   ].map(([l, v, c]) => (
                     <div key={String(l)} className="flex justify-between border-b border-border/50 py-[3px] last:border-b-0">
-                      <span className="text-[9px] text-muted">{l}</span>
-                      <span className={`font-mono text-[9px] ${c}`}>{v}</span>
+                      <span className="text-[10px] text-muted">{l}</span>
+                      <span className={`font-mono text-[10px] ${c}`}>{v}</span>
                     </div>
                   ))}
                 </div>
               </div>
               <div className="mb-2.5 grid grid-cols-2 gap-2">
                 <div>
-                  <div className="mb-1 text-[8px] font-semibold uppercase text-boom">Roster Strengths</div>
+                  <div className="mb-1 text-[9px] font-semibold uppercase text-boom">Roster Strengths</div>
                   {yourTeam.strengths.map((s) => (
-                    <div key={s} className="mb-0.5 flex items-center gap-1 text-[9px] text-muted">
+                    <div key={s} className="mb-0.5 flex items-center gap-1 text-[10px] text-muted">
                       <span className="h-[5px] w-[5px] rounded-full bg-boom" />
                       {s}
                     </div>
                   ))}
                 </div>
                 <div>
-                  <div className="mb-1 text-[8px] font-semibold uppercase text-[#ef4444]">Needs Attention</div>
+                  <div className="mb-1 text-[9px] font-semibold uppercase text-[#ef4444]">Needs Attention</div>
                   {yourTeam.needsAttention.map((s) => (
-                    <div key={s} className="mb-0.5 flex items-center gap-1 text-[9px] text-muted">
+                    <div key={s} className="mb-0.5 flex items-center gap-1 text-[10px] text-muted">
                       <span className="h-[5px] w-[5px] rounded-full bg-[#ef4444]" />
                       {s}
                     </div>
                   ))}
                 </div>
               </div>
-              <div className="mb-1.5 text-[8px] uppercase tracking-wide text-muted">Top Players by Dynasty Rating</div>
+              <div className="mb-1.5 text-[9px] uppercase tracking-wide text-muted">Top Players by Dynasty Rating</div>
               {yourTeam.topPlayers.map((p) => (
                 <div key={p.playerId} className="flex items-center gap-1.5 border-b border-border/40 py-1 last:border-b-0">
                   <PlayerAvatar playerId={p.playerId} name={p.fullName} size={20} />
                   <div className="min-w-0 flex-1">
-                    <div className="text-[10px] text-text">{p.fullName}</div>
-                    <div className="text-[8px] text-muted">
+                    <div className="text-[11px] text-text">{p.fullName}</div>
+                    <div className="text-[9px] text-muted">
                       {p.position} · {p.team}
                     </div>
                   </div>
-                  <span className="font-mono text-[11px] text-text">{p.tfoScore.toFixed(1)}</span>
-                  <span className="rounded border border-border bg-white/[0.03] px-1.5 py-0.5 text-[7px] font-semibold text-text">
+                  <span className="font-mono text-[12px] text-text">{p.tfoScore.toFixed(1)}</span>
+                  <span className="rounded border border-border bg-white/[0.03] px-1.5 py-0.5 text-[8px] font-semibold text-text">
                     {getGradeLabel(p.tfoScore)}
                   </span>
                 </div>
               ))}
-              <Link href="/players" className="mt-1.5 block text-[9px] text-boom no-underline hover:underline">
+              <Link href="/players" className="mt-1.5 block text-[10px] text-boom no-underline hover:underline">
                 View Full Roster →
               </Link>
             </div>
@@ -173,15 +173,15 @@ export default function LeagueDetailPanels({ data }: { data: LeagueDetailData })
           {/* LEAGUE INTEL */}
           <div className="overflow-hidden rounded-md border border-border bg-surface">
             <div className="border-b border-border px-3 py-2">
-              <div className="text-[11px] font-semibold uppercase tracking-wide text-text">League Intel (LI)</div>
-              <div className="text-[9px] text-muted">Know your league. Know your opponents.</div>
+              <div className="text-[12px] font-semibold uppercase tracking-wide text-text">League Intel (LI)</div>
+              <div className="text-[10px] text-muted">Know your league. Know your opponents.</div>
             </div>
             <div className="overflow-x-auto p-2">
               <table className="w-full border-collapse">
                 <thead>
                   <tr>
                     {['Manager', 'LI', 'Trade', 'Draft', 'Agg', 'Overpays For'].map((h) => (
-                      <th key={h} className="border-b border-border px-1 py-1 text-left text-[8px] uppercase tracking-wide text-muted">
+                      <th key={h} className="border-b border-border px-1 py-1 text-left text-[9px] uppercase tracking-wide text-muted">
                         {h}
                       </th>
                     ))}
@@ -190,27 +190,27 @@ export default function LeagueDetailPanels({ data }: { data: LeagueDetailData })
                 <tbody>
                   {leagueIntel.map((row) => (
                     <tr key={row.managerId} className="hover:bg-white/[0.01]">
-                      <td className="border-b border-border/40 px-1 py-1 text-[9px] text-text">
+                      <td className="border-b border-border/40 px-1 py-1 text-[10px] text-text">
                         {row.handle}
-                        {row.isYou && <span className="ml-1 text-[7px] text-boom">(You)</span>}
+                        {row.isYou && <span className="ml-1 text-[8px] text-boom">(You)</span>}
                       </td>
                       <td className="border-b border-border/40 px-1 py-1">
-                        <span className={`font-mono text-[10px] ${row.liScore >= 65 ? 'text-boom' : row.liScore >= 50 ? 'text-hold' : 'text-muted'}`}>
+                        <span className={`font-mono text-[11px] ${row.liScore >= 65 ? 'text-boom' : row.liScore >= 50 ? 'text-hold' : 'text-muted'}`}>
                           {row.liScore}
                         </span>
                       </td>
                       <td className="border-b border-border/40 px-1 py-1">
-                        <span className={`rounded px-1 py-0.5 text-[7px] ${tendencyClass(row.tradeTendency)}`}>
+                        <span className={`rounded px-1 py-0.5 text-[8px] ${tendencyClass(row.tradeTendency)}`}>
                           {row.tradeTendency}
                         </span>
                       </td>
-                      <td className="border-b border-border/40 px-1 py-1 text-[8px] text-muted">{row.draftStyle}</td>
+                      <td className="border-b border-border/40 px-1 py-1 text-[9px] text-muted">{row.draftStyle}</td>
                       <td className="border-b border-border/40 px-1 py-1">
-                        <span className={`rounded px-1 py-0.5 text-[7px] ${aggressionClass(row.aggression)}`}>
+                        <span className={`rounded px-1 py-0.5 text-[8px] ${aggressionClass(row.aggression)}`}>
                           {row.aggression}
                         </span>
                       </td>
-                      <td className="border-b border-border/40 px-1 py-1 text-[8px] text-muted">{row.overpaysFor}</td>
+                      <td className="border-b border-border/40 px-1 py-1 text-[9px] text-muted">{row.overpaysFor}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -221,7 +221,7 @@ export default function LeagueDetailPanels({ data }: { data: LeagueDetailData })
           {/* STANDINGS */}
           <div className="overflow-hidden rounded-md border border-border bg-surface">
             <div className="border-b border-border px-3 py-2">
-              <div className="text-[11px] font-semibold uppercase tracking-wide text-text">
+              <div className="text-[12px] font-semibold uppercase tracking-wide text-text">
                 Standings &amp; Projections
               </div>
             </div>
@@ -230,7 +230,7 @@ export default function LeagueDetailPanels({ data }: { data: LeagueDetailData })
                 <thead>
                   <tr>
                     {['#', 'Team', 'Record', 'PF', 'Proj', 'Odds'].map((h) => (
-                      <th key={h} className="border-b border-border px-1 py-1 text-left text-[8px] uppercase tracking-wide text-muted">
+                      <th key={h} className="border-b border-border px-1 py-1 text-left text-[9px] uppercase tracking-wide text-muted">
                         {h}
                       </th>
                     ))}
@@ -240,22 +240,22 @@ export default function LeagueDetailPanels({ data }: { data: LeagueDetailData })
                   {standings.map((row) => (
                     <tr key={row.handle} className={row.isYou ? 'bg-boom/[0.03]' : 'hover:bg-white/[0.01]'}>
                       <td className="border-b border-border/40 px-1 py-1">
-                        <span className={`font-mono text-[10px] ${row.rank <= 2 ? 'text-boom' : 'text-muted'}`}>
+                        <span className={`font-mono text-[11px] ${row.rank <= 2 ? 'text-boom' : 'text-muted'}`}>
                           {row.rank}
                         </span>
                       </td>
-                      <td className="border-b border-border/40 px-1 py-1 text-[9px] text-text">
+                      <td className="border-b border-border/40 px-1 py-1 text-[10px] text-text">
                         {row.handle}
                         {row.isYou ? ' (You)' : ''}
                       </td>
-                      <td className="border-b border-border/40 px-1 py-1 font-mono text-[9px]">{row.record}</td>
-                      <td className="border-b border-border/40 px-1 py-1 font-mono text-[9px] text-muted">
+                      <td className="border-b border-border/40 px-1 py-1 font-mono text-[10px]">{row.record}</td>
+                      <td className="border-b border-border/40 px-1 py-1 font-mono text-[10px] text-muted">
                         {row.pointsFor}
                       </td>
-                      <td className="border-b border-border/40 px-1 py-1 font-mono text-[9px] text-muted">
+                      <td className="border-b border-border/40 px-1 py-1 font-mono text-[10px] text-muted">
                         {row.projectedFinish}
                       </td>
-                      <td className={`border-b border-border/40 px-1 py-1 font-mono text-[9px] ${row.playoffOdds >= 70 ? 'text-boom' : row.playoffOdds >= 40 ? 'text-hold' : 'text-muted'}`}>
+                      <td className={`border-b border-border/40 px-1 py-1 font-mono text-[10px] ${row.playoffOdds >= 70 ? 'text-boom' : row.playoffOdds >= 40 ? 'text-hold' : 'text-muted'}`}>
                         {row.playoffOdds}%
                       </td>
                     </tr>
@@ -270,42 +270,42 @@ export default function LeagueDetailPanels({ data }: { data: LeagueDetailData })
           {/* TRADE OPPORTUNITIES */}
           <div className="overflow-hidden rounded-md border border-border bg-surface">
             <div className="border-b border-border px-3 py-2">
-              <div className="text-[11px] font-semibold uppercase tracking-wide text-text">Trade Opportunities</div>
-              <div className="text-[9px] text-muted">Target these players. Approach these managers.</div>
+              <div className="text-[12px] font-semibold uppercase tracking-wide text-text">Trade Opportunities</div>
+              <div className="text-[10px] text-muted">Target these players. Approach these managers.</div>
             </div>
             <div className="grid grid-cols-2 gap-2.5 p-3">
               <div>
-                <div className="mb-1.5 text-[8px] uppercase tracking-wide text-muted">Best Players to Target</div>
+                <div className="mb-1.5 text-[9px] uppercase tracking-wide text-muted">Best Players to Target</div>
                 {tradeTargets.map((t) => (
                   <div key={t.playerId} className="flex items-center gap-1.5 border-b border-border/40 py-1 last:border-b-0">
                     <PlayerAvatar playerId={t.playerId} name={t.fullName} size={20} />
                     <div className="min-w-0 flex-1">
-                      <div className="text-[9px] text-text">{t.fullName}</div>
-                      <div className="text-[7px] text-muted">
+                      <div className="text-[10px] text-text">{t.fullName}</div>
+                      <div className="text-[8px] text-muted">
                         {t.position} · {t.team} · {t.ownerHandle}
                       </div>
                     </div>
-                    <span className="font-mono text-[10px] text-boom">{t.tfoScore.toFixed(1)}</span>
+                    <span className="font-mono text-[11px] text-boom">{t.tfoScore.toFixed(1)}</span>
                   </div>
                 ))}
-                <Link href="/trade" className="mt-1.5 block text-[9px] text-boom no-underline">
+                <Link href="/trade" className="mt-1.5 block text-[10px] text-boom no-underline">
                   View All Targets →
                 </Link>
               </div>
               <div>
-                <div className="mb-1.5 text-[8px] uppercase tracking-wide text-muted">
+                <div className="mb-1.5 text-[9px] uppercase tracking-wide text-muted">
                   Managers to Approach <span className="text-boom">LI</span>
                 </div>
                 {managerTargets.map((m) => (
                   <div key={m.handle} className="flex gap-1.5 border-b border-border/40 py-1 last:border-b-0">
                     <div className="min-w-0 flex-1">
-                      <div className="text-[9px] text-text">{m.handle}</div>
-                      <div className="text-[8px] leading-snug text-muted">{m.note}</div>
+                      <div className="text-[10px] text-text">{m.handle}</div>
+                      <div className="text-[9px] leading-snug text-muted">{m.note}</div>
                     </div>
-                    <span className="ml-auto shrink-0 font-mono text-[11px] text-boom">{m.liScore}</span>
+                    <span className="ml-auto shrink-0 font-mono text-[12px] text-boom">{m.liScore}</span>
                   </div>
                 ))}
-                <Link href="/trade" className="mt-1.5 block text-[9px] text-boom no-underline">
+                <Link href="/trade" className="mt-1.5 block text-[10px] text-boom no-underline">
                   Trade Finder →
                 </Link>
               </div>
@@ -315,16 +315,16 @@ export default function LeagueDetailPanels({ data }: { data: LeagueDetailData })
           {/* SIGNALS */}
           <div className="overflow-hidden rounded-md border border-border bg-surface">
             <div className="border-b border-border px-3 py-2">
-              <div className="text-[11px] font-semibold uppercase tracking-wide text-text">League-Specific Signals</div>
-              <div className="text-[9px] text-muted">Insights tailored to your league settings.</div>
+              <div className="text-[12px] font-semibold uppercase tracking-wide text-text">League-Specific Signals</div>
+              <div className="text-[10px] text-muted">Insights tailored to your league settings.</div>
             </div>
             <div className="p-3">
               {signals.map((s) => (
                 <div key={s.name} className="flex gap-2 border-b border-border/40 py-1.5 last:border-b-0">
                   <span className="text-sm">{s.icon}</span>
                   <div>
-                    <div className="text-[10px] font-medium text-text">{s.name}</div>
-                    <div className="text-[9px] leading-snug text-muted">{s.description}</div>
+                    <div className="text-[11px] font-medium text-text">{s.name}</div>
+                    <div className="text-[10px] leading-snug text-muted">{s.description}</div>
                   </div>
                 </div>
               ))}
@@ -334,18 +334,18 @@ export default function LeagueDetailPanels({ data }: { data: LeagueDetailData })
           {/* SETTINGS */}
           <div className="overflow-hidden rounded-md border border-border bg-surface">
             <div className="border-b border-border px-3 py-2">
-              <div className="text-[11px] font-semibold uppercase tracking-wide text-text">League Settings</div>
+              <div className="text-[12px] font-semibold uppercase tracking-wide text-text">League Settings</div>
             </div>
             <div className="p-3">
               {Object.entries(settings).map(([key, val]) => (
                 <div key={key} className="flex justify-between border-b border-border/40 py-1 last:border-b-0">
-                  <span className="text-[9px] capitalize text-muted">
+                  <span className="text-[10px] capitalize text-muted">
                     {key.replace(/([A-Z])/g, ' $1').trim()}
                   </span>
-                  <span className="max-w-[180px] text-right text-[9px] text-text">{val}</span>
+                  <span className="max-w-[180px] text-right text-[10px] text-text">{val}</span>
                 </div>
               ))}
-              <Link href="/settings" className="mt-2 block text-[9px] text-boom no-underline">
+              <Link href="/settings" className="mt-2 block text-[10px] text-boom no-underline">
                 Edit League Settings
               </Link>
             </div>

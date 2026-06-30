@@ -19,7 +19,7 @@ function PlayerAvatar({ a }: { a: RecentActivity }) {
   if (err) {
     return (
       <div className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: `${color}20` }}>
-        <span className="text-[9px] font-bold" style={{ color }}>{initials}</span>
+        <span className="text-[10px] font-bold" style={{ color }}>{initials}</span>
       </div>
     );
   }
@@ -49,13 +49,13 @@ export default function RecentActivityFeed({ activity, loading }: Props) {
   return (
     <div className="glass-card overflow-hidden">
       <div className="px-4 py-3 border-b border-white/[0.08]">
-        <h2 className="text-[12px] font-bold text-white tracking-wide">RECENT WAIVER ACTIVITY</h2>
+        <h2 className="text-[13px] font-bold text-white tracking-wide">RECENT WAIVER ACTIVITY</h2>
       </div>
 
       {/* Column header */}
       <div className="px-4 py-2 border-b border-white/[0.06] grid grid-cols-[50px_1fr_60px_60px_1fr] gap-2">
         {['TIME', 'PLAYER', 'ACTION', 'LEAGUE'].map((h, i) => (
-          <span key={h} className={`text-[10px] font-semibold text-slate-500 uppercase tracking-wider ${i === 3 ? 'hidden sm:block' : ''}`}>{h}</span>
+          <span key={h} className={`text-[11px] font-semibold text-slate-500 uppercase tracking-wider ${i === 3 ? 'hidden sm:block' : ''}`}>{h}</span>
         ))}
       </div>
 
@@ -68,14 +68,14 @@ export default function RecentActivityFeed({ activity, loading }: Props) {
           ))
           : activity.length === 0
             ? (
-              <div className="px-4 py-8 text-center text-slate-500 text-[12px]">
+              <div className="px-4 py-8 text-center text-slate-500 text-[13px]">
                 No recent waiver activity found
               </div>
             )
             : activity.map((a, i) => (
               <div key={i} className="px-4 py-2.5 grid grid-cols-[50px_1fr_60px_1fr] sm:grid-cols-[50px_1fr_60px_1fr] gap-2 items-center hover:bg-white/[0.02] transition-colors">
                 {/* Time */}
-                <span className="text-[11px] font-mono text-slate-500" style={{ fontFamily: 'JetBrains Mono, monospace' }}>
+                <span className="text-[12px] font-mono text-slate-500" style={{ fontFamily: 'JetBrains Mono, monospace' }}>
                   {formatMinutes(a.minutesAgo)}
                 </span>
 
@@ -83,21 +83,21 @@ export default function RecentActivityFeed({ activity, loading }: Props) {
                 <div className="flex items-center gap-2 min-w-0">
                   <PlayerAvatar a={a} />
                   <div className="min-w-0">
-                    <p className="text-[12px] font-semibold text-white truncate">{a.playerName}</p>
-                    <p className="text-[10px] text-slate-500 uppercase">{a.position} · {a.team}</p>
+                    <p className="text-[13px] font-semibold text-white truncate">{a.playerName}</p>
+                    <p className="text-[11px] text-slate-500 uppercase">{a.position} · {a.team}</p>
                   </div>
                 </div>
 
                 {/* Action */}
                 <span
-                  className="text-[11px] font-semibold"
+                  className="text-[12px] font-semibold"
                   style={{ color: a.action === 'Added' ? '#36E7A1' : '#EF4444' }}
                 >
                   {a.action}
                 </span>
 
                 {/* League */}
-                <span className="text-[11px] text-slate-400 truncate hidden sm:block">{a.leagueName}</span>
+                <span className="text-[12px] text-slate-400 truncate hidden sm:block">{a.leagueName}</span>
               </div>
             ))
         }
@@ -105,7 +105,7 @@ export default function RecentActivityFeed({ activity, loading }: Props) {
 
       {!loading && activity.length > 0 && (
         <div className="px-4 py-2.5 border-t border-white/[0.06]">
-          <button className="text-[11px] font-semibold text-cyan-400 hover:text-cyan-300 transition-colors">
+          <button className="text-[12px] font-semibold text-cyan-400 hover:text-cyan-300 transition-colors">
             View All Activity →
           </button>
         </div>

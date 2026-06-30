@@ -46,13 +46,13 @@ export default function TradeTopBar({ stats }: TradeTopBarProps) {
             key={cell.label}
             className="flex min-w-[110px] shrink-0 flex-col justify-center border-r border-border px-3 py-1.5 last:border-r-0 md:min-w-0 md:px-[18px]"
           >
-            <div className="mb-[3px] font-mono text-[7.5px] uppercase tracking-[1.5px] text-muted">
+            <div className="mb-[3px] font-mono text-[8.5px] uppercase tracking-[1.5px] text-muted">
               {cell.label}
             </div>
             <div className={`font-figtree text-[27px] leading-none tracking-[-0.5px] ${cell.color}`}>
               {cell.value}
             </div>
-            <div className="mt-0.5 font-figtree text-[8px] text-muted">{cell.desc}</div>
+            <div className="mt-0.5 font-figtree text-[9px] text-muted">{cell.desc}</div>
           </div>
         ))}
       </div>

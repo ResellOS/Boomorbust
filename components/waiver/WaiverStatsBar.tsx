@@ -60,7 +60,7 @@ export default function WaiverStatsBar({ data, loading }: Props) {
     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 mb-4">
       {cards.map(({ label, value, color }) => (
         <div key={label} className="glass-card p-4">
-          <p className="text-[10px] text-slate-400 uppercase tracking-widest mb-1">{label}</p>
+          <p className="text-[11px] text-slate-400 uppercase tracking-widest mb-1">{label}</p>
           {!value ? (
             <Skeleton w="w-20" />
           ) : (
@@ -76,7 +76,7 @@ export default function WaiverStatsBar({ data, loading }: Props) {
 
       {/* Next Waiver Run — countdown */}
       <div className="glass-card p-4 col-span-2 sm:col-span-1">
-        <p className="text-[10px] text-slate-400 uppercase tracking-widest mb-1">Next Waiver Run</p>
+        <p className="text-[11px] text-slate-400 uppercase tracking-widest mb-1">Next Waiver Run</p>
         {loading || !data ? (
           <Skeleton w="w-20" />
         ) : (

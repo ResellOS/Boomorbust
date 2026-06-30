@@ -49,7 +49,7 @@ function SuggestionRow({ item, isLast }: { item: ProactiveTradeItem; isLast: boo
           />
         ) : (
           <div
-            className="w-full h-full flex items-center justify-center text-[10px] font-semibold"
+            className="w-full h-full flex items-center justify-center text-[11px] font-semibold"
             style={{ background: `${color}22`, color }}
           >
             {initials}

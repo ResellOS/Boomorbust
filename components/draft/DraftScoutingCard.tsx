@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import PlayerAvatar from '@/components/players/PlayerAvatar';
+import RecommendationFeedback from '@/components/feedback/RecommendationFeedback';
 import type { DraftablePlayer } from '@/lib/draft/types';
 import { scoutingVerdict } from '@/lib/draft/warRoomUi';
 import { bobReasoning, dynastyRankByPosition } from '@/lib/draft/analyst';
@@ -37,8 +38,8 @@ export default function DraftScoutingCard({
   if (!player) {
     return (
       <div className="rounded-md border border-border bg-[#0f1420] p-3">
-        <div className="font-mono text-[8px] uppercase tracking-[1.5px] text-muted">Player Scouting</div>
-        <p className="mt-2 font-mono text-[10px] text-muted">
+        <div className="font-mono text-[9px] uppercase tracking-[1.5px] text-muted">Player Scouting</div>
+        <p className="mt-2 font-mono text-[11px] text-muted">
           Select a player from the big board to view scouting intel.
         </p>
       </div>
@@ -55,13 +56,13 @@ export default function DraftScoutingCard({
       <div className="flex items-start gap-3">
         <PlayerAvatar playerId={player.playerId} name={player.name} size={52} />
         <div className="min-w-0 flex-1">
-          <div className="font-mono text-[13px] uppercase text-text">{player.name}</div>
-          <div className="font-mono text-[10px] text-muted">
+          <div className="font-mono text-[14px] uppercase text-text">{player.name}</div>
+          <div className="font-mono text-[11px] text-muted">
             {player.position} · {player.team}
             {player.age != null && ` · Age ${player.age}`}
           </div>
           <div
-            className="mt-1 inline-block rounded px-1.5 py-0.5 font-mono text-[8px] uppercase"
+            className="mt-1 inline-block rounded px-1.5 py-0.5 font-mono text-[9px] uppercase"
             style={{ color: vColor, border: `1px solid ${vColor}44` }}
           >
             {verdict}
@@ -69,11 +70,11 @@ export default function DraftScoutingCard({
         </div>
         <div className="text-right">
           <div className="font-mono text-[22px] tabular-nums text-boom">{player.tfoScore.toFixed(1)}</div>
-          <div className="font-mono text-[8px] text-muted">BOB Score</div>
+          <div className="font-mono text-[9px] text-muted">BOB Score</div>
         </div>
       </div>
 
-      <div className="mt-3 grid grid-cols-3 gap-2 font-mono text-[9px]">
+      <div className="mt-3 grid grid-cols-3 gap-2 font-mono text-[10px]">
         <div>
           <div className="text-muted">Pos Rank</div>
           <div className="text-text">{posRank}</div>
@@ -89,14 +90,14 @@ export default function DraftScoutingCard({
       </div>
 
       <div className="mt-3">
-        <div className="mb-1 font-mono text-[8px] uppercase text-muted">Strengths</div>
+        <div className="mb-1 font-mono text-[9px] uppercase text-muted">Strengths</div>
         <ul className="space-y-0.5">
-          <li className="flex gap-1 font-mono text-[9px] text-text">
+          <li className="flex gap-1 font-mono text-[10px] text-text">
             <span style={{ color: positionColor(player.position) }}>✓</span>
             {reasoning}
           </li>
           {player.verdict && (
-            <li className="flex gap-1 font-mono text-[9px] text-text">
+            <li className="flex gap-1 font-mono text-[10px] text-text">
               <span className="text-boom">✓</span>
               TFO verdict: {player.verdict}
             </li>
@@ -105,30 +106,42 @@ export default function DraftScoutingCard({
       </div>
 
       {player.isRookie && draftType === 'rookie' && (
-        <p className="mt-2 font-mono text-[8px] text-hold">
+        <p className="mt-2 font-mono text-[9px] text-hold">
           College scouting scores — BBB integration coming soon
         </p>
       )}
+
+      <div className="mt-3 flex items-center justify-between gap-2">
+        <span className="font-mono text-[9px] uppercase tracking-[0.08em] text-muted">
+          Pick suggestion
+        </span>
+        <RecommendationFeedback
+          surface="draft_pick"
+          subjectType="player"
+          subjectId={player.playerId}
+          context={{ verdict, currentOverall, draftType }}
+        />
+      </div>
 
       <div className="mt-3 flex gap-2">
         <button
           type="button"
           disabled={!isUserTurn}
           onClick={() => onDraft?.(player)}
-          className="flex-1 rounded bg-boom py-2 font-mono text-[9px] uppercase text-bg disabled:opacity-40"
+          className="flex-1 rounded bg-boom py-2 font-mono text-[10px] uppercase text-bg disabled:opacity-40"
         >
           Draft Player
         </button>
         <button
           type="button"
           onClick={() => onQueue?.(player)}
-          className="rounded border border-border px-3 py-2 font-mono text-[9px] uppercase text-muted hover:text-text"
+          className="rounded border border-border px-3 py-2 font-mono text-[10px] uppercase text-muted hover:text-text"
         >
           + Queue
         </button>
         <Link
           href={`/players?player=${player.playerId}`}
-          className="rounded border border-[#7c3aed]/40 px-3 py-2 font-mono text-[9px] uppercase text-[#A78BFA] hover:bg-[#7c3aed]/10"
+          className="rounded border border-[#7c3aed]/40 px-3 py-2 font-mono text-[10px] uppercase text-[#A78BFA] hover:bg-[#7c3aed]/10"
         >
           Hub →
         </Link>

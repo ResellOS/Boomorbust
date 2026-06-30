@@ -41,7 +41,7 @@ function PosBadge({ pos }: { pos: string }) {
   const c = POSITION_COLORS[k] ?? POSITION_COLORS.WR;
   return (
     <span
-      className="text-[10px] font-bold px-1.5 py-0.5 rounded-md shrink-0"
+      className="text-[11px] font-bold px-1.5 py-0.5 rounded-md shrink-0"
       style={{ backgroundColor: `${c.bg}99`, color: c.text }}
     >
       {pos.toUpperCase()}
@@ -101,7 +101,7 @@ export default function PlayerCard({
         />
       ) : (
         <div
-          className="w-8 h-8 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0"
+          className="w-8 h-8 rounded-full flex items-center justify-center text-[11px] font-bold shrink-0"
           style={{
             border: `2px solid ${borderCol}`,
             background: POSITION_COLORS[k]?.bg ?? '#1F2937',

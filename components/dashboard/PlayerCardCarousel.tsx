@@ -54,7 +54,7 @@ export default function PlayerCardCarousel({ players, staticMode = false }: Play
 
   if (sorted.length === 0) {
     return (
-      <div className="flex h-[140px] items-center justify-center rounded-[9px] border border-border bg-surface font-mono text-[12px] text-muted">
+      <div className="flex h-[140px] items-center justify-center rounded-[9px] border border-border bg-surface font-mono text-[13px] text-muted">
         No rostered players synced yet — run a league sync to populate your board.
       </div>
     );
@@ -69,10 +69,10 @@ export default function PlayerCardCarousel({ players, staticMode = false }: Play
   return (
     <div className="w-full min-w-0">
       <div className="mb-2 flex items-center justify-between">
-        <span className="font-figtree text-[12px] font-semibold uppercase tracking-[1.5px] text-text">
+        <span className="font-figtree text-[13px] font-semibold uppercase tracking-[1.5px] text-text">
           MARKET SIGNALS
         </span>
-        <Link href="/players" className="font-mono text-[10px] text-boom no-underline">
+        <Link href="/players" className="font-mono text-[11px] text-boom no-underline">
           View All Players →
         </Link>
       </div>

@@ -121,10 +121,10 @@ export default function DraftTradeModal({
       <div className="max-h-[90vh] w-full max-w-[560px] overflow-y-auto rounded-[12px] border border-border bg-bg p-5 shadow-[0_0_40px_rgba(54,231,161,0.12)]">
         <div className="mb-4 flex items-start justify-between gap-2">
           <div>
-            <div className="font-figtree text-[16px] font-bold text-text">Propose Trade</div>
-            <div className="font-mono text-[10px] text-muted">With {teamName}</div>
+            <div className="font-figtree text-[17px] font-bold text-text">Propose Trade</div>
+            <div className="font-mono text-[11px] text-muted">With {teamName}</div>
           </div>
-          <button type="button" onClick={onClose} className="font-mono text-[14px] text-muted hover:text-text">
+          <button type="button" onClick={onClose} className="font-mono text-[15px] text-muted hover:text-text">
             ×
           </button>
         </div>
@@ -151,7 +151,7 @@ export default function DraftTradeModal({
         </div>
 
         {resultMsg && (
-          <p className="mt-3 rounded-[6px] border border-border bg-surface px-3 py-2 font-figtree text-[11px] text-text">
+          <p className="mt-3 rounded-[6px] border border-border bg-surface px-3 py-2 font-figtree text-[12px] text-text">
             {resultMsg}
           </p>
         )}
@@ -160,14 +160,14 @@ export default function DraftTradeModal({
           <button
             type="button"
             onClick={submit}
-            className="flex-1 rounded-[8px] bg-boom py-2.5 font-figtree text-[12px] font-bold uppercase text-bg"
+            className="flex-1 rounded-[8px] bg-boom py-2.5 font-figtree text-[13px] font-bold uppercase text-bg"
           >
             Send Offer
           </button>
           <button
             type="button"
             onClick={onClose}
-            className="rounded-[8px] border border-border px-4 py-2.5 font-figtree text-[12px] text-muted"
+            className="rounded-[8px] border border-border px-4 py-2.5 font-figtree text-[13px] text-muted"
           >
             Cancel
           </button>
@@ -196,17 +196,17 @@ function TradeSide({
 }) {
   return (
     <div className="rounded-[8px] border border-border bg-surface/40 p-3">
-      <div className="mb-2 font-figtree text-[11px] font-bold uppercase text-muted">{title}</div>
-      <div className="mb-2 font-mono text-[8px] uppercase text-muted">Players</div>
+      <div className="mb-2 font-figtree text-[12px] font-bold uppercase text-muted">{title}</div>
+      <div className="mb-2 font-mono text-[9px] uppercase text-muted">Players</div>
       {players.length === 0 ? (
-        <div className="mb-2 font-figtree text-[10px] text-muted/70">None drafted</div>
+        <div className="mb-2 font-figtree text-[11px] text-muted/70">None drafted</div>
       ) : (
         players.map((p) => (
           <button
             key={p.playerId}
             type="button"
             onClick={() => onPlayer(selectedPlayer === p.playerId ? null : p.playerId)}
-            className={`mb-1 block w-full rounded px-2 py-1 text-left font-figtree text-[10px] ${
+            className={`mb-1 block w-full rounded px-2 py-1 text-left font-figtree text-[11px] ${
               selectedPlayer === p.playerId ? 'bg-boom/15 text-boom' : 'text-text hover:bg-white/5'
             }`}
           >
@@ -214,13 +214,13 @@ function TradeSide({
           </button>
         ))
       )}
-      <div className="mb-1 mt-2 font-mono text-[8px] uppercase text-muted">Future Picks</div>
+      <div className="mb-1 mt-2 font-mono text-[9px] uppercase text-muted">Future Picks</div>
       {future.slice(0, 6).map((fp) => (
         <button
           key={fp.overall}
           type="button"
           onClick={() => onPick(selectedPick === fp.overall ? null : fp.overall)}
-          className={`mb-1 block w-full rounded px-2 py-1 text-left font-mono text-[10px] ${
+          className={`mb-1 block w-full rounded px-2 py-1 text-left font-mono text-[11px] ${
             selectedPick === fp.overall ? 'bg-boom/15 text-boom' : 'text-muted hover:text-text'
           }`}
         >

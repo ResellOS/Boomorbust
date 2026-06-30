@@ -21,7 +21,7 @@ function LightningBolt({ className }: { className?: string }) {
 /** Text-based BOB mark: green bolt + BOOM / OR / BUST in Bebas Neue. No images. */
 export default function BobTextLogo({ className, size = 'default' }: { className?: string; size?: 'default' | 'compact' }) {
   const main = size === 'compact' ? 'text-[18px] sm:text-[20px]' : 'text-[22px] sm:text-[26px]';
-  const orSize = size === 'compact' ? 'text-[11px] sm:text-[12px]' : 'text-[12px] sm:text-[14px]';
+  const orSize = size === 'compact' ? 'text-[12px] sm:text-[13px]' : 'text-[13px] sm:text-[15px]';
   return (
     <span className={`inline-flex items-center gap-2 ${className ?? ''}`}>
       <LightningBolt className="h-7 w-7 shrink-0 sm:h-8 sm:w-8" />

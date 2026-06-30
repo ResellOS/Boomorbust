@@ -61,27 +61,27 @@ export default function PortfolioSimulator({
   return (
     <section className="mb-4 rounded-lg border border-border bg-surface p-4">
       <div className="flex items-center gap-2">
-        <span className="font-mono text-[10px] uppercase tracking-wide text-text">
+        <span className="font-mono text-[11px] uppercase tracking-wide text-text">
           Portfolio Simulator
         </span>
-        <span className="rounded border border-hold/30 bg-hold/10 px-1.5 py-px font-mono text-[8px] uppercase text-hold">
+        <span className="rounded border border-hold/30 bg-hold/10 px-1.5 py-px font-mono text-[9px] uppercase text-hold">
           Beta
         </span>
       </div>
-      <p className="mt-1 font-mono text-[9px] text-muted">
+      <p className="mt-1 font-mono text-[10px] text-muted">
         Estimated impact based on BOB dynasty ratings — no trade is sent.
       </p>
 
       <div className="mt-3 grid gap-3 md:grid-cols-2">
         <label className="block">
-          <span className="font-mono text-[9px] uppercase text-muted">Trade Away</span>
+          <span className="font-mono text-[10px] uppercase text-muted">Trade Away</span>
           <select
             value={tradeAwayId}
             onChange={(e) => {
               setTradeAwayId(e.target.value);
               setSimulated(false);
             }}
-            className="mt-1 w-full rounded border border-border bg-bg px-2 py-2 font-mono text-[10px] text-text outline-none"
+            className="mt-1 w-full rounded border border-border bg-bg px-2 py-2 font-mono text-[11px] text-text outline-none"
           >
             <option value="">Select player…</option>
             {ownedPool.map((p) => (
@@ -92,14 +92,14 @@ export default function PortfolioSimulator({
           </select>
         </label>
         <label className="block">
-          <span className="font-mono text-[9px] uppercase text-muted">Acquire</span>
+          <span className="font-mono text-[10px] uppercase text-muted">Acquire</span>
           <select
             value={acquireId}
             onChange={(e) => {
               setAcquireId(e.target.value);
               setSimulated(false);
             }}
-            className="mt-1 w-full rounded border border-border bg-bg px-2 py-2 font-mono text-[10px] text-text outline-none"
+            className="mt-1 w-full rounded border border-border bg-bg px-2 py-2 font-mono text-[11px] text-text outline-none"
           >
             <option value="">Select player…</option>
             {acquirePool.map((p) => (
@@ -115,13 +115,13 @@ export default function PortfolioSimulator({
         type="button"
         disabled={!tradeAwayId || !acquireId}
         onClick={() => setSimulated(true)}
-        className="mt-3 w-full rounded border-none bg-boom py-2.5 font-mono text-[10px] uppercase tracking-wide text-bg disabled:opacity-40 md:w-auto md:px-8"
+        className="mt-3 w-full rounded border-none bg-boom py-2.5 font-mono text-[11px] uppercase tracking-wide text-bg disabled:opacity-40 md:w-auto md:px-8"
       >
         Simulate
       </button>
 
       {simulated && result && (
-        <div className="mt-4 space-y-2 border-t border-[#1e2640] pt-3 font-mono text-[10px]">
+        <div className="mt-4 space-y-2 border-t border-[#1e2640] pt-3 font-mono text-[11px]">
           <div className="flex justify-between">
             <span className="text-muted">Portfolio Value</span>
             <span className="text-text">
@@ -133,7 +133,7 @@ export default function PortfolioSimulator({
             <span className="text-muted">Championship Odds</span>
             <span className="text-text">
               {result.beforeOdds}% → <span className="text-boom">{result.afterOdds}%</span>
-              <span className="ml-1 text-[8px] text-muted">Estimated</span>
+              <span className="ml-1 text-[9px] text-muted">Estimated</span>
             </span>
           </div>
           <div className="flex justify-between">

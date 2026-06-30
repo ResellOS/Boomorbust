@@ -70,7 +70,7 @@ export default async function PlayersPage() {
 
       <Suspense
         fallback={
-          <div className="col-start-1 md:col-start-2 row-start-2 flex items-center justify-center font-mono text-[11px] text-muted">
+          <div className="col-start-1 md:col-start-2 row-start-2 flex items-center justify-center font-mono text-[12px] text-muted">
             Loading players…
           </div>
         }

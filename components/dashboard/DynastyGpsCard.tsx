@@ -34,7 +34,7 @@ function StrengthGauge({ value, label }: { value: number; label: string }) {
           </span>
         </div>
       </div>
-      <span className="mt-1 font-mono text-[7px] uppercase tracking-wide text-muted">{label}</span>
+      <span className="mt-1 font-mono text-[8px] uppercase tracking-wide text-muted">{label}</span>
     </div>
   );
 }
@@ -54,14 +54,14 @@ export default function DynastyGpsCard({
       className="dash-clickable-card flex h-full flex-col overflow-hidden rounded-[10px] border border-[#1e2640] bg-[#0f1420] no-underline"
     >
       <div className="border-b border-[#1e2640]/80 px-3.5 py-2.5">
-        <h3 className="font-figtree text-[10px] uppercase tracking-[1.5px] text-[#e8ecf4]">Dynasty GPS</h3>
-        <p className="font-mono text-[8px] text-[#6b7a99]">Strategic context · tap for blueprint</p>
+        <h3 className="font-figtree text-[11px] uppercase tracking-[1.5px] text-[#e8ecf4]">Dynasty GPS</h3>
+        <p className="font-mono text-[9px] text-[#6b7a99]">Strategic context · tap for blueprint</p>
       </div>
 
       <div className="flex flex-1 flex-col gap-3 p-3.5">
         <div className="flex items-start justify-between gap-3">
           <div>
-            <div className="font-mono text-[7px] uppercase tracking-wide text-[#6b7a99]">
+            <div className="font-mono text-[8px] uppercase tracking-wide text-[#6b7a99]">
               {data.isLeagueContext ? 'League Status' : 'Portfolio Status'}
             </div>
             <div
@@ -89,13 +89,13 @@ export default function DynastyGpsCard({
         </div>
 
         <div className="mt-auto border-t border-[#1e2640]/60 pt-3">
-          <div className="font-mono text-[7px] uppercase tracking-wide text-[#6b7a99]">
+          <div className="font-mono text-[8px] uppercase tracking-wide text-[#6b7a99]">
             Recommended Focus
           </div>
-          <p className="mt-1 font-figtree text-[11px] leading-relaxed text-[#e8ecf4]">
+          <p className="mt-1 font-figtree text-[12px] leading-relaxed text-[#e8ecf4]">
             {data.recommendedFocus}
           </p>
-          <span className="mt-2 inline-flex items-center gap-0.5 font-mono text-[9px] text-boom">
+          <span className="mt-2 inline-flex items-center gap-0.5 font-mono text-[10px] text-boom">
             View Full GPS
             <ChevronRight className="h-3 w-3" />
           </span>
@@ -118,9 +118,9 @@ function Metric({
 }) {
   return (
     <div className="rounded-md border border-[#1e2640]/60 bg-[#141929]/60 px-2.5 py-2">
-      <div className="font-mono text-[7px] uppercase tracking-wide text-[#6b7a99]">{label}</div>
+      <div className="font-mono text-[8px] uppercase tracking-wide text-[#6b7a99]">{label}</div>
       <div
-        className={`mt-0.5 text-[12px] leading-snug ${accent ? 'font-mono tabular-nums text-boom' : 'font-figtree text-[#e8ecf4]'}`}
+        className={`mt-0.5 text-[13px] leading-snug ${accent ? 'font-mono tabular-nums text-boom' : 'font-figtree text-[#e8ecf4]'}`}
         style={risk ? { color: '#EF4444' } : undefined}
       >
         {value}

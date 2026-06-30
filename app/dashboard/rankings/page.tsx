@@ -185,14 +185,14 @@ function TrajectoryChart({
           <span className="text-2xl leading-none tabular-nums font-bold" style={{ ...F_BEBAS, color: deltaColor }}>
             {delta > 0 ? '+' : ''}{delta}%
           </span>
-          <span className="ml-1.5 text-[9px] uppercase tracking-[0.12em]" style={{ ...F_INTER, color: TEXT_MUTED }}>
+          <span className="ml-1.5 text-[10px] uppercase tracking-[0.12em]" style={{ ...F_INTER, color: TEXT_MUTED }}>
             DELTAPOINT
           </span>
         </div>
       )}
 
       {/* Legend */}
-      <div className="mt-2 flex gap-3 justify-center text-[9px]" style={F_INTER}>
+      <div className="mt-2 flex gap-3 justify-center text-[10px]" style={F_INTER}>
         <span className="flex items-center gap-1" style={{ color: TEXT_MUTED }}>
           <span className="h-0.5 w-4 rounded-full inline-block" style={{ background: INDIGO }} /> Process
         </span>
@@ -240,11 +240,11 @@ function PlayerContextPanel({
       >
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-1.5 flex-wrap">
-            <p className="text-[10px] font-bold uppercase tracking-[0.14em]" style={{ ...F_INTER, color: TEXT_MUTED }}>
+            <p className="text-[11px] font-bold uppercase tracking-[0.14em]" style={{ ...F_INTER, color: TEXT_MUTED }}>
               PLAYER CONTEXT
             </p>
           </div>
-          <p className="mt-0.5 text-[10px] uppercase" style={{ ...F_INTER, color: TEXT_MUTED }}>
+          <p className="mt-0.5 text-[11px] uppercase" style={{ ...F_INTER, color: TEXT_MUTED }}>
             (SELECTED: {row.name.split(' ').at(-1)?.toUpperCase() ?? row.name.toUpperCase()})
           </p>
         </div>
@@ -282,17 +282,17 @@ function PlayerContextPanel({
           <div className="min-w-0">
             <p className="text-sm font-semibold text-white truncate" style={F_INTER}>{row.name}</p>
             <div className="mt-1 flex flex-wrap items-center gap-1.5">
-              <span className="rounded px-1.5 py-0.5 text-[9px] font-bold uppercase" style={{ background: ps.bg, color: ps.text }}>
+              <span className="rounded px-1.5 py-0.5 text-[10px] font-bold uppercase" style={{ background: ps.bg, color: ps.text }}>
                 {row.pos}
               </span>
               {row.teamAbbr && (
-                <span className="rounded border px-1.5 py-0.5 text-[9px]" style={{ borderColor: BORDER, color: TEXT_MUTED }}>
+                <span className="rounded border px-1.5 py-0.5 text-[10px]" style={{ borderColor: BORDER, color: TEXT_MUTED }}>
                   {row.teamAbbr}
                 </span>
               )}
               {rank <= 5 && (
                 <span
-                  className="flex items-center gap-1 rounded border px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide"
+                  className="flex items-center gap-1 rounded border px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide"
                   style={{ borderColor: `${CYAN}50`, background: `${CYAN}15`, color: CYAN }}
                 >
                   ◆ IMMORTAL
@@ -324,7 +324,7 @@ function PlayerContextPanel({
           className="rounded-sm border p-2.5"
           style={{ background: CARD, borderColor: BORDER }}
         >
-          <p className="mb-2 text-[9px] font-bold uppercase tracking-[0.12em]" style={{ ...F_INTER, color: TEXT_MUTED }}>
+          <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.12em]" style={{ ...F_INTER, color: TEXT_MUTED }}>
             Process vs. Results
             <span className="ml-1 font-normal" style={{ color: TEXT_MUTED }}>
               ({new Date().getFullYear()} Trajectory)
@@ -344,7 +344,7 @@ function PlayerContextPanel({
             { label: 'BBSM VAL', val: row.bbv ?? null, color: CYAN },
           ].map(({ label, val, color }) => (
             <div key={label} className="rounded-sm border p-2" style={{ background: CARD2, borderColor: BORDER }}>
-              <p className="text-[8px] uppercase tracking-[0.12em]" style={{ ...F_INTER, color: TEXT_MUTED }}>
+              <p className="text-[9px] uppercase tracking-[0.12em]" style={{ ...F_INTER, color: TEXT_MUTED }}>
                 {label}
               </p>
               <p className="mt-0.5 text-lg leading-none tabular-nums" style={{ ...F_BEBAS, color }}>
@@ -361,11 +361,11 @@ function PlayerContextPanel({
         >
           <div className="flex items-center gap-1.5">
             <TrendingUp className="h-3 w-3 shrink-0" style={{ color: CYAN }} />
-            <p className="text-[9px] font-bold uppercase tracking-[0.1em]" style={{ ...F_INTER, color: CYAN }}>
+            <p className="text-[10px] font-bold uppercase tracking-[0.1em]" style={{ ...F_INTER, color: CYAN }}>
               Boomer Case
             </p>
           </div>
-          <p className="text-[10px] leading-relaxed" style={{ ...F_INTER, color: TEXT_SEC }}>
+          <p className="text-[11px] leading-relaxed" style={{ ...F_INTER, color: TEXT_SEC }}>
             {row.ktc >= 7000
               ? 'Elite 3-down workload projected. Dynasty ceiling intact through 2027.'
               : row.ktc >= 4500
@@ -380,11 +380,11 @@ function PlayerContextPanel({
         >
           <div className="flex items-center gap-1.5">
             <TrendingDown className="h-3 w-3 shrink-0" style={{ color: RED }} />
-            <p className="text-[9px] font-bold uppercase tracking-[0.1em]" style={{ ...F_INTER, color: RED }}>
+            <p className="text-[10px] font-bold uppercase tracking-[0.1em]" style={{ ...F_INTER, color: RED }}>
               Nuke Risk
             </p>
           </div>
-          <p className="text-[10px] leading-relaxed" style={{ ...F_INTER, color: TEXT_SEC }}>
+          <p className="text-[11px] leading-relaxed" style={{ ...F_INTER, color: TEXT_SEC }}>
             {isBust
               ? `Market compression detected. KTC premium may not hold into offseason. Sell window open.`
               : row.ageNum >= 28
@@ -625,13 +625,13 @@ export default function RankingsPage() {
               className="flex items-center gap-2 rounded-sm border px-2.5 py-1.5"
               style={{ borderColor: `${CYAN}40`, background: `${CYAN}10` }}
             >
-              <span className="text-[9px] uppercase tracking-[0.12em]" style={{ ...F_INTER, color: TEXT_MUTED }}>
+              <span className="text-[10px] uppercase tracking-[0.12em]" style={{ ...F_INTER, color: TEXT_MUTED }}>
                 Context:
               </span>
               <select
                 value={selectedLeague}
                 onChange={(e) => setSelectedLeague(e.target.value)}
-                className="bg-transparent text-[10px] font-bold uppercase tracking-wide focus:outline-none"
+                className="bg-transparent text-[11px] font-bold uppercase tracking-wide focus:outline-none"
                 style={{ ...F_INTER, color: CYAN }}
               >
                 <option value="all" style={{ background: '#111' }}>All Leagues</option>
@@ -651,7 +651,7 @@ export default function RankingsPage() {
                   type="button"
                   onClick={() => setPos(p)}
                   className={clsx(
-                    'rounded-sm border px-2 py-1 text-[9px] font-bold uppercase tracking-wide transition',
+                    'rounded-sm border px-2 py-1 text-[10px] font-bold uppercase tracking-wide transition',
                     pos === p ? 'text-white' : 'hover:border-[#374151]'
                   )}
                   style={{
@@ -679,7 +679,7 @@ export default function RankingsPage() {
               <option value="vets" style={{ background: '#111' }}>Vets 28+</option>
             </select>
 
-            <span className="ml-auto text-[10px] tabular-nums" style={{ ...F_INTER, color: TEXT_MUTED }}>
+            <span className="ml-auto text-[11px] tabular-nums" style={{ ...F_INTER, color: TEXT_MUTED }}>
               {sorted.length} players
             </span>
           </div>
@@ -687,7 +687,7 @@ export default function RankingsPage() {
 
         {/* Table header */}
         <div
-          className="grid shrink-0 border-b px-3 py-2 text-[9px] font-bold uppercase tracking-[0.12em]"
+          className="grid shrink-0 border-b px-3 py-2 text-[10px] font-bold uppercase tracking-[0.12em]"
           style={{
             borderColor: BORDER,
             background: 'rgba(0,0,0,0.3)',
@@ -774,7 +774,7 @@ export default function RankingsPage() {
                       >
                         {rank}
                         {isImmortal && (
-                          <span className="ml-0.5 text-[8px] align-top" style={{ color: CYAN }}>◆</span>
+                          <span className="ml-0.5 text-[9px] align-top" style={{ color: CYAN }}>◆</span>
                         )}
                       </span>
 
@@ -796,7 +796,7 @@ export default function RankingsPage() {
                           />
                         ) : (
                           <span
-                            className="shrink-0 rounded flex items-center justify-center text-[8px] font-bold"
+                            className="shrink-0 rounded flex items-center justify-center text-[9px] font-bold"
                             style={{ width: 30, height: 30, background: `${INDIGO}30`, color: '#a5b4fc', border: `1px solid ${BORDER}` }}
                           >
                             {row.name.slice(0, 2).toUpperCase()}
@@ -804,13 +804,13 @@ export default function RankingsPage() {
                         )}
                         <span className="min-w-0">
                           <span
-                            className="block truncate text-[12px] font-semibold transition-colors group-hover:text-white"
+                            className="block truncate text-[13px] font-semibold transition-colors group-hover:text-white"
                             style={{ color: isSelected ? TEXT : TEXT_SEC }}
                           >
                             {row.name}
                           </span>
                           <span
-                            className="inline-block rounded px-1 py-0.5 text-[8px] font-bold uppercase"
+                            className="inline-block rounded px-1 py-0.5 text-[9px] font-bold uppercase"
                             style={{ background: ps.bg, color: ps.text }}
                           >
                             {row.pos}
@@ -819,23 +819,23 @@ export default function RankingsPage() {
                       </span>
 
                       {/* Team */}
-                      <span className="text-[11px] tabular-nums" style={{ ...F_MONO, color: TEXT_MUTED }}>
+                      <span className="text-[12px] tabular-nums" style={{ ...F_MONO, color: TEXT_MUTED }}>
                         {row.teamAbbr ?? '—'}
                       </span>
 
                       {/* Age */}
-                      <span className="text-[11px] tabular-nums" style={{ ...F_MONO, color: TEXT_MUTED }}>
+                      <span className="text-[12px] tabular-nums" style={{ ...F_MONO, color: TEXT_MUTED }}>
                         {row.ageNum || '—'}
                       </span>
 
                       {/* Market Val (KTC) */}
-                      <span className="text-right text-[13px] tabular-nums font-medium" style={{ ...F_BEBAS, color: TEXT }}>
+                      <span className="text-right text-[14px] tabular-nums font-medium" style={{ ...F_BEBAS, color: TEXT }}>
                         {Math.round(row.ktc).toLocaleString()}
                       </span>
 
                       {/* BBSM Val */}
                       <span
-                        className="text-right text-[13px] tabular-nums font-medium"
+                        className="text-right text-[14px] tabular-nums font-medium"
                         style={{ ...F_BEBAS, color: typeof row.bbv === 'number' ? CYAN : TEXT_MUTED }}
                       >
                         {typeof row.bbv === 'number' ? Math.round(row.bbv).toLocaleString() : '—'}
@@ -843,7 +843,7 @@ export default function RankingsPage() {
 
                       {/* Delta % */}
                       <span
-                        className="text-right text-[12px] tabular-nums font-bold"
+                        className="text-right text-[13px] tabular-nums font-bold"
                         style={{
                           ...F_BEBAS,
                           color: row.delta === null
@@ -857,7 +857,7 @@ export default function RankingsPage() {
                       {/* Signal */}
                       <span className="flex justify-center">
                         <span
-                          className="rounded-sm border px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide"
+                          className="rounded-sm border px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide"
                           style={{
                             borderColor: sm.border,
                             background: sm.bg,

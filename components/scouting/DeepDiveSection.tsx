@@ -113,7 +113,7 @@ export default function DeepDiveSection() {
   return (
     <div className={`${GLASS} p-4 mt-4`} id="scouting-deep-dive">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <p className="text-[12px] uppercase tracking-widest text-[#64748B] font-semibold">DEEP DIVE ANY PLAYER</p>
+        <p className="text-[13px] uppercase tracking-widest text-[#64748B] font-semibold">DEEP DIVE ANY PLAYER</p>
         <div ref={wrapRef} className="relative w-full sm:w-auto sm:min-w-[12rem]">
           <div className="flex items-center gap-2 rounded-lg border border-white/[0.08] bg-white/[0.03] px-3 py-2 focus-within:border-emerald-500/50">
             <Search className="w-4 h-4 text-[#64748B] shrink-0" aria-hidden />
@@ -126,7 +126,7 @@ export default function DeepDiveSection() {
                 setOpenHits(true);
               }}
               onFocus={() => setOpenHits(true)}
-              className="w-full sm:w-48 bg-transparent text-[13px] text-white placeholder:text-[#64748B] outline-none border-0"
+              className="w-full sm:w-48 bg-transparent text-[14px] text-white placeholder:text-[#64748B] outline-none border-0"
               style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}
               autoComplete="off"
             />
@@ -134,20 +134,20 @@ export default function DeepDiveSection() {
           {openHits && (debounced.length >= 2 || hits.length > 0) ? (
             <div className="absolute right-0 left-0 sm:left-auto sm:right-0 sm:min-w-[16rem] z-30 mt-1 max-h-56 overflow-y-auto rounded-lg border border-white/[0.1] bg-[#0a0d14]/95 backdrop-blur-xl py-1">
               {searchLoading ? (
-                <p className="px-3 py-2 text-[12px] text-[#64748B]">Searching…</p>
+                <p className="px-3 py-2 text-[13px] text-[#64748B]">Searching…</p>
               ) : hits.length === 0 ? (
-                <p className="px-3 py-2 text-[12px] text-[#64748B]">No players found</p>
+                <p className="px-3 py-2 text-[13px] text-[#64748B]">No players found</p>
               ) : (
                 hits.map((h) => (
                   <button
                     key={h.playerId}
                     type="button"
-                    className="w-full text-left px-3 py-2 hover:bg-white/[0.05] text-[13px] text-white border-0 bg-transparent cursor-pointer"
+                    className="w-full text-left px-3 py-2 hover:bg-white/[0.05] text-[14px] text-white border-0 bg-transparent cursor-pointer"
                     onMouseDown={(e) => e.preventDefault()}
                     onClick={() => selectHit(h)}
                   >
                     {h.full_name}
-                    <span className="text-[#64748B] text-[11px] ml-2">
+                    <span className="text-[#64748B] text-[12px] ml-2">
                       {h.position} {h.team ? `· ${h.team}` : ''}
                     </span>
                   </button>
@@ -178,7 +178,7 @@ export default function DeepDiveSection() {
                     unoptimized
                   />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center text-[14px] font-bold text-white">
+                  <div className="w-full h-full flex items-center justify-center text-[15px] font-bold text-white">
                     {(player.name || '?').slice(0, 2).toUpperCase()}
                   </div>
                 )}
@@ -187,7 +187,7 @@ export default function DeepDiveSection() {
                 <h3 className="text-[18px] sm:text-[22px] font-bold text-white truncate" style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}>
                   {player.name}
                 </h3>
-                <p className="text-[13px] text-[#64748B] mt-0.5">
+                <p className="text-[14px] text-[#64748B] mt-0.5">
                   {player.position} · {player.team}
                 </p>
                 <div className="flex flex-wrap items-center gap-x-0 gap-y-2 mt-3 divide-x divide-white/[0.08]">
@@ -199,8 +199,8 @@ export default function DeepDiveSection() {
                     { lab: 'DRAFT', val: player.draft },
                   ].map((x) => (
                     <span key={x.lab} className="inline-flex items-center gap-1.5 px-3 first:pl-0 first:pr-3">
-                      <span className="text-[9px] uppercase text-[#64748B] font-semibold tracking-wide">{x.lab}</span>
-                      <span className="text-[11px] sm:text-[13px] text-white font-mono tabular-nums">{x.val}</span>
+                      <span className="text-[10px] uppercase text-[#64748B] font-semibold tracking-wide">{x.lab}</span>
+                      <span className="text-[12px] sm:text-[14px] text-white font-mono tabular-nums">{x.val}</span>
                     </span>
                   ))}
                 </div>
@@ -209,22 +209,22 @@ export default function DeepDiveSection() {
 
             <div className="flex flex-wrap gap-6 lg:justify-end">
               <div>
-                <p className="text-[10px] uppercase tracking-widest text-[#64748B] font-mono">PLAYER SCORE</p>
+                <p className="text-[11px] uppercase tracking-widest text-[#64748B] font-mono">PLAYER SCORE</p>
                 <p className="text-[40px] sm:text-[48px] font-bold tabular-nums leading-none mt-1" style={{ fontFamily: 'JetBrains Mono, monospace', color: '#36E7A1' }}>
                   {player.playerScore}
                 </p>
                 <span
-                  className="inline-block mt-1 text-[10px] font-bold px-2 py-0.5 rounded-full border"
+                  className="inline-block mt-1 text-[11px] font-bold px-2 py-0.5 rounded-full border"
                   style={{ color: '#36E7A1', background: 'rgba(54,231,161,0.12)', borderColor: 'rgba(54,231,161,0.35)' }}
                 >
                   {player.scoreTier}
                 </span>
-                <p className="text-[11px] text-[#64748B] mt-1" style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}>
+                <p className="text-[12px] text-[#64748B] mt-1" style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}>
                   {player.scoreSub}
                 </p>
               </div>
               <div>
-                <p className="text-[10px] uppercase tracking-widest text-[#64748B] font-mono">TREND (30 DAYS)</p>
+                <p className="text-[11px] uppercase tracking-widest text-[#64748B] font-mono">TREND (30 DAYS)</p>
                 <p className="text-[32px] sm:text-[36px] font-bold tabular-nums leading-none mt-1" style={{ fontFamily: 'JetBrains Mono, monospace', color: '#36E7A1' }}>
                   {player.trend30d >= 0 ? '+' : ''}
                   {Number(player.trend30d).toFixed(1)}
@@ -248,7 +248,7 @@ export default function DeepDiveSection() {
                   role="tab"
                   aria-selected={is}
                   onClick={() => setSubTab(t.id)}
-                  className="flex-shrink-0 min-h-[40px] px-3 py-2 text-[11px] font-bold tracking-wide whitespace-nowrap border-b-2 transition-colors"
+                  className="flex-shrink-0 min-h-[40px] px-3 py-2 text-[12px] font-bold tracking-wide whitespace-nowrap border-b-2 transition-colors"
                   style={{
                     fontFamily: 'var(--font-body), Inter, sans-serif',
                     color: is ? '#ffffff' : '#64748B',
@@ -270,11 +270,11 @@ export default function DeepDiveSection() {
                   key={m.label}
                   className="rounded-lg border border-white/[0.04] bg-white/[0.02] p-3 text-center"
                 >
-                  <p className="text-[10px] uppercase tracking-wide text-[#64748B] font-semibold">{m.label}</p>
+                  <p className="text-[11px] uppercase tracking-wide text-[#64748B] font-semibold">{m.label}</p>
                   <p className="text-[20px] sm:text-[22px] font-bold tabular-nums mt-1 font-mono" style={{ color: m.valueColor }}>
                     {m.value}
                   </p>
-                  <p className="text-[11px] mt-0.5" style={{ color: m.tierColor }}>
+                  <p className="text-[12px] mt-0.5" style={{ color: m.tierColor }}>
                     {m.tier}
                   </p>
                 </div>
@@ -283,19 +283,19 @@ export default function DeepDiveSection() {
           ) : null}
 
           {!showMetrics ? (
-            <p className="text-center text-[13px] text-[#64748B] py-10" style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}>
+            <p className="text-center text-[14px] text-[#64748B] py-10" style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}>
               This view is coming soon.
             </p>
           ) : null}
 
           <div className="text-center mt-4">
-            <Link href={`/arbitrage`} className="text-[13px] text-[#22D3EE] hover:underline inline-block">
+            <Link href={`/arbitrage`} className="text-[14px] text-[#22D3EE] hover:underline inline-block">
               View Full Player Profile →
             </Link>
           </div>
         </div>
       ) : (
-        <p className="text-[13px] text-[#64748B] mt-3">Could not load player.</p>
+        <p className="text-[14px] text-[#64748B] mt-3">Could not load player.</p>
       )}
     </div>
   );

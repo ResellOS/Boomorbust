@@ -97,7 +97,7 @@ export default function WaiverWirePage() {
         {/* Page header */}
         <div className="mb-2">
           <h1 className="text-2xl font-bold text-white tracking-tight">Waiver Wire</h1>
-          <p className="text-[13px] text-slate-500 mt-0.5">Find value before your league mates do.</p>
+          <p className="text-[14px] text-slate-500 mt-0.5">Find value before your league mates do.</p>
         </div>
 
         {/* Stats bar */}
@@ -164,15 +164,15 @@ export default function WaiverWirePage() {
           <div className="grid grid-cols-1 xl:grid-cols-[1fr_300px] gap-4 items-start">
             <div className="glass-card overflow-hidden">
               <div className="px-4 py-3 border-b border-white/[0.08]">
-                <h2 className="text-[13px] font-bold text-white tracking-wide">ROSTER GAPS — DETAILED VIEW</h2>
+                <h2 className="text-[14px] font-bold text-white tracking-wide">ROSTER GAPS — DETAILED VIEW</h2>
               </div>
               <div className="overflow-x-auto">
               <table className="w-full min-w-[320px]">
                 <thead>
                   <tr className="border-b border-white/[0.08]">
-                    <th className="px-4 py-2 text-left text-[10px] font-semibold text-slate-500 uppercase tracking-wider">POSITION</th>
-                    <th className="px-4 py-2 text-left text-[10px] font-semibold text-slate-500 uppercase tracking-wider">NEED LEVEL</th>
-                    <th className="px-4 py-2 text-right text-[10px] font-semibold text-slate-500 uppercase tracking-wider">AVAILABLE IMPACT</th>
+                    <th className="px-4 py-2 text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider">POSITION</th>
+                    <th className="px-4 py-2 text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider">NEED LEVEL</th>
+                    <th className="px-4 py-2 text-right text-[11px] font-semibold text-slate-500 uppercase tracking-wider">AVAILABLE IMPACT</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -181,13 +181,13 @@ export default function WaiverWirePage() {
                     return (
                       <tr key={g.position} className="border-b border-white/[0.04] hover:bg-white/[0.02] transition-colors">
                         <td className="px-4 py-3">
-                          <span className="text-[14px] font-bold text-white font-mono" style={{ fontFamily: 'JetBrains Mono, monospace' }}>{g.position}</span>
+                          <span className="text-[15px] font-bold text-white font-mono" style={{ fontFamily: 'JetBrains Mono, monospace' }}>{g.position}</span>
                         </td>
                         <td className="px-4 py-3">
-                          <span className="text-[12px] font-semibold" style={{ color }}>{g.needLevel}</span>
+                          <span className="text-[13px] font-semibold" style={{ color }}>{g.needLevel}</span>
                         </td>
                         <td className="px-4 py-3 text-right">
-                          <span className="text-[13px] font-mono font-bold text-white" style={{ fontFamily: 'JetBrains Mono, monospace' }}>{g.availableImpact}</span>
+                          <span className="text-[14px] font-mono font-bold text-white" style={{ fontFamily: 'JetBrains Mono, monospace' }}>{g.availableImpact}</span>
                         </td>
                       </tr>
                     );

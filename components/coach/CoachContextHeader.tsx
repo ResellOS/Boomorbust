@@ -21,9 +21,9 @@ function LeagueCard({ league }: { league: LeagueContext }) {
       className="flex-shrink-0 rounded-xl px-4 py-3 min-w-[140px]"
       style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.09)' }}
     >
-      <p className="text-[13px] font-semibold text-white truncate">{league.name}</p>
-      <p className="text-[10px] text-slate-500 mt-0.5">{league.format}</p>
-      <p className="text-[10px] font-semibold mt-1" style={{ color }}>{league.status}</p>
+      <p className="text-[14px] font-semibold text-white truncate">{league.name}</p>
+      <p className="text-[11px] text-slate-500 mt-0.5">{league.format}</p>
+      <p className="text-[11px] font-semibold mt-1" style={{ color }}>{league.status}</p>
     </div>
   );
 }
@@ -54,10 +54,10 @@ export default function CoachContextHeader({ leagues, loading }: Props) {
               <circle cx="7" cy="7" r="6" fill="rgba(54,231,161,0.2)" stroke="#36E7A1" strokeWidth="1"/>
               <path d="M4.5 7l2 2 3-3" stroke="#36E7A1" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
-            <span className="text-[13px] font-semibold" style={{ color: '#36E7A1' }}>Full Context Active</span>
+            <span className="text-[14px] font-semibold" style={{ color: '#36E7A1' }}>Full Context Active</span>
           </div>
           {/* League stats */}
-          <p className="text-[13px] text-slate-400">
+          <p className="text-[14px] text-slate-400">
             {leagues.length} Leagues · {totalRosters} Rosters · {totalPlayers}+ Players
           </p>
         </div>
@@ -70,7 +70,7 @@ export default function CoachContextHeader({ leagues, loading }: Props) {
           : leagues.length > 0
             ? leagues.map((l) => <LeagueCard key={l.id} league={l} />)
             : (
-              <div className="text-[12px] text-slate-500 py-2">
+              <div className="text-[13px] text-slate-500 py-2">
                 No leagues found — connect your Sleeper account in settings
               </div>
             )

@@ -163,7 +163,7 @@ export default function Sidebar({
             >
               <Icon className="h-4 w-4 shrink-0" strokeWidth={2} />
               {!collapsed ? (
-                <span className="font-figtree text-[13px] font-medium">{item.label}</span>
+                <span className="font-figtree text-[14px] font-medium">{item.label}</span>
               ) : null}
             </Link>
           );
@@ -171,7 +171,7 @@ export default function Sidebar({
       </nav>
       {!collapsed ? (
         <>
-      <div className="shrink-0 px-[15px] pb-[3px] pt-[11px] font-figtree text-[11px] font-extrabold uppercase tracking-[1.5px] text-muted">
+      <div className="shrink-0 px-[15px] pb-[3px] pt-[11px] font-figtree text-[12px] font-extrabold uppercase tracking-[1.5px] text-muted">
         My Leagues
       </div>
       <div className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
@@ -196,7 +196,7 @@ export default function Sidebar({
                 className="h-[7px] w-[7px] rounded-full"
                 style={{ background: dotColor }}
               />
-              <span className="flex min-w-0 items-center gap-1 font-figtree text-[12.5px] font-medium">
+              <span className="flex min-w-0 items-center gap-1 font-figtree text-[13.5px] font-medium">
                 <span className="truncate">{displayName}</span>
                 <span className="shrink-0 text-boom opacity-0 transition-opacity group-hover:opacity-100">
                   →
@@ -205,7 +205,7 @@ export default function Sidebar({
               {rs ? (
                 <span
                   aria-label={`${displayName} ${rs.label}`}
-                  className="ml-1 shrink-0 whitespace-nowrap rounded-[3px] px-[7px] py-0.5 font-mono text-[8px] font-medium"
+                  className="ml-1 shrink-0 whitespace-nowrap rounded-[3px] px-[7px] py-0.5 font-mono text-[9px] font-medium"
                   style={{ color: rs.color, background: `${rs.color}1a` }}
                 >
                   {rs.label}
@@ -213,7 +213,7 @@ export default function Sidebar({
               ) : (
                 <span
                   aria-label={`${displayName} ${tag.label}`}
-                  className={`ml-1 shrink-0 whitespace-nowrap rounded-[3px] px-[7px] py-0.5 font-mono text-[8px] font-medium ${
+                  className={`ml-1 shrink-0 whitespace-nowrap rounded-[3px] px-[7px] py-0.5 font-mono text-[9px] font-medium ${
                     tag.variant === 'contender'
                       ? 'bg-boom/10 text-boom'
                       : tag.variant === 'rebuild'
@@ -231,39 +231,39 @@ export default function Sidebar({
       {weekContext && (
         <>
           <div className="shrink-0 border-t border-border px-3 pb-1 pt-2.5">
-            <div className="mb-1.5 text-[8px] font-medium uppercase tracking-[1.5px] text-muted">
+            <div className="mb-1.5 text-[9px] font-medium uppercase tracking-[1.5px] text-muted">
               {weekContext.isOffseason ? 'Preseason Context' : `Week ${weekContext.nflWeek} Context`}
             </div>
-            <div className="flex items-center justify-between px-3 py-1 text-[10px]">
+            <div className="flex items-center justify-between px-3 py-1 text-[11px]">
               <span className="text-muted">NFL Week</span>
               <span className="text-text">
                 {weekContext.isOffseason ? 'Preseason' : weekContext.nflWeek}
               </span>
             </div>
-            <div className="flex items-center justify-between px-3 py-1 text-[10px]">
+            <div className="flex items-center justify-between px-3 py-1 text-[11px]">
               <span className="text-muted">Start/Sit Window</span>
               <span className={weekContext.windowOpen ? 'text-boom' : 'text-hold'}>
                 {weekContext.windowOpen ? 'Open' : 'Locked'}
               </span>
             </div>
-            <div className="flex items-center justify-between px-3 py-1 text-[10px]">
+            <div className="flex items-center justify-between px-3 py-1 text-[11px]">
               <span className="text-muted">Lock Deadline</span>
               <span className="text-hold">{weekContext.lockDeadline}</span>
             </div>
-            <div className="flex items-center justify-between px-3 py-1 text-[10px]">
+            <div className="flex items-center justify-between px-3 py-1 text-[11px]">
               <span className="text-muted">Weather Impact</span>
               <span className="text-boom">{weekContext.weatherImpact}</span>
             </div>
             <Link
               href="/matchups"
-              className="flex items-center gap-1 px-3 py-2 text-[10px] text-boom no-underline hover:underline"
+              className="flex items-center gap-1 px-3 py-2 text-[11px] text-boom no-underline hover:underline"
             >
               View Matchup Matrix →
             </Link>
           </div>
           {typeof bobConfidence === 'number' && (
             <div className="shrink-0 border-t border-border px-3 py-2.5">
-              <div className="mb-1 text-[8px] font-medium uppercase tracking-[1.5px] text-muted">
+              <div className="mb-1 text-[9px] font-medium uppercase tracking-[1.5px] text-muted">
                 BOB Confidence Score
               </div>
               <ConfidenceRing pct={bobConfidence} isOffseason={weekContext.isOffseason} />
@@ -274,32 +274,32 @@ export default function Sidebar({
       {exposureOverview && (
         <>
           <div className="shrink-0 border-t border-border px-[14px] pb-1 pt-2.5">
-            <div className="mb-2 font-figtree text-[9px] font-medium uppercase tracking-[1.5px] text-muted">
+            <div className="mb-2 font-figtree text-[10px] font-medium uppercase tracking-[1.5px] text-muted">
               Portfolio Overview
             </div>
             <div className="grid gap-[7px] pb-2.5">
               <div className="rounded-[5px] border border-border bg-[#080d14] px-[11px] py-[9px]">
-                <div className="mb-[3px] text-[9px] uppercase tracking-[0.8px] text-muted">
+                <div className="mb-[3px] text-[10px] uppercase tracking-[0.8px] text-muted">
                   Total Assets
                 </div>
-                <div className="font-mono text-[15px] text-text">
+                <div className="font-mono text-[16px] text-text">
                   {exposureOverview.totalAssets}{' '}
-                  <span className="font-figtree text-[10px] text-muted">players</span>
+                  <span className="font-figtree text-[11px] text-muted">players</span>
                 </div>
               </div>
               <div className="rounded-[5px] border border-border bg-[#080d14] px-[11px] py-[9px]">
-                <div className="mb-[3px] text-[9px] uppercase tracking-[0.8px] text-muted">
+                <div className="mb-[3px] text-[10px] uppercase tracking-[0.8px] text-muted">
                   Avg Dynasty Rating
                 </div>
-                <div className="font-mono text-[15px] text-boom">
+                <div className="font-mono text-[16px] text-boom">
                   {exposureOverview.avgDynastyRating.toFixed(1)}
                 </div>
               </div>
               <div className="rounded-[5px] border border-border bg-[#080d14] px-[11px] py-[9px]">
-                <div className="mb-[3px] text-[9px] uppercase tracking-[0.8px] text-muted">
+                <div className="mb-[3px] text-[10px] uppercase tracking-[0.8px] text-muted">
                   Boom Rate
                 </div>
-                <div className="font-mono text-[15px] text-boom">
+                <div className="font-mono text-[16px] text-boom">
                   {exposureOverview.boomRate.toFixed(1)}%
                 </div>
               </div>
@@ -307,7 +307,7 @@ export default function Sidebar({
           </div>
           {exposureHealth && (
             <div className="shrink-0 border-t border-border px-[14px] pb-3.5">
-              <div className="mb-2 font-figtree text-[9px] font-medium uppercase tracking-[1.5px] text-muted">
+              <div className="mb-2 font-figtree text-[10px] font-medium uppercase tracking-[1.5px] text-muted">
                 Exposure Health
               </div>
               <div
@@ -332,14 +332,14 @@ export default function Sidebar({
                   }}
                 />
               </div>
-              <div className="text-[10px] text-muted">{exposureHealth.sub}</div>
+              <div className="text-[11px] text-muted">{exposureHealth.sub}</div>
             </div>
           )}
         </>
       )}
       {rosterSnapshot && rosterSnapshot.length > 0 && (
         <div className="shrink-0 border-t border-border px-[15px] py-2.5">
-          <div className="mb-2 font-figtree text-[11px] font-extrabold uppercase tracking-[1.5px] text-muted">
+          <div className="mb-2 font-figtree text-[12px] font-extrabold uppercase tracking-[1.5px] text-muted">
             My Roster Snapshot
           </div>
           <div className="flex flex-col gap-1.5">
@@ -350,12 +350,12 @@ export default function Sidebar({
                 className="flex items-center justify-between gap-2 rounded-md border border-border/60 bg-surface2/50 px-2 py-1.5 text-inherit no-underline transition-colors hover:bg-white/[0.03]"
               >
                 <div className="min-w-0">
-                  <div className="truncate font-figtree text-[11px] text-text">{p.name}</div>
-                  <div className="font-mono text-[8px] text-muted">
+                  <div className="truncate font-figtree text-[12px] text-text">{p.name}</div>
+                  <div className="font-mono text-[9px] text-muted">
                     {p.position} · {p.team}
                   </div>
                 </div>
-                <span className="shrink-0 font-mono text-[10px] text-boom">
+                <span className="shrink-0 font-mono text-[11px] text-boom">
                   {p.tfoScore.toFixed(1)}
                 </span>
               </Link>
@@ -365,7 +365,7 @@ export default function Sidebar({
       )}
       {signalCounts && (
         <div className="shrink-0 border-t border-border px-[14px] py-2.5">
-          <div className="mb-2 font-figtree text-[9px] font-medium uppercase tracking-[1.5px] text-muted">
+          <div className="mb-2 font-figtree text-[10px] font-medium uppercase tracking-[1.5px] text-muted">
             Market Signals
           </div>
           <div className="grid grid-cols-3 gap-1.5">
@@ -381,13 +381,13 @@ export default function Sidebar({
                 className="rounded-[5px] border border-border bg-[#080d14] px-2 py-2 text-center"
               >
                 <div
-                  className="font-mono text-[14px] font-bold tabular-nums"
+                  className="font-mono text-[15px] font-bold tabular-nums"
                   style={{ color: item.color }}
                 >
                   {item.count}
                 </div>
                 <div
-                  className="mt-0.5 font-mono text-[7px] font-bold uppercase tracking-wide"
+                  className="mt-0.5 font-mono text-[8px] font-bold uppercase tracking-wide"
                   style={{ color: item.color }}
                 >
                   {formatSignalBucketLabel(item.key)}
@@ -416,9 +416,9 @@ export default function Sidebar({
           ].map((feature) => (
             <div
               key={feature}
-              className="mb-1 flex items-center gap-2 font-figtree text-[11px] text-muted"
+              className="mb-1 flex items-center gap-2 font-figtree text-[12px] text-muted"
             >
-              <div className="flex h-[15px] w-[15px] shrink-0 items-center justify-center rounded-full border border-boom/40 bg-boom/15 text-[9px] text-boom">
+              <div className="flex h-[15px] w-[15px] shrink-0 items-center justify-center rounded-full border border-boom/40 bg-boom/15 text-[10px] text-boom">
                 ✓
               </div>
               {feature}

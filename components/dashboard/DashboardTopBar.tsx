@@ -87,7 +87,7 @@ function PortfolioStrengthStat({ value, delta }: { value: number; delta: number 
     >
       <button
         type="button"
-        className="mb-[3px] flex items-center gap-1 font-figtree text-[10px] uppercase tracking-[1.2px] text-muted"
+        className="mb-[3px] flex items-center gap-1 font-figtree text-[11px] uppercase tracking-[1.2px] text-muted"
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
         aria-label="Empire Rating info"
@@ -101,16 +101,16 @@ function PortfolioStrengthStat({ value, delta }: { value: number; delta: number 
         </div>
         {deltaLabel != null && (
           <div className="flex flex-col leading-none">
-            <span className="font-mono text-[11px] tabular-nums" style={{ color: deltaColor }}>
+            <span className="font-mono text-[12px] tabular-nums" style={{ color: deltaColor }}>
               {deltaLabel}
             </span>
-            <span className="font-mono text-[8px] text-muted">vs last sync</span>
+            <span className="font-mono text-[9px] text-muted">vs last sync</span>
           </div>
         )}
       </div>
-      <div className="font-mono text-[8px] text-muted/80">Dynasty asset score</div>
+      <div className="font-mono text-[9px] text-muted/80">Dynasty asset score</div>
       <div
-        className={`absolute left-2 top-[58px] z-50 w-[260px] rounded-[7px] border border-border bg-surface px-3 py-2.5 font-figtree text-[11px] leading-relaxed text-muted ${
+        className={`absolute left-2 top-[58px] z-50 w-[260px] rounded-[7px] border border-border bg-surface px-3 py-2.5 font-figtree text-[12px] leading-relaxed text-muted ${
           open ? 'block' : 'hidden md:group-hover:block'
         }`}
         role="tooltip"
@@ -141,14 +141,14 @@ function Stat({
   const color = accent ? 'text-boom' : hold ? 'text-hold' : 'text-text';
   return (
     <div className="flex min-w-[100px] shrink-0 flex-col justify-center border-r border-border px-3 py-1.5 last:border-r-0 md:px-[18px]">
-      <div className="mb-[3px] font-figtree text-[10px] uppercase tracking-[1.2px] text-muted">{label}</div>
+      <div className="mb-[3px] font-figtree text-[11px] uppercase tracking-[1.2px] text-muted">{label}</div>
       <div
         className={`font-mono text-[22px] font-semibold leading-none tracking-[-0.5px] ${color}`}
         style={accent ? GLOW : undefined}
       >
         {value}
       </div>
-      {sub ? <div className="mt-0.5 font-mono text-[8px] text-hold">{sub}</div> : null}
+      {sub ? <div className="mt-0.5 font-mono text-[9px] text-hold">{sub}</div> : null}
     </div>
   );
 }

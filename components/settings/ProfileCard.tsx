@@ -82,16 +82,16 @@ export default function ProfileCard({ data, onEdit }: Props) {
               <h2 className="text-[22px] font-bold text-white mb-1">{teamName}</h2>
             )}
 
-            <p className="text-[12px] font-mono text-slate-400 mb-1">@{data.username}</p>
+            <p className="text-[13px] font-mono text-slate-400 mb-1">@{data.username}</p>
 
             <span
-              className="inline-block px-2.5 py-0.5 rounded text-[10px] font-bold tracking-wider mb-1.5"
+              className="inline-block px-2.5 py-0.5 rounded text-[11px] font-bold tracking-wider mb-1.5"
               style={{ background: 'rgba(124,58,237,0.2)', color: '#A78BFA', border: '1px solid rgba(167,139,250,0.3)' }}
             >
               {data.dynastyTitle}
             </span>
 
-            <p className="text-[12px] text-slate-500">{data.memberSince}</p>
+            <p className="text-[13px] text-slate-500">{data.memberSince}</p>
 
             {editing ? (
               <textarea
@@ -99,11 +99,11 @@ export default function ProfileCard({ data, onEdit }: Props) {
                 onChange={(e) => setBio(e.target.value)}
                 rows={2}
                 placeholder="Tell your league who you are…"
-                className="mt-1.5 w-full max-w-xs text-[13px] text-slate-300 bg-white/[0.05] rounded-lg px-3 py-2 border border-white/10 outline-none resize-none"
+                className="mt-1.5 w-full max-w-xs text-[14px] text-slate-300 bg-white/[0.05] rounded-lg px-3 py-2 border border-white/10 outline-none resize-none"
               />
             ) : (
               bio ? (
-                <p className="text-[13px] text-slate-400 mt-1.5">{bio}</p>
+                <p className="text-[14px] text-slate-400 mt-1.5">{bio}</p>
               ) : null
             )}
           </div>
@@ -114,14 +114,14 @@ export default function ProfileCard({ data, onEdit }: Props) {
             <>
               <button
                 onClick={() => setEditing(false)}
-                className="px-3 py-1.5 rounded-lg text-[11px] text-slate-400 border border-white/10 hover:text-white transition-colors"
+                className="px-3 py-1.5 rounded-lg text-[12px] text-slate-400 border border-white/10 hover:text-white transition-colors"
               >
                 Cancel
               </button>
               <button
                 onClick={handleSave}
                 disabled={saving}
-                className="px-3 py-1.5 rounded-lg text-[11px] font-semibold transition-colors"
+                className="px-3 py-1.5 rounded-lg text-[12px] font-semibold transition-colors"
                 style={{ background: '#36E7A1', color: '#0a0d14' }}
               >
                 {saving ? 'Saving…' : 'Save'}
@@ -130,7 +130,7 @@ export default function ProfileCard({ data, onEdit }: Props) {
           ) : (
             <button
               onClick={() => { setEditing(true); onEdit(); }}
-              className="px-4 py-2 rounded-lg text-[12px] font-medium text-slate-300 hover:text-white transition-colors"
+              className="px-4 py-2 rounded-lg text-[13px] font-medium text-slate-300 hover:text-white transition-colors"
               style={{ border: '1px solid rgba(255,255,255,0.15)', background: 'rgba(255,255,255,0.04)' }}
             >
               Edit Profile
@@ -149,9 +149,9 @@ export default function ProfileCard({ data, onEdit }: Props) {
               {s.value}
             </p>
             {'sub' in s && s.sub && (
-              <p className="text-[10px] font-semibold" style={{ color: s.color }}>{s.sub}</p>
+              <p className="text-[11px] font-semibold" style={{ color: s.color }}>{s.sub}</p>
             )}
-            <p className="text-[10px] text-slate-500 uppercase tracking-wider mt-0.5">{s.label}</p>
+            <p className="text-[11px] text-slate-500 uppercase tracking-wider mt-0.5">{s.label}</p>
           </div>
         ))}
       </div>

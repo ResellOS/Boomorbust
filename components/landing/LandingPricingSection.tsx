@@ -14,7 +14,7 @@ const GLASS =
 
 function CheckItem({ children }: { children: ReactNode }) {
   return (
-    <li className="flex gap-2.5 text-[13px] leading-snug text-white/85" style={{ fontFamily: 'var(--font-body)' }}>
+    <li className="flex gap-2.5 text-[14px] leading-snug text-white/85" style={{ fontFamily: 'var(--font-body)' }}>
       <span className="shrink-0 font-semibold" style={{ color: BOOM }}>
         ✓
       </span>
@@ -33,7 +33,7 @@ function PriceLine({ amount, color, suffix = true }: { amount: string; color?: s
         ${amount}
       </span>
       {suffix ? (
-        <span className="ml-1 text-[13px] font-medium text-white/55" style={{ fontFamily: 'var(--font-body)' }}>
+        <span className="ml-1 text-[14px] font-medium text-white/55" style={{ fontFamily: 'var(--font-body)' }}>
           /mo
         </span>
       ) : null}
@@ -42,7 +42,7 @@ function PriceLine({ amount, color, suffix = true }: { amount: string; color?: s
 }
 
 const GHOST_CTA =
-  'mt-8 flex min-h-[44px] w-full items-center justify-center rounded-lg border border-white/[0.22] py-3 text-center text-[13px] font-semibold text-white transition-[filter,border-color,background-color] duration-200 hover:brightness-110 hover:border-white/35 hover:bg-white/[0.04] disabled:opacity-60';
+  'mt-8 flex min-h-[44px] w-full items-center justify-center rounded-lg border border-white/[0.22] py-3 text-center text-[14px] font-semibold text-white transition-[filter,border-color,background-color] duration-200 hover:brightness-110 hover:border-white/35 hover:bg-white/[0.04] disabled:opacity-60';
 
 export default function LandingPricingSection() {
   const [ref, inView] = useInViewOnce<HTMLDivElement>();
@@ -63,11 +63,11 @@ export default function LandingPricingSection() {
         >
           {/* Free */}
           <div className={`${GLASS} flex min-h-[360px] flex-col p-5 sm:p-6`}>
-            <p className="text-[15px] font-semibold text-white" style={{ fontFamily: 'var(--font-body)' }}>
+            <p className="text-[16px] font-semibold text-white" style={{ fontFamily: 'var(--font-body)' }}>
               Free
             </p>
             <PriceLine amount="0" suffix={false} />
-            <p className="mt-2 text-[13px] text-white/55" style={{ fontFamily: 'var(--font-body)' }}>
+            <p className="mt-2 text-[14px] text-white/55" style={{ fontFamily: 'var(--font-body)' }}>
               Basic features.
             </p>
             <ul className="mt-6 flex flex-1 flex-col gap-2.5">
@@ -85,11 +85,11 @@ export default function LandingPricingSection() {
 
           {/* Rookie */}
           <div className={`${GLASS} flex min-h-[360px] flex-col p-5 sm:p-6`}>
-            <p className="text-[15px] font-semibold text-white" style={{ fontFamily: 'var(--font-body)' }}>
+            <p className="text-[16px] font-semibold text-white" style={{ fontFamily: 'var(--font-body)' }}>
               Rookie
             </p>
             <PriceLine amount="5" color={BOOM} />
-            <p className="mt-2 text-[13px] text-white/55" style={{ fontFamily: 'var(--font-body)' }}>
+            <p className="mt-2 text-[14px] text-white/55" style={{ fontFamily: 'var(--font-body)' }}>
               Standard features.
             </p>
             <ul className="mt-6 flex flex-1 flex-col gap-2.5">
@@ -105,11 +105,11 @@ export default function LandingPricingSection() {
 
           {/* Veteran */}
           <div className={`${GLASS} flex min-h-[360px] flex-col p-5 sm:p-6`}>
-            <p className="text-[15px] font-semibold text-white" style={{ fontFamily: 'var(--font-body)' }}>
+            <p className="text-[16px] font-semibold text-white" style={{ fontFamily: 'var(--font-body)' }}>
               Veteran
             </p>
             <PriceLine amount="15" color={BOOM} />
-            <p className="mt-2 text-[13px] text-white/55" style={{ fontFamily: 'var(--font-body)' }}>
+            <p className="mt-2 text-[14px] text-white/55" style={{ fontFamily: 'var(--font-body)' }}>
               Advanced features + Trade Hub.
             </p>
             <ul className="mt-6 flex flex-1 flex-col gap-2.5">
@@ -120,7 +120,7 @@ export default function LandingPricingSection() {
             </ul>
             <PricingCheckoutButton
               plan="veteran"
-              className="mt-8 flex min-h-[44px] w-full items-center justify-center rounded-lg border py-3 text-center text-[13px] font-semibold transition-[filter,box-shadow,background-color] duration-200 hover:brightness-110 hover:bg-[#3ECFAD]/10 disabled:opacity-60"
+              className="mt-8 flex min-h-[44px] w-full items-center justify-center rounded-lg border py-3 text-center text-[14px] font-semibold transition-[filter,box-shadow,background-color] duration-200 hover:brightness-110 hover:bg-[#3ECFAD]/10 disabled:opacity-60"
               style={{
                 fontFamily: 'var(--font-body)',
                 borderColor: 'rgba(62, 207, 173, 0.55)',
@@ -155,11 +155,11 @@ export default function LandingPricingSection() {
             >
               MOST POPULAR
             </span>
-            <p className="text-[15px] font-semibold text-white" style={{ fontFamily: 'var(--font-body)' }}>
+            <p className="text-[16px] font-semibold text-white" style={{ fontFamily: 'var(--font-body)' }}>
               All-Pro Terminal
             </p>
             <PriceLine amount="35" color={PURPLE} />
-            <p className="mt-2 text-[13px] text-white/55" style={{ fontFamily: 'var(--font-body)' }}>
+            <p className="mt-2 text-[14px] text-white/55" style={{ fontFamily: 'var(--font-body)' }}>
               The full arsenal. Maximum edge.
             </p>
             <ul className="mt-6 flex flex-1 flex-col gap-2.5">
@@ -170,7 +170,7 @@ export default function LandingPricingSection() {
             </ul>
             <PricingCheckoutButton
               plan="allpro"
-              className="mt-8 flex min-h-[44px] w-full items-center justify-center rounded-lg py-3 text-center text-[13px] font-bold text-[#0a0d14] transition-[filter,box-shadow] duration-200 hover:brightness-110 disabled:opacity-60"
+              className="mt-8 flex min-h-[44px] w-full items-center justify-center rounded-lg py-3 text-center text-[14px] font-bold text-[#0a0d14] transition-[filter,box-shadow] duration-200 hover:brightness-110 disabled:opacity-60"
               style={{
                 fontFamily: 'var(--font-body)',
                 background: BOOM,

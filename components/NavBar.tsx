@@ -66,7 +66,7 @@ function TierBadge({ tier }: { tier: 'free' | 'pro' | 'elite' | 'all_pro_termina
   return (
     <span
       className={clsx(
-        'text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full border shrink-0 font-mono',
+        'text-[11px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full border shrink-0 font-mono',
         styles,
       )}
     >
@@ -108,7 +108,7 @@ interface NavBarProps {
 
 const navLinkClass = (active: boolean) =>
   clsx(
-    'font-mono text-[11px] uppercase tracking-[0.08em] transition-colors pb-1 border-b-2',
+    'font-mono text-[12px] uppercase tracking-[0.08em] transition-colors pb-1 border-b-2',
     active
       ? 'text-white border-[#22D3EE]'
       : 'text-[#94A3B8] hover:text-white border-transparent',
@@ -116,7 +116,7 @@ const navLinkClass = (active: boolean) =>
 
 const dropdownLinkClass = (active: boolean) =>
   clsx(
-    'block py-2 px-3 rounded-lg font-mono text-[11px] uppercase tracking-[0.08em] transition-colors',
+    'block py-2 px-3 rounded-lg font-mono text-[12px] uppercase tracking-[0.08em] transition-colors',
     active ? 'text-white bg-white/[0.06]' : 'text-[#94A3B8] hover:text-white hover:bg-white/[0.04]',
   );
 
@@ -246,7 +246,7 @@ export default function NavBar({ email, username, tier, empireTicker = null }: N
                   >
                     {MORE_SECTIONS.map((section) => (
                       <div key={section.title} className="mb-3 last:mb-0">
-                        <p className="px-3 pb-1.5 font-mono text-[9px] uppercase tracking-[0.14em] text-slate-500">
+                        <p className="px-3 pb-1.5 font-mono text-[10px] uppercase tracking-[0.14em] text-slate-500">
                           — {section.title} —
                         </p>
                         <div className="flex flex-col gap-0.5">
@@ -276,14 +276,14 @@ export default function NavBar({ email, username, tier, empireTicker = null }: N
           {/* Center: empire record ticker */}
           <div className="justify-self-center flex items-center justify-center min-w-0 max-w-[min(100%,200px)] sm:max-w-none px-1">
             {empireTicker && empireTicker.total > 0 ? (
-              <div className="rounded-full px-2 py-1 sm:px-3 sm:py-1.5 md:px-3.5 md:py-2 bg-[#36E7A1] font-mono text-[9px] sm:text-[10px] md:text-[11px] font-black uppercase tracking-[0.1em] md:tracking-[0.12em] shrink-0 border border-emerald-400/50 shadow-[0_0_24px_rgba(54,231,161,0.45)] tabular-nums">
+              <div className="rounded-full px-2 py-1 sm:px-3 sm:py-1.5 md:px-3.5 md:py-2 bg-[#36E7A1] font-mono text-[10px] sm:text-[11px] md:text-[12px] font-black uppercase tracking-[0.1em] md:tracking-[0.12em] shrink-0 border border-emerald-400/50 shadow-[0_0_24px_rgba(54,231,161,0.45)] tabular-nums">
                 <span className="text-black">{empireTicker.winning}</span>
                 <span className="text-black/60"> / </span>
                 <span className="text-black">{empireTicker.total}</span>
                 <span className="text-black/90 ml-1 sm:ml-1.5 hidden sm:inline">Winning</span>
               </div>
             ) : empireTicker ? (
-              <span className="text-[9px] font-mono font-black uppercase tracking-[0.18em] text-slate-500 whitespace-nowrap">
+              <span className="text-[10px] font-mono font-black uppercase tracking-[0.18em] text-slate-500 whitespace-nowrap">
                 Wk {empireTicker.week}
               </span>
             ) : null}
@@ -294,7 +294,7 @@ export default function NavBar({ email, username, tier, empireTicker = null }: N
             {isDashboardHome && (
               <Link
                 href="/auth/signup"
-                className="hidden sm:inline-flex items-center gap-1 rounded-md px-2.5 py-1.5 text-[11px] font-semibold text-white border border-[#1F2937] transition hover:brightness-110 shrink-0 font-mono uppercase tracking-[0.06em]"
+                className="hidden sm:inline-flex items-center gap-1 rounded-md px-2.5 py-1.5 text-[12px] font-semibold text-white border border-[#1F2937] transition hover:brightness-110 shrink-0 font-mono uppercase tracking-[0.06em]"
                 style={{
                   background: 'linear-gradient(135deg, #6366f1 0%, #2563eb 55%, #22d3ee 100%)',
                   boxShadow: '0 0 20px rgba(34,211,238,0.2)',
@@ -313,7 +313,7 @@ export default function NavBar({ email, username, tier, empireTicker = null }: N
               <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-gradient-to-br from-[var(--indigo)]/40 to-[var(--cyan)]/20 flex items-center justify-center text-white text-xs sm:text-sm font-bold border border-[#1F2937] font-mono">
                 {initial}
               </div>
-              <div className="hidden xl:flex items-baseline gap-1 min-w-0 max-w-[220px] text-[10px] font-mono text-slate-500">
+              <div className="hidden xl:flex items-baseline gap-1 min-w-0 max-w-[220px] text-[11px] font-mono text-slate-500">
                 <span className="text-slate-200 font-semibold truncate">{display}</span>
                 <span className="shrink-0">signed in</span>
               </div>
@@ -354,12 +354,12 @@ export default function NavBar({ email, username, tier, empireTicker = null }: N
             {MAIN_NAV.map((item) => (
               <div key={item.href}>
                 {item.mobilePillar ? (
-                  <p className="text-[9px] uppercase tracking-[0.14em] text-slate-500 mb-1.5">{item.mobilePillar}</p>
+                  <p className="text-[10px] uppercase tracking-[0.14em] text-slate-500 mb-1.5">{item.mobilePillar}</p>
                 ) : null}
                 <Link
                   href={item.href}
                   className={clsx(
-                    'block text-[11px] uppercase tracking-[0.08em] py-2 border-b-2 transition-colors',
+                    'block text-[12px] uppercase tracking-[0.08em] py-2 border-b-2 transition-colors',
                     isMainNavActive(pathname, item.href)
                       ? 'text-white border-[#22D3EE]'
                       : 'text-[#94A3B8] border-transparent hover:text-white',
@@ -372,7 +372,7 @@ export default function NavBar({ email, username, tier, empireTicker = null }: N
             ))}
 
             <div>
-              <p className="text-[9px] uppercase tracking-[0.14em] text-slate-500 mb-1.5">MORE</p>
+              <p className="text-[10px] uppercase tracking-[0.14em] text-slate-500 mb-1.5">MORE</p>
               <div
                 className="glass-panel rounded-xl p-3 space-y-4"
                 style={{
@@ -383,7 +383,7 @@ export default function NavBar({ email, username, tier, empireTicker = null }: N
               >
                 {MORE_SECTIONS.map((section) => (
                   <div key={section.title}>
-                    <p className="text-[9px] uppercase tracking-[0.14em] text-slate-500 mb-2">— {section.title} —</p>
+                    <p className="text-[10px] uppercase tracking-[0.14em] text-slate-500 mb-2">— {section.title} —</p>
                     <div className="flex flex-col gap-1">
                       {section.links.map((l) => (
                         <Link
@@ -407,7 +407,7 @@ export default function NavBar({ email, username, tier, empireTicker = null }: N
                 setOpen(false);
                 void handleSignOut();
               }}
-              className="text-left text-[11px] uppercase tracking-[0.08em] text-[#94A3B8] hover:text-white pt-2 border-t border-white/[0.06]"
+              className="text-left text-[12px] uppercase tracking-[0.08em] text-[#94A3B8] hover:text-white pt-2 border-t border-white/[0.06]"
             >
               Sign out
             </button>
@@ -438,7 +438,7 @@ export default function NavBar({ email, username, tier, empireTicker = null }: N
               }}
             >
               <Icon className="w-5 h-5 shrink-0" strokeWidth={active ? 2.5 : 2} />
-              <span className="text-[9px] font-mono uppercase tracking-[0.06em] truncate w-full text-center">
+              <span className="text-[10px] font-mono uppercase tracking-[0.06em] truncate w-full text-center">
                 {meta.label}
               </span>
             </Link>
@@ -454,7 +454,7 @@ export default function NavBar({ email, username, tier, empireTicker = null }: N
           aria-label={open ? 'Close full menu' : 'Open full menu'}
         >
           <Menu className="w-5 h-5" />
-          <span className="text-[9px] font-mono uppercase tracking-[0.06em]">More</span>
+          <span className="text-[10px] font-mono uppercase tracking-[0.06em]">More</span>
         </button>
       </nav>
     </>

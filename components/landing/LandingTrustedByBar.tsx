@@ -32,7 +32,7 @@ function LogoTile({ label, sub, icon }: { label: string; sub?: string; icon?: 's
     >
       {icon === 'sleeper' ? <SleeperGlyph /> : null}
       <span
-        className="text-center text-[12px] font-semibold uppercase tracking-[0.12em] text-white/55 sm:text-[13px]"
+        className="text-center text-[13px] font-semibold uppercase tracking-[0.12em] text-white/55 sm:text-[14px]"
         style={{ fontFamily: 'var(--font-body)' }}
       >
         {icon === 'sleeper' ? (
@@ -57,7 +57,7 @@ export default function LandingTrustedByBar() {
         >
           Loved by Players
         </h2>
-        <p className="mx-auto mt-2 max-w-[520px] text-center text-[13px] text-[#64748B] sm:text-[14px]" style={{ fontFamily: 'var(--font-body)' }}>
+        <p className="mx-auto mt-2 max-w-[520px] text-center text-[14px] text-[#64748B] sm:text-[15px]" style={{ fontFamily: 'var(--font-body)' }}>
           Built for managers who run multiple dynasty leagues on Sleeper and want one command surface.
         </p>
 

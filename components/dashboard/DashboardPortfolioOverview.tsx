@@ -18,7 +18,7 @@ export default function DashboardPortfolioOverview({
 
   return (
     <section className="rounded-[10px] border border-[#1e2640] bg-[#0f1420] px-4 py-4 md:px-5">
-      <h3 className="font-figtree text-[10px] uppercase tracking-[1.8px] text-[#e8ecf4]">{title}</h3>
+      <h3 className="font-figtree text-[11px] uppercase tracking-[1.8px] text-[#e8ecf4]">{title}</h3>
 
       <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
         <Stat label="Total Players" value={String(data.totalPlayers)} />
@@ -39,7 +39,7 @@ export default function DashboardPortfolioOverview({
         </div>
         <div className="grid flex-1 grid-cols-2 gap-x-4 gap-y-1 sm:grid-cols-4">
           {data.positionDepth.map((seg) => (
-            <div key={seg.position} className="flex items-center gap-2 font-mono text-[9px]">
+            <div key={seg.position} className="flex items-center gap-2 font-mono text-[10px]">
               <span className="h-2 w-2 rounded-full" style={{ background: seg.color }} />
               <span className="text-[#6b7a99]">{seg.position}</span>
               <span className="tabular-nums text-[#e8ecf4]">{seg.pct}%</span>
@@ -66,9 +66,9 @@ function Stat({
 }) {
   return (
     <div className="rounded-md border border-[#1e2640]/50 bg-[#141929]/50 px-2.5 py-2">
-      <div className="font-mono text-[7px] uppercase tracking-wide text-[#6b7a99]">{label}</div>
+      <div className="font-mono text-[8px] uppercase tracking-wide text-[#6b7a99]">{label}</div>
       <div
-        className={`mt-0.5 font-mono text-[11px] tabular-nums leading-snug ${muted ? 'text-[#6b7a99]' : accent ? 'text-boom' : 'text-[#e8ecf4]'}`}
+        className={`mt-0.5 font-mono text-[12px] tabular-nums leading-snug ${muted ? 'text-[#6b7a99]' : accent ? 'text-boom' : 'text-[#e8ecf4]'}`}
         style={color ? { color } : undefined}
       >
         {value}

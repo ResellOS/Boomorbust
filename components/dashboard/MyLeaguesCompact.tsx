@@ -53,7 +53,7 @@ export default function MyLeaguesCompact({
             <div className="font-mono text-[18px] font-black tabular-nums text-[#22D3EE]">
               {portfolioHealth.total}
             </div>
-            <div className="mt-0.5 text-[8px] font-mono uppercase tracking-[0.1em] text-[#64748B]">
+            <div className="mt-0.5 text-[9px] font-mono uppercase tracking-[0.1em] text-[#64748B]">
               Leagues
             </div>
           </div>
@@ -61,7 +61,7 @@ export default function MyLeaguesCompact({
             <div className="font-mono text-[18px] font-black tabular-nums text-[#36E7A1]">
               {portfolioHealth.winning}
             </div>
-            <div className="mt-0.5 text-[8px] font-mono uppercase tracking-[0.1em] text-[#64748B]">
+            <div className="mt-0.5 text-[9px] font-mono uppercase tracking-[0.1em] text-[#64748B]">
               Winning
             </div>
           </div>
@@ -69,31 +69,31 @@ export default function MyLeaguesCompact({
             <div className="font-mono text-[18px] font-black tabular-nums text-[#EF4444]">
               {portfolioHealth.atRisk}
             </div>
-            <div className="mt-0.5 text-[8px] font-mono uppercase tracking-[0.1em] text-[#64748B]">
+            <div className="mt-0.5 text-[9px] font-mono uppercase tracking-[0.1em] text-[#64748B]">
               At Risk
             </div>
           </div>
         </div>
       )}
       <div className="flex items-center justify-between mb-3">
-        <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-300 flex items-center gap-2">
+        <h3 className="text-[11px] font-black uppercase tracking-[0.3em] text-slate-300 flex items-center gap-2">
           <Trophy className="w-3 h-3 text-[#FBBF24]" />
           My Leagues
-          <span className="text-[10px] font-mono text-slate-600">({count})</span>
+          <span className="text-[11px] font-mono text-slate-600">({count})</span>
         </h3>
         <div className="flex items-center gap-2">
           {onSelect && selectedId && (
             <button
               type="button"
               onClick={() => onSelect(null)}
-              className="text-[9px] font-bold text-slate-500 hover:text-white transition-colors"
+              className="text-[10px] font-bold text-slate-500 hover:text-white transition-colors"
             >
               Empire ✕
             </button>
           )}
           <Link
             href="/dashboard/mission-control"
-            className="text-[10px] font-bold text-[#22D3EE] hover:text-white transition-colors"
+            className="text-[11px] font-bold text-[#22D3EE] hover:text-white transition-colors"
           >
             View All →
           </Link>
@@ -124,14 +124,14 @@ export default function MyLeaguesCompact({
               </span>
               <div className="flex-1 min-w-0">
                 <div
-                  className={`text-[11px] font-semibold truncate transition-colors ${
+                  className={`text-[12px] font-semibold truncate transition-colors ${
                     active ? 'text-[#36E7A1]' : 'text-white group-hover:text-[#36E7A1]'
                   }`}
                 >
                   {lg.name}
                 </div>
                 {lg.meta && (
-                  <div className="text-[9px] text-slate-600 font-mono">
+                  <div className="text-[10px] text-slate-600 font-mono">
                     {lg.meta}
                   </div>
                 )}

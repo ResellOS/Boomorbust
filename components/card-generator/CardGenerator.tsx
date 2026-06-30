@@ -216,7 +216,7 @@ export default function CardGenerator() {
           <div className="glass-panel rounded-xl p-6 space-y-6 border border-white/[0.08]">
             {/* Player search */}
             <div ref={searchRef} className="relative">
-              <label className="block text-[10px] font-mono font-bold uppercase tracking-[0.14em] text-slate-400 mb-2">
+              <label className="block text-[11px] font-mono font-bold uppercase tracking-[0.14em] text-slate-400 mb-2">
                 Player
               </label>
               <div className="relative">
@@ -243,7 +243,7 @@ export default function CardGenerator() {
                       className="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-white/[0.05] text-left transition-colors"
                     >
                       <span
-                        className="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded"
+                        className="text-[11px] font-mono font-bold px-1.5 py-0.5 rounded"
                         style={{
                           color: posColors[p.position] ?? '#94A3B8',
                           background: `${posColors[p.position] ?? '#94A3B8'}18`,
@@ -261,7 +261,7 @@ export default function CardGenerator() {
 
             {/* Year */}
             <div>
-              <label className="block text-[10px] font-mono font-bold uppercase tracking-[0.14em] text-slate-400 mb-2">
+              <label className="block text-[11px] font-mono font-bold uppercase tracking-[0.14em] text-slate-400 mb-2">
                 Year
               </label>
               <div className="flex gap-2">
@@ -285,7 +285,7 @@ export default function CardGenerator() {
 
             {/* Scoring format */}
             <div>
-              <label className="block text-[10px] font-mono font-bold uppercase tracking-[0.14em] text-slate-400 mb-2">
+              <label className="block text-[11px] font-mono font-bold uppercase tracking-[0.14em] text-slate-400 mb-2">
                 Scoring Format
               </label>
               <div className="grid grid-cols-2 gap-2">

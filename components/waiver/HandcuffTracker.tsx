@@ -21,7 +21,7 @@ function ScoreBadge({ score }: { score: number }) {
   const color = score >= 70 ? '#EF4444' : score >= 50 ? '#FBBF24' : '#64748B';
   return (
     <span
-      className="text-[13px] font-bold tabular-nums"
+      className="text-[14px] font-bold tabular-nums"
       style={{ fontFamily: 'JetBrains Mono, monospace', color }}
     >
       {score}
@@ -44,23 +44,23 @@ function HandcuffRow({ item }: { item: HandcuffAnalysis }) {
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1">
             <span
-              className="text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider"
+              className="text-[11px] font-bold px-2 py-0.5 rounded uppercase tracking-wider"
               style={{ background: bg, color, border: `1px solid ${color}22` }}
             >
               {item.recommendation}
             </span>
             <span
-              className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider"
+              className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider"
             >
               {item.starter.team}
             </span>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-[14px] font-bold text-white truncate">
+            <span className="text-[15px] font-bold text-white truncate">
               {item.starter.full_name}
             </span>
-            <span className="text-[11px] text-slate-500">→</span>
-            <span className="text-[13px] font-semibold text-slate-300 truncate">
+            <span className="text-[12px] text-slate-500">→</span>
+            <span className="text-[14px] font-semibold text-slate-300 truncate">
               {item.handcuff?.full_name ?? 'No backup found'}
             </span>
           </div>
@@ -69,13 +69,13 @@ function HandcuffRow({ item }: { item: HandcuffAnalysis }) {
         {/* Scores */}
         <div className="flex flex-col items-end gap-1 shrink-0">
           <div className="flex items-center gap-1.5">
-            <span className="text-[9px] text-slate-500 uppercase tracking-widest">HC</span>
+            <span className="text-[10px] text-slate-500 uppercase tracking-widest">HC</span>
             <ScoreBadge score={item.handcuff_score} />
           </div>
           {item.handcuff && (
             <div className="flex items-center gap-1.5">
-              <span className="text-[9px] text-slate-500 uppercase tracking-widest">Rating</span>
-              <span className="text-[11px] text-slate-400 tabular-nums" style={{ fontFamily: 'JetBrains Mono, monospace' }}>
+              <span className="text-[10px] text-slate-500 uppercase tracking-widest">Rating</span>
+              <span className="text-[12px] text-slate-400 tabular-nums" style={{ fontFamily: 'JetBrains Mono, monospace' }}>
                 {Math.round(item.handcuff.tfo_score)}
               </span>
             </div>
@@ -90,7 +90,7 @@ function HandcuffRow({ item }: { item: HandcuffAnalysis }) {
           style={{ background: 'rgba(54,231,161,0.08)', border: '1px solid rgba(54,231,161,0.2)' }}
         >
           <span style={{ color: '#36E7A1', fontSize: 12 }}>✓</span>
-          <span className="text-[12px] font-semibold" style={{ color: '#36E7A1' }}>
+          <span className="text-[13px] font-semibold" style={{ color: '#36E7A1' }}>
             You own {item.handcuff?.full_name ?? 'the handcuff'}
           </span>
         </div>
@@ -100,14 +100,14 @@ function HandcuffRow({ item }: { item: HandcuffAnalysis }) {
           style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)' }}
         >
           <span style={{ color: '#EF4444', fontSize: 12 }}>!</span>
-          <span className="text-[12px] font-semibold" style={{ color: '#EF4444' }}>
+          <span className="text-[13px] font-semibold" style={{ color: '#EF4444' }}>
             {item.handcuff.full_name} available — not on your roster
           </span>
         </div>
       ) : null}
 
       {/* Reasoning */}
-      <p className="text-[12px] text-slate-400 leading-relaxed" style={{ fontFamily: 'JetBrains Mono, monospace' }}>
+      <p className="text-[13px] text-slate-400 leading-relaxed" style={{ fontFamily: 'JetBrains Mono, monospace' }}>
         {item.reasoning}
       </p>
     </div>
@@ -150,7 +150,7 @@ export default function HandcuffTracker({ leagueId }: { leagueId?: string | null
         className="rounded-xl px-4 py-6 text-center"
         style={{ background: 'rgba(239,68,68,0.06)', border: '1px solid rgba(239,68,68,0.15)' }}
       >
-        <p className="text-[13px] text-red-400">{error}</p>
+        <p className="text-[14px] text-red-400">{error}</p>
       </div>
     );
   }
@@ -161,8 +161,8 @@ export default function HandcuffTracker({ leagueId }: { leagueId?: string | null
         className="rounded-xl px-4 py-10 text-center"
         style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.07)' }}
       >
-        <p className="text-[13px] text-slate-500">No elite RBs (rating &gt; 70) found on your roster.</p>
-        <p className="text-[12px] text-slate-600 mt-1">Sync your leagues and seed players first.</p>
+        <p className="text-[14px] text-slate-500">No elite RBs (rating &gt; 70) found on your roster.</p>
+        <p className="text-[13px] text-slate-600 mt-1">Sync your leagues and seed players first.</p>
       </div>
     );
   }
@@ -175,12 +175,12 @@ export default function HandcuffTracker({ leagueId }: { leagueId?: string | null
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-[15px] font-bold text-white tracking-wide">HANDCUFF TRACKER</h2>
-          <p className="text-[12px] text-slate-500 mt-0.5">
+          <h2 className="text-[16px] font-bold text-white tracking-wide">HANDCUFF TRACKER</h2>
+          <p className="text-[13px] text-slate-500 mt-0.5">
             Your elite RBs and whether you own their insurance policy.
           </p>
         </div>
-        <div className="flex items-center gap-3 text-[11px] text-slate-500">
+        <div className="flex items-center gap-3 text-[12px] text-slate-500">
           <span>{unowned.length} unowned</span>
           <span className="text-slate-700">·</span>
           <span style={{ color: '#36E7A1' }}>{owned.length} covered</span>
@@ -190,7 +190,7 @@ export default function HandcuffTracker({ leagueId }: { leagueId?: string | null
       {/* Unowned handcuffs first */}
       {unowned.length > 0 && (
         <div className="space-y-3">
-          <p className="text-[11px] font-semibold text-red-400 uppercase tracking-wider">ACTION NEEDED</p>
+          <p className="text-[12px] font-semibold text-red-400 uppercase tracking-wider">ACTION NEEDED</p>
           {unowned.map((item) => (
             <HandcuffRow key={item.starter.player_id} item={item} />
           ))}
@@ -200,7 +200,7 @@ export default function HandcuffTracker({ leagueId }: { leagueId?: string | null
       {/* Owned handcuffs */}
       {owned.length > 0 && (
         <div className="space-y-3">
-          <p className="text-[11px] font-semibold uppercase tracking-wider" style={{ color: '#36E7A1' }}>
+          <p className="text-[12px] font-semibold uppercase tracking-wider" style={{ color: '#36E7A1' }}>
             COVERED
           </p>
           {owned.map((item) => (

@@ -87,8 +87,8 @@ export default function ExposureTracker({
               <PlayerAvatar playerId={r.player_id} playerName={r.name} position={r.position} size={28} />
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-1.5 mb-1">
-                  <span className="text-[11px] font-semibold text-white truncate">{r.name}</span>
-                  <span className="text-[8px] font-bold uppercase px-1 py-px rounded border border-white/12 text-[#94A3B8] shrink-0">
+                  <span className="text-[12px] font-semibold text-white truncate">{r.name}</span>
+                  <span className="text-[9px] font-bold uppercase px-1 py-px rounded border border-white/12 text-[#94A3B8] shrink-0">
                     {r.position}
                   </span>
                 </div>

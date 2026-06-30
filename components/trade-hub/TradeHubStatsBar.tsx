@@ -37,7 +37,7 @@ function StatCard({
         {value}
       </span>
       <span
-        className="mt-2 text-[12px] text-[#64748B]"
+        className="mt-2 text-[13px] text-[#64748B]"
         style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}
       >
         {label}

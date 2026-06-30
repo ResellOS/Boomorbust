@@ -34,7 +34,7 @@ export default function AdSlot({ placement, showAds, className = '' }: AdSlotPro
 
   return (
     <div className={`overflow-hidden rounded-[7px] border border-border/60 bg-surface2/40 p-2 ${className}`}>
-      <div className="mb-1.5 text-center font-mono text-[7px] uppercase tracking-[2px] text-muted/50">
+      <div className="mb-1.5 text-center font-mono text-[8px] uppercase tracking-[2px] text-muted/50">
         Sponsored
       </div>
       <ins

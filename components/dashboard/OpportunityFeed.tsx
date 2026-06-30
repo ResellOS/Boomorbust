@@ -35,14 +35,14 @@ export default function OpportunityFeed({
   return (
     <section className="flex flex-col overflow-hidden rounded-[10px] border border-[#1e2640] bg-[#0f1420]">
       <div className="border-b border-[#1e2640]/80 px-3.5 py-2.5">
-        <h3 className="font-figtree text-[10px] uppercase tracking-[1.5px] text-[#e8ecf4]">
+        <h3 className="font-figtree text-[11px] uppercase tracking-[1.5px] text-[#e8ecf4]">
           Opportunity Feed
         </h3>
-        <p className="font-mono text-[8px] text-[#8b9bb8]">Actionable intelligence · tap any item</p>
+        <p className="font-mono text-[9px] text-[#8b9bb8]">Actionable intelligence · tap any item</p>
       </div>
       <div className="divide-y divide-[#1e2640]/50">
         {items.length === 0 ? (
-          <p className="px-4 py-5 font-figtree text-[11px] text-[#8b9bb8]">
+          <p className="px-4 py-5 font-figtree text-[12px] text-[#8b9bb8]">
             Feed populates as BOB logs trade edges, value shifts, and lineup calls.
           </p>
         ) : (
@@ -62,7 +62,7 @@ function FeedRow({ item }: { item: OpportunityFeedItem }) {
       className={`dash-clickable-row flex gap-2.5 px-3.5 py-2.5 ${glowClass}`}
     >
       <div
-        className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded font-mono text-[10px] font-semibold"
+        className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded font-mono text-[11px] font-semibold"
         style={{ color: item.color, background: `${item.color}18`, border: `1px solid ${item.color}30` }}
       >
         {CATEGORY_ICONS[item.category]}
@@ -70,26 +70,26 @@ function FeedRow({ item }: { item: OpportunityFeedItem }) {
       <div className="min-w-0 flex-1">
         <div className="flex items-center justify-between gap-2">
           <span
-            className="rounded px-1.5 py-0.5 font-mono text-[7px] font-semibold uppercase tracking-wide"
+            className="rounded px-1.5 py-0.5 font-mono text-[8px] font-semibold uppercase tracking-wide"
             style={{ color: item.color, background: `${item.color}14` }}
           >
             {item.category}
           </span>
-          <span className="font-mono text-[8px] tabular-nums text-[#8b9bb8]">
+          <span className="font-mono text-[9px] tabular-nums text-[#8b9bb8]">
             {formatFeedTimeAgo(item.minutesAgo)}
           </span>
         </div>
-        <p className="mt-1 font-figtree text-[12px] font-semibold leading-snug text-[#e8ecf4]">
+        <p className="mt-1 font-figtree text-[13px] font-semibold leading-snug text-[#e8ecf4]">
           {item.headline}
         </p>
-        <p className="mt-0.5 font-figtree text-[11px] leading-snug text-[#b8c4dc]">
+        <p className="mt-0.5 font-figtree text-[12px] leading-snug text-[#b8c4dc]">
           {item.explanation}
         </p>
         {item.actionHint ? (
-          <p className="mt-1 font-mono text-[9px] font-medium text-boom">{item.actionHint}</p>
+          <p className="mt-1 font-mono text-[10px] font-medium text-boom">{item.actionHint}</p>
         ) : null}
         {(item.metricValue || item.secondaryValue) && (
-          <div className="mt-1 flex flex-wrap gap-x-3 font-mono text-[8px] tabular-nums text-[#9aa8c4]">
+          <div className="mt-1 flex flex-wrap gap-x-3 font-mono text-[9px] tabular-nums text-[#9aa8c4]">
             {item.metricLabel ? (
               <span>
                 {item.metricLabel}: <span className="text-[#e8ecf4]">{item.metricValue ?? '—'}</span>
@@ -103,7 +103,7 @@ function FeedRow({ item }: { item: OpportunityFeedItem }) {
           </div>
         )}
         {item.href ? (
-          <span className="mt-1.5 inline-flex items-center gap-0.5 font-mono text-[8px] text-boom">
+          <span className="mt-1.5 inline-flex items-center gap-0.5 font-mono text-[9px] text-boom">
             Open <ChevronRight className="h-3 w-3" />
           </span>
         ) : null}

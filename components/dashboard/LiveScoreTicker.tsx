@@ -60,7 +60,7 @@ export default function LiveScoreTicker({ inSeason }: { inSeason: boolean }) {
         style={{ animation: `${animName} ${Math.max(30, events.length * 8)}s linear infinite` }}
       >
         {doubled.map((ev, i) => (
-          <span key={`${ev.id}-${i}`} className="mx-6 inline-flex items-center gap-2 font-mono text-[10px]">
+          <span key={`${ev.id}-${i}`} className="mx-6 inline-flex items-center gap-2 font-mono text-[11px]">
             {ev.isLive && (
               <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-boom" />
             )}

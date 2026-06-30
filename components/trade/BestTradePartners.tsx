@@ -58,7 +58,7 @@ function PartnerCard({
 
         <div className="mt-1.5 h-2 w-32 rounded bg-[#1e2640]/40" />
 
-        <p className="mt-2 font-figtree text-[10px] text-[#6b7a99]">Building manager profile…</p>
+        <p className="mt-2 font-figtree text-[11px] text-[#6b7a99]">Building manager profile…</p>
 
       </div>
 
@@ -84,9 +84,9 @@ function PartnerCard({
 
         <div className="min-w-0">
 
-          <div className="font-figtree text-[12px] font-semibold text-[#e8ecf4]">{m.displayName}</div>
+          <div className="font-figtree text-[13px] font-semibold text-[#e8ecf4]">{m.displayName}</div>
 
-          <div className="font-mono text-[8px] text-[#8b9bb8]">
+          <div className="font-mono text-[9px] text-[#8b9bb8]">
 
             {m.leagueName} · {displayArchetypeLabel(m.profile)}
 
@@ -96,9 +96,9 @@ function PartnerCard({
 
         <div className="shrink-0 text-right">
 
-          <div className="font-mono text-[13px] font-semibold tabular-nums text-boom">{m.tradeLikelihood}%</div>
+          <div className="font-mono text-[14px] font-semibold tabular-nums text-boom">{m.tradeLikelihood}%</div>
 
-          <div className="font-mono text-[6px] uppercase text-[#6b7a99]">Likelihood</div>
+          <div className="font-mono text-[7px] uppercase text-[#6b7a99]">Likelihood</div>
 
         </div>
 
@@ -106,7 +106,7 @@ function PartnerCard({
 
 
 
-      <div className="mt-1.5 grid grid-cols-2 gap-x-2 gap-y-0.5 font-mono text-[8px]">
+      <div className="mt-1.5 grid grid-cols-2 gap-x-2 gap-y-0.5 font-mono text-[9px]">
 
         <div>
 
@@ -138,9 +138,9 @@ function PartnerCard({
 
       <div className="mt-1.5 rounded border border-[#1e2640]/50 bg-[#141929]/40 px-2 py-1">
 
-        <div className="font-mono text-[7px] uppercase text-[#6b7a99]">Suggested Opener</div>
+        <div className="font-mono text-[8px] uppercase text-[#6b7a99]">Suggested Opener</div>
 
-        <div className="font-figtree text-[9px] text-[#e8ecf4]">{recommendedOpeningOffer(m)}</div>
+        <div className="font-figtree text-[10px] text-[#e8ecf4]">{recommendedOpeningOffer(m)}</div>
 
       </div>
 
@@ -148,7 +148,7 @@ function PartnerCard({
 
       <div className="mt-1.5 grid grid-cols-1 gap-0.5">
 
-        <div className="font-mono text-[7px]">
+        <div className="font-mono text-[8px]">
 
           <span className="text-[#6b7a99]">Behavior: </span>
 
@@ -156,7 +156,7 @@ function PartnerCard({
 
         </div>
 
-        <div className="font-mono text-[7px]">
+        <div className="font-mono text-[8px]">
 
           <span className="text-[#6b7a99]">Best Approach: </span>
 
@@ -174,7 +174,7 @@ function PartnerCard({
 
         onClick={(e) => e.stopPropagation()}
 
-        className="mt-1 inline-flex items-center gap-0.5 font-mono text-[8px] text-boom no-underline"
+        className="mt-1 inline-flex items-center gap-0.5 font-mono text-[9px] text-boom no-underline"
 
       >
 
@@ -224,13 +224,13 @@ export default function BestTradePartners({
 
       <div className="shrink-0 border-b border-[#1e2640]/80 px-3 py-2">
 
-        <h3 className="font-figtree text-[10px] uppercase tracking-[1.5px] text-[#e8ecf4]">
+        <h3 className="font-figtree text-[11px] uppercase tracking-[1.5px] text-[#e8ecf4]">
 
           Best Trade Partners
 
         </h3>
 
-        <p className="font-mono text-[8px] text-[#6b7a99]">Who to deal with + how to open</p>
+        <p className="font-mono text-[9px] text-[#6b7a99]">Who to deal with + how to open</p>
 
       </div>
 

@@ -136,7 +136,7 @@ export default function ScoutingTerminalPage() {
             <h1 className="text-[28px] font-bold text-white leading-tight" style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}>
               Scouting Terminal
             </h1>
-            <p className="text-[14px] text-[#64748B] mt-1" style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}>
+            <p className="text-[15px] text-[#64748B] mt-1" style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}>
               Find edges. Before they&apos;re obvious.
             </p>
           </div>

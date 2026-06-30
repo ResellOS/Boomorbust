@@ -145,7 +145,7 @@ export default function PlayerCard({
             />
           ) : (
             <div
-              className="flex h-full w-full items-center justify-center font-figtree text-[15px] font-bold"
+              className="flex h-full w-full items-center justify-center font-figtree text-[16px] font-bold"
               style={{ color: themeColor, background: '#141929' }}
             >
               {initials(playerName)}
@@ -153,10 +153,10 @@ export default function PlayerCard({
           )}
         </div>
         <div className="flex min-w-0 flex-1 flex-col justify-center pl-2.5">
-          <div className="mb-1 font-figtree text-[13px] font-bold leading-tight text-text">
+          <div className="mb-1 font-figtree text-[14px] font-bold leading-tight text-text">
             {playerName}
           </div>
-          <div className="mb-2 font-mono text-[12px] text-muted">
+          <div className="mb-2 font-mono text-[13px] text-muted">
             {position} · {team}
           </div>
           <div
@@ -165,21 +165,21 @@ export default function PlayerCard({
           >
             {tfoScore.toFixed(1)}
           </div>
-          <div className="mt-1.5 font-mono text-[10px] text-muted">{displayTier}</div>
+          <div className="mt-1.5 font-mono text-[11px] text-muted">{displayTier}</div>
         </div>
       </div>
       {marketVerdict === undefined ? (
         // Surface doesn't supply a market verdict (landing / league cards):
         // show the descriptive performance grade, not an action signal.
         <div
-          className="mx-3 mb-2.5 rounded-[5px] border border-border bg-white/[0.03] py-2 text-center font-figtree text-[11px] font-semibold tracking-wide text-text"
+          className="mx-3 mb-2.5 rounded-[5px] border border-border bg-white/[0.03] py-2 text-center font-figtree text-[12px] font-semibold tracking-wide text-text"
           title="Performance grade — descriptive quality"
         >
           {getGradeLabel(tfoScore)}
         </div>
       ) : marketVerdict && !marketVerdict.noMarketData ? (
         <div
-          className="mx-3 mb-2.5 cursor-help rounded-[5px] py-2 text-center font-figtree text-[11px] font-semibold tracking-wide"
+          className="mx-3 mb-2.5 cursor-help rounded-[5px] py-2 text-center font-figtree text-[12px] font-semibold tracking-wide"
           style={{
             color: marketVerdict.color,
             background: `${marketVerdict.color}1f`,
@@ -191,10 +191,10 @@ export default function PlayerCard({
         </div>
       ) : (
         <div
-          className="mx-3 mb-2.5 flex cursor-help items-center justify-center gap-1.5 rounded-[5px] border border-border py-2 text-center font-figtree text-[11px] font-semibold tracking-wide text-muted"
+          className="mx-3 mb-2.5 flex cursor-help items-center justify-center gap-1.5 rounded-[5px] border border-border py-2 text-center font-figtree text-[12px] font-semibold tracking-wide text-muted"
           title="No market data — held by default"
         >
-          Hold <span className="font-mono text-[9px] text-muted/60">N/A</span>
+          Hold <span className="font-mono text-[10px] text-muted/60">N/A</span>
         </div>
       )}
       <div className="flex flex-1 items-center justify-center px-1 pb-3 pt-1">

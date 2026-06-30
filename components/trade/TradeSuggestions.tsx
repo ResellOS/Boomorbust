@@ -19,7 +19,7 @@ function WhyBullets({ reasons, mobileOpen }: { reasons: string[]; mobileOpen: bo
       {reasons.map((reason) => (
         <li
           key={reason}
-          className="flex items-start gap-1.5 font-mono text-[8.5px] leading-snug text-muted"
+          className="flex items-start gap-1.5 font-mono text-[9.5px] leading-snug text-muted"
         >
           <span className="mt-[3px] h-1 w-1 shrink-0 rounded-full bg-muted/60" aria-hidden />
           {reason}
@@ -64,7 +64,7 @@ function SuggestionRow({
       </div>
       <div className="min-w-0 flex-1">
         <div className="flex items-start justify-between gap-2">
-          <div className="font-figtree text-[11px] text-text">
+          <div className="font-figtree text-[12px] text-text">
             {s.type === 'buy' ? (
               <>
                 <span className="font-semibold" style={{ color: s.verdictColor }}>
@@ -72,7 +72,7 @@ function SuggestionRow({
                 </span>{' '}
                 low on {s.playerName}
                 {s.managerName ? (
-                  <span className="ml-1 font-mono text-[8.5px] text-muted">via {s.managerName}</span>
+                  <span className="ml-1 font-mono text-[9.5px] text-muted">via {s.managerName}</span>
                 ) : null}
               </>
             ) : (
@@ -84,14 +84,14 @@ function SuggestionRow({
               </>
             )}
             <span
-              className="ml-1.5 rounded-[3px] px-1 py-px font-mono text-[7px] font-bold"
+              className="ml-1.5 rounded-[3px] px-1 py-px font-mono text-[8px] font-bold"
               style={{ color: s.verdictColor, background: `${s.verdictColor}1f` }}
             >
               {formatMarketVerdictLabel(s.verdict)}
             </span>
           </div>
           <div
-            className="shrink-0 text-right font-figtree text-[15px] font-bold"
+            className="shrink-0 text-right font-figtree text-[16px] font-bold"
             title="Engine vs market rank delta (scaled)"
             style={{ color: s.verdictColor }}
           >
@@ -107,7 +107,7 @@ function SuggestionRow({
                 e.stopPropagation();
                 setWhyOpen((v) => !v);
               }}
-              className="mt-1 font-mono text-[8px] text-muted underline-offset-2 hover:text-text hover:underline md:hidden"
+              className="mt-1 font-mono text-[9px] text-muted underline-offset-2 hover:text-text hover:underline md:hidden"
             >
               {whyOpen ? 'Hide why' : 'Why?'}
             </button>
@@ -123,13 +123,13 @@ export default function TradeSuggestions({ suggestions, onSuggestionClick }: Tra
   return (
     <div className="flex flex-col overflow-hidden rounded-[7px] border border-border bg-surface">
       <div className="shrink-0 border-b border-border bg-bg px-3 py-2">
-        <div className="font-figtree text-[10px] font-bold uppercase tracking-[1.5px] text-text">
+        <div className="font-figtree text-[11px] font-bold uppercase tracking-[1.5px] text-text">
           BOB Suggested Trades
         </div>
-        <div className="font-mono text-[8px] text-muted">Proactive deals found by BOB Engine</div>
+        <div className="font-mono text-[9px] text-muted">Proactive deals found by BOB Engine</div>
       </div>
       {suggestions.length === 0 ? (
-        <div className="px-3 py-4 font-figtree text-[11px] text-muted">No suggestions yet.</div>
+        <div className="px-3 py-4 font-figtree text-[12px] text-muted">No suggestions yet.</div>
       ) : (
         suggestions.map((s) => (
           <SuggestionRow

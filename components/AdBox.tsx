@@ -83,7 +83,7 @@ export default function AdBox({ slot, tier, premiumContent, className }: AdBoxPr
 
         <Link
           href="/dashboard/settings#billing"
-          className="font-mono text-[9px] uppercase tracking-[0.1em] no-underline rounded-full px-2.5 py-1 border transition-colors hover:bg-[#22D3EE]/15"
+          className="font-mono text-[10px] uppercase tracking-[0.1em] no-underline rounded-full px-2.5 py-1 border transition-colors hover:bg-[#22D3EE]/15"
           style={{
             color: '#22D3EE',
             borderColor: 'rgba(34,211,238,0.2)',

@@ -88,17 +88,17 @@ function AlertCard({ alert }: { alert: WeatherAlert }) {
       </div>
       <div className="flex-1 min-w-0">
         <div className="flex items-center justify-between gap-2 mb-1">
-          <p className="text-[14px] font-bold text-white truncate">{alert.game}</p>
+          <p className="text-[15px] font-bold text-white truncate">{alert.game}</p>
           <span
-            className="flex-shrink-0 text-[10px] font-bold px-2 py-0.5 rounded"
+            className="flex-shrink-0 text-[11px] font-bold px-2 py-0.5 rounded"
             style={{ color: style.labelColor, background: `${style.border}`, border: `1px solid ${style.border}` }}
           >
             {style.label}
           </span>
         </div>
-        <p className="text-[11px] text-slate-400 mb-1">{alert.stadium}</p>
-        <p className="text-[12px] text-slate-300">{alert.conditions}</p>
-        <p className="text-[11px] mt-1" style={{ color: style.labelColor }}>
+        <p className="text-[12px] text-slate-400 mb-1">{alert.stadium}</p>
+        <p className="text-[13px] text-slate-300">{alert.conditions}</p>
+        <p className="text-[12px] mt-1" style={{ color: style.labelColor }}>
           Impact: {alert.impact}
         </p>
       </div>
@@ -124,13 +124,13 @@ function SkeletonCard() {
 export default function WeatherAlertsTab({ alerts, loading }: Props) {
   return (
     <div className="glass-card p-4">
-      <h2 className="text-[13px] font-bold text-white tracking-wide mb-4">WEATHER ALERTS</h2>
+      <h2 className="text-[14px] font-bold text-white tracking-wide mb-4">WEATHER ALERTS</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
         {loading
           ? [...Array(3)].map((_, i) => <SkeletonCard key={i} />)
           : alerts.length === 0
             ? (
-              <div className="col-span-2 text-center py-10 text-slate-500 text-[13px]">
+              <div className="col-span-2 text-center py-10 text-slate-500 text-[14px]">
                 No weather concerns this week — all games look clean
               </div>
             )

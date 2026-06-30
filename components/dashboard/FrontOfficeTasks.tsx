@@ -64,21 +64,21 @@ function TaskRow({
       tabIndex={0}
     >
       <span
-        className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full font-mono text-[9px] font-semibold text-[#0a0d14] sm:mt-0"
+        className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full font-mono text-[10px] font-semibold text-[#0a0d14] sm:mt-0"
         style={{ background: glow.accent }}
       >
         {card.priority}
       </span>
 
       <div className="min-w-0 flex-1">
-        <p className="font-figtree text-[12px] font-medium leading-snug text-[#e8ecf4]">{card.title}</p>
+        <p className="font-figtree text-[13px] font-medium leading-snug text-[#e8ecf4]">{card.title}</p>
         <div className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-0.5">
-          <span className="font-mono text-[8px] text-[#8b9bb8]">{card.leagueName}</span>
-          <span className="font-mono text-[7px] uppercase tracking-wide text-[#6b7a99]">·</span>
-          <span className="font-mono text-[7px] uppercase tracking-wide" style={{ color: glow.accent }}>
+          <span className="font-mono text-[9px] text-[#8b9bb8]">{card.leagueName}</span>
+          <span className="font-mono text-[8px] uppercase tracking-wide text-[#6b7a99]">·</span>
+          <span className="font-mono text-[8px] uppercase tracking-wide" style={{ color: glow.accent }}>
             {URGENCY_LABEL[card.urgency]}
           </span>
-          <span className="font-figtree text-[10px] leading-snug text-[#9aa8c4]">{card.reasonLine}</span>
+          <span className="font-figtree text-[11px] leading-snug text-[#9aa8c4]">{card.reasonLine}</span>
         </div>
       </div>
 
@@ -88,14 +88,14 @@ function TaskRow({
             type="button"
             disabled={busy}
             onClick={() => onStage(card)}
-            className="dash-action-btn dash-action-btn-bust rounded border border-bust/40 bg-bust/15 px-2 py-1 font-mono text-[8px] uppercase text-bust disabled:opacity-50"
+            className="dash-action-btn dash-action-btn-bust rounded border border-bust/40 bg-bust/15 px-2 py-1 font-mono text-[9px] uppercase text-bust disabled:opacity-50"
           >
             Stage Offer
           </button>
         ) : null}
         <Link
           href={card.ctaHref}
-          className="dash-action-btn rounded border border-[#1e2640] px-2 py-1 font-mono text-[8px] text-boom no-underline"
+          className="dash-action-btn rounded border border-[#1e2640] px-2 py-1 font-mono text-[9px] text-boom no-underline"
         >
           View Details
         </Link>
@@ -105,7 +105,7 @@ function TaskRow({
               type="button"
               disabled={busy}
               onClick={() => onComplete(card.taskId!)}
-              className="dash-action-btn rounded border border-boom/25 bg-boom/10 px-2 py-1 font-mono text-[8px] text-boom disabled:opacity-50"
+              className="dash-action-btn rounded border border-boom/25 bg-boom/10 px-2 py-1 font-mono text-[9px] text-boom disabled:opacity-50"
             >
               Complete
             </button>
@@ -232,21 +232,21 @@ export default function FrontOfficeTasks({
     <section className="overflow-hidden rounded-[10px] border border-[#1e2640] bg-[#0f1420]">
       <div className="flex items-center justify-between border-b border-[#1e2640]/80 px-3 py-2">
         <div>
-          <h3 className="font-figtree text-[10px] uppercase tracking-[1.5px] text-[#e8ecf4]">Command Queue</h3>
-          <p className="font-mono text-[8px] text-[#8b9bb8]">Next 3 moves after top priority</p>
+          <h3 className="font-figtree text-[11px] uppercase tracking-[1.5px] text-[#e8ecf4]">Command Queue</h3>
+          <p className="font-mono text-[9px] text-[#8b9bb8]">Next 3 moves after top priority</p>
         </div>
         <div className="flex items-center gap-1">
-          <span className="font-mono text-[10px] tabular-nums text-boom">{missions.length}</span>
+          <span className="font-mono text-[11px] tabular-nums text-boom">{missions.length}</span>
           <Link
             href="/trade"
-            className="dash-action-btn flex items-center gap-0.5 font-mono text-[8px] text-boom no-underline"
+            className="dash-action-btn flex items-center gap-0.5 font-mono text-[9px] text-boom no-underline"
           >
             View All <ChevronRight className="h-3 w-3" />
           </Link>
         </div>
       </div>
       {missions.length === 0 ? (
-        <p className="px-3 py-3 font-mono text-[10px] text-[#6b7a99]">No tasks queued — you&apos;re caught up.</p>
+        <p className="px-3 py-3 font-mono text-[11px] text-[#6b7a99]">No tasks queued — you&apos;re caught up.</p>
       ) : (
         missions.map((card) => (
           <TaskRow

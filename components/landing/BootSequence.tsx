@@ -109,7 +109,7 @@ export default function BootSequence({
         transition={{ delay: 0.35, duration: 0.5 }}
       >
         <span
-          className="text-[10px] font-black uppercase tracking-[0.55em]"
+          className="text-[11px] font-black uppercase tracking-[0.55em]"
           style={{ color: "var(--color-boom)" }}
         >
           {phase === "glow" ? "Initializing" : "Syncing Portfolio"}
@@ -136,7 +136,7 @@ export default function BootSequence({
 
       {/* Bottom version tag */}
       <motion.p
-        className="absolute bottom-10 text-[9px] font-black uppercase tracking-[0.4em] text-slate-700"
+        className="absolute bottom-10 text-[10px] font-black uppercase tracking-[0.4em] text-slate-700"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.6 }}

@@ -236,7 +236,7 @@ export default function WeeklyDecisionsClient({
             <div className="font-mono text-[18px] uppercase tracking-[-0.5px] text-text md:text-[22px]">
               Weekly Decisions
             </div>
-            <div className="font-mono text-[10px] text-muted">
+            <div className="font-mono text-[11px] text-muted">
               Game day command center — approve lineup calls before kickoff
             </div>
           </div>
@@ -249,7 +249,7 @@ export default function WeeklyDecisionsClient({
               >
                 <ChevronLeft className="h-3.5 w-3.5" />
               </button>
-              <span className="flex h-7 items-center border-x border-border px-2.5 font-mono text-[11px] text-text">
+              <span className="flex h-7 items-center border-x border-border px-2.5 font-mono text-[12px] text-text">
                 {preseason ? 'Preseason' : `Week ${week}`}
               </span>
               <button
@@ -262,7 +262,7 @@ export default function WeeklyDecisionsClient({
             </div>
             <button
               type="button"
-              className="hidden rounded border border-[#7c3aed]/50 bg-[#7c3aed]/15 px-3 py-1.5 font-mono text-[9px] uppercase text-[#A78BFA] sm:inline-block"
+              className="hidden rounded border border-[#7c3aed]/50 bg-[#7c3aed]/15 px-3 py-1.5 font-mono text-[10px] uppercase text-[#A78BFA] sm:inline-block"
             >
               Sync Lineup
               {notSyncedCount > 0 && (
@@ -277,7 +277,7 @@ export default function WeeklyDecisionsClient({
           <button
             type="button"
             onClick={() => handleLeagueChange('all')}
-            className={`shrink-0 rounded-[6px] border px-3 py-1.5 font-figtree text-[11px] transition-colors ${
+            className={`shrink-0 rounded-[6px] border px-3 py-1.5 font-figtree text-[12px] transition-colors ${
               isPortfolio
                 ? 'border-boom bg-boom/15 text-boom'
                 : 'border-border bg-surface text-muted hover:text-text'
@@ -290,7 +290,7 @@ export default function WeeklyDecisionsClient({
               key={lg.id}
               type="button"
               onClick={() => handleLeagueChange(lg.id)}
-              className={`shrink-0 rounded-[6px] border px-3 py-1.5 font-figtree text-[11px] transition-colors ${
+              className={`shrink-0 rounded-[6px] border px-3 py-1.5 font-figtree text-[12px] transition-colors ${
                 leagueId === lg.id
                   ? 'border-boom bg-boom/15 font-semibold text-boom'
                   : 'border-border bg-surface text-muted hover:text-text'
@@ -425,7 +425,7 @@ export default function WeeklyDecisionsClient({
               />
             )}
             {isPortfolio && (
-              <div className="rounded-md border border-border bg-surface2/40 p-3 font-mono text-[10px] text-muted">
+              <div className="rounded-md border border-border bg-surface2/40 p-3 font-mono text-[11px] text-muted">
                 Select a league to view projected lineup field. Portfolio mode shows decisions
                 across all {leagueCount} leagues.
               </div>
@@ -465,9 +465,9 @@ function StatCell({
 }) {
   return (
     <div className="rounded border border-border/60 bg-surface2/30 px-2 py-1.5">
-      <div className="font-mono text-[7px] uppercase tracking-wide text-muted">{label}</div>
-      <div className="font-mono text-[14px] text-text">{value}</div>
-      <div className="font-mono text-[8px] text-muted">{sub}</div>
+      <div className="font-mono text-[8px] uppercase tracking-wide text-muted">{label}</div>
+      <div className="font-mono text-[15px] text-text">{value}</div>
+      <div className="font-mono text-[9px] text-muted">{sub}</div>
     </div>
   );
 }

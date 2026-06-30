@@ -40,7 +40,7 @@ function CollegeBadge({ college }: { college: string }) {
   const info = COLLEGE_ABBREVS[college] ?? { abbr: college.slice(0, 3).toUpperCase(), color: '#475569' };
   return (
     <span
-      className="text-[10px] font-bold px-1.5 py-0.5 rounded"
+      className="text-[11px] font-bold px-1.5 py-0.5 rounded"
       style={{ background: `${info.color}30`, color: info.color, border: `1px solid ${info.color}40` }}
     >
       {info.abbr}
@@ -52,7 +52,7 @@ function FfigGradeBadge({ grade }: { grade: RookieProspect['ffigGrade'] }) {
   const { bg, color } = ffigGradeStyle(grade);
   return (
     <span
-      className="text-[13px] font-bold px-2 py-0.5 rounded-md"
+      className="text-[14px] font-bold px-2 py-0.5 rounded-md"
       style={{ background: bg, color, border: `1px solid ${color}40` }}
     >
       {grade}
@@ -64,7 +64,7 @@ function VerdictBadge({ verdict }: { verdict: RookieProspect['verdict'] }) {
   const color = verdictColor(verdict);
   return (
     <span
-      className="text-[10px] font-bold px-2 py-0.5 rounded tracking-wide whitespace-nowrap"
+      className="text-[11px] font-bold px-2 py-0.5 rounded tracking-wide whitespace-nowrap"
       style={{ background: `${color}18`, color, border: `1px solid ${color}30` }}
     >
       {verdict}
@@ -74,7 +74,7 @@ function VerdictBadge({ verdict }: { verdict: RookieProspect['verdict'] }) {
 
 function TeamBadge({ team }: { team: string }) {
   return (
-    <span className="text-[11px] font-bold text-white bg-white/[0.08] px-1.5 py-0.5 rounded font-mono"
+    <span className="text-[12px] font-bold text-white bg-white/[0.08] px-1.5 py-0.5 rounded font-mono"
       style={{ fontFamily: 'JetBrains Mono, monospace' }}>
       {team}
     </span>
@@ -97,7 +97,7 @@ export default function RookieBigBoard({ prospects, loading, onSelect, selected 
   return (
     <div className="glass-card overflow-hidden">
       <div className="px-4 py-3 border-b border-white/[0.08]">
-        <h2 className="text-[13px] font-bold text-white tracking-wide">ROOKIE BIG BOARD</h2>
+        <h2 className="text-[14px] font-bold text-white tracking-wide">ROOKIE BIG BOARD</h2>
       </div>
 
       <div className="overflow-x-auto">
@@ -117,7 +117,7 @@ export default function RookieBigBoard({ prospects, loading, onSelect, selected 
                 { label: 'TRE FIT',      cls: 'hidden lg:table-cell text-right' },
                 { label: 'VERDICT',      cls: '' },
               ].map(({ label, cls }) => (
-                <th key={label} className={`px-3 py-2 text-left text-[10px] font-semibold text-slate-500 uppercase tracking-wider ${cls}`}>
+                <th key={label} className={`px-3 py-2 text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider ${cls}`}>
                   {label}
                 </th>
               ))}
@@ -137,7 +137,7 @@ export default function RookieBigBoard({ prospects, loading, onSelect, selected 
                     >
                       {/* RANK */}
                       <td className="px-3 py-2.5 text-center">
-                        <span className="text-[12px] font-mono font-bold text-slate-400" style={{ fontFamily: 'JetBrains Mono, monospace' }}>
+                        <span className="text-[13px] font-mono font-bold text-slate-400" style={{ fontFamily: 'JetBrains Mono, monospace' }}>
                           {p.rank}
                         </span>
                       </td>
@@ -150,9 +150,9 @@ export default function RookieBigBoard({ prospects, loading, onSelect, selected 
                             style={{ background: posColor(p.position) }}
                           />
                           <div>
-                            <p className="text-[12px] font-semibold text-white truncate max-w-[140px]">{p.name}</p>
+                            <p className="text-[13px] font-semibold text-white truncate max-w-[140px]">{p.name}</p>
                             <div className="flex items-center gap-1.5 sm:hidden">
-                              <span className="text-[10px] font-bold" style={{ color: posColor(p.position) }}>{p.position}</span>
+                              <span className="text-[11px] font-bold" style={{ color: posColor(p.position) }}>{p.position}</span>
                               <CollegeBadge college={p.college} />
                             </div>
                           </div>
@@ -161,7 +161,7 @@ export default function RookieBigBoard({ prospects, loading, onSelect, selected 
 
                       {/* POS */}
                       <td className="px-3 py-2.5 hidden sm:table-cell">
-                        <span className="text-[11px] font-bold" style={{ color: posColor(p.position) }}>{p.position}</span>
+                        <span className="text-[12px] font-bold" style={{ color: posColor(p.position) }}>{p.position}</span>
                       </td>
 
                       {/* COLLEGE */}
@@ -176,14 +176,14 @@ export default function RookieBigBoard({ prospects, loading, onSelect, selected 
 
                       {/* RTS SCORE */}
                       <td className="px-3 py-2.5 hidden sm:table-cell">
-                        <span className="text-[15px] font-bold" style={{ fontFamily: 'JetBrains Mono, monospace', color: '#36E7A1' }}>
+                        <span className="text-[16px] font-bold" style={{ fontFamily: 'JetBrains Mono, monospace', color: '#36E7A1' }}>
                           {p.rtsScore}
                         </span>
                       </td>
 
                       {/* DRAFT CAPITAL */}
                       <td className="px-3 py-2.5 hidden lg:table-cell">
-                        <span className="text-[11px] text-slate-300 font-mono" style={{ fontFamily: 'JetBrains Mono, monospace' }}>
+                        <span className="text-[12px] text-slate-300 font-mono" style={{ fontFamily: 'JetBrains Mono, monospace' }}>
                           {p.draftCapital}
                         </span>
                       </td>
@@ -197,14 +197,14 @@ export default function RookieBigBoard({ prospects, loading, onSelect, selected 
 
                       {/* BOOM% */}
                       <td className="px-3 py-2.5 hidden md:table-cell text-right">
-                        <span className="text-[12px] font-mono text-white" style={{ fontFamily: 'JetBrains Mono, monospace' }}>
+                        <span className="text-[13px] font-mono text-white" style={{ fontFamily: 'JetBrains Mono, monospace' }}>
                           {p.boomPct}%
                         </span>
                       </td>
 
                       {/* TRE FIT */}
                       <td className="px-3 py-2.5 hidden lg:table-cell text-right">
-                        <span className="text-[12px] font-mono" style={{ fontFamily: 'JetBrains Mono, monospace', color: '#36E7A1' }}>
+                        <span className="text-[13px] font-mono" style={{ fontFamily: 'JetBrains Mono, monospace', color: '#36E7A1' }}>
                           {p.treFit}%
                         </span>
                       </td>
@@ -223,7 +223,7 @@ export default function RookieBigBoard({ prospects, loading, onSelect, selected 
 
       {!loading && (
         <div className="px-4 py-3 border-t border-white/[0.06] flex justify-center">
-          <button className="text-[12px] font-semibold text-cyan-400 hover:text-cyan-300 transition-colors">
+          <button className="text-[13px] font-semibold text-cyan-400 hover:text-cyan-300 transition-colors">
             View Full Rookie Board →
           </button>
         </div>

@@ -60,19 +60,19 @@ export default function ScoutingEmpireWidget() {
       className="rounded-xl border border-white/[0.08] bg-white/[0.03] backdrop-blur-[24px] px-4 py-3 shrink-0"
       style={{ boxShadow: '0 0 24px rgba(54,231,161,0.08)' }}
     >
-      <p className="text-[10px] uppercase tracking-widest text-[#64748B] font-mono mb-1">DYNASTY POWER RATING</p>
+      <p className="text-[11px] uppercase tracking-widest text-[#64748B] font-mono mb-1">DYNASTY POWER RATING</p>
       <div className="flex items-end gap-3">
         <p className="text-[28px] font-bold leading-none tabular-nums" style={{ fontFamily: 'JetBrains Mono, monospace', color: '#36E7A1' }}>
           {score}
         </p>
         <div className="flex flex-col items-start gap-0.5 pb-0.5">
           <span
-            className="text-[10px] font-bold px-2 py-0.5 rounded-full border"
+            className="text-[11px] font-bold px-2 py-0.5 rounded-full border"
             style={{ color: '#36E7A1', background: 'rgba(54,231,161,0.12)', borderColor: 'rgba(54,231,161,0.35)' }}
           >
             {grade}
           </span>
-          <span className="text-[11px] text-[#64748B]" style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}>{pct}</span>
+          <span className="text-[12px] text-[#64748B]" style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}>{pct}</span>
         </div>
         <svg width="60" height="28" viewBox="0 0 60 24" className="ml-1 shrink-0" aria-hidden>
           <polyline points={pts} fill="none" stroke="#36E7A1" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />

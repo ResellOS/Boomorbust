@@ -158,28 +158,28 @@ export default function FrontOfficeHome() {
             className="flex h-[100px] w-full max-w-[180px] flex-col justify-center rounded-xl border border-teal-500/30 bg-teal-950/50 px-4 py-3 shadow-inner"
             style={{ minWidth: 'min(100%, 180px)' }}
           >
-            <p className="text-[10px] font-bold uppercase tracking-wider text-teal-200/80">Week &amp; league edge</p>
+            <p className="text-[11px] font-bold uppercase tracking-wider text-teal-200/80">Week &amp; league edge</p>
             <p className="mt-1 text-2xl font-bold text-teal-100">{dashboardMetrics.weekEdge}</p>
-            <p className="mt-0.5 text-[11px] leading-tight text-slate-500">Average projected advantage (PPR)</p>
+            <p className="mt-0.5 text-[12px] leading-tight text-slate-500">Average projected advantage (PPR)</p>
           </div>
           <div
             className="flex h-[100px] w-full max-w-[180px] flex-col justify-center rounded-xl border border-blue-500/30 bg-blue-950/50 px-4 py-3"
             style={{ minWidth: 'min(100%, 180px)' }}
           >
-            <p className="text-[10px] font-bold uppercase tracking-wider text-blue-200/80">Trade analyzer</p>
+            <p className="text-[11px] font-bold uppercase tracking-wider text-blue-200/80">Trade analyzer</p>
             <p className="mt-1 text-2xl font-bold text-blue-100">You&apos;re overpaying {dashboardMetrics.tradeOverpay}</p>
-            <p className="mt-0.5 text-[11px] leading-tight text-slate-500">Transparency on every proposed trade</p>
+            <p className="mt-0.5 text-[12px] leading-tight text-slate-500">Transparency on every proposed trade</p>
           </div>
           <div
             className="flex h-[100px] w-full max-w-[180px] flex-col justify-center rounded-xl border border-rose-500/30 bg-rose-950/40 px-4 py-3"
             style={{ minWidth: 'min(100%, 180px)' }}
           >
-            <p className="text-[10px] font-bold uppercase tracking-wider text-rose-200/80">Roster health</p>
+            <p className="text-[11px] font-bold uppercase tracking-wider text-rose-200/80">Roster health</p>
             <p className="mt-1 text-xl font-bold text-rose-100">
               {dashboardMetrics.rosterHealth.healthy} healthy · {dashboardMetrics.rosterHealth.out} out ·{' '}
               {dashboardMetrics.rosterHealth.suspended} suspended
             </p>
-            <p className="mt-0.5 text-[11px] leading-tight text-slate-500">At-a-glance injury tracking</p>
+            <p className="mt-0.5 text-[12px] leading-tight text-slate-500">At-a-glance injury tracking</p>
           </div>
         </div>
       </section>
@@ -221,7 +221,7 @@ export default function FrontOfficeHome() {
                 >
                   <span className="text-xs font-bold text-white/90">{s.n}</span>
                   <p className="mt-1 text-sm font-bold text-white">{s.title}</p>
-                  <p className="mt-0.5 text-[11px] leading-snug text-slate-200/80">{s.body}</p>
+                  <p className="mt-0.5 text-[12px] leading-snug text-slate-200/80">{s.body}</p>
                 </div>
                 {i < flowSteps.length - 1 && (
                   <div className="my-2 flex items-center justify-center text-slate-500 md:my-0 md:mx-2 md:shrink-0">
@@ -411,7 +411,7 @@ export default function FrontOfficeHome() {
             >
               <div className="mb-3 h-8 w-8 rounded-full bg-slate-700" aria-hidden />
               <p className="text-xs leading-relaxed text-slate-300">&ldquo;{t.quote}&rdquo;</p>
-              <footer className="mt-auto pt-3 text-[11px] text-slate-500">
+              <footer className="mt-auto pt-3 text-[12px] text-slate-500">
                 <cite className="not-italic font-semibold text-slate-400">— {t.author}</cite>
                 <p className="mt-1">{t.subtext}</p>
               </footer>
@@ -434,7 +434,7 @@ export default function FrontOfficeHome() {
                 )}
               >
                 {tier.highlight && (
-                  <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-emerald-500 px-3 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white">
+                  <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-emerald-500 px-3 py-0.5 text-[11px] font-bold uppercase tracking-wide text-white">
                     Most popular
                   </span>
                 )}
@@ -463,10 +463,10 @@ export default function FrontOfficeHome() {
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-6 md:flex-row md:items-start">
           <div className="text-center md:text-left">
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">The Front Office</p>
-            <p className="mt-2 max-w-xs text-[11px] leading-relaxed text-slate-500">Manage your dynasty like a front office.</p>
-            <p className="mt-4 text-[11px] text-slate-600">© 2026 The Front Office. All rights reserved.</p>
+            <p className="mt-2 max-w-xs text-[12px] leading-relaxed text-slate-500">Manage your dynasty like a front office.</p>
+            <p className="mt-4 text-[12px] text-slate-600">© 2026 The Front Office. All rights reserved.</p>
           </div>
-          <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-[11px] text-slate-500 md:justify-end">
+          <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-[12px] text-slate-500 md:justify-end">
             <Link href="/terms" className="transition hover:text-slate-300">
               Terms of Service
             </Link>

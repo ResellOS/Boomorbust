@@ -27,10 +27,10 @@ export default function PerformanceClient({ data }: { data: PerformancePageData 
         <h1 className="font-figtree text-[34px] font-extrabold leading-none tracking-[-1px] text-text">
           BOB TRACK RECORD
         </h1>
-        <p className="mt-2 font-figtree text-[14px] leading-snug text-text">
+        <p className="mt-2 font-figtree text-[15px] leading-snug text-text">
           {HERO_SUBTITLE}
         </p>
-        <p className="mt-2 max-w-xl font-figtree text-[12px] leading-relaxed text-muted">
+        <p className="mt-2 max-w-xl font-figtree text-[13px] leading-relaxed text-muted">
           {HERO_MUTED}
         </p>
       </div>
@@ -48,30 +48,30 @@ export default function PerformanceClient({ data }: { data: PerformancePageData 
       {/* Section 2 — Locked Definitions */}
       <section className="mb-6">
         <div className="mb-1 flex flex-wrap items-center gap-2">
-          <div className="font-figtree text-[11px] font-bold uppercase tracking-[1.5px] text-text">
+          <div className="font-figtree text-[12px] font-bold uppercase tracking-[1.5px] text-text">
             How We Define a Win
           </div>
-          <span className="rounded-[4px] border border-border bg-bg/60 px-2 py-0.5 font-mono text-[8px] text-muted">
+          <span className="rounded-[4px] border border-border bg-bg/60 px-2 py-0.5 font-mono text-[9px] text-muted">
             Locked June 18, 2026
           </span>
         </div>
-        <p className="mb-3 font-mono text-[9px] text-muted">{DEFINITIONS_SUBTITLE}</p>
+        <p className="mb-3 font-mono text-[10px] text-muted">{DEFINITIONS_SUBTITLE}</p>
         <div className="grid gap-3 md:grid-cols-3">
           {WIN_DEFINITIONS.map((def) => (
             <div
               key={def.title}
               className="rounded-[10px] border border-border bg-surface/60 p-4 backdrop-blur-xl"
             >
-              <div className="font-figtree text-[12px] font-semibold text-boom">
+              <div className="font-figtree text-[13px] font-semibold text-boom">
                 {def.title}
               </div>
-              <p className="mt-2 font-figtree text-[11px] leading-relaxed text-muted">
+              <p className="mt-2 font-figtree text-[12px] leading-relaxed text-muted">
                 {def.body}
               </p>
             </div>
           ))}
         </div>
-        <p className="mt-3 font-figtree text-[10px] leading-relaxed text-muted">
+        <p className="mt-3 font-figtree text-[11px] leading-relaxed text-muted">
           {INVALIDATED_NOTE}
         </p>
       </section>

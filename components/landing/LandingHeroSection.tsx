@@ -51,7 +51,7 @@ export default function LandingHeroSection() {
         </h1>
 
         <p
-          className="mb-10 mt-2 max-w-[540px] text-[16px] leading-[1.7] sm:text-[18px]"
+          className="mb-10 mt-2 max-w-[540px] text-[17px] leading-[1.7] sm:text-[18px]"
           style={{ color: 'var(--text-secondary)', fontFamily: 'var(--font-body)' }}
         >
           Sync your fantasy leagues and get personalised sit/start decisions, trade analysis, and weekly edge score — both
@@ -61,14 +61,14 @@ export default function LandingHeroSection() {
         <div className="mb-8 flex flex-col items-center lg:items-start gap-4 sm:flex-row">
           <Link
             href="/auth/signup"
-            className="inline-flex items-center gap-2 rounded-xl bg-[#3ECFAD] px-8 py-4 text-[15px] font-black text-black shadow-[0_0_48px_rgba(62,207,173,0.35)] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_0_64px_rgba(62,207,173,0.5)]"
+            className="inline-flex items-center gap-2 rounded-xl bg-[#3ECFAD] px-8 py-4 text-[16px] font-black text-black shadow-[0_0_48px_rgba(62,207,173,0.35)] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_0_64px_rgba(62,207,173,0.5)]"
             style={{ fontFamily: 'var(--font-body)' }}
           >
             🏈 Import My Leagues
           </Link>
           <Link
             href="#mockup"
-            className="inline-flex items-center gap-2 rounded-xl border border-white/20 px-8 py-4 text-[15px] font-semibold text-white transition-all duration-200 hover:border-white/40 hover:bg-white/[0.04]"
+            className="inline-flex items-center gap-2 rounded-xl border border-white/20 px-8 py-4 text-[16px] font-semibold text-white transition-all duration-200 hover:border-white/40 hover:bg-white/[0.04]"
             style={{ fontFamily: 'var(--font-body)' }}
           >
             <span className="text-[#3ECFAD]">▶</span> See It In Action

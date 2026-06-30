@@ -77,7 +77,7 @@ function SideColumn({
 
   return (
     <div className="flex min-w-0 flex-col rounded-[8px] border border-border bg-surface">
-      <div className="border-b border-border px-3 py-2 font-figtree text-[11px] font-bold uppercase tracking-[1.5px] text-text">
+      <div className="border-b border-border px-3 py-2 font-figtree text-[12px] font-bold uppercase tracking-[1.5px] text-text">
         {title}
       </div>
 
@@ -88,7 +88,7 @@ function SideColumn({
           onChange={(e) => setQuery(e.target.value)}
           onFocus={() => results.length && setOpen(true)}
           placeholder="Search player…"
-          className="w-full rounded-[6px] border border-border bg-bg px-2.5 py-1.5 font-figtree text-[11px] text-text outline-none placeholder:text-muted focus:border-boom/50"
+          className="w-full rounded-[6px] border border-border bg-bg px-2.5 py-1.5 font-figtree text-[12px] text-text outline-none placeholder:text-muted focus:border-boom/50"
         />
         {open && results.length > 0 && (
           <div className="absolute left-2.5 right-2.5 top-[40px] z-20 max-h-[220px] overflow-y-auto rounded-[6px] border border-border bg-surface2 shadow-lg">
@@ -110,10 +110,10 @@ function SideColumn({
                 }}
                 className="flex w-full items-center justify-between gap-2 px-2.5 py-1.5 text-left hover:bg-white/[0.04]"
               >
-                <span className="truncate font-figtree text-[11px] text-text">
-                  {r.name} <span className="font-mono text-[8px] text-muted">{r.position} · {r.team ?? 'FA'}</span>
+                <span className="truncate font-figtree text-[12px] text-text">
+                  {r.name} <span className="font-mono text-[9px] text-muted">{r.position} · {r.team ?? 'FA'}</span>
                 </span>
-                <span className="shrink-0 font-mono text-[10px] text-boom">
+                <span className="shrink-0 font-mono text-[11px] text-boom">
                   {r.tfoScore != null ? r.tfoScore.toFixed(1) : '—'}
                 </span>
               </button>
@@ -127,7 +127,7 @@ function SideColumn({
         <select
           value={pickIdx}
           onChange={(e) => setPickIdx(e.target.value)}
-          className="min-w-0 flex-1 rounded-[6px] border border-border bg-bg px-2 py-1 font-figtree text-[10px] text-text outline-none focus:border-boom/50"
+          className="min-w-0 flex-1 rounded-[6px] border border-border bg-bg px-2 py-1 font-figtree text-[11px] text-text outline-none focus:border-boom/50"
         >
           <option value="">{pickOptions.length ? pickPlaceholder : 'No picks available'}</option>
           {pickOptions.map((p, i) => (
@@ -151,7 +151,7 @@ function SideColumn({
             });
             setPickIdx('');
           }}
-          className="shrink-0 rounded-[6px] border border-border px-2 py-1 font-figtree text-[10px] text-muted hover:text-text disabled:opacity-40"
+          className="shrink-0 rounded-[6px] border border-border px-2 py-1 font-figtree text-[11px] text-muted hover:text-text disabled:opacity-40"
         >
           + Pick
         </button>
@@ -160,21 +160,21 @@ function SideColumn({
       {/* Assets */}
       <div className="flex-1 px-2.5">
         {assets.length === 0 ? (
-          <div className="py-3 text-center font-figtree text-[10px] text-muted">No assets yet.</div>
+          <div className="py-3 text-center font-figtree text-[11px] text-muted">No assets yet.</div>
         ) : (
           assets.map((a) => (
             <div key={a.key} className="flex items-center justify-between gap-2 border-b border-border/40 py-1.5">
-              <span className="min-w-0 truncate font-figtree text-[11px] text-text">
+              <span className="min-w-0 truncate font-figtree text-[12px] text-text">
                 {a.isPick ? '🎟 ' : ''}{a.label}
               </span>
               <div className="flex shrink-0 items-center gap-2">
-                <span className="font-mono text-[10px] text-boom">
+                <span className="font-mono text-[11px] text-boom">
                   {a.tfoScore != null ? a.tfoScore.toFixed(1) : '—'}
                 </span>
                 <button
                   type="button"
                   onClick={() => onRemove(a.key)}
-                  className="font-mono text-[11px] text-muted hover:text-bust"
+                  className="font-mono text-[12px] text-muted hover:text-bust"
                   aria-label="Remove"
                 >
                   ×
@@ -187,11 +187,11 @@ function SideColumn({
 
       {/* Side totals */}
       <div className="mt-1 border-t border-border px-2.5 py-2">
-        <div className="flex items-center justify-between font-mono text-[10px]">
+        <div className="flex items-center justify-between font-mono text-[11px]">
           <span className="text-muted">Value total</span>
           <span className="text-text">{tfoSum.toFixed(1)}</span>
         </div>
-        <div className="flex items-center justify-between font-mono text-[10px]">
+        <div className="flex items-center justify-between font-mono text-[11px]">
           <span className="text-muted">KTC total</span>
           <span className="text-text">{ktcSum.toLocaleString()}</span>
         </div>
@@ -253,10 +253,10 @@ export default function TradeCalculator({
     <>
       {!embedded && (
         <div className="mb-2 flex items-center justify-between">
-          <span className="font-figtree text-[11px] font-bold uppercase tracking-[1.5px] text-text">
+          <span className="font-figtree text-[12px] font-bold uppercase tracking-[1.5px] text-text">
             Trade Calculator
           </span>
-          <span className="font-mono text-[8px] text-muted">Roster-agnostic · any players or picks</span>
+          <span className="font-mono text-[9px] text-muted">Roster-agnostic · any players or picks</span>
         </div>
       )}
 
@@ -285,12 +285,12 @@ export default function TradeCalculator({
         style={{ borderColor: `${verdict.color}66`, background: `${verdict.color}12` }}
       >
         <div className="flex items-center justify-between">
-          <div className="font-figtree text-[13px] font-bold" style={{ color: verdict.color }}>
+          <div className="font-figtree text-[14px] font-bold" style={{ color: verdict.color }}>
             {verdict.label}
           </div>
           <div className="text-right">
-            <div className="font-mono text-[9px] uppercase tracking-wide text-muted">Trade Value Delta</div>
-            <div className="font-mono text-[15px] font-bold" style={{ color: verdict.color }}>
+            <div className="font-mono text-[10px] uppercase tracking-wide text-muted">Trade Value Delta</div>
+            <div className="font-mono text-[16px] font-bold" style={{ color: verdict.color }}>
               {delta >= 0 ? '+' : ''}{delta.toFixed(1)}
             </div>
           </div>
@@ -310,7 +310,7 @@ export default function TradeCalculator({
             />
           )}
         </div>
-        <div className="mt-1 flex justify-between font-mono text-[7.5px] uppercase tracking-wide text-muted">
+        <div className="mt-1 flex justify-between font-mono text-[8.5px] uppercase tracking-wide text-muted">
           <span>You Give</span>
           <span>You Get</span>
         </div>

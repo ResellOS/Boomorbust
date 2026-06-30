@@ -250,7 +250,7 @@ export default function AdminDashboardClient({
             <p className="display mt-3 text-4xl text-white">{data.totalUsers}</p>
             <p className="mt-2 text-xs font-semibold text-[var(--green)]">+{data.signupsThisWeek} this week</p>
             <div className="mt-5">
-              <p className="mb-2 text-[10px] uppercase text-[var(--text-muted)]">Signups · last 30 days</p>
+              <p className="mb-2 text-[11px] uppercase text-[var(--text-muted)]">Signups · last 30 days</p>
               <SparklineGraph data={data.signupSparkline} height={56} />
             </div>
           </Card>
@@ -335,8 +335,8 @@ export default function AdminDashboardClient({
         </section>
 
         {/* Action log */}
-        <section className="rounded-xl border border-[var(--border)] bg-black/25 p-4 font-mono text-[11px] text-[var(--text-secondary)]">
-          <div className="mb-3 text-[10px] font-bold uppercase tracking-widest text-[var(--text-muted)]">Action log</div>
+        <section className="rounded-xl border border-[var(--border)] bg-black/25 p-4 font-mono text-[12px] text-[var(--text-secondary)]">
+          <div className="mb-3 text-[11px] font-bold uppercase tracking-widest text-[var(--text-muted)]">Action log</div>
           {actionLogs.length === 0 ? (
             <p>No actions yet.</p>
           ) : (
@@ -353,7 +353,7 @@ export default function AdminDashboardClient({
             <div className="overflow-auto rounded-xl border border-[var(--border)] bg-[var(--bg-card)]/90">
               <table className="w-full min-w-[480px] text-left text-xs">
                 <thead>
-                  <tr className="border-b border-[var(--border)] text-[10px] uppercase tracking-wider text-[var(--text-muted)]">
+                  <tr className="border-b border-[var(--border)] text-[11px] uppercase tracking-wider text-[var(--text-muted)]">
                     <th className="py-3 pl-4 pr-2 font-semibold">Email</th>
                     <th className="py-3 pr-2 font-semibold">Sleeper</th>
                     <th className="py-3 pr-2 font-semibold">Tier</th>
@@ -383,7 +383,7 @@ export default function AdminDashboardClient({
             <div className="overflow-auto rounded-xl border border-[var(--border)] bg-[var(--bg-card)]/90">
               <table className="w-full text-left text-xs">
                 <thead>
-                  <tr className="border-b border-[var(--border)] text-[10px] uppercase tracking-wider text-[var(--text-muted)]">
+                  <tr className="border-b border-[var(--border)] text-[11px] uppercase tracking-wider text-[var(--text-muted)]">
                     <th className="py-3 pl-4 pr-2 font-semibold">Source</th>
                     <th className="py-3 pr-2 font-semibold">Message</th>
                     <th className="py-3 pr-4 font-semibold whitespace-nowrap">Time</th>
@@ -412,7 +412,7 @@ export default function AdminDashboardClient({
           </section>
         </div>
 
-        <footer className="flex flex-wrap gap-x-8 gap-y-2 border-t border-[var(--border)] pt-8 text-[11px] text-[var(--text-muted)]">
+        <footer className="flex flex-wrap gap-x-8 gap-y-2 border-t border-[var(--border)] pt-8 text-[12px] text-[var(--text-muted)]">
           <span>
             SHA <span className="font-mono text-[var(--text-secondary)]">{buildMeta.sha}</span>
           </span>
@@ -436,7 +436,7 @@ export default function AdminDashboardClient({
                 Close
               </button>
             </div>
-            <pre className="mt-6 overflow-x-auto whitespace-pre-wrap break-words rounded-lg bg-black/40 p-4 text-[11px] text-emerald-200/95">
+            <pre className="mt-6 overflow-x-auto whitespace-pre-wrap break-words rounded-lg bg-black/40 p-4 text-[12px] text-emerald-200/95">
               {profileModal.json ? JSON.stringify(profileModal.json, null, 2) : '{}'}
             </pre>
           </div>
@@ -480,11 +480,11 @@ function QuickAction({
           busy && 'cursor-wait'
         )}
       >
-        <span className="flex items-center gap-2 text-[15px] font-semibold text-white">
+        <span className="flex items-center gap-2 text-[16px] font-semibold text-white">
           {busy ? <Spinner /> : null}
           {title}
         </span>
-        <span className="mt-2 text-[12px] text-[var(--text-muted)]">{desc}</span>
+        <span className="mt-2 text-[13px] text-[var(--text-muted)]">{desc}</span>
       </button>
     </Card>
   );
@@ -510,24 +510,24 @@ function ExpandedErrorRow({
   return (
     <>
       <tr className={clsx('cursor-pointer border-b border-[var(--border)]/70 hover:bg-white/[0.03]', expanded && 'bg-white/[0.04]')} onClick={onToggle}>
-        <td className={clsx('py-3 pl-4 pr-2 font-mono text-[11px]', color)}>{row.source}</td>
-        <td className="max-w-[200px] truncate py-3 pr-2 font-mono text-[11px] text-[var(--text-secondary)] sm:max-w-md">{row.message}</td>
-        <td className="py-3 pr-4 whitespace-nowrap text-[10px] text-[var(--text-muted)]">{formatIso(row.created_at)}</td>
+        <td className={clsx('py-3 pl-4 pr-2 font-mono text-[12px]', color)}>{row.source}</td>
+        <td className="max-w-[200px] truncate py-3 pr-2 font-mono text-[12px] text-[var(--text-secondary)] sm:max-w-md">{row.message}</td>
+        <td className="py-3 pr-4 whitespace-nowrap text-[11px] text-[var(--text-muted)]">{formatIso(row.created_at)}</td>
       </tr>
       {expanded && (
         <tr className="bg-black/35">
           <td colSpan={3} className="px-4 pb-6 pt-0">
-            <p className="mb-3 text-[10px] font-bold uppercase text-[var(--text-muted)]">Full message</p>
-            <pre className="mb-6 max-h-48 overflow-auto whitespace-pre-wrap break-words rounded-lg border border-white/10 p-3 font-mono text-[11px] text-[var(--text-secondary)]">{row.message}</pre>
+            <p className="mb-3 text-[11px] font-bold uppercase text-[var(--text-muted)]">Full message</p>
+            <pre className="mb-6 max-h-48 overflow-auto whitespace-pre-wrap break-words rounded-lg border border-white/10 p-3 font-mono text-[12px] text-[var(--text-secondary)]">{row.message}</pre>
             {row.metadata != null ? (
               <>
-                <p className="mb-3 text-[10px] font-bold uppercase text-[var(--text-muted)]">Metadata</p>
-                <pre className="max-h-48 overflow-auto whitespace-pre-wrap break-words rounded-lg border border-white/10 p-3 font-mono text-[11px] text-amber-200/95">
+                <p className="mb-3 text-[11px] font-bold uppercase text-[var(--text-muted)]">Metadata</p>
+                <pre className="max-h-48 overflow-auto whitespace-pre-wrap break-words rounded-lg border border-white/10 p-3 font-mono text-[12px] text-amber-200/95">
                   {JSON.stringify(row.metadata, null, 2)}
                 </pre>
               </>
             ) : (
-              <p className="text-[11px] text-[var(--text-muted)]">No metadata</p>
+              <p className="text-[12px] text-[var(--text-muted)]">No metadata</p>
             )}
           </td>
         </tr>

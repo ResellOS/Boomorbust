@@ -16,7 +16,7 @@ function PlayerAvatar({ playerId, name }: { playerId: string; name: string }) {
   if (err) {
     return (
       <div className="w-7 h-7 rounded-full bg-white/[0.08] flex items-center justify-center flex-shrink-0">
-        <span className="text-[9px] font-bold text-slate-300">{initials}</span>
+        <span className="text-[10px] font-bold text-slate-300">{initials}</span>
       </div>
     );
   }
@@ -51,8 +51,8 @@ export default function StartSitTab({ players, loading }: Props) {
   return (
     <div className="glass-card overflow-hidden">
       <div className="px-4 py-3 border-b border-white/[0.08]">
-        <h2 className="text-[13px] font-bold text-white tracking-wide">START / SIT ANALYSIS</h2>
-        <p className="text-[11px] text-slate-500 mt-0.5">Borderline players only — studs always start</p>
+        <h2 className="text-[14px] font-bold text-white tracking-wide">START / SIT ANALYSIS</h2>
+        <p className="text-[12px] text-slate-500 mt-0.5">Borderline players only — studs always start</p>
       </div>
 
       <div className="overflow-x-auto">
@@ -68,7 +68,7 @@ export default function StartSitTab({ players, loading }: Props) {
               ].map(({ label, className = '' }) => (
                 <th
                   key={label}
-                  className={`px-3 py-2 text-left text-[10px] font-semibold text-slate-500 uppercase tracking-wider ${className}`}
+                  className={`px-3 py-2 text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider ${className}`}
                 >
                   {label}
                 </th>
@@ -81,7 +81,7 @@ export default function StartSitTab({ players, loading }: Props) {
               : players.length === 0
                 ? (
                   <tr>
-                    <td colSpan={5} className="px-4 py-10 text-center text-slate-500 text-[12px]">
+                    <td colSpan={5} className="px-4 py-10 text-center text-slate-500 text-[13px]">
                       No borderline start/sit decisions this week
                     </td>
                   </tr>
@@ -93,15 +93,15 @@ export default function StartSitTab({ players, loading }: Props) {
                       <div className="flex items-center gap-2">
                         <PlayerAvatar playerId={p.playerId} name={p.name} />
                         <div>
-                          <p className="text-[12px] font-semibold text-white leading-tight">{p.name}</p>
-                          <p className="text-[10px] text-slate-500 uppercase">{p.position} · {p.team}</p>
+                          <p className="text-[13px] font-semibold text-white leading-tight">{p.name}</p>
+                          <p className="text-[11px] text-slate-500 uppercase">{p.position} · {p.team}</p>
                         </div>
                       </div>
                     </td>
 
                     {/* OPP */}
                     <td className="px-3 py-3 hidden sm:table-cell">
-                      <span className="text-[12px] text-slate-300 font-mono" style={{ fontFamily: 'JetBrains Mono, monospace' }}>
+                      <span className="text-[13px] text-slate-300 font-mono" style={{ fontFamily: 'JetBrains Mono, monospace' }}>
                         {p.opponent && p.opponent !== '—' ? `${p.team} vs ${p.opponent}` : '—'}
                       </span>
                     </td>
@@ -109,7 +109,7 @@ export default function StartSitTab({ players, loading }: Props) {
                     {/* SSAS */}
                     <td className="px-3 py-3 hidden md:table-cell">
                       <span
-                        className="text-[11px] font-mono font-semibold"
+                        className="text-[12px] font-mono font-semibold"
                         style={{ fontFamily: 'JetBrains Mono, monospace', color: ssasColor(p.ssasRank) }}
                       >
                         {p.ssasTeam} ({ordinalSuffix(p.ssasRank)})
@@ -119,7 +119,7 @@ export default function StartSitTab({ players, loading }: Props) {
                     {/* Verdict */}
                     <td className="px-3 py-3">
                       <span
-                        className="px-2 py-0.5 rounded text-[11px] font-bold tracking-wide"
+                        className="px-2 py-0.5 rounded text-[12px] font-bold tracking-wide"
                         style={{
                           color: verdictColor(p.verdict),
                           border: `1px solid ${verdictColor(p.verdict)}30`,
@@ -132,7 +132,7 @@ export default function StartSitTab({ players, loading }: Props) {
 
                     {/* Reasoning */}
                     <td className="px-3 py-3 max-w-xs">
-                      <p className="text-[11px] text-slate-400 leading-relaxed line-clamp-2">{p.reasoning}</p>
+                      <p className="text-[12px] text-slate-400 leading-relaxed line-clamp-2">{p.reasoning}</p>
                     </td>
                   </tr>
                 ))

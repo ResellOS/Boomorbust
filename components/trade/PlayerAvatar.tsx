@@ -47,7 +47,7 @@ export default function PlayerAvatar({
           onError={() => setFailed(true)}
         />
       ) : (
-        <span className="relative z-[1] font-mono text-[9px] font-bold" style={{ color: textColor }}>
+        <span className="relative z-[1] font-mono text-[10px] font-bold" style={{ color: textColor }}>
           {initials(name)}
         </span>
       )}

@@ -32,11 +32,11 @@ export default function LandingDynastyStatsSection() {
             <p className="font-mono text-[clamp(2.25rem,8vw,3.5rem)] font-bold tabular-nums leading-none text-[#22D3EE]" style={{ textShadow: '0 0 28px rgba(34,211,238,0.35)' }}>
               13.4%
             </p>
-            <p className="mt-2 text-[12px] font-bold uppercase tracking-[0.14em] text-[#64748B]" style={{ fontFamily: 'var(--font-body)' }}>
+            <p className="mt-2 text-[13px] font-bold uppercase tracking-[0.14em] text-[#64748B]" style={{ fontFamily: 'var(--font-body)' }}>
               Sit/Start Edge
             </p>
             <EdgeSparkline />
-            <p className="mt-3 text-[13px] leading-relaxed text-[#64748B]" style={{ fontFamily: 'var(--font-body)' }}>
+            <p className="mt-3 text-[14px] leading-relaxed text-[#64748B]" style={{ fontFamily: 'var(--font-body)' }}>
               Validated lift vs consensus ranks when decisions follow the model.
             </p>
           </article>
@@ -51,10 +51,10 @@ export default function LandingDynastyStatsSection() {
             >
               42-18-2
             </p>
-            <p className="mt-1 text-[11px] font-bold uppercase tracking-[0.14em] text-[#64748B]" style={{ fontFamily: 'var(--font-body)' }}>
+            <p className="mt-1 text-[12px] font-bold uppercase tracking-[0.14em] text-[#64748B]" style={{ fontFamily: 'var(--font-body)' }}>
               Verified Record
             </p>
-            <p className="mt-4 text-[13px] leading-relaxed text-[#64748B]" style={{ fontFamily: 'var(--font-body)' }}>
+            <p className="mt-4 text-[14px] leading-relaxed text-[#64748B]" style={{ fontFamily: 'var(--font-body)' }}>
               Tracked outcomes across active Sleeper leagues — not cherry-picked highlights.
             </p>
           </article>
@@ -70,10 +70,10 @@ export default function LandingDynastyStatsSection() {
                 />
               </svg>
             </div>
-            <p className="mt-4 text-[13px] font-bold uppercase tracking-[0.12em] text-[#8B5CF6]" style={{ fontFamily: 'var(--font-body)' }}>
+            <p className="mt-4 text-[14px] font-bold uppercase tracking-[0.12em] text-[#8B5CF6]" style={{ fontFamily: 'var(--font-body)' }}>
               Refinement Feedback Loop
             </p>
-            <p className="mt-2 text-[13px] leading-relaxed text-[#94A3B8]" style={{ fontFamily: 'var(--font-body)' }}>
+            <p className="mt-2 text-[14px] leading-relaxed text-[#94A3B8]" style={{ fontFamily: 'var(--font-body)' }}>
               <span className="font-mono tabular-nums">100%</span> transparency — every miss feeds the next model pass.
             </p>
           </article>

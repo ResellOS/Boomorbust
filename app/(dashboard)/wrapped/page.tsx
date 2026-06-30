@@ -41,14 +41,14 @@ function PlayerChip({ name, pos, team, detail }: { name: string; pos: string; te
           <Image src={photoUrl(name)} alt={name} width={36} height={36} className="object-cover" onError={() => setErr(true)} unoptimized />
         ) : (
           <div className="w-9 h-9 flex items-center justify-center" style={{ background: `${color}20` }}>
-            <span className="text-[10px] font-bold" style={{ color }}>{name.split(' ').map((s) => s[0]).join('').slice(0, 2)}</span>
+            <span className="text-[11px] font-bold" style={{ color }}>{name.split(' ').map((s) => s[0]).join('').slice(0, 2)}</span>
           </div>
         )}
       </div>
       <div>
-        <p className="text-[13px] font-semibold text-white">{name}</p>
-        <p className="text-[10px]" style={{ color }}>{pos} · {team}</p>
-        {detail && <p className="text-[10px] text-slate-500">{detail}</p>}
+        <p className="text-[14px] font-semibold text-white">{name}</p>
+        <p className="text-[11px]" style={{ color }}>{pos} · {team}</p>
+        {detail && <p className="text-[11px] text-slate-500">{detail}</p>}
       </div>
     </div>
   );
@@ -64,13 +64,13 @@ function DynastyGradeCard({ score, grade, tier, sparkData }: { score: number; gr
 
   return (
     <div className="rounded-xl p-5 flex flex-col gap-4" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
-      <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">YOUR DYNASTY GRADE</p>
+      <p className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">YOUR DYNASTY GRADE</p>
       <div className="flex items-center gap-5">
         <div>
           <p className="text-[52px] font-bold leading-none" style={{ fontFamily: 'JetBrains Mono, monospace', color: gradeColor }}>{grade}</p>
-          <p className="text-[16px] font-bold text-white mt-1">{score} / 100</p>
-          <p className="text-[12px] font-semibold mt-0.5" style={{ color: gradeColor }}>{tier}</p>
-          <p className="text-[10px] text-slate-500 mt-0.5">Top 12% of all managers</p>
+          <p className="text-[17px] font-bold text-white mt-1">{score} / 100</p>
+          <p className="text-[13px] font-semibold mt-0.5" style={{ color: gradeColor }}>{tier}</p>
+          <p className="text-[11px] text-slate-500 mt-0.5">Top 12% of all managers</p>
         </div>
         <div className="flex-1">
           <svg viewBox="0 0 120 40" preserveAspectRatio="none" className="w-full h-12">
@@ -110,11 +110,11 @@ function SeasonSummary(p: SeasonSummaryProps) {
 
   return (
     <div className="rounded-xl p-5" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
-      <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-4">SEASON SUMMARY</p>
+      <p className="text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-4">SEASON SUMMARY</p>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {stats.map((s, i) => (
           <div key={i} className={`flex flex-col ${s.big ? 'items-center' : ''}`}>
-            <p className="text-[10px] text-slate-500">{s.label}</p>
+            <p className="text-[11px] text-slate-500">{s.label}</p>
             {s.ring ? (
               <div className="w-12 h-12 rounded-full flex items-center justify-center border-2 mt-1" style={{ borderColor: '#A78BFA', color: '#A78BFA' }}>
                 <p className="text-[22px] font-bold" style={{ fontFamily: 'JetBrains Mono, monospace' }}>{s.value}</p>
@@ -126,7 +126,7 @@ function SeasonSummary(p: SeasonSummaryProps) {
                 {s.big && <span className="ml-1 text-[18px]">🏆</span>}
               </p>
             )}
-            {s.sub && <p className="text-[10px] text-slate-500 mt-0.5">{s.sub}</p>}
+            {s.sub && <p className="text-[11px] text-slate-500 mt-0.5">{s.sub}</p>}
           </div>
         ))}
       </div>
@@ -152,14 +152,14 @@ function TradeHighlight({ label, week, givePlayer, givePos, giveTeam, giveExtra,
   return (
     <div className="rounded-xl p-5" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
       <div className="flex items-center justify-between mb-4">
-        <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{label}</p>
-        <span className="text-[10px] text-slate-500">Week {week}</span>
+        <p className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">{label}</p>
+        <span className="text-[11px] text-slate-500">Week {week}</span>
       </div>
 
       <div className="grid grid-cols-[1fr_auto_1fr] gap-3 items-center mb-4">
         {/* You Gave */}
         <div>
-          <p className="text-[9px] text-slate-600 uppercase mb-2">You Gave</p>
+          <p className="text-[10px] text-slate-600 uppercase mb-2">You Gave</p>
           <div className="space-y-2">
             <PlayerChip name={givePlayer} pos={givePos} team={giveTeam} detail={giveExtra} />
           </div>
@@ -171,7 +171,7 @@ function TradeHighlight({ label, week, givePlayer, givePos, giveTeam, giveExtra,
         </div>
         {/* You Got */}
         <div>
-          <p className="text-[9px] text-slate-600 uppercase mb-2">You Got</p>
+          <p className="text-[10px] text-slate-600 uppercase mb-2">You Got</p>
           <div className="space-y-2">
             <PlayerChip name={getPlayer} pos={getPos} team={getTeam} detail={getExtra} />
           </div>
@@ -180,11 +180,11 @@ function TradeHighlight({ label, week, givePlayer, givePos, giveTeam, giveExtra,
 
       <div className="flex items-center justify-between pt-3 border-t" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
         <div>
-          <p className="text-[9px] text-slate-500 uppercase">Trade Grade</p>
+          <p className="text-[10px] text-slate-500 uppercase">Trade Grade</p>
           <p className="text-[18px] font-bold" style={{ fontFamily: 'JetBrains Mono, monospace', color: gradeColor }}>{grade}</p>
         </div>
         <div className="text-right">
-          <p className="text-[9px] text-slate-500 uppercase">{isGood ? 'Value Gained' : 'Value Lost'}</p>
+          <p className="text-[10px] text-slate-500 uppercase">{isGood ? 'Value Gained' : 'Value Lost'}</p>
           <p className="text-[18px] font-bold" style={{ fontFamily: 'JetBrains Mono, monospace', color: gradeColor }}>
             {isGood ? '+' : ''}{valueChange.toLocaleString()}
           </p>
@@ -215,10 +215,10 @@ function TrophyCard() {
         <circle cx="40" cy="28" r="4" fill="#FBBF24" opacity="0.8"/>
       </svg>
       <div className="text-center">
-        <p className="text-[14px] font-bold text-white">BUILT DIFFERENT.</p>
-        <p className="text-[14px] font-bold text-white">PLAYED DIFFERENT.</p>
-        <p className="text-[14px] font-bold text-white">WON DIFFERENT.</p>
-        <p className="text-[11px] mt-1" style={{ color: '#A78BFA' }}>#DynastyDifferent</p>
+        <p className="text-[15px] font-bold text-white">BUILT DIFFERENT.</p>
+        <p className="text-[15px] font-bold text-white">PLAYED DIFFERENT.</p>
+        <p className="text-[15px] font-bold text-white">WON DIFFERENT.</p>
+        <p className="text-[12px] mt-1" style={{ color: '#A78BFA' }}>#DynastyDifferent</p>
       </div>
     </div>
   );
@@ -234,21 +234,21 @@ function RankListRow({ item, index }: { item: RankListItem; index: number }) {
   const color = posColorMap[item.pos] ?? '#64748B';
   return (
     <div className="flex items-center gap-3">
-      <span className="text-[11px] text-slate-500 font-bold w-4">{index + 1}</span>
+      <span className="text-[12px] text-slate-500 font-bold w-4">{index + 1}</span>
       <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0 bg-white/[0.06]">
         {!err ? (
           <Image src={photoUrl(item.name)} alt={item.name} width={32} height={32} className="object-cover" onError={() => setErr(true)} unoptimized />
         ) : (
           <div className="w-8 h-8 flex items-center justify-center" style={{ background: `${color}20` }}>
-            <span className="text-[9px] font-bold" style={{ color }}>{item.name.split(' ').map((s) => s[0]).join('').slice(0, 2)}</span>
+            <span className="text-[10px] font-bold" style={{ color }}>{item.name.split(' ').map((s) => s[0]).join('').slice(0, 2)}</span>
           </div>
         )}
       </div>
       <div className="flex-1 min-w-0">
-        <p className="text-[12px] font-semibold text-white truncate">{item.name}</p>
-        <p className="text-[10px] text-slate-500">{item.pos} · {item.team}</p>
+        <p className="text-[13px] font-semibold text-white truncate">{item.name}</p>
+        <p className="text-[11px] text-slate-500">{item.pos} · {item.team}</p>
       </div>
-      <p className="text-[12px] font-bold flex-shrink-0" style={{ fontFamily: 'JetBrains Mono, monospace', color: '#36E7A1' }}>
+      <p className="text-[13px] font-bold flex-shrink-0" style={{ fontFamily: 'JetBrains Mono, monospace', color: '#36E7A1' }}>
         +{item.delta}
       </p>
     </div>
@@ -259,15 +259,15 @@ function RankList({ title, label, items }: { title: string; label: string; items
   return (
     <div className="rounded-xl p-4 flex flex-col gap-3" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
       <div>
-        <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">{title}</p>
-        <p className="text-[10px] text-slate-600">{label}</p>
+        <p className="text-[12px] font-bold text-slate-400 uppercase tracking-widest">{title}</p>
+        <p className="text-[11px] text-slate-600">{label}</p>
       </div>
       <div className="space-y-2.5">
         {items.map((item, i) => (
           <RankListRow key={`${item.name}-${i}`} item={item} index={i} />
         ))}
       </div>
-      <button className="text-[11px] mt-auto" style={{ color: '#36E7A1' }}>View {title === 'TOP PLAYERS' ? 'Full Roster' : 'All ' + title.split(' ')[1]} →</button>
+      <button className="text-[12px] mt-auto" style={{ color: '#36E7A1' }}>View {title === 'TOP PLAYERS' ? 'Full Roster' : 'All ' + title.split(' ')[1]} →</button>
     </div>
   );
 }
@@ -283,12 +283,12 @@ function AchievementCard({ icon, title, desc, stat, sub }: { icon: string; title
           {icon}
         </div>
         <div>
-          <p className="text-[12px] font-bold text-white">{title}</p>
-          <p className="text-[10px] text-slate-500">{desc}</p>
+          <p className="text-[13px] font-bold text-white">{title}</p>
+          <p className="text-[11px] text-slate-500">{desc}</p>
         </div>
       </div>
       <p className="text-[28px] font-bold" style={{ fontFamily: 'JetBrains Mono, monospace', color: '#36E7A1' }}>{stat}</p>
-      <p className="text-[10px] text-slate-500 mt-0.5">{sub}</p>
+      <p className="text-[11px] text-slate-500 mt-0.5">{sub}</p>
     </div>
   );
 }
@@ -300,23 +300,23 @@ function ShareCard({ grade, score, record, tier }: { grade: string; score: numbe
   return (
     <div className="rounded-xl overflow-hidden" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
       <div className="p-4 border-b" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
-        <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1">SHARE YOUR WRAPPED</p>
-        <p className="text-[11px] text-slate-500">Show off your season with a shareable card.</p>
+        <p className="text-[12px] font-bold text-slate-400 uppercase tracking-widest mb-1">SHARE YOUR WRAPPED</p>
+        <p className="text-[12px] text-slate-500">Show off your season with a shareable card.</p>
       </div>
 
       {/* Preview card */}
       <div className="p-4">
         <div className="flex items-center gap-2.5 mb-3">
-          <div className="w-8 h-8 rounded-full bg-white/[0.1] flex items-center justify-center text-[11px] font-bold text-white">B</div>
+          <div className="w-8 h-8 rounded-full bg-white/[0.1] flex items-center justify-center text-[12px] font-bold text-white">B</div>
           <div>
-            <p className="text-[12px] font-semibold text-white">Boom or Bust</p>
-            <p className="text-[10px] text-slate-500">@boomorbustff</p>
+            <p className="text-[13px] font-semibold text-white">Boom or Bust</p>
+            <p className="text-[11px] text-slate-500">@boomorbustff</p>
           </div>
         </div>
-        <p className="text-[11px] text-slate-400 mb-3">Just wrapped my dynasty season!</p>
+        <p className="text-[12px] text-slate-400 mb-3">Just wrapped my dynasty season!</p>
         <div className="flex gap-1.5 flex-wrap mb-3">
           {['🏆 Champion', '📊 Elite Manager', `🔥 Top 12%`].map((tag) => (
-            <span key={tag} className="text-[10px] text-slate-400">{tag}</span>
+            <span key={tag} className="text-[11px] text-slate-400">{tag}</span>
           ))}
         </div>
 
@@ -325,11 +325,11 @@ function ShareCard({ grade, score, record, tier }: { grade: string; score: numbe
           className="rounded-lg p-3 text-center"
           style={{ background: 'linear-gradient(135deg, #0a0d14, #1a0a2e)', border: '1px solid rgba(124,58,237,0.3)' }}
         >
-          <p className="text-[10px] text-slate-500 uppercase tracking-widest mb-1">MY 2024 DYNASTY WRAPPED.</p>
+          <p className="text-[11px] text-slate-500 uppercase tracking-widest mb-1">MY 2024 DYNASTY WRAPPED.</p>
           <p className="text-[32px] font-bold" style={{ fontFamily: 'JetBrains Mono, monospace', color: gradeColor }}>{grade}</p>
-          <p className="text-[11px] text-slate-400">{score} / 100</p>
-          <p className="text-[11px] font-semibold" style={{ color: gradeColor }}>{tier.toUpperCase()}</p>
-          <div className="flex justify-center gap-3 mt-2 text-[10px] text-slate-500">
+          <p className="text-[12px] text-slate-400">{score} / 100</p>
+          <p className="text-[12px] font-semibold" style={{ color: gradeColor }}>{tier.toUpperCase()}</p>
+          <div className="flex justify-center gap-3 mt-2 text-[11px] text-slate-500">
             <span>🏆 CHAMPION</span>
             <span>{record} RECORD</span>
             <span>#DynastyDifferent</span>
@@ -340,7 +340,7 @@ function ShareCard({ grade, score, record, tier }: { grade: string; score: numbe
       {/* Twitter share */}
       <div className="px-4 pb-4">
         <button
-          className="w-full py-2.5 rounded-xl font-bold text-[13px] text-white transition-all hover:opacity-90"
+          className="w-full py-2.5 rounded-xl font-bold text-[14px] text-white transition-all hover:opacity-90"
           style={{ background: 'linear-gradient(135deg, #7c3aed, #2563eb)' }}
         >
           Share to Twitter
@@ -420,8 +420,8 @@ export default function WrappedPage() {
           <div className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4 animate-pulse" style={{ background: 'rgba(54,231,161,0.1)', border: '1px solid rgba(54,231,161,0.25)' }}>
             <span className="text-2xl">🏆</span>
           </div>
-          <p className="text-[16px] font-semibold text-white mb-1">Generating your Dynasty Wrapped...</p>
-          <p className="text-[12px] text-slate-500">Analyzing your full season</p>
+          <p className="text-[17px] font-semibold text-white mb-1">Generating your Dynasty Wrapped...</p>
+          <p className="text-[13px] text-slate-500">Analyzing your full season</p>
         </div>
       </div>
     );
@@ -433,14 +433,14 @@ export default function WrappedPage() {
       <div className="flex items-start justify-between flex-wrap gap-3 mb-6">
         <div>
           <h1 className="text-[26px] font-bold text-white">Wrapped</h1>
-          <p className="text-[13px] text-slate-500 mt-0.5">Your dynasty year in review. A season to remember.</p>
+          <p className="text-[14px] text-slate-500 mt-0.5">Your dynasty year in review. A season to remember.</p>
         </div>
         <div className="flex items-center gap-3">
           {/* Season selector */}
           <select
             value={season}
             onChange={(e) => setSeason(e.target.value)}
-            className="rounded-xl px-4 py-2 text-[12px] text-slate-300 appearance-none cursor-pointer"
+            className="rounded-xl px-4 py-2 text-[13px] text-slate-300 appearance-none cursor-pointer"
             style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }}
           >
             {['2024', '2023', '2022'].map((y) => (
@@ -450,7 +450,7 @@ export default function WrappedPage() {
 
           {/* Share */}
           <button
-            className="flex items-center gap-2 rounded-xl px-4 py-2 text-[13px] font-bold"
+            className="flex items-center gap-2 rounded-xl px-4 py-2 text-[14px] font-bold"
             style={{ background: 'linear-gradient(135deg, #7c3aed, #2563eb)', color: 'white' }}
           >
             Share Your Wrapped
@@ -459,7 +459,7 @@ export default function WrappedPage() {
       </div>
 
       {error && (
-        <div className="mb-4 px-4 py-3 rounded-xl text-[12px] text-red-300" style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.25)' }}>
+        <div className="mb-4 px-4 py-3 rounded-xl text-[13px] text-red-300" style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.25)' }}>
           {error}
         </div>
       )}

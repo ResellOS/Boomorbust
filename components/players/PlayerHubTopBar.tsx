@@ -87,7 +87,7 @@ export default function PlayerHubTopBar({ stats }: PlayerHubTopBarProps) {
             key={item.label}
             className="flex min-w-[110px] shrink-0 flex-col justify-center border-r border-border px-3 py-1.5 last:border-r-0 md:min-w-0 md:px-[18px]"
           >
-            <div className="mb-[3px] font-mono text-[7.5px] uppercase tracking-[1.5px] text-muted">
+            <div className="mb-[3px] font-mono text-[8.5px] uppercase tracking-[1.5px] text-muted">
               {item.label}
             </div>
             <div
@@ -97,7 +97,7 @@ export default function PlayerHubTopBar({ stats }: PlayerHubTopBarProps) {
             >
               {item.value}
             </div>
-            <div className="mt-0.5 font-mono text-[7.5px] text-muted">{item.desc}</div>
+            <div className="mt-0.5 font-mono text-[8.5px] text-muted">{item.desc}</div>
           </div>
         ))}
       </div>

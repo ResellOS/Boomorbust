@@ -28,7 +28,7 @@ const HOVER_DELAY_MS = 150;
 function PositionBadge({ position }: { position: string }) {
   return (
     <span
-      className="inline-flex h-[16px] min-w-[22px] items-center justify-center rounded-[3px] px-0.5 font-mono text-[8px]"
+      className="inline-flex h-[16px] min-w-[22px] items-center justify-center rounded-[3px] px-0.5 font-mono text-[9px]"
       style={{ color: positionColor(position), background: `${positionColor(position)}1a` }}
     >
       {position}
@@ -137,14 +137,14 @@ export default function DraftPlayerPool({
   return (
     <div className="relative flex min-h-0 flex-1 flex-col">
       <div className="shrink-0 border-b border-border px-3 py-1.5">
-        <div className="font-mono text-[8px] uppercase tracking-[1.5px] text-muted">Big Board / Player Pool</div>
+        <div className="font-mono text-[9px] uppercase tracking-[1.5px] text-muted">Big Board / Player Pool</div>
       </div>
       <div className="shrink-0 space-y-2 border-b border-border px-3 py-2">
         <input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Find player  Ctrl+F"
-          className="w-full rounded-[6px] border border-border bg-bg px-3 py-1.5 font-mono text-[11px] text-text outline-none placeholder:text-muted focus:border-boom/40"
+          className="w-full rounded-[6px] border border-border bg-bg px-3 py-1.5 font-mono text-[12px] text-text outline-none placeholder:text-muted focus:border-boom/40"
         />
         <div className="flex flex-wrap gap-1">
           {POS_TABS.map((f) => (
@@ -152,7 +152,7 @@ export default function DraftPlayerPool({
               key={f}
               type="button"
               onClick={() => setFilter(f)}
-              className={`rounded-[4px] px-2 py-0.5 font-mono text-[9px] ${
+              className={`rounded-[4px] px-2 py-0.5 font-mono text-[10px] ${
                 filter === f ? 'bg-boom/15 text-boom' : 'text-muted hover:text-text'
               }`}
             >
@@ -171,7 +171,7 @@ export default function DraftPlayerPool({
               key={t.key}
               type="button"
               onClick={() => t.set(!t.on)}
-              className={`rounded-[4px] border px-2 py-0.5 font-mono text-[8px] ${
+              className={`rounded-[4px] border px-2 py-0.5 font-mono text-[9px] ${
                 t.on ? 'border-boom/40 text-boom' : 'border-border text-muted'
               }`}
             >
@@ -192,7 +192,7 @@ export default function DraftPlayerPool({
           }
         }}
       >
-        <div className="sticky top-0 z-[1] grid grid-cols-[36px_minmax(120px,1fr)_40px_44px_56px_44px_48px_36px_28px] gap-1 border-b border-border bg-bg px-2 py-1.5 font-mono text-[7px] uppercase tracking-wide text-muted">
+        <div className="sticky top-0 z-[1] grid grid-cols-[36px_minmax(120px,1fr)_40px_44px_56px_44px_48px_36px_28px] gap-1 border-b border-border bg-bg px-2 py-1.5 font-mono text-[8px] uppercase tracking-wide text-muted">
           <span>Rank</span>
           <span>Player</span>
           <span>Pos</span>
@@ -215,7 +215,7 @@ export default function DraftPlayerPool({
               {showBreak && (
                 <div className="flex items-center gap-2 bg-surface2/80 px-3 py-1">
                   <div className="h-px flex-1 bg-border" />
-                  <span className="font-mono text-[8px] uppercase tracking-[2px] text-boom">
+                  <span className="font-mono text-[9px] uppercase tracking-[2px] text-boom">
                     Tier {tier}
                   </span>
                   <div className="h-px flex-1 bg-border" />
@@ -237,25 +237,25 @@ export default function DraftPlayerPool({
                   }
                 }}
               >
-                <span className="font-mono text-[10px] tabular-nums text-muted">{p.bobRank}</span>
+                <span className="font-mono text-[11px] tabular-nums text-muted">{p.bobRank}</span>
                 <button
                   type="button"
                   disabled={!isUserTurn || drafted}
                   onClick={() => onPick(p)}
                   className="flex min-w-0 items-center gap-1.5 text-left disabled:cursor-default"
                 >
-                  <span className="truncate font-mono text-[11px] text-text">{p.name}</span>
+                  <span className="truncate font-mono text-[12px] text-text">{p.name}</span>
                 </button>
                 <PositionBadge position={p.position} />
-                <span className="font-mono text-[10px] text-muted">{p.team}</span>
-                <span className="text-right font-mono text-[11px] tabular-nums text-boom">
+                <span className="font-mono text-[11px] text-muted">{p.team}</span>
+                <span className="text-right font-mono text-[12px] tabular-nums text-boom">
                   {p.tfoScore.toFixed(1)}
                 </span>
-                <span className="text-right font-mono text-[10px] tabular-nums text-muted">{p.adp}</span>
-                <span className="text-right font-mono text-[10px] tabular-nums text-boom">
+                <span className="text-right font-mono text-[11px] tabular-nums text-muted">{p.adp}</span>
+                <span className="text-right font-mono text-[11px] tabular-nums text-boom">
                   {valueGap(p.adp, currentOverall)}
                 </span>
-                <span className="text-center font-mono text-[10px] text-boom">
+                <span className="text-center font-mono text-[11px] text-boom">
                   {p.adp < currentOverall ? '↑' : p.adp > currentOverall + 5 ? '↓' : '—'}
                 </span>
                 <button

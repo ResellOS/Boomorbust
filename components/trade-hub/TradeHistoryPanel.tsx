@@ -21,7 +21,7 @@ function HistoryAvatar({ playerId, name }: { playerId: string; name: string }) {
 
   if (!playerId || err) {
     return (
-      <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-white/[0.08] text-[10px] font-bold text-white">
+      <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-white/[0.08] text-[11px] font-bold text-white">
         {initials}
       </div>
     );
@@ -107,18 +107,18 @@ export default function TradeHistoryPanel({ limit = 5, className }: TradeHistory
       <div className="flex flex-col gap-2 border-b border-white/[0.06] px-3 py-3 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between sm:gap-3 sm:px-4">
         <div className="min-w-0">
           <p
-            className="text-[12px] font-semibold uppercase tracking-wide text-[#64748B]"
+            className="text-[13px] font-semibold uppercase tracking-wide text-[#64748B]"
             style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}
           >
             TRADE HISTORY
           </p>
-          <p className="mt-0.5 text-[11px] text-[#475569]" style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}>
+          <p className="mt-0.5 text-[12px] text-[#475569]" style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}>
             All past trades with TRE verdict
           </p>
         </div>
         <Link
           href="/dashboard/trade-hub/history"
-          className="inline-flex min-h-[44px] shrink-0 items-center text-[12px] text-[#22D3EE] hover:bg-white/[0.04] hover:underline sm:min-h-0"
+          className="inline-flex min-h-[44px] shrink-0 items-center text-[13px] text-[#22D3EE] hover:bg-white/[0.04] hover:underline sm:min-h-0"
           style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}
         >
           View Full History →
@@ -130,37 +130,37 @@ export default function TradeHistoryPanel({ limit = 5, className }: TradeHistory
           <thead>
             <tr>
               <th
-                className="border-b border-white/[0.06] pb-2 whitespace-nowrap text-[10px] font-semibold uppercase tracking-wide text-[#64748B]"
+                className="border-b border-white/[0.06] pb-2 whitespace-nowrap text-[11px] font-semibold uppercase tracking-wide text-[#64748B]"
                 style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}
               >
                 TIME
               </th>
               <th
-                className="border-b border-white/[0.06] pb-2 whitespace-nowrap text-[10px] font-semibold uppercase tracking-wide text-[#64748B]"
+                className="border-b border-white/[0.06] pb-2 whitespace-nowrap text-[11px] font-semibold uppercase tracking-wide text-[#64748B]"
                 style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}
               >
                 TRADED
               </th>
               <th
-                className="border-b border-white/[0.06] pb-2 whitespace-nowrap text-[10px] font-semibold uppercase tracking-wide text-[#64748B]"
+                className="border-b border-white/[0.06] pb-2 whitespace-nowrap text-[11px] font-semibold uppercase tracking-wide text-[#64748B]"
                 style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}
               >
                 PLAYER GIVEN
               </th>
               <th
-                className="border-b border-white/[0.06] pb-2 whitespace-nowrap text-[10px] font-semibold normal-case tracking-wide text-[#64748B]"
+                className="border-b border-white/[0.06] pb-2 whitespace-nowrap text-[11px] font-semibold normal-case tracking-wide text-[#64748B]"
                 style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}
               >
                 for
               </th>
               <th
-                className="border-b border-white/[0.06] pb-2 whitespace-nowrap text-[10px] font-semibold uppercase tracking-wide text-[#64748B]"
+                className="border-b border-white/[0.06] pb-2 whitespace-nowrap text-[11px] font-semibold uppercase tracking-wide text-[#64748B]"
                 style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}
               >
                 PLAYER RECEIVED
               </th>
               <th
-                className="border-b border-white/[0.06] pb-2 text-right whitespace-nowrap text-[10px] font-semibold uppercase tracking-wide text-[#64748B]"
+                className="border-b border-white/[0.06] pb-2 text-right whitespace-nowrap text-[11px] font-semibold uppercase tracking-wide text-[#64748B]"
                 style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}
               >
                 TRE VERDICT
@@ -201,11 +201,11 @@ export default function TradeHistoryPanel({ limit = 5, className }: TradeHistory
                 ? (
                     <tr>
                       <td colSpan={6} className="py-6 text-center" style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}>
-                        <p className="text-[13px] text-red-400">{error}</p>
+                        <p className="text-[14px] text-red-400">{error}</p>
                         <button
                           type="button"
                           onClick={() => void load()}
-                          className="mt-3 min-h-[44px] rounded-lg border border-white/[0.12] bg-white/[0.05] px-4 text-[13px] text-white hover:bg-white/[0.08]"
+                          className="mt-3 min-h-[44px] rounded-lg border border-white/[0.12] bg-white/[0.05] px-4 text-[14px] text-white hover:bg-white/[0.08]"
                         >
                           Retry
                         </button>
@@ -215,7 +215,7 @@ export default function TradeHistoryPanel({ limit = 5, className }: TradeHistory
                 : (data?.trades ?? []).length === 0
                   ? (
                       <tr>
-                        <td colSpan={6} className="py-6 text-center text-[13px] text-[#64748B]" style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}>
+                        <td colSpan={6} className="py-6 text-center text-[14px] text-[#64748B]" style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}>
                           No trade history yet.
                         </td>
                       </tr>
@@ -236,18 +236,18 @@ function HistoryTableRow({ row }: { row: TradeHistoryRowDto }) {
   return (
     <tr className="cursor-pointer border-b border-white/[0.04] transition-colors last:border-b-0 hover:bg-white/[0.03]">
       <td
-        className="min-h-[44px] min-w-[40px] py-2.5 pr-2 align-middle text-[11px] tabular-nums text-[#64748B] sm:py-3"
+        className="min-h-[44px] min-w-[40px] py-2.5 pr-2 align-middle text-[12px] tabular-nums text-[#64748B] sm:py-3"
         style={{ fontFamily: 'var(--font-mono), JetBrains Mono, monospace' }}
       >
         {row.timeLabel}
       </td>
-      <td className="min-h-[44px] py-2.5 pr-2 align-middle text-[11px] text-[#475569] sm:py-3" style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}>
+      <td className="min-h-[44px] py-2.5 pr-2 align-middle text-[12px] text-[#475569] sm:py-3" style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}>
         Traded
       </td>
       <td className="min-h-[44px] min-w-0 py-2.5 pr-2 align-middle sm:py-3">
         <div className="flex min-w-0 items-center gap-2">
           <HistoryAvatar playerId={row.givenPlayerId} name={row.givenName} />
-          <span className="flex min-w-0 items-center gap-1 text-[12px] font-medium text-white" style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}>
+          <span className="flex min-w-0 items-center gap-1 text-[13px] font-medium text-white" style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}>
             <span className="truncate">{row.givenName}</span>
             {row.givenWarning ? (
               <AlertTriangle className="h-3.5 w-3.5 shrink-0 text-amber-400" aria-label="Aging player warning" />
@@ -255,7 +255,7 @@ function HistoryTableRow({ row }: { row: TradeHistoryRowDto }) {
           </span>
         </div>
       </td>
-      <td className="min-h-[44px] py-2.5 pr-2 align-middle text-[11px] text-[#475569] sm:py-3" style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}>
+      <td className="min-h-[44px] py-2.5 pr-2 align-middle text-[12px] text-[#475569] sm:py-3" style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}>
         for
       </td>
       <td className="min-h-[44px] min-w-0 py-2.5 pr-2 align-middle sm:py-3">
@@ -263,7 +263,7 @@ function HistoryTableRow({ row }: { row: TradeHistoryRowDto }) {
           {row.receivedPlayerId ? (
             <HistoryAvatar playerId={row.receivedPlayerId} name={receivedAvatarName} />
           ) : null}
-          <span className="truncate text-[12px] font-medium text-white" style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}>
+          <span className="truncate text-[13px] font-medium text-white" style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}>
             {row.receivedDisplay}
           </span>
         </div>
@@ -271,13 +271,13 @@ function HistoryTableRow({ row }: { row: TradeHistoryRowDto }) {
       <td className="min-h-[44px] py-2.5 pl-2 text-right align-middle sm:py-3">
         <div className="flex flex-wrap items-center justify-end gap-2">
           <span
-            className={`inline-flex shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase ${badge}`}
+            className={`inline-flex shrink-0 rounded-full px-2 py-0.5 text-[11px] font-semibold uppercase ${badge}`}
             style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}
           >
             {row.verdict}
           </span>
           <span
-            className={`text-[12px] font-bold tabular-nums ${scoreCls}`}
+            className={`text-[13px] font-bold tabular-nums ${scoreCls}`}
             style={{ fontFamily: 'var(--font-mono), JetBrains Mono, monospace' }}
           >
             {row.scoreDisplay}

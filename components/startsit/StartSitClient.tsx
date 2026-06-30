@@ -13,6 +13,7 @@ import type {
 import OffseasonContextBanner from '@/components/startsit/OffseasonContextBanner';
 import PlayerAvatar from '@/components/players/PlayerAvatar';
 import ConfidenceBadge from '@/components/startsit/ConfidenceBadge';
+import RecommendationFeedback from '@/components/feedback/RecommendationFeedback';
 import { startSitConfidenceStyle } from '@/lib/ui/labels';
 
 interface StartSitClientProps {
@@ -66,7 +67,7 @@ function ConfidencePill({ tier }: { tier: 'Lean' | 'Strong' | 'Smash' }) {
 
   return (
     <span
-      className="inline-block rounded px-2 py-0.5 font-mono text-[9px] uppercase tracking-wide"
+      className="inline-block rounded px-2 py-0.5 font-mono text-[10px] uppercase tracking-wide"
       style={{ color: style.color, background: bg, border: `1px solid ${border}` }}
     >
       {tier}
@@ -88,7 +89,7 @@ function HeroDecisionCard({ decision }: { decision: LineupDecision }) {
         boxShadow: `inset 3px 0 12px -4px ${glow}40`,
       }}
     >
-      <div className="mb-3 font-mono text-[9px] uppercase tracking-[1.5px]" style={{ color: glow }}>
+      <div className="mb-3 font-mono text-[10px] uppercase tracking-[1.5px]" style={{ color: glow }}>
         {label}
       </div>
 
@@ -101,16 +102,16 @@ function HeroDecisionCard({ decision }: { decision: LineupDecision }) {
               size={40}
             />
             <div>
-              <div className="font-mono text-[13px] uppercase text-text">
+              <div className="font-mono text-[14px] uppercase text-text">
                 {decision.startPlayer.fullName}
               </div>
-              <div className="font-mono text-[10px] text-muted">
+              <div className="font-mono text-[11px] text-muted">
                 {decision.startPlayer.position} · {decision.startPlayer.team}
               </div>
             </div>
           </div>
 
-          <div className="text-center font-mono text-[10px] uppercase tracking-widest text-muted">
+          <div className="text-center font-mono text-[11px] uppercase tracking-widest text-muted">
             over
           </div>
 
@@ -121,10 +122,10 @@ function HeroDecisionCard({ decision }: { decision: LineupDecision }) {
               size={40}
             />
             <div>
-              <div className="font-mono text-[13px] uppercase text-text">
+              <div className="font-mono text-[14px] uppercase text-text">
                 {decision.sitPlayer.fullName}
               </div>
-              <div className="font-mono text-[10px] text-muted">
+              <div className="font-mono text-[11px] text-muted">
                 {decision.sitPlayer.position} · {decision.sitPlayer.team}
               </div>
             </div>
@@ -133,28 +134,43 @@ function HeroDecisionCard({ decision }: { decision: LineupDecision }) {
 
         <div className="flex shrink-0 flex-col items-end gap-1 sm:min-w-[140px]">
           <div className="font-mono text-[18px] text-boom">+{decision.edgePts.toFixed(1)}</div>
-          <div className="text-[9px] text-muted">Expected Points</div>
+          <div className="text-[10px] text-muted">Expected Points</div>
           <div className="mt-1 flex items-center gap-1.5">
-            <span className="font-mono text-[11px] text-text">{decision.confidence}%</span>
+            <span className="font-mono text-[12px] text-text">{decision.confidence}%</span>
             <ConfidenceBadge pct={decision.confidence} />
           </div>
-          <div className="mt-2 font-mono text-[9px] text-muted">
+          <div className="mt-2 font-mono text-[10px] text-muted">
             League: {decision.leagueName}
           </div>
         </div>
       </div>
 
       <div className="mt-4 border-t border-border/60 pt-3">
-        <div className="mb-1.5 font-mono text-[8px] uppercase tracking-wide text-muted">Why</div>
+        <div className="mb-1.5 font-mono text-[9px] uppercase tracking-wide text-muted">Why</div>
         <ul className="space-y-0.5">
           {decision.whyBullets.slice(0, 4).map((b) => (
-            <li key={b} className="font-mono text-[9px] text-muted">
+            <li key={b} className="font-mono text-[10px] text-muted">
               • {b}
             </li>
           ))}
         </ul>
-        <div className="mt-2 font-mono text-[9px] text-bust/80">
+        <div className="mt-2 font-mono text-[10px] text-bust/80">
           If ignored: -{decision.edgePts.toFixed(1)} projected points
+        </div>
+        <div className="mt-2.5 flex items-center justify-between gap-2">
+          <span className="font-mono text-[9px] uppercase tracking-wide text-muted">
+            Was this call right?
+          </span>
+          <RecommendationFeedback
+            surface="lineup"
+            subjectType="lineup_decision"
+            subjectId={`${decision.startPlayer.playerId}-${decision.sitPlayer.playerId}`}
+            context={{
+              variant: decision.variant,
+              edgePts: decision.edgePts,
+              league: decision.leagueName,
+            }}
+          />
         </div>
       </div>
     </div>
@@ -179,7 +195,7 @@ function DecisionsTable({
   if (rows.length === 0) {
     return (
       <div className="rounded-md border border-border bg-surface px-4 py-8 text-center">
-        <p className="font-mono text-[11px] text-muted">No additional decisions to review.</p>
+        <p className="font-mono text-[12px] text-muted">No additional decisions to review.</p>
       </div>
     );
   }
@@ -192,7 +208,7 @@ function DecisionsTable({
             {['Confidence', 'Decision', 'League', 'Edge', 'Why', 'Action'].map((h) => (
               <th
                 key={h}
-                className="px-3 py-2 font-mono text-[8px] uppercase tracking-wide text-muted"
+                className="px-3 py-2 font-mono text-[9px] uppercase tracking-wide text-muted"
               >
                 {h}
               </th>
@@ -210,18 +226,18 @@ function DecisionsTable({
                 <td className="px-3 py-2.5">
                   <ConfidencePill tier={d.confidenceTier} />
                 </td>
-                <td className="px-3 py-2.5 font-mono text-[10px] text-text">
+                <td className="px-3 py-2.5 font-mono text-[11px] text-text">
                   {d.decisionLabel}
                 </td>
-                <td className="px-3 py-2.5 font-mono text-[10px] text-muted">{d.leagueName}</td>
-                <td className="px-3 py-2.5 font-mono text-[10px] text-boom">
+                <td className="px-3 py-2.5 font-mono text-[11px] text-muted">{d.leagueName}</td>
+                <td className="px-3 py-2.5 font-mono text-[11px] text-boom">
                   +{d.edgePts.toFixed(1)} pts
                 </td>
                 <td className="max-w-[180px] px-3 py-2.5">
                   <button
                     type="button"
                     onClick={() => setExpanded(expanded === d.id ? null : d.id)}
-                    className="border-none bg-transparent p-0 text-left font-mono text-[9px] text-muted hover:text-text"
+                    className="border-none bg-transparent p-0 text-left font-mono text-[10px] text-muted hover:text-text"
                   >
                     {expanded === d.id
                       ? d.whyBullets.join(' · ')
@@ -234,7 +250,7 @@ function DecisionsTable({
                       type="button"
                       disabled={done}
                       onClick={() => onAccept(d.id)}
-                      className="rounded border border-boom/30 bg-boom/10 px-2 py-1 font-mono text-[9px] text-boom disabled:opacity-40"
+                      className="rounded border border-boom/30 bg-boom/10 px-2 py-1 font-mono text-[10px] text-boom disabled:opacity-40"
                     >
                       {accepted.has(d.id) ? 'Accepted' : 'Accept'}
                     </button>
@@ -242,7 +258,7 @@ function DecisionsTable({
                       type="button"
                       disabled={done}
                       onClick={() => onIgnore(d.id)}
-                      className="rounded border border-border px-2 py-1 font-mono text-[9px] text-muted disabled:opacity-40"
+                      className="rounded border border-border px-2 py-1 font-mono text-[10px] text-muted disabled:opacity-40"
                     >
                       {ignored.has(d.id) ? 'Ignored' : 'Ignore'}
                     </button>
@@ -271,10 +287,10 @@ function OptimizeModal({
       <div className="max-h-[85vh] w-full max-w-md overflow-y-auto rounded-md border border-border bg-surface p-5">
         {!showReview ? (
           <>
-            <div className="mb-4 font-mono text-[11px] uppercase tracking-wide text-text">
+            <div className="mb-4 font-mono text-[12px] uppercase tracking-wide text-text">
               Lineup Optimizer
             </div>
-            <div className="space-y-2 font-mono text-[11px] text-muted">
+            <div className="space-y-2 font-mono text-[12px] text-muted">
               <p>
                 <span className="text-text">{optimizer.leagueCount}</span> leagues checked
               </p>
@@ -291,14 +307,14 @@ function OptimizeModal({
               <button
                 type="button"
                 onClick={() => setShowReview(true)}
-                className="w-full rounded border-none bg-boom py-2.5 font-mono text-[11px] uppercase tracking-wide text-bg"
+                className="w-full rounded border-none bg-boom py-2.5 font-mono text-[12px] uppercase tracking-wide text-bg"
               >
                 Review Changes →
               </button>
               <button
                 type="button"
                 onClick={onClose}
-                className="w-full rounded border border-border bg-transparent py-2 font-mono text-[10px] text-muted"
+                className="w-full rounded border border-border bg-transparent py-2 font-mono text-[11px] text-muted"
               >
                 Close
               </button>
@@ -306,19 +322,19 @@ function OptimizeModal({
           </>
         ) : (
           <>
-            <div className="mb-3 font-mono text-[11px] uppercase tracking-wide text-text">
+            <div className="mb-3 font-mono text-[12px] uppercase tracking-wide text-text">
               Recommended Changes
             </div>
             <div className="space-y-3">
               {optimizer.leagueChanges.map((lc) => (
                 <div key={lc.leagueId} className="rounded border border-border/60 p-3">
-                  <div className="mb-2 font-mono text-[10px] text-text">{lc.leagueName}</div>
-                  <div className="mb-1 font-mono text-[9px] text-boom">
+                  <div className="mb-2 font-mono text-[11px] text-text">{lc.leagueName}</div>
+                  <div className="mb-1 font-mono text-[10px] text-boom">
                     +{lc.potentialGain.toFixed(1)} pts potential
                   </div>
                   <ul className="space-y-1">
                     {lc.decisions.map((d) => (
-                      <li key={d.id} className="font-mono text-[9px] text-muted">
+                      <li key={d.id} className="font-mono text-[10px] text-muted">
                         {d.decisionLabel}
                       </li>
                     ))}
@@ -329,7 +345,7 @@ function OptimizeModal({
             <button
               type="button"
               onClick={onClose}
-              className="mt-4 w-full rounded border border-border bg-transparent py-2 font-mono text-[10px] text-muted"
+              className="mt-4 w-full rounded border border-border bg-transparent py-2 font-mono text-[11px] text-muted"
             >
               Close
             </button>
@@ -344,12 +360,12 @@ function FlexDecisionRow({ flex }: { flex: FlexDecision }) {
   const tier = flex.confidenceTier ?? 'Lean';
   return (
     <div className="border-b border-border/50 px-3 py-2.5 last:border-b-0">
-      <div className="font-mono text-[10px] text-text">{flex.pickNote}</div>
+      <div className="font-mono text-[11px] text-text">{flex.pickNote}</div>
       <div className="mt-1 flex items-center gap-2">
-        <span className="font-mono text-[10px] text-boom">+{flex.dynastyEdge.toFixed(1)} projected</span>
+        <span className="font-mono text-[11px] text-boom">+{flex.dynastyEdge.toFixed(1)} projected</span>
         <span className="text-muted">·</span>
         <ConfidencePill tier={tier} />
-        <span className="font-mono text-[9px] text-muted">confidence</span>
+        <span className="font-mono text-[10px] text-muted">confidence</span>
       </div>
     </div>
   );
@@ -447,7 +463,7 @@ export default function StartSitClient({
           <div className="font-mono text-[22px] uppercase tracking-[-0.5px] text-text">
             Weekly Decisions
           </div>
-          <div className="mt-0.5 font-mono text-[11px] text-muted">
+          <div className="mt-0.5 font-mono text-[12px] text-muted">
             What lineup changes should you make today?
           </div>
         </div>
@@ -456,17 +472,17 @@ export default function StartSitClient({
             <button
               type="button"
               onClick={() => handleWeekChange(-1)}
-              className="flex h-7 w-7 items-center justify-center border-none bg-transparent text-[13px] text-muted hover:text-text"
+              className="flex h-7 w-7 items-center justify-center border-none bg-transparent text-[14px] text-muted hover:text-text"
             >
               ‹
             </button>
-            <span className="flex h-7 items-center border-x border-border px-2.5 font-mono text-[11px] text-text">
+            <span className="flex h-7 items-center border-x border-border px-2.5 font-mono text-[12px] text-text">
               {preseason ? 'Preseason' : `Week ${week}`}
             </span>
             <button
               type="button"
               onClick={() => handleWeekChange(1)}
-              className="flex h-7 w-7 items-center justify-center border-none bg-transparent text-[13px] text-muted hover:text-text"
+              className="flex h-7 w-7 items-center justify-center border-none bg-transparent text-[14px] text-muted hover:text-text"
             >
               ›
             </button>
@@ -474,7 +490,7 @@ export default function StartSitClient({
           <select
             value={leagueId}
             onChange={(e) => setLeagueId(e.target.value)}
-            className="h-7 cursor-pointer rounded-[5px] border border-border bg-surface2 px-2.5 font-mono text-[11px] text-text outline-none"
+            className="h-7 cursor-pointer rounded-[5px] border border-border bg-surface2 px-2.5 font-mono text-[12px] text-text outline-none"
           >
             <option value="all">All Leagues</option>
             {leagues.map((l) => (
@@ -491,37 +507,37 @@ export default function StartSitClient({
       <div className="min-h-0 flex-1 overflow-y-auto px-[18px] pb-3 [scrollbar-width:thin]">
         {/* Decisions Summary */}
         <div className="mb-3 rounded-md border border-border bg-surface px-4 py-3">
-          <div className="font-mono text-[11px] uppercase tracking-wide text-text">
+          <div className="font-mono text-[12px] uppercase tracking-wide text-text">
             {weekLabel} Front Office Decisions
           </div>
           {!hasRealData || summary.total === 0 ? (
-            <p className="mt-2 font-mono text-[10px] leading-relaxed text-muted">
+            <p className="mt-2 font-mono text-[11px] leading-relaxed text-muted">
               Preseason Mode — BOB needs scored players in your rosters before lineup decisions
               can be generated. Projections will update as 2026 training camp data arrives. All calls
               are tracked starting Week 1.
             </p>
           ) : (
             <>
-              <p className="mt-2 font-mono text-[11px] text-muted">
+              <p className="mt-2 font-mono text-[12px] text-muted">
                 {summary.total} decision{summary.total !== 1 ? 's' : ''} identified
               </p>
-              <p className="mt-1 font-mono text-[10px] text-muted">
+              <p className="mt-1 font-mono text-[11px] text-muted">
                 {summary.high} High Confidence · {summary.medium} Medium · {summary.low} Low
               </p>
               <div className="mt-2 flex flex-wrap gap-4">
                 <div>
-                  <div className="font-mono text-[9px] uppercase text-muted">Expected gain if followed</div>
-                  <div className="font-mono text-[16px] text-boom">+{summary.expectedGain.toFixed(1)} pts</div>
+                  <div className="font-mono text-[10px] uppercase text-muted">Expected gain if followed</div>
+                  <div className="font-mono text-[17px] text-boom">+{summary.expectedGain.toFixed(1)} pts</div>
                 </div>
                 <div>
-                  <div className="font-mono text-[9px] uppercase text-muted">Potential cost if ignored</div>
-                  <div className="font-mono text-[16px] text-bust/90">-{summary.potentialCost.toFixed(1)} pts</div>
+                  <div className="font-mono text-[10px] uppercase text-muted">Potential cost if ignored</div>
+                  <div className="font-mono text-[17px] text-bust/90">-{summary.potentialCost.toFixed(1)} pts</div>
                 </div>
               </div>
             </>
           )}
           {preseason && hasRealData && (
-            <p className="mt-2 font-mono text-[9px] leading-relaxed text-muted">
+            <p className="mt-2 font-mono text-[10px] leading-relaxed text-muted">
               Preseason projections based on 2025 historical data — confidence increases as 2026
               season data arrives.
             </p>
@@ -531,7 +547,7 @@ export default function StartSitClient({
         {/* Must Act — Hero Cards */}
         {heroDecisions.length > 0 && (
           <div className="mb-3 space-y-2.5">
-            <div className="font-mono text-[9px] uppercase tracking-[1.5px] text-muted">
+            <div className="font-mono text-[10px] uppercase tracking-[1.5px] text-muted">
               Must Act
             </div>
             {heroDecisions.map((d) => (
@@ -543,7 +559,7 @@ export default function StartSitClient({
         {/* All Decisions Table */}
         {decisions.length > 0 && (
           <div className="mb-3">
-            <div className="mb-2 font-mono text-[9px] uppercase tracking-[1.5px] text-muted">
+            <div className="mb-2 font-mono text-[10px] uppercase tracking-[1.5px] text-muted">
               {tableDecisions.length > 0 ? 'All Decisions' : 'Decision Log'}
             </div>
             <DecisionsTable
@@ -555,7 +571,7 @@ export default function StartSitClient({
             />
             {tableDecisions.length > 0 && heroDecisions.length > 0 && (
               <div className="mt-2 text-center">
-                <span className="font-mono text-[9px] text-muted">
+                <span className="font-mono text-[10px] text-muted">
                   {heroDecisions.length} hero decision{heroDecisions.length !== 1 ? 's' : ''} shown above
                 </span>
               </div>
@@ -565,31 +581,31 @@ export default function StartSitClient({
 
         {/* Lineup Optimizer */}
         <div className="mb-3 rounded-md border border-border bg-surface px-4 py-4">
-          <div className="font-mono text-[9px] uppercase tracking-[1.5px] text-muted">
+          <div className="font-mono text-[10px] uppercase tracking-[1.5px] text-muted">
             Lineup Optimizer
           </div>
           {hasRealData && lineupOptimizer.optimizedLineupPts > 0 ? (
             <>
               <div className="mt-3 flex flex-wrap items-end gap-4">
                 <div>
-                  <div className="font-mono text-[9px] text-muted">Lineup Grade</div>
+                  <div className="font-mono text-[10px] text-muted">Lineup Grade</div>
                   <div className="font-mono text-[28px] text-boom">{lineupOptimizer.grade}</div>
                 </div>
                 <div>
-                  <div className="font-mono text-[9px] text-muted">Current Lineup Projected</div>
-                  <div className="font-mono text-[14px] text-text">
+                  <div className="font-mono text-[10px] text-muted">Current Lineup Projected</div>
+                  <div className="font-mono text-[15px] text-text">
                     {lineupOptimizer.currentLineupPts.toFixed(1)} pts
                   </div>
                 </div>
                 <div>
-                  <div className="font-mono text-[9px] text-muted">BOB Optimized Lineup</div>
-                  <div className="font-mono text-[14px] text-boom">
+                  <div className="font-mono text-[10px] text-muted">BOB Optimized Lineup</div>
+                  <div className="font-mono text-[15px] text-boom">
                     {lineupOptimizer.optimizedLineupPts.toFixed(1)} pts
                   </div>
                 </div>
                 <div>
-                  <div className="font-mono text-[9px] text-muted">Potential Gain</div>
-                  <div className="font-mono text-[14px] text-boom">
+                  <div className="font-mono text-[10px] text-muted">Potential Gain</div>
+                  <div className="font-mono text-[15px] text-boom">
                     +{lineupOptimizer.potentialGain.toFixed(1)} pts
                   </div>
                 </div>
@@ -597,13 +613,13 @@ export default function StartSitClient({
               <button
                 type="button"
                 onClick={() => setShowOptimizeModal(true)}
-                className="mt-4 w-full rounded border-none bg-boom py-3 font-mono text-[11px] uppercase tracking-wide text-bg sm:w-auto sm:px-8"
+                className="mt-4 w-full rounded border-none bg-boom py-3 font-mono text-[12px] uppercase tracking-wide text-bg sm:w-auto sm:px-8"
               >
                 Optimize All Leagues
               </button>
             </>
           ) : (
-            <p className="mt-2 font-mono text-[10px] text-muted">
+            <p className="mt-2 font-mono text-[11px] text-muted">
               Optimizer activates once scored roster data is available for your leagues.
             </p>
           )}
@@ -613,8 +629,8 @@ export default function StartSitClient({
         {flexDecisions.length > 0 && (
           <div className="overflow-hidden rounded-md border border-border bg-surface">
             <div className="border-b border-border px-3 py-2">
-              <div className="font-mono text-[10px] uppercase text-hold">Flex Decisions</div>
-              <div className="font-mono text-[9px] text-muted">Close calls — BOB breaks the tie</div>
+              <div className="font-mono text-[11px] uppercase text-hold">Flex Decisions</div>
+              <div className="font-mono text-[10px] text-muted">Close calls — BOB breaks the tie</div>
             </div>
             {flexDecisions.map((f) => (
               <FlexDecisionRow key={f.position} flex={f} />
@@ -624,7 +640,7 @@ export default function StartSitClient({
 
         {/* Season record strip (compact) */}
         <div className="mt-3 rounded-md border border-border/60 bg-surface2/40 px-3 py-2">
-          <div className="flex flex-wrap items-center gap-3 font-mono text-[9px] text-muted">
+          <div className="flex flex-wrap items-center gap-3 font-mono text-[10px] text-muted">
             <span>
               Season: {seasonRecord.wins}-{seasonRecord.losses}-{seasonRecord.pushes}
             </span>

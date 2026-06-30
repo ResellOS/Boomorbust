@@ -256,9 +256,9 @@ export default function CoachPage() {
           <div>
             <div className="flex items-center gap-3 mb-0.5">
               <h1 className="text-[22px] font-bold text-white">Dynasty Coach</h1>
-              <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-white/[0.08] text-slate-400 border border-white/[0.1]">AI</span>
+              <span className="px-2 py-0.5 rounded text-[11px] font-bold bg-white/[0.08] text-slate-400 border border-white/[0.1]">AI</span>
             </div>
-            <p className="text-[13px] text-slate-500">Ask anything about your roster, trades, or strategy.</p>
+            <p className="text-[14px] text-slate-500">Ask anything about your roster, trades, or strategy.</p>
           </div>
         </div>
 

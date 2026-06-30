@@ -19,10 +19,10 @@ export default function PortfolioOverviewCard({ overview }: { overview: Portfoli
         borderImage: 'linear-gradient(90deg, rgba(54,231,161,0.25), rgba(167,139,250,0.15)) 1',
       }}
     >
-      <div className="font-mono text-[10px] uppercase tracking-[2px] text-muted">
+      <div className="font-mono text-[11px] uppercase tracking-[2px] text-muted">
         Dynasty Portfolio
       </div>
-      <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 font-mono text-[11px] text-text">
+      <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 font-mono text-[12px] text-text">
         <span>
           Total Asset Value:{' '}
           <span className="text-boom">{overview.totalAssetValue.toLocaleString()}</span>
@@ -30,11 +30,11 @@ export default function PortfolioOverviewCard({ overview }: { overview: Portfoli
         <span className="text-muted">·</span>
         <span>{overview.leaguesConnected} Leagues</span>
       </div>
-      <div className="mt-1 flex flex-wrap gap-x-4 gap-y-1 font-mono text-[10px] text-muted">
+      <div className="mt-1 flex flex-wrap gap-x-4 gap-y-1 font-mono text-[11px] text-muted">
         <span>
           Championship Odds:{' '}
           <span className="text-text">{overview.championshipOdds}%</span>
-          <span className="ml-1 text-[8px]">Estimated</span>
+          <span className="ml-1 text-[9px]">Estimated</span>
         </span>
         <span>·</span>
         <span>
@@ -56,7 +56,7 @@ export default function PortfolioOverviewCard({ overview }: { overview: Portfoli
       <div className="mt-4 space-y-3 overflow-x-auto">
         {overview.positionBreakdown.map((row) => (
           <div key={row.position} className="min-w-[280px]">
-            <div className="mb-1 flex items-center justify-between font-mono text-[10px]">
+            <div className="mb-1 flex items-center justify-between font-mono text-[11px]">
               <span style={{ color: row.color }}>{row.position}</span>
               <span className="text-text">{row.pct}%</span>
             </div>
@@ -71,10 +71,10 @@ export default function PortfolioOverviewCard({ overview }: { overview: Portfoli
       </div>
 
       <div className="mt-3 border-t border-[#1e2640] pt-3">
-        <div className="mb-1 font-mono text-[8px] uppercase tracking-wide text-muted">
+        <div className="mb-1 font-mono text-[9px] uppercase tracking-wide text-muted">
           {BENCHMARK_LABEL}
         </div>
-        <div className="flex flex-wrap gap-3 font-mono text-[9px]">
+        <div className="flex flex-wrap gap-3 font-mono text-[10px]">
           {overview.positionBreakdown.map((row) => (
             <span key={row.position}>
               <span style={{ color: row.color }}>{row.position}</span>{' '}

@@ -46,17 +46,17 @@ function MarketSignalCard({ player }: { player: RotationPlayer }) {
     >
       <div className="mb-2 flex flex-wrap items-center gap-2">
         <span
-          className="rounded px-2 py-0.5 font-mono text-[9px] uppercase tracking-wide"
+          className="rounded px-2 py-0.5 font-mono text-[10px] uppercase tracking-wide"
           style={{ color: mv.color, background: `${mv.color}1a` }}
         >
           {verdictLabel}
         </span>
-        <span className="font-figtree text-[13px] text-text">{player.name}</span>
-        <span className="font-mono text-[9px] text-muted">
+        <span className="font-figtree text-[14px] text-text">{player.name}</span>
+        <span className="font-mono text-[10px] text-muted">
           {player.position} · {player.team}
         </span>
       </div>
-      <div className="space-y-1 font-mono text-[10px] tabular-nums text-muted">
+      <div className="space-y-1 font-mono text-[11px] tabular-nums text-muted">
         <div>
           Market Rank: <span className="text-text">{ktc ?? '—'}</span>
         </div>
@@ -67,10 +67,10 @@ function MarketSignalCard({ player }: { player: RotationPlayer }) {
           Gap: <span className="text-text">{gap != null ? `${gap} spots` : '—'}</span>
         </div>
       </div>
-      <p className="mt-2 font-figtree text-[10px] italic text-muted">
+      <p className="mt-2 font-figtree text-[11px] italic text-muted">
         &ldquo;{suggestedAction(mv.verdict, mv.rankDelta)}&rdquo;
       </p>
-      <div className="mt-2 font-mono text-[9px] text-muted">
+      <div className="mt-2 font-mono text-[10px] text-muted">
         Confidence: <span className="text-text">{confidenceTier(mv.rankDelta)}</span>
       </div>
     </div>
@@ -82,7 +82,7 @@ export default function MarketSignalsPanel({ players }: { players: RotationPlaye
 
   if (sorted.length === 0) {
     return (
-      <div className="rounded-[10px] border border-border bg-[#0f1420] px-4 py-6 text-center font-mono text-[12px] text-muted">
+      <div className="rounded-[10px] border border-border bg-[#0f1420] px-4 py-6 text-center font-mono text-[13px] text-muted">
         No market signals yet — sync leagues to populate.
       </div>
     );
@@ -91,8 +91,8 @@ export default function MarketSignalsPanel({ players }: { players: RotationPlaye
   return (
     <section>
       <div className="mb-2 flex items-center justify-between px-0.5">
-        <span className="font-figtree text-[10px] uppercase tracking-[1.5px] text-text">Market Signals</span>
-        <Link href="/players" className="font-mono text-[10px] text-boom no-underline hover:underline">
+        <span className="font-figtree text-[11px] uppercase tracking-[1.5px] text-text">Market Signals</span>
+        <Link href="/players" className="font-mono text-[11px] text-boom no-underline hover:underline">
           View All Players →
         </Link>
       </div>

@@ -43,10 +43,10 @@ function UsageDonut({ label, current, max, color }: DonutProps) {
           >
             {current.toLocaleString()}
           </p>
-          <p className="text-[9px] text-slate-500 mt-0.5">of {max.toLocaleString()}</p>
+          <p className="text-[10px] text-slate-500 mt-0.5">of {max.toLocaleString()}</p>
         </div>
       </div>
-      <p className="text-[10px] text-slate-400 text-center leading-tight max-w-[90px]">{label}</p>
+      <p className="text-[11px] text-slate-400 text-center leading-tight max-w-[90px]">{label}</p>
     </div>
   );
 }
@@ -71,7 +71,7 @@ export default function UsageDonuts({ usage, renewsLabel }: Props) {
       className="rounded-xl p-5"
       style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}
     >
-      <p className="text-[12px] font-bold text-slate-400 uppercase tracking-widest mb-5">USAGE OVERVIEW</p>
+      <p className="text-[13px] font-bold text-slate-400 uppercase tracking-widest mb-5">USAGE OVERVIEW</p>
 
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 justify-items-center">
         {items.map((item, i) => (
@@ -85,7 +85,7 @@ export default function UsageDonuts({ usage, renewsLabel }: Props) {
         ))}
       </div>
 
-      <p className="text-[10px] text-slate-500 mt-5 flex items-center gap-1.5">
+      <p className="text-[11px] text-slate-500 mt-5 flex items-center gap-1.5">
         <svg width="11" height="11" viewBox="0 0 11 11" fill="none">
           <circle cx="5.5" cy="5.5" r="4.5" stroke="#64748B" strokeWidth="1"/>
           <path d="M5.5 3.5v2.5l1.5 1" stroke="#64748B" strokeWidth="1" strokeLinecap="round"/>

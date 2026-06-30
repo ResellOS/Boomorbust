@@ -14,7 +14,7 @@ export default function WeeklyCompletionCard({ completion }: WeeklyCompletionCar
 
   return (
     <div className="rounded-md border border-border bg-surface p-3">
-      <div className="font-mono text-[8px] uppercase tracking-[1.5px] text-muted">
+      <div className="font-mono text-[9px] uppercase tracking-[1.5px] text-muted">
         Weekly Completion
       </div>
       <div className="mt-2 flex items-center gap-3">
@@ -37,20 +37,20 @@ export default function WeeklyCompletionCard({ completion }: WeeklyCompletionCar
               }}
             />
           </svg>
-          <span className="absolute inset-0 flex items-center justify-center font-mono text-[14px] text-boom">
+          <span className="absolute inset-0 flex items-center justify-center font-mono text-[15px] text-boom">
             {pct}%
           </span>
         </div>
         <div className="min-w-0 flex-1">
-          <div className="font-mono text-[11px] text-text">
+          <div className="font-mono text-[12px] text-text">
             {leaguesComplete} of {leaguesTotal} leagues
           </div>
-          <div className="font-mono text-[10px] text-muted">
+          <div className="font-mono text-[11px] text-muted">
             {decisionsComplete} of {decisionsTotal} decisions complete
           </div>
           <Link
             href="/dashboard"
-            className="mt-1.5 inline-block font-mono text-[9px] text-boom hover:underline"
+            className="mt-1.5 inline-block font-mono text-[10px] text-boom hover:underline"
           >
             View Portfolio →
           </Link>

@@ -51,18 +51,18 @@ export default function LiveSignalCard() {
       }}
     >
       <div className="flex items-center justify-between gap-2">
-        <span className="font-mono text-[9px] uppercase tracking-[2px] text-boom">
+        <span className="font-mono text-[10px] uppercase tracking-[2px] text-boom">
           {signal.signalType}
         </span>
-        <span className="font-mono text-[8px] uppercase tracking-[1.5px] text-boom/70">
+        <span className="font-mono text-[9px] uppercase tracking-[1.5px] text-boom/70">
           Live Signal
         </span>
       </div>
-      <div className="mt-2 font-figtree text-[15px] text-text">{signal.playerName}</div>
-      <div className="mt-1 font-mono text-[10px] text-muted">
+      <div className="mt-2 font-figtree text-[16px] text-text">{signal.playerName}</div>
+      <div className="mt-1 font-mono text-[11px] text-muted">
         Market Rank: {signal.marketRankLabel} · BOB Rank: {signal.bobRankLabel}
       </div>
-      <div className="mt-0.5 font-mono text-[10px] text-boom">
+      <div className="mt-0.5 font-mono text-[11px] text-boom">
         Gap: {signal.gapSpots} spot{signal.gapSpots === 1 ? '' : 's'}
       </div>
     </div>

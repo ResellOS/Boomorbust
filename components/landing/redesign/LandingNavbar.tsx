@@ -70,7 +70,7 @@ export default function LandingNavbar() {
             <Link
               key={l.label}
               href={l.href}
-              className="font-figtree text-[13px] text-[#e8ecf4]/75 transition hover:text-[#e8ecf4]"
+              className="font-figtree text-[14px] text-[#e8ecf4]/75 transition hover:text-[#e8ecf4]"
             >
               {l.label}
             </Link>
@@ -78,7 +78,7 @@ export default function LandingNavbar() {
           <div className="relative" ref={resRef}>
             <button
               type="button"
-              className="flex items-center gap-1 font-figtree text-[13px] text-[#e8ecf4]/75 hover:text-[#e8ecf4]"
+              className="flex items-center gap-1 font-figtree text-[14px] text-[#e8ecf4]/75 hover:text-[#e8ecf4]"
               onClick={() => setResourcesOpen((v) => !v)}
             >
               Resources ▾
@@ -92,7 +92,7 @@ export default function LandingNavbar() {
                   <Link
                     key={r.href}
                     href={r.href}
-                    className="block px-4 py-2 font-figtree text-[12px] text-[#e8ecf4]/80 hover:bg-white/5 hover:text-[#e8ecf4]"
+                    className="block px-4 py-2 font-figtree text-[13px] text-[#e8ecf4]/80 hover:bg-white/5 hover:text-[#e8ecf4]"
                     onClick={() => setResourcesOpen(false)}
                   >
                     {r.label}
@@ -106,14 +106,14 @@ export default function LandingNavbar() {
         <div className="hidden items-center gap-3 lg:flex">
           <Link
             href="/auth/login"
-            className="rounded-md border px-4 py-2 font-figtree text-[13px] text-[#e8ecf4]/90 transition hover:border-[#36E7A1]/40"
+            className="rounded-md border px-4 py-2 font-figtree text-[14px] text-[#e8ecf4]/90 transition hover:border-[#36E7A1]/40"
             style={{ borderColor: LANDING.border }}
           >
             Log In
           </Link>
           <Link
             href="/onboarding"
-            className="rounded-md px-4 py-2 font-figtree text-[13px] text-[#0a0d14] transition hover:brightness-110"
+            className="rounded-md px-4 py-2 font-figtree text-[14px] text-[#0a0d14] transition hover:brightness-110"
             style={{ background: LANDING.boom }}
           >
             Import My Leagues
@@ -138,18 +138,18 @@ export default function LandingNavbar() {
               <Link
                 key={l.href}
                 href={l.href}
-                className="py-2.5 font-figtree text-[14px] text-[#e8ecf4]/85"
+                className="py-2.5 font-figtree text-[15px] text-[#e8ecf4]/85"
                 onClick={closeMobile}
               >
                 {l.label}
               </Link>
             ))}
-            <Link href="/auth/login" className="mt-2 py-2.5 font-figtree text-[14px] text-[#e8ecf4]" onClick={closeMobile}>
+            <Link href="/auth/login" className="mt-2 py-2.5 font-figtree text-[15px] text-[#e8ecf4]" onClick={closeMobile}>
               Log In
             </Link>
             <Link
               href="/onboarding"
-              className="mt-1 rounded-md py-3 text-center font-figtree text-[14px] text-[#0a0d14]"
+              className="mt-1 rounded-md py-3 text-center font-figtree text-[15px] text-[#0a0d14]"
               style={{ background: LANDING.boom }}
               onClick={closeMobile}
             >

@@ -44,22 +44,22 @@ export default function TradeHubFooterStatusBar({ stats, loading }: TradeHubFoot
       <div className="grid grid-cols-2 gap-x-3 gap-y-4 sm:gap-4 lg:grid-cols-4">
         <div className="min-h-[44px] min-w-0 py-1 sm:min-h-0">
           <p
-            className="text-[9px] font-semibold uppercase tracking-wide text-[#64748B]"
+            className="text-[10px] font-semibold uppercase tracking-wide text-[#64748B]"
             style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}
           >
             TRE ENGINE STATUS
           </p>
-          <p className="mt-1 text-[13px] font-medium text-[#36E7A1]" style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}>
+          <p className="mt-1 text-[14px] font-medium text-[#36E7A1]" style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}>
             {treStatus}
           </p>
-          <p className="mt-0.5 text-[11px] text-[#475569]" style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}>
+          <p className="mt-0.5 text-[12px] text-[#475569]" style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}>
             {treLast}
           </p>
         </div>
 
         <div className="min-h-[44px] min-w-0 py-1 sm:min-h-0">
           <p
-            className="text-[9px] font-semibold uppercase tracking-wide text-[#64748B]"
+            className="text-[10px] font-semibold uppercase tracking-wide text-[#64748B]"
             style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}
           >
             SMART COUNTER ACCURACY
@@ -70,14 +70,14 @@ export default function TradeHubFooterStatusBar({ stats, loading }: TradeHubFoot
           >
             {accPct.toFixed(1)}%
           </p>
-          <p className="mt-0.5 text-[11px] text-[#36E7A1]" style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}>
+          <p className="mt-0.5 text-[12px] text-[#36E7A1]" style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}>
             {accTier}
           </p>
         </div>
 
         <div className="min-h-[44px] min-w-0 py-1 sm:min-h-0">
           <p
-            className="text-[9px] font-semibold uppercase tracking-wide text-[#64748B]"
+            className="text-[10px] font-semibold uppercase tracking-wide text-[#64748B]"
             style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}
           >
             SUGGESTION SUCCESS RATE
@@ -88,14 +88,14 @@ export default function TradeHubFooterStatusBar({ stats, loading }: TradeHubFoot
           >
             {sugPct.toFixed(1)}%
           </p>
-          <p className="mt-0.5 text-[11px] text-[#64748B]" style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}>
+          <p className="mt-0.5 text-[12px] text-[#64748B]" style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}>
             {sugTier}
           </p>
         </div>
 
         <div className="min-h-[44px] min-w-0 py-1 sm:min-h-0">
           <p
-            className="text-[9px] font-semibold uppercase tracking-wide text-[#64748B]"
+            className="text-[10px] font-semibold uppercase tracking-wide text-[#64748B]"
             style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}
           >
             TRADE VOLUME
@@ -106,7 +106,7 @@ export default function TradeHubFooterStatusBar({ stats, loading }: TradeHubFoot
           >
             {volume}
           </p>
-          <p className="mt-0.5 text-[11px] text-[#64748B]" style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}>
+          <p className="mt-0.5 text-[12px] text-[#64748B]" style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}>
             This Month
           </p>
         </div>

@@ -28,11 +28,11 @@ function AssetChip({ asset }: { asset: TradeAsset }) {
         style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}
       >
         <div className="w-10 h-10 rounded-full bg-white/[0.08] flex items-center justify-center flex-shrink-0">
-          <span className="text-[11px] font-bold text-slate-300">PK</span>
+          <span className="text-[12px] font-bold text-slate-300">PK</span>
         </div>
         <div>
-          <p className="text-[13px] font-semibold text-white">{asset.name}</p>
-          <p className="text-[10px] text-slate-400">{asset.detail}</p>
+          <p className="text-[14px] font-semibold text-white">{asset.name}</p>
+          <p className="text-[11px] text-slate-400">{asset.detail}</p>
         </div>
       </div>
     );
@@ -56,16 +56,16 @@ function AssetChip({ asset }: { asset: TradeAsset }) {
           />
         ) : (
           <div className="w-10 h-10 flex items-center justify-center" style={{ background: `${color}20` }}>
-            <span className="text-[11px] font-bold" style={{ color }}>
+            <span className="text-[12px] font-bold" style={{ color }}>
               {asset.name.split(' ').map((s) => s[0]).join('').slice(0, 2)}
             </span>
           </div>
         )}
       </div>
       <div>
-        <p className="text-[13px] font-semibold text-white">{asset.name}</p>
-        <p className="text-[11px]" style={{ color }}>{pos} · {asset.team}</p>
-        <p className="text-[10px] text-slate-400">{asset.detail}</p>
+        <p className="text-[14px] font-semibold text-white">{asset.name}</p>
+        <p className="text-[12px]" style={{ color }}>{pos} · {asset.team}</p>
+        <p className="text-[11px] text-slate-400">{asset.detail}</p>
       </div>
     </div>
   );
@@ -76,8 +76,8 @@ function DeltaBadge({ value, label }: { value: number; label: string }) {
   const color = isPos ? '#36E7A1' : '#EF4444';
   return (
     <div className="text-center">
-      <p className="text-[9px] text-slate-500 uppercase tracking-wider mb-0.5">{label}</p>
-      <p className="text-[14px] font-bold" style={{ fontFamily: 'JetBrains Mono, monospace', color }}>
+      <p className="text-[10px] text-slate-500 uppercase tracking-wider mb-0.5">{label}</p>
+      <p className="text-[15px] font-bold" style={{ fontFamily: 'JetBrains Mono, monospace', color }}>
         {isPos ? '+' : ''}{value}%
       </p>
     </div>
@@ -105,7 +105,7 @@ export default function TradeAnalysisCard({ data }: Props) {
           className="rounded-xl px-5 py-4 flex flex-col items-center justify-center"
           style={{ background: vstyle.bg, border: `1px solid ${vstyle.border}`, minWidth: 140 }}
         >
-          <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-2">BOOM COACH VERDICT</p>
+          <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-widest mb-2">BOOM COACH VERDICT</p>
           <div className="flex items-center gap-2 mb-1">
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
               <circle cx="8" cy="8" r="7" fill={vstyle.color} opacity="0.2"/>
@@ -115,23 +115,23 @@ export default function TradeAnalysisCard({ data }: Props) {
               {data.verdict}
             </p>
           </div>
-          <p className="text-[11px] text-slate-400">Confidence: <span style={{ color: vstyle.color }}>{data.confidence}%</span></p>
+          <p className="text-[12px] text-slate-400">Confidence: <span style={{ color: vstyle.color }}>{data.confidence}%</span></p>
         </div>
       </div>
 
       {/* Value Analysis */}
       <div className="px-4">
-        <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-3">VALUE ANALYSIS</p>
+        <p className="text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-3">VALUE ANALYSIS</p>
         <div className="grid grid-cols-[1fr_auto_1fr_auto] gap-3 items-center">
           {/* You Give */}
           <div>
-            <p className="text-[10px] text-slate-500 mb-2 uppercase">YOU GIVE</p>
+            <p className="text-[11px] text-slate-500 mb-2 uppercase">YOU GIVE</p>
             <div className="space-y-2">
               {data.give.map((a, i) => <AssetChip key={i} asset={a} />)}
             </div>
             <div className="mt-2">
-              <p className="text-[9px] text-slate-500 uppercase tracking-wider">TOTAL VALUE</p>
-              <p className="text-[16px] font-bold text-white font-mono" style={{ fontFamily: 'JetBrains Mono, monospace' }}>
+              <p className="text-[10px] text-slate-500 uppercase tracking-wider">TOTAL VALUE</p>
+              <p className="text-[17px] font-bold text-white font-mono" style={{ fontFamily: 'JetBrains Mono, monospace' }}>
                 {data.totalGive.toLocaleString()}
               </p>
             </div>
@@ -140,19 +140,19 @@ export default function TradeAnalysisCard({ data }: Props) {
           {/* VS divider */}
           <div className="flex flex-col items-center gap-1.5 px-2">
             <div className="w-px h-16 bg-white/[0.1]" />
-            <span className="text-[10px] font-bold text-slate-600">VS</span>
+            <span className="text-[11px] font-bold text-slate-600">VS</span>
             <div className="w-px h-16 bg-white/[0.1]" />
           </div>
 
           {/* You Get */}
           <div>
-            <p className="text-[10px] text-slate-500 mb-2 uppercase">YOU GET</p>
+            <p className="text-[11px] text-slate-500 mb-2 uppercase">YOU GET</p>
             <div className="space-y-2">
               {data.receive.map((a, i) => <AssetChip key={i} asset={a} />)}
             </div>
             <div className="mt-2">
-              <p className="text-[9px] text-slate-500 uppercase tracking-wider">TOTAL VALUE</p>
-              <p className="text-[16px] font-bold text-white font-mono" style={{ fontFamily: 'JetBrains Mono, monospace' }}>
+              <p className="text-[10px] text-slate-500 uppercase tracking-wider">TOTAL VALUE</p>
+              <p className="text-[17px] font-bold text-white font-mono" style={{ fontFamily: 'JetBrains Mono, monospace' }}>
                 {data.totalReceive.toLocaleString()}
               </p>
             </div>
@@ -163,14 +163,14 @@ export default function TradeAnalysisCard({ data }: Props) {
             className="rounded-xl p-4 flex flex-col items-center"
             style={{ background: edgePos ? 'rgba(54,231,161,0.06)' : 'rgba(239,68,68,0.06)', border: edgePos ? '1px solid rgba(54,231,161,0.2)' : '1px solid rgba(239,68,68,0.2)', minWidth: 110 }}
           >
-            <p className="text-[9px] text-slate-500 uppercase tracking-wider mb-1">VALUE EDGE</p>
+            <p className="text-[10px] text-slate-500 uppercase tracking-wider mb-1">VALUE EDGE</p>
             <p
               className="text-[22px] font-bold"
               style={{ fontFamily: 'JetBrains Mono, monospace', color: edgePos ? '#36E7A1' : '#EF4444' }}
             >
               {edgePos ? '+' : ''}{data.valueEdge.toFixed(1)}%
             </p>
-            <p className="text-[10px] text-slate-400 mt-0.5">{edgePos ? 'In Your Favor' : 'Against You'}</p>
+            <p className="text-[11px] text-slate-400 mt-0.5">{edgePos ? 'In Your Favor' : 'Against You'}</p>
           </div>
         </div>
       </div>
@@ -182,7 +182,7 @@ export default function TradeAnalysisCard({ data }: Props) {
           className="rounded-xl p-3"
           style={{ background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.06)' }}
         >
-          <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2.5">KEY REASONS</p>
+          <p className="text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-2.5">KEY REASONS</p>
           <ul className="space-y-2">
             {data.reasons.map((r, i) => (
               <li key={i} className="flex items-start gap-2">
@@ -190,7 +190,7 @@ export default function TradeAnalysisCard({ data }: Props) {
                   <circle cx="7" cy="7" r="6" fill="rgba(54,231,161,0.15)"/>
                   <path d="M4.5 7l2 2 3-3" stroke="#36E7A1" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
-                <span className="text-[11px] text-slate-300 leading-relaxed">{r}</span>
+                <span className="text-[12px] text-slate-300 leading-relaxed">{r}</span>
               </li>
             ))}
           </ul>
@@ -201,14 +201,14 @@ export default function TradeAnalysisCard({ data }: Props) {
           className="rounded-xl p-3 min-w-[160px]"
           style={{ background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.06)' }}
         >
-          <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-3">TEAM IMPACT</p>
+          <p className="text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-3">TEAM IMPACT</p>
           <div className="grid grid-cols-2 gap-3">
             <DeltaBadge value={data.teamImpact.winNow} label="WIN NOW" />
             <DeltaBadge value={data.teamImpact.futureValue} label="FUTURE VALUE" />
             <DeltaBadge value={data.teamImpact.depthHit} label="DEPTH HIT" />
             <div className="text-center">
-              <p className="text-[9px] text-slate-500 uppercase tracking-wider mb-0.5">FLEXIBILITY</p>
-              <p className="text-[13px] font-semibold text-slate-300">{data.teamImpact.flexibility}</p>
+              <p className="text-[10px] text-slate-500 uppercase tracking-wider mb-0.5">FLEXIBILITY</p>
+              <p className="text-[14px] font-semibold text-slate-300">{data.teamImpact.flexibility}</p>
             </div>
           </div>
         </div>

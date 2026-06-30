@@ -22,8 +22,8 @@ export default function BreakoutWatchPanel({ loading }: Props) {
   return (
     <div className={`${GLASS} overflow-hidden mt-4`} id="scouting-breakout">
       <div className="flex items-center justify-between px-4 py-3 border-b border-white/[0.06]">
-        <p className="text-[12px] uppercase tracking-widest text-[#64748B] font-semibold">BREAKOUT WATCH</p>
-        <span className="text-[12px] text-[#22D3EE]">Signals →</span>
+        <p className="text-[13px] uppercase tracking-widest text-[#64748B] font-semibold">BREAKOUT WATCH</p>
+        <span className="text-[13px] text-[#22D3EE]">Signals →</span>
       </div>
       {loading ? (
         <div className="p-4 space-y-2">
@@ -37,13 +37,13 @@ export default function BreakoutWatchPanel({ loading }: Props) {
             <li key={r.name} className="px-4 py-3 hover:bg-white/[0.03] transition-colors cursor-pointer">
               <div className="flex items-start justify-between gap-2">
                 <div>
-                  <p className="text-[13px] font-medium text-white">{r.name}</p>
-                  <p className="text-[11px] text-[#64748B]">{r.meta}</p>
-                  <p className="text-[12px] text-[#94a3b8] mt-1" style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}>
+                  <p className="text-[14px] font-medium text-white">{r.name}</p>
+                  <p className="text-[12px] text-[#64748B]">{r.meta}</p>
+                  <p className="text-[13px] text-[#94a3b8] mt-1" style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}>
                     {r.signal}
                   </p>
                 </div>
-                <span className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase ${heatClass(r.heat)}`}>
+                <span className={`shrink-0 rounded-full px-2 py-0.5 text-[11px] font-bold uppercase ${heatClass(r.heat)}`}>
                   {r.heat}
                 </span>
               </div>

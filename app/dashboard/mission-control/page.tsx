@@ -151,7 +151,7 @@ function ScatterPlot({ data }: { data: ScatterDatum[] }) {
       {/* Tooltip */}
       {hovered && (
         <div
-          className="pointer-events-none absolute z-10 rounded-lg border px-3 py-2 text-[11px] shadow-xl"
+          className="pointer-events-none absolute z-10 rounded-lg border px-3 py-2 text-[12px] shadow-xl"
           style={{
             left: tooltipPos.x + 12,
             top: tooltipPos.y - 16,
@@ -162,7 +162,7 @@ function ScatterPlot({ data }: { data: ScatterDatum[] }) {
         >
           <p className="font-semibold text-white">{hovered.label}</p>
           <p style={{ fontFamily: 'ui-monospace, monospace' }}>MV {hovered.mv} · SALS {hovered.sals}</p>
-          <p className="mt-1 text-[10px]" style={{ color: '#94a3b8' }}>
+          <p className="mt-1 text-[11px]" style={{ color: '#94a3b8' }}>
             {hovered.sals > 2000 ? 'Tier: SALS > 2000' : hovered.sals < 0 ? 'Tier: Negative SALS' : 'Tier: SALS 0–2000'}
           </p>
         </div>
@@ -223,7 +223,7 @@ export default function MissionControlPage() {
             <span className="text-xl tracking-[0.12em] text-amber-100 sm:text-2xl" style={FONT_BEBAS}>
               SYSTEM STATUS: DEFCON 2
             </span>
-            <span className="ml-auto hidden text-[10px] font-medium uppercase tracking-[0.2em] text-amber-200/70 sm:inline" style={{ fontFamily: 'var(--font-body)' }}>
+            <span className="ml-auto hidden text-[11px] font-medium uppercase tracking-[0.2em] text-amber-200/70 sm:inline" style={{ fontFamily: 'var(--font-body)' }}>
               Market sync live
             </span>
           </div>
@@ -238,12 +238,12 @@ export default function MissionControlPage() {
           >
             <div className="flex items-center gap-2 border-b px-3 py-2" style={{ borderColor: '#1F2937' }}>
               <Activity className="h-4 w-4 text-[#22c55e]/80" aria-hidden />
-              <span className="text-[10px] font-semibold uppercase tracking-[0.14em]" style={{ color: '#64748b' }}>
+              <span className="text-[11px] font-semibold uppercase tracking-[0.14em]" style={{ color: '#64748b' }}>
                 Live feed
               </span>
             </div>
             <div ref={tickerRef} className="min-h-[160px] flex-1 overflow-y-auto px-3 py-2">
-              <pre className="whitespace-pre-wrap break-words font-mono text-[10px] leading-[1.55]" style={{ color: TICKER_GREEN }}>
+              <pre className="whitespace-pre-wrap break-words font-mono text-[11px] leading-[1.55]" style={{ color: TICKER_GREEN }}>
                 {lines.join('\n')}
               </pre>
             </div>
@@ -256,8 +256,8 @@ export default function MissionControlPage() {
             aria-label="Tactical map"
           >
             <div className="mb-2 flex flex-wrap items-center justify-between gap-2 px-1">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#64748b]">Scatter · SALS tiers</p>
-              <div className="flex flex-wrap gap-3 text-[9px] font-mono uppercase text-[#94a3b8]">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#64748b]">Scatter · SALS tiers</p>
+              <div className="flex flex-wrap gap-3 text-[10px] font-mono uppercase text-[#94a3b8]">
                 {[
                   { color: CYAN,    label: 'SALS > 2000' },
                   { color: EMERALD, label: '0–2000' },

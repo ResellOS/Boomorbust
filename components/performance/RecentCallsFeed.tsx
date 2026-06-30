@@ -49,37 +49,37 @@ function CallCard({ call }: { call: BobCall }) {
       className="rounded-[10px] border border-border bg-surface/50 p-4 backdrop-blur-xl"
       style={{ borderLeftWidth: 3, borderLeftColor: border }}
     >
-      <div className="font-figtree text-[13px] font-semibold text-text">
+      <div className="font-figtree text-[14px] font-semibold text-text">
         {emoji} {call.recommendation.toUpperCase()} — {call.playerName}
       </div>
-      <div className="mt-1 font-mono text-[10px] text-muted">
+      <div className="mt-1 font-mono text-[11px] text-muted">
         Called: {formatCallDate(call.callDate)}
       </div>
       {call.confidencePct != null && (
-        <div className="mt-0.5 font-mono text-[10px] text-muted">
+        <div className="mt-0.5 font-mono text-[11px] text-muted">
           Confidence: {call.confidencePct}% ({confidenceLabel(call.confidence)})
         </div>
       )}
 
       {(call.bobRating != null || call.marketRank) && (
-        <div className="mt-2 font-mono text-[10px] text-text">
+        <div className="mt-2 font-mono text-[11px] text-text">
           {call.bobRating != null && <>BOB Rating: {call.bobRating}</>}
           {call.bobRating != null && call.marketRank && ' · '}
           {call.marketRank && <>Market Rank: {call.marketRank}</>}
         </div>
       )}
 
-      <div className={`mt-2 font-mono text-[11px] font-semibold ${res.className}`}>
+      <div className={`mt-2 font-mono text-[12px] font-semibold ${res.className}`}>
         Result: {res.text}
       </div>
 
       {call.marketImpact && (
-        <div className="mt-1 font-mono text-[10px] text-muted">
+        <div className="mt-1 font-mono text-[11px] text-muted">
           Market Value: {call.marketImpact}
         </div>
       )}
       {call.missedBy && (
-        <div className="mt-1 font-mono text-[10px] text-muted">
+        <div className="mt-1 font-mono text-[11px] text-muted">
           Missed by: {call.missedBy}
         </div>
       )}
@@ -100,10 +100,10 @@ export default function RecentCallsFeed({ calls }: { calls: BobCall[] }) {
     <section className="mb-6">
       <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
         <div>
-          <div className="font-figtree text-[11px] font-bold uppercase tracking-[1.5px] text-text">
+          <div className="font-figtree text-[12px] font-bold uppercase tracking-[1.5px] text-text">
             Recent Calls
           </div>
-          <p className="mt-0.5 font-figtree text-[10px] text-muted">
+          <p className="mt-0.5 font-figtree text-[11px] text-muted">
             The live record — every call, win and loss.
           </p>
         </div>
@@ -113,7 +113,7 @@ export default function RecentCallsFeed({ calls }: { calls: BobCall[] }) {
               key={f.id}
               type="button"
               onClick={() => setFilter(f.id)}
-              className={`rounded-[5px] px-2.5 py-1 font-mono text-[9px] transition-colors ${
+              className={`rounded-[5px] px-2.5 py-1 font-mono text-[10px] transition-colors ${
                 filter === f.id
                   ? 'bg-boom/15 text-boom'
                   : 'text-muted hover:text-text'
@@ -127,12 +127,12 @@ export default function RecentCallsFeed({ calls }: { calls: BobCall[] }) {
 
       {!hasAny ? (
         <div className="rounded-[10px] border border-dashed border-border bg-surface/30 px-6 py-10 text-center">
-          <p className="mx-auto max-w-md font-figtree text-[13px] leading-relaxed text-muted">
+          <p className="mx-auto max-w-md font-figtree text-[14px] leading-relaxed text-muted">
             {EMPTY_TRACKER_MESSAGE}
           </p>
         </div>
       ) : filtered.length === 0 ? (
-        <div className="rounded-[10px] border border-border bg-surface/30 px-6 py-8 text-center font-figtree text-[12px] text-muted">
+        <div className="rounded-[10px] border border-border bg-surface/30 px-6 py-8 text-center font-figtree text-[13px] text-muted">
           No calls match this filter.
         </div>
       ) : (

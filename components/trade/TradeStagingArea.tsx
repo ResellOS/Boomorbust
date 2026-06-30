@@ -128,13 +128,13 @@ export default function TradeStagingArea({
 
       <div className="border-b border-[#1e2640]/80 px-3 py-2">
 
-        <h3 className="font-figtree text-[10px] uppercase tracking-[1.5px] text-[#e8ecf4]">
+        <h3 className="font-figtree text-[11px] uppercase tracking-[1.5px] text-[#e8ecf4]">
 
           Offer Builder
 
         </h3>
 
-        <p className="font-mono text-[8px] text-[#6b7a99]">Review package before Command Queue</p>
+        <p className="font-mono text-[9px] text-[#6b7a99]">Review package before Command Queue</p>
 
       </div>
 
@@ -144,7 +144,7 @@ export default function TradeStagingArea({
 
         <div className="flex flex-1 items-center justify-center px-4 py-8 text-center">
 
-          <p className="font-figtree text-[11px] text-[#6b7a99]">
+          <p className="font-figtree text-[12px] text-[#6b7a99]">
 
             Click any trade card or database row to build an offer.
 
@@ -174,13 +174,13 @@ export default function TradeStagingArea({
 
           >
 
-            <div className="font-figtree text-[11px] font-semibold" style={{ color: interpretation.color }}>
+            <div className="font-figtree text-[12px] font-semibold" style={{ color: interpretation.color }}>
 
               {interpretation.label}
 
             </div>
 
-            <p className="mt-0.5 font-figtree text-[9px] leading-snug text-[#9aa8c4]">{interpretation.detail}</p>
+            <p className="mt-0.5 font-figtree text-[10px] leading-snug text-[#9aa8c4]">{interpretation.detail}</p>
 
           </div>
 
@@ -188,9 +188,9 @@ export default function TradeStagingArea({
 
           <div className="mx-3 mt-2 rounded border border-[#1e2640]/50 bg-[#141929]/40 px-2 py-1.5">
 
-            <div className="font-mono text-[7px] uppercase text-boom">Why It Works</div>
+            <div className="font-mono text-[8px] uppercase text-boom">Why It Works</div>
 
-            <p className="mt-0.5 font-figtree text-[9px] leading-snug text-[#b8c4dc]">{worksBecause}</p>
+            <p className="mt-0.5 font-figtree text-[10px] leading-snug text-[#b8c4dc]">{worksBecause}</p>
 
           </div>
 
@@ -198,9 +198,9 @@ export default function TradeStagingArea({
 
           <div className="border-t border-[#1e2640]/60 px-3 py-2">
 
-            <div className="font-mono text-[7px] uppercase text-[#6b7a99]">Deal Metrics</div>
+            <div className="font-mono text-[8px] uppercase text-[#6b7a99]">Deal Metrics</div>
 
-            <div className="mt-1 grid grid-cols-2 gap-x-2 gap-y-1 font-mono text-[8px]">
+            <div className="mt-1 grid grid-cols-2 gap-x-2 gap-y-1 font-mono text-[9px]">
 
               <Row label="Acceptance">
 
@@ -260,9 +260,9 @@ export default function TradeStagingArea({
 
               <div className="rounded border border-boom/40 bg-boom/10 px-2 py-1.5 text-center">
 
-                <div className="font-mono text-[10px] font-semibold text-boom">Offer Staged</div>
+                <div className="font-mono text-[11px] font-semibold text-boom">Offer Staged</div>
 
-                <div className="font-mono text-[8px] text-boom/80">Added to Command Queue</div>
+                <div className="font-mono text-[9px] text-boom/80">Added to Command Queue</div>
 
               </div>
 
@@ -276,7 +276,7 @@ export default function TradeStagingArea({
 
               disabled={offerStaged}
 
-              className={`dash-action-btn w-full rounded-md py-2 font-mono text-[10px] font-semibold uppercase text-white ${
+              className={`dash-action-btn w-full rounded-md py-2 font-mono text-[11px] font-semibold uppercase text-white ${
 
                 offerStaged ? 'bg-boom/30' : 'bg-bust'
 
@@ -308,17 +308,17 @@ function Side({ label, items, accent }: { label: string; items: CalculatorAsset[
 
     <div className="rounded-md border border-[#1e2640]/50 bg-[#141929]/40 px-2 py-1.5">
 
-      <div className="font-mono text-[7px] uppercase text-[#6b7a99]">{label}</div>
+      <div className="font-mono text-[8px] uppercase text-[#6b7a99]">{label}</div>
 
       {items.length === 0 ? (
 
-        <div className="font-figtree text-[10px] text-[#6b7a99]">—</div>
+        <div className="font-figtree text-[11px] text-[#6b7a99]">—</div>
 
       ) : (
 
         items.map((a) => (
 
-          <div key={a.key} className={`font-figtree text-[10px] ${accent ? 'text-boom' : 'text-[#e8ecf4]'}`}>
+          <div key={a.key} className={`font-figtree text-[11px] ${accent ? 'text-boom' : 'text-[#e8ecf4]'}`}>
 
             · {a.label}
 

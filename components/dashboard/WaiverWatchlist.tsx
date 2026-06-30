@@ -114,20 +114,20 @@ export default function WaiverWatchlist({
           )}
         </div>
         <div className="min-w-0 flex-1 flex flex-col justify-center py-0.5">
-          <div className="text-[11px] font-black text-white truncate font-mono leading-tight">
+          <div className="text-[12px] font-black text-white truncate font-mono leading-tight">
             {target.name}
           </div>
-          <div className="text-[10px] text-slate-500 font-mono truncate">
+          <div className="text-[11px] text-slate-500 font-mono truncate">
             {target.position} · {target.team}
           </div>
         </div>
         <div className="shrink-0 flex flex-row items-center justify-end gap-2">
           <div className="text-right">
-            <div className="text-[8px] font-black uppercase tracking-wider text-slate-500 font-mono">
+            <div className="text-[9px] font-black uppercase tracking-wider text-slate-500 font-mono">
               Add
             </div>
             <div
-              className="text-[13px] font-black font-mono text-[#36E7A1] leading-none"
+              className="text-[14px] font-black font-mono text-[#36E7A1] leading-none"
               style={{
                 textShadow: '0 0 12px rgba(54,231,161,0.55), 0 0 24px rgba(54,231,161,0.25)',
               }}
@@ -135,7 +135,7 @@ export default function WaiverWatchlist({
               +{pct}%
             </div>
           </div>
-          <span className={`text-[9px] font-black font-mono whitespace-nowrap ${trend.className}`}>
+          <span className={`text-[10px] font-black font-mono whitespace-nowrap ${trend.className}`}>
             {trend.text}
           </span>
         </div>
@@ -156,15 +156,15 @@ export default function WaiverWatchlist({
   return (
     <div className={`glass-panel p-3 ${className}`}>
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-300 flex items-center gap-2">
+        <h3 className="text-[11px] font-black uppercase tracking-[0.3em] text-slate-300 flex items-center gap-2">
           <span className="w-1 h-3 bg-[#A78BFA] inline-block shadow-[0_0_8px_rgba(167,139,250,0.7)]" />
           Waiver Wire Watchlist
-          <span className="text-[#A78BFA] bg-[#A78BFA]/10 border border-[#A78BFA]/20 rounded px-1.5 py-0.5 text-[9px] font-black font-mono">
+          <span className="text-[#A78BFA] bg-[#A78BFA]/10 border border-[#A78BFA]/20 rounded px-1.5 py-0.5 text-[10px] font-black font-mono">
             {leagueName}
           </span>
         </h3>
         <span
-          className="text-[9px] font-black font-mono uppercase tracking-[0.2em] px-2 py-1 rounded border"
+          className="text-[10px] font-black font-mono uppercase tracking-[0.2em] px-2 py-1 rounded border"
           style={{
             color: '#36E7A1',
             background: 'rgba(54,231,161,0.08)',
@@ -178,7 +178,7 @@ export default function WaiverWatchlist({
 
       {visible.length === 0 && (
         <div className="border border-dashed border-white/[0.06] rounded-lg py-6 text-center">
-          <p className="text-[10px] uppercase tracking-widest text-slate-600 font-mono">
+          <p className="text-[11px] uppercase tracking-widest text-slate-600 font-mono">
             No trending adds available right now
           </p>
         </div>
@@ -198,12 +198,12 @@ export default function WaiverWatchlist({
                 >
                   <div className="flex items-center gap-2 px-0.5">
                     <span
-                      className="text-[9px] font-black text-black uppercase tracking-widest font-mono px-2 py-0.5 rounded"
+                      className="text-[10px] font-black text-black uppercase tracking-widest font-mono px-2 py-0.5 rounded"
                       style={{ background: `linear-gradient(90deg, ${stripe}, ${stripe}cc)` }}
                     >
                       {pos === 'OTHER' ? 'OTHER' : pos}
                     </span>
-                    <span className="text-[9px] text-slate-600 font-mono uppercase tracking-wider">
+                    <span className="text-[10px] text-slate-600 font-mono uppercase tracking-wider">
                       Targets
                     </span>
                   </div>

@@ -28,7 +28,7 @@ function SuggestionAvatar({ playerId, name }: { playerId: string; name: string }
 
   if (!playerId || err) {
     return (
-      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white/[0.08] text-[11px] font-bold text-white">
+      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white/[0.08] text-[12px] font-bold text-white">
         {initials}
       </div>
     );
@@ -54,14 +54,14 @@ function LockedOverlay() {
     <div className="absolute inset-0 z-10 flex flex-col items-center justify-center rounded-xl bg-black/60 px-6 text-center backdrop-blur-sm">
       <Lock className="h-7 w-7 text-[#64748B]" aria-hidden />
       <p
-        className="mt-3 max-w-[280px] text-[14px] font-medium text-white"
+        className="mt-3 max-w-[280px] text-[15px] font-medium text-white"
         style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}
       >
         TRE Suggestions are locked on Free and Rookie. Upgrade to Veteran or All-Pro Terminal.
       </p>
       <Link
         href="/pricing"
-        className="mt-4 inline-flex min-h-[44px] items-center justify-center rounded-lg bg-emerald-500 px-5 py-2 text-[13px] font-semibold text-black transition-colors hover:bg-emerald-400"
+        className="mt-4 inline-flex min-h-[44px] items-center justify-center rounded-lg bg-emerald-500 px-5 py-2 text-[14px] font-semibold text-black transition-colors hover:bg-emerald-400"
         style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}
       >
         Upgrade Now →
@@ -93,18 +93,18 @@ function SuggestionRow({ row }: { row: TreSuggestionRowDto }) {
       <SuggestionAvatar playerId={row.playerId} name={row.playerDisplayName} />
       <div className="min-w-0 flex-1">
         <p
-          className="truncate text-[13px] font-medium text-white"
+          className="truncate text-[14px] font-medium text-white"
           style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}
         >
           {row.headline}
         </p>
-        <p className="truncate text-[11px] text-[#64748B]" style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}>
+        <p className="truncate text-[12px] text-[#64748B]" style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}>
           Target: {row.targetName}
         </p>
       </div>
       <div className="shrink-0 text-right">
         <p
-          className="text-[9px] font-semibold uppercase tracking-wide text-[#64748B]"
+          className="text-[10px] font-semibold uppercase tracking-wide text-[#64748B]"
           style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}
         >
           TRE EDGE
@@ -196,18 +196,18 @@ export default function TRESuggestionsPanel({ className }: TRESuggestionsPanelPr
       <div className="flex flex-col gap-2 border-b border-white/[0.06] px-3 py-3 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between sm:gap-3 sm:px-4">
         <div className="min-w-0">
           <p
-            className="text-[12px] font-semibold uppercase tracking-wide text-[#64748B]"
+            className="text-[13px] font-semibold uppercase tracking-wide text-[#64748B]"
             style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}
           >
             TRE SUGGESTED TRADES
           </p>
-          <p className="mt-0.5 text-[11px] text-[#475569]" style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}>
+          <p className="mt-0.5 text-[12px] text-[#475569]" style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}>
             Proactive deals found by TRE Engine
           </p>
         </div>
         <Link
           href="/dashboard/trade-hub"
-          className="inline-flex min-h-[44px] shrink-0 items-center text-[12px] text-[#22D3EE] hover:bg-white/[0.04] hover:underline sm:min-h-0"
+          className="inline-flex min-h-[44px] shrink-0 items-center text-[13px] text-[#22D3EE] hover:bg-white/[0.04] hover:underline sm:min-h-0"
           style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}
         >
           View All Suggestions →
@@ -225,13 +225,13 @@ export default function TRESuggestionsPanel({ className }: TRESuggestionsPanelPr
           </div>
         ) : error ? (
           <div className="flex flex-col items-center gap-3 py-6 text-center">
-            <p className="text-[13px] text-red-400" style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}>
+            <p className="text-[14px] text-red-400" style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}>
               {error}
             </p>
             <button
               type="button"
               onClick={() => void loadSuggestions()}
-              className="min-h-[44px] rounded-lg border border-white/[0.12] bg-white/[0.05] px-4 text-[13px] text-white hover:bg-white/[0.08]"
+              className="min-h-[44px] rounded-lg border border-white/[0.12] bg-white/[0.05] px-4 text-[14px] text-white hover:bg-white/[0.08]"
               style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}
             >
               Retry
@@ -244,7 +244,7 @@ export default function TRESuggestionsPanel({ className }: TRESuggestionsPanelPr
             ))}
           </div>
         ) : (
-          <p className="py-6 text-center text-[13px] text-[#64748B]" style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}>
+          <p className="py-6 text-center text-[14px] text-[#64748B]" style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}>
             No suggestions right now.
           </p>
         )}

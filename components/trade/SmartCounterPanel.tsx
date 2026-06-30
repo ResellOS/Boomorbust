@@ -89,18 +89,18 @@ export default function SmartCounterPanel({
   return (
     <div className="flex h-full min-h-0 flex-col gap-2.5 overflow-y-auto border-l border-border bg-bg p-3.5">
       <div className="mb-1">
-        <div className="font-figtree text-[11px] font-bold uppercase tracking-wide text-text">
+        <div className="font-figtree text-[12px] font-bold uppercase tracking-wide text-text">
           Smart Counter
         </div>
-        <div className="mt-0.5 font-mono text-[8.5px] text-muted">
+        <div className="mt-0.5 font-mono text-[9.5px] text-muted">
           Aggressive · Balanced · Conservative
         </div>
       </div>
 
       {loading ? (
-        <div className="font-mono text-[9px] text-muted">Generating counters…</div>
+        <div className="font-mono text-[10px] text-muted">Generating counters…</div>
       ) : counters.length === 0 ? (
-        <div className="font-figtree text-[11px] text-muted">
+        <div className="font-figtree text-[12px] text-muted">
           Select an offer to generate Smart Counter responses.
         </div>
       ) : (
@@ -112,11 +112,11 @@ export default function SmartCounterPanel({
             <div key={c.tier} className={`rounded-lg border p-3 ${style.card}`}>
               <div className="mb-1 flex items-start justify-between">
                 <div>
-                  <div className={`mb-0.5 font-mono text-[8.5px] font-bold uppercase tracking-[1.5px] ${style.type}`}>
+                  <div className={`mb-0.5 font-mono text-[9.5px] font-bold uppercase tracking-[1.5px] ${style.type}`}>
                     {c.tier}
                   </div>
                   <div className="font-figtree text-sm font-bold text-text">{c.title}</div>
-                  <div className="font-mono text-[8.5px] text-muted">{c.description}</div>
+                  <div className="font-mono text-[9.5px] text-muted">{c.description}</div>
                 </div>
                 <div
                   className={`flex h-[38px] w-[38px] shrink-0 items-center justify-center rounded-lg border text-lg ${style.iconBg}`}
@@ -124,7 +124,7 @@ export default function SmartCounterPanel({
                   {style.icon}
                 </div>
               </div>
-              <div className="mb-2 font-mono text-[8.5px] text-muted">
+              <div className="mb-2 font-mono text-[9.5px] text-muted">
                 Suggested adjustment:{' '}
                 <span className={c.adjustmentType === 'add' ? 'font-bold text-boom' : c.adjustmentType === 'remove' ? 'font-bold text-bust' : ''}>
                   {c.adjustment}
@@ -136,12 +136,12 @@ export default function SmartCounterPanel({
                     {c.edgeScore > 0 ? '+' : ''}
                     {c.edgeScore.toFixed(1)}
                   </div>
-                  <div className="font-mono text-[8px] text-muted">Dynasty Edge</div>
+                  <div className="font-mono text-[9px] text-muted">Dynasty Edge</div>
                 </div>
                 <button
                   type="button"
                   onClick={() => void copyCounter(c.copyText)}
-                  className={`rounded px-3.5 py-[7px] font-figtree text-[11px] font-bold tracking-wide ${style.btn}`}
+                  className={`rounded px-3.5 py-[7px] font-figtree text-[12px] font-bold tracking-wide ${style.btn}`}
                 >
                   Send Counter
                 </button>
@@ -151,14 +151,14 @@ export default function SmartCounterPanel({
         })
       )}
 
-      <span className="block cursor-pointer py-1.5 text-center font-mono text-[9px] text-boom">
+      <span className="block cursor-pointer py-1.5 text-center font-mono text-[10px] text-boom">
         View All Smart Counters →
       </span>
 
       <div className="mt-auto rounded-[7px] border border-muted/15 bg-boom/[0.018] p-2.5 text-center">
-        <div className="mb-1 font-mono text-[7px] uppercase tracking-[2px] text-muted/40">Sponsored</div>
+        <div className="mb-1 font-mono text-[8px] uppercase tracking-[2px] text-muted/40">Sponsored</div>
         <div className="font-figtree text-lg font-extrabold tracking-wide text-boom/50">UNDERDOG</div>
-        <div className="mt-0.5 font-mono text-[7px] text-muted/40">Best Ball Fantasy · Sign Up Free</div>
+        <div className="mt-0.5 font-mono text-[8px] text-muted/40">Best Ball Fantasy · Sign Up Free</div>
       </div>
     </div>
   );

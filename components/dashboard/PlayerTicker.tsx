@@ -17,15 +17,15 @@ function TickerCard({ p }: { p: RotationPlayer }) {
   return (
     <div className="flex min-w-0 flex-col gap-0.5 px-1">
       <div className="flex min-w-0 items-center gap-2">
-        <span className="shrink-0 font-mono text-[13px] font-bold tabular-nums" style={{ color }}>
+        <span className="shrink-0 font-mono text-[14px] font-bold tabular-nums" style={{ color }}>
           {arrow}
         </span>
-        <span className="min-w-0 truncate font-figtree text-[12px] font-semibold text-text">{name}</span>
-        <span className="shrink-0 font-mono text-[12px] font-bold tabular-nums" style={{ color }}>
+        <span className="min-w-0 truncate font-figtree text-[13px] font-semibold text-text">{name}</span>
+        <span className="shrink-0 font-mono text-[13px] font-bold tabular-nums" style={{ color }}>
           {delta}
         </span>
       </div>
-      <p className="truncate pl-[22px] font-mono text-[10px] leading-snug text-[#64748B]">{reason}</p>
+      <p className="truncate pl-[22px] font-mono text-[11px] leading-snug text-[#64748B]">{reason}</p>
     </div>
   );
 }
@@ -53,7 +53,7 @@ export default function PlayerTicker({ players, animated }: PlayerTickerProps) {
 
   if (sorted.length === 0) {
     return (
-      <div className="flex h-[46px] items-center rounded-[7px] border border-border bg-surface px-3 font-mono text-[11px] text-muted">
+      <div className="flex h-[46px] items-center rounded-[7px] border border-border bg-surface px-3 font-mono text-[12px] text-muted">
         No rostered players in this league yet.
       </div>
     );

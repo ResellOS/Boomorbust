@@ -28,7 +28,7 @@ export default function WaiverFilterBar({
       <select
         value={activeLeagueId ?? ''}
         onChange={(e) => onLeagueChange(e.target.value || null)}
-        className="text-[12px] font-medium bg-white/[0.06] border border-white/[0.12] rounded-lg px-3 py-2 min-h-[36px] text-white appearance-none cursor-pointer min-w-[140px]"
+        className="text-[13px] font-medium bg-white/[0.06] border border-white/[0.12] rounded-lg px-3 py-2 min-h-[36px] text-white appearance-none cursor-pointer min-w-[140px]"
       >
         <option value="" className="bg-[#0a0d14]">All Leagues</option>
         {leagues.map((l) => (
@@ -44,7 +44,7 @@ export default function WaiverFilterBar({
             <button
               key={pos}
               onClick={() => onPositionChange(pos)}
-              className="px-3 py-1 rounded-full text-[11px] font-semibold transition-all"
+              className="px-3 py-1 rounded-full text-[12px] font-semibold transition-all"
               style={{
                 background: active ? '#36E7A1' : 'rgba(255,255,255,0.05)',
                 color: active ? '#0a0d14' : '#94a3b8',
@@ -62,7 +62,7 @@ export default function WaiverFilterBar({
         <select
           value={scoring}
           onChange={(e) => onScoringChange(e.target.value as WaiverScoring)}
-          className="text-[12px] font-medium bg-white/[0.06] border border-white/[0.12] rounded-lg px-3 py-2 min-h-[36px] text-white appearance-none cursor-pointer"
+          className="text-[13px] font-medium bg-white/[0.06] border border-white/[0.12] rounded-lg px-3 py-2 min-h-[36px] text-white appearance-none cursor-pointer"
         >
           {SCORING_OPTIONS.map((s) => (
             <option key={s} value={s} className="bg-[#0a0d14]">{s} Scoring</option>

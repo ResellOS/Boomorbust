@@ -70,7 +70,7 @@ function MiniBar({ value, max, color }: { value: number; max: number; color: str
       <div className="h-1.5 w-24 rounded-full bg-white/[0.06] overflow-hidden shrink-0">
         <div className="h-full rounded-full transition-all" style={{ width: `${pct}%`, backgroundColor: color }} />
       </div>
-      <span className="tabular-nums text-[11px] text-[var(--text-muted)]">{value.toLocaleString()}</span>
+      <span className="tabular-nums text-[12px] text-[var(--text-muted)]">{value.toLocaleString()}</span>
     </div>
   );
 }
@@ -92,10 +92,10 @@ function PlayerContext({
       {/* Header */}
       <div className="flex items-start justify-between gap-3 p-5 border-b border-[var(--border)]">
         <div>
-          <p className="text-[10px] uppercase tracking-[0.2em] text-[var(--text-muted)] mb-1">Player Context</p>
+          <p className="text-[11px] uppercase tracking-[0.2em] text-[var(--text-muted)] mb-1">Player Context</p>
           <h2 className="display text-2xl text-white leading-tight">{player.name}</h2>
           <p className="text-sm text-[var(--text-secondary)] mt-1">
-            <span className={clsx('text-[10px] font-bold px-1.5 py-0.5 rounded', POS_BADGE[player.position])}>
+            <span className={clsx('text-[11px] font-bold px-1.5 py-0.5 rounded', POS_BADGE[player.position])}>
               {player.position}
             </span>
             {' '}·{' '}{player.team} · Age {player.age}
@@ -120,7 +120,7 @@ function PlayerContext({
             backgroundColor: signalColor + '0D',
           }}
         >
-          <p className="text-[11px] uppercase tracking-[0.2em] text-[var(--text-muted)] mb-2">
+          <p className="text-[12px] uppercase tracking-[0.2em] text-[var(--text-muted)] mb-2">
             BBSM vs Market
           </p>
           <p className="display text-[3.5rem] leading-none font-normal" style={{ color: signalColor }}>
@@ -134,11 +134,11 @@ function PlayerContext({
         {/* Value bars */}
         <div className="space-y-4">
           <div>
-            <p className="text-[10px] uppercase tracking-[0.2em] text-[var(--text-muted)] mb-2">Market Value (KTC)</p>
+            <p className="text-[11px] uppercase tracking-[0.2em] text-[var(--text-muted)] mb-2">Market Value (KTC)</p>
             <MiniBar value={player.marketValue} max={10000} color="#6366f1" />
           </div>
           <div>
-            <p className="text-[10px] uppercase tracking-[0.2em] text-[var(--text-muted)] mb-2">BBSM Value</p>
+            <p className="text-[11px] uppercase tracking-[0.2em] text-[var(--text-muted)] mb-2">BBSM Value</p>
             <MiniBar value={player.bbsmValue} max={10000} color={signalColor} />
           </div>
           <div className="pt-1 border-t border-[var(--border)] flex items-center justify-between text-sm">
@@ -152,36 +152,36 @@ function PlayerContext({
         {/* Ratings, verdict, why */}
         <div className="space-y-3 rounded-xl border border-[var(--border)] bg-black/20 p-4">
           <div className="space-y-1">
-            <p className="text-[10px] uppercase tracking-[0.2em] text-[var(--text-muted)]">OUR RATING</p>
+            <p className="text-[11px] uppercase tracking-[0.2em] text-[var(--text-muted)]">OUR RATING</p>
             <p className="text-sm font-semibold text-white">{player.tfoGrade.replace(/_/g, ' ')}</p>
           </div>
           <div className="space-y-1 pt-2 border-t border-[var(--border)]">
-            <p className="text-[10px] uppercase tracking-[0.2em] text-[var(--text-muted)]">MARKET RATING</p>
+            <p className="text-[11px] uppercase tracking-[0.2em] text-[var(--text-muted)]">MARKET RATING</p>
             <p className="text-sm text-[var(--text-secondary)]" style={{ fontFamily: 'var(--font-body)' }}>
               {getMarketCategory(player.delta)}
             </p>
           </div>
           <div className="space-y-1 pt-2 border-t border-[var(--border)]">
-            <p className="text-[10px] uppercase tracking-[0.2em] text-[var(--text-muted)]">OUR VERDICT</p>
+            <p className="text-[11px] uppercase tracking-[0.2em] text-[var(--text-muted)]">OUR VERDICT</p>
             <p
               className="display text-xl tracking-wide font-bold"
               style={{ color: getArbitrageSignalColor(player.signal) }}
             >
               {arbitrageSignalToAction(player.signal)}
             </p>
-            <p className="text-[10px] text-[var(--text-muted)]">Signal tier: {player.signal}</p>
+            <p className="text-[11px] text-[var(--text-muted)]">Signal tier: {player.signal}</p>
           </div>
           <div className="space-y-1 pt-2 border-t border-[var(--border)]">
-            <p className="text-[10px] uppercase tracking-[0.2em] text-[var(--text-muted)]">WHY</p>
+            <p className="text-[11px] uppercase tracking-[0.2em] text-[var(--text-muted)]">WHY</p>
             <p className="text-xs text-[var(--text-secondary)] leading-snug" style={{ fontFamily: 'var(--font-body)' }}>
               {firstTfoReasonSentence(player.tfoReasoning)}
             </p>
           </div>
           <div className="pt-2 border-t border-[var(--border)] flex flex-wrap gap-3 items-baseline">
-            <span className="text-[10px] text-[var(--text-muted)]">Dynasty rating</span>
+            <span className="text-[11px] text-[var(--text-muted)]">Dynasty rating</span>
             <span className="display text-lg text-white tabular-nums">{player.tfoScore.toFixed(1)}</span>
             <span
-              className="text-[10px] font-bold px-2 py-0.5 rounded border border-white/15 uppercase tracking-wide display"
+              className="text-[11px] font-bold px-2 py-0.5 rounded border border-white/15 uppercase tracking-wide display"
               style={{
                 color: TFO_VERDICT_HEX[player.tfoVerdict] ?? '#94A3B8',
                 borderColor: `${TFO_VERDICT_HEX[player.tfoVerdict] ?? '#94A3B8'}44`,
@@ -192,7 +192,7 @@ function PlayerContext({
             </span>
           </div>
           {player.tfoFlags.length > 0 && (
-            <p className="text-[10px] text-[var(--text-muted)]">Flags: {player.tfoFlags.join(', ')}</p>
+            <p className="text-[11px] text-[var(--text-muted)]">Flags: {player.tfoFlags.join(', ')}</p>
           )}
         </div>
 
@@ -278,7 +278,7 @@ export default function ArbitragePage() {
       <main className="max-w-[1400px] mx-auto px-4 sm:px-6 pb-28 lg:pb-12 pt-8 lg:pt-10">
         {/* Header */}
         <header className="mb-8">
-          <p className="text-[11px] uppercase tracking-[0.25em] text-[var(--text-muted)] mb-1">2026 Post-FA Snapshot</p>
+          <p className="text-[12px] uppercase tracking-[0.25em] text-[var(--text-muted)] mb-1">2026 Post-FA Snapshot</p>
           <h1 className="display text-[clamp(2rem,5vw,3rem)] text-white leading-none">
             COMBINED RANKINGS
           </h1>
@@ -305,7 +305,7 @@ export default function ArbitragePage() {
             { label: 'Avg Gap', value: `${avgGapPct}%`, color: '#6366f1' },
           ].map((stat) => (
             <div key={stat.label} className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)]/95 p-4">
-              <p className="text-[10px] uppercase tracking-[0.2em] text-[var(--text-muted)] mb-2">{stat.label}</p>
+              <p className="text-[11px] uppercase tracking-[0.2em] text-[var(--text-muted)] mb-2">{stat.label}</p>
               <p className="display text-3xl" style={{ color: stat.color }}>{stat.value}</p>
             </div>
           ))}
@@ -369,7 +369,7 @@ export default function ArbitragePage() {
                   ].map((h) => (
                     <th
                       key={h}
-                      className="px-4 py-3 text-left text-[10px] uppercase tracking-[0.18em] text-[var(--text-muted)] font-medium whitespace-nowrap"
+                      className="px-4 py-3 text-left text-[11px] uppercase tracking-[0.18em] text-[var(--text-muted)] font-medium whitespace-nowrap"
                     >
                       {h}
                     </th>
@@ -398,19 +398,19 @@ export default function ArbitragePage() {
                       {/* Player */}
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-2">
-                          <div className="w-8 h-8 rounded-lg bg-[var(--bg-secondary)] flex items-center justify-center text-[10px] font-bold text-[var(--text-secondary)] shrink-0 border border-[var(--border)]">
+                          <div className="w-8 h-8 rounded-lg bg-[var(--bg-secondary)] flex items-center justify-center text-[11px] font-bold text-[var(--text-secondary)] shrink-0 border border-[var(--border)]">
                             {p.firstName[0]}{p.lastName[0]}
                           </div>
                           <div>
                             <p className="text-white font-medium leading-tight">{p.name}</p>
-                            <p className="text-[11px] text-[var(--text-muted)]">{p.team}</p>
+                            <p className="text-[12px] text-[var(--text-muted)]">{p.team}</p>
                           </div>
                         </div>
                       </td>
 
                       {/* Position */}
                       <td className="px-4 py-3">
-                        <span className={clsx('text-[10px] font-bold px-1.5 py-0.5 rounded', POS_BADGE[p.position])}>
+                        <span className={clsx('text-[11px] font-bold px-1.5 py-0.5 rounded', POS_BADGE[p.position])}>
                           {p.position}
                         </span>
                       </td>
@@ -442,7 +442,7 @@ export default function ArbitragePage() {
 
                       {/* TFO grade */}
                       <td className="px-4 py-3">
-                        <span className="text-[10px] font-bold text-[var(--cyan)] whitespace-nowrap">
+                        <span className="text-[11px] font-bold text-[var(--cyan)] whitespace-nowrap">
                           {formatEngineGradeLabel(p.tfoGrade.replace(/_/g, ' '))}
                         </span>
                       </td>
@@ -450,7 +450,7 @@ export default function ArbitragePage() {
                       {/* TFO verdict */}
                       <td className="px-4 py-3">
                         <span
-                          className="inline-flex px-2 py-0.5 rounded border text-[10px] font-bold uppercase tracking-wide display whitespace-nowrap"
+                          className="inline-flex px-2 py-0.5 rounded border text-[11px] font-bold uppercase tracking-wide display whitespace-nowrap"
                           style={{
                             color: TFO_VERDICT_HEX[p.tfoVerdict] ?? '#94A3B8',
                             borderColor: `${TFO_VERDICT_HEX[p.tfoVerdict] ?? '#94A3B8'}55`,
@@ -464,7 +464,7 @@ export default function ArbitragePage() {
                       {/* Signal */}
                       <td className="px-4 py-3">
                         <span
-                          className="inline-flex px-2 py-0.5 rounded border text-[10px] font-bold uppercase tracking-wide display whitespace-nowrap"
+                          className="inline-flex px-2 py-0.5 rounded border text-[11px] font-bold uppercase tracking-wide display whitespace-nowrap"
                           style={signalBadgeStyle(p.signal)}
                         >
                           {p.signal}
@@ -472,7 +472,7 @@ export default function ArbitragePage() {
                       </td>
 
                       {/* Note */}
-                      <td className="px-4 py-3 text-[var(--text-secondary)] text-[11px] max-w-[180px] whitespace-nowrap overflow-hidden text-ellipsis" style={{ fontFamily: 'var(--font-body)' }}>
+                      <td className="px-4 py-3 text-[var(--text-secondary)] text-[12px] max-w-[180px] whitespace-nowrap overflow-hidden text-ellipsis" style={{ fontFamily: 'var(--font-body)' }}>
                         {p.note}
                       </td>
                     </tr>
@@ -505,11 +505,11 @@ export default function ArbitragePage() {
                     onClick={() => setSelectedPlayer(p)}
                   >
                     <div className="flex items-center gap-2">
-                      <span className={clsx('text-[10px] font-bold px-1.5 py-0.5 rounded', POS_BADGE[p.position])}>
+                      <span className={clsx('text-[11px] font-bold px-1.5 py-0.5 rounded', POS_BADGE[p.position])}>
                         {p.position}
                       </span>
                       <span className="text-white text-sm font-medium">{p.name}</span>
-                      <span className="text-[var(--text-muted)] text-[11px]">{p.team} · {p.age}y</span>
+                      <span className="text-[var(--text-muted)] text-[12px]">{p.team} · {p.age}y</span>
                     </div>
                     <DeltaBadge delta={p.delta} color={p.signalColor} />
                   </li>

@@ -46,7 +46,7 @@ export default function RookieFilterBar({
           onChange={(e) => onSearch(e.target.value)}
           onFocus={() => setFocused(true)}
           onBlur={() => setFocused(false)}
-          className="pl-8 pr-3 py-2 min-h-[36px] text-[12px] rounded-lg text-white placeholder-slate-500 outline-none w-40 transition-all"
+          className="pl-8 pr-3 py-2 min-h-[36px] text-[13px] rounded-lg text-white placeholder-slate-500 outline-none w-40 transition-all"
           style={{
             background: 'rgba(255,255,255,0.05)',
             border: focused ? '1px solid rgba(54,231,161,0.4)' : '1px solid rgba(255,255,255,0.1)',
@@ -58,7 +58,7 @@ export default function RookieFilterBar({
       <select
         value={position}
         onChange={(e) => onPosition(e.target.value as RookiePosition)}
-        className="text-[12px] font-medium bg-white/[0.06] border border-white/[0.12] rounded-lg px-3 py-2 min-h-[36px] text-white appearance-none cursor-pointer"
+        className="text-[13px] font-medium bg-white/[0.06] border border-white/[0.12] rounded-lg px-3 py-2 min-h-[36px] text-white appearance-none cursor-pointer"
       >
         {POSITIONS.map((p) => (
           <option key={p} value={p} className="bg-[#0a0d14]">
@@ -71,7 +71,7 @@ export default function RookieFilterBar({
       <select
         value={college}
         onChange={(e) => onCollege(e.target.value)}
-        className="text-[12px] font-medium bg-white/[0.06] border border-white/[0.12] rounded-lg px-3 py-2 min-h-[36px] text-white appearance-none cursor-pointer"
+        className="text-[13px] font-medium bg-white/[0.06] border border-white/[0.12] rounded-lg px-3 py-2 min-h-[36px] text-white appearance-none cursor-pointer"
       >
         {COLLEGES.map((c) => (
           <option key={c} value={c} className="bg-[#0a0d14]">{c}</option>
@@ -82,7 +82,7 @@ export default function RookieFilterBar({
       <select
         value={draftClass}
         onChange={(e) => onDraftClass(e.target.value as DraftClass)}
-        className="text-[12px] font-medium bg-white/[0.06] border border-white/[0.12] rounded-lg px-3 py-2 min-h-[36px] text-white appearance-none cursor-pointer"
+        className="text-[13px] font-medium bg-white/[0.06] border border-white/[0.12] rounded-lg px-3 py-2 min-h-[36px] text-white appearance-none cursor-pointer"
       >
         {DRAFT_CLASSES.map((d) => (
           <option key={d} value={d} className="bg-[#0a0d14]">{d} Draft Class</option>
@@ -91,7 +91,7 @@ export default function RookieFilterBar({
 
       {/* Filters button */}
       <button
-        className="flex items-center gap-1.5 px-3 py-2 min-h-[36px] rounded-lg text-[12px] font-medium text-slate-300 hover:text-white transition-colors"
+        className="flex items-center gap-1.5 px-3 py-2 min-h-[36px] rounded-lg text-[13px] font-medium text-slate-300 hover:text-white transition-colors"
         style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }}
       >
         <svg width="12" height="12" viewBox="0 0 12 12" fill="none">

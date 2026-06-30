@@ -61,27 +61,27 @@ function NewsModal({
         role="dialog"
       >
         <div className="border-b border-border px-4 py-3">
-          <div className="font-figtree text-[13px] font-semibold text-text">{item.headline}</div>
+          <div className="font-figtree text-[14px] font-semibold text-text">{item.headline}</div>
           {impact ? (
-            <p className="mt-1.5 font-mono text-[10px] leading-snug text-[#9aa8c4]">{impact}</p>
+            <p className="mt-1.5 font-mono text-[11px] leading-snug text-[#9aa8c4]">{impact}</p>
           ) : null}
           {assets.length > 0 ? (
             <div className="mt-2">
-              <div className="font-mono text-[8px] uppercase tracking-wide text-muted">Affected Assets</div>
+              <div className="font-mono text-[9px] uppercase tracking-wide text-muted">Affected Assets</div>
               <div className="mt-1 flex flex-wrap gap-2">
                 {assets.map((name) =>
                   item.playerId ? (
                     <Link
                       key={name}
                       href={playerHubHref(item.playerId)}
-                      className="rounded border border-boom/30 bg-boom/10 px-2 py-0.5 font-figtree text-[10px] text-boom no-underline hover:border-boom/50"
+                      className="rounded border border-boom/30 bg-boom/10 px-2 py-0.5 font-figtree text-[11px] text-boom no-underline hover:border-boom/50"
                     >
                       {name}
                     </Link>
                   ) : (
                     <span
                       key={name}
-                      className="rounded border border-border px-2 py-0.5 font-figtree text-[10px] text-text"
+                      className="rounded border border-border px-2 py-0.5 font-figtree text-[11px] text-text"
                     >
                       {name}
                     </span>
@@ -90,7 +90,7 @@ function NewsModal({
               </div>
             </div>
           ) : null}
-          <div className="mt-2 flex items-center gap-2 font-mono text-[10px] text-muted">
+          <div className="mt-2 flex items-center gap-2 font-mono text-[11px] text-muted">
             <span>{item.source}</span>
             <span>·</span>
             <span>{formatTimeAgo(item.publishedAt)} ago</span>
@@ -106,14 +106,14 @@ function NewsModal({
             />
           ) : (
             <div className="flex h-[200px] flex-col items-center justify-center gap-3 p-6 text-center">
-              <p className="font-figtree text-[12px] text-muted">
+              <p className="font-figtree text-[13px] text-muted">
                 This article cannot be embedded. Open it in a new tab.
               </p>
               <a
                 href={item.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="dash-action-btn rounded-md border border-boom/40 px-4 py-2 font-figtree text-[12px] text-boom no-underline"
+                className="dash-action-btn rounded-md border border-boom/40 px-4 py-2 font-figtree text-[13px] text-boom no-underline"
               >
                 Read full article
               </a>
@@ -125,14 +125,14 @@ function NewsModal({
             href={item.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="font-mono text-[10px] text-boom no-underline hover:underline"
+            className="font-mono text-[11px] text-boom no-underline hover:underline"
           >
             Open in new tab
           </a>
           <button
             type="button"
             onClick={onClose}
-            className="rounded border border-border px-3 py-1 font-figtree text-[11px] text-muted hover:text-text"
+            className="rounded border border-border px-3 py-1 font-figtree text-[12px] text-muted hover:text-text"
           >
             Close (Esc)
           </button>
@@ -167,8 +167,8 @@ export default function DynastyNewsFeed({
     <>
       <div className="flex shrink-0 flex-col overflow-hidden rounded-[7px] border border-border bg-surface">
         <div className="flex shrink-0 items-center justify-between border-b border-border bg-bg px-3 py-[7px]">
-          <span className="font-figtree text-[10px] uppercase tracking-[1.5px] text-text">{title}</span>
-          <span className="font-mono text-[10px] text-boom">● LIVE</span>
+          <span className="font-figtree text-[11px] uppercase tracking-[1.5px] text-text">{title}</span>
+          <span className="font-mono text-[11px] text-boom">● LIVE</span>
         </div>
         <div className="grid grid-cols-1 gap-0 md:grid-cols-2 lg:grid-cols-4">
           {visible.map((item) => {
@@ -184,19 +184,19 @@ export default function DynastyNewsFeed({
                 }}
                 className="group dash-clickable-row flex w-full cursor-pointer flex-col border-b border-r border-border/40 px-3 py-3 text-left last:border-b-0 md:border-b-0"
               >
-                <span className="font-figtree text-[11px] font-semibold leading-snug text-text">
+                <span className="font-figtree text-[12px] font-semibold leading-snug text-text">
                   {item.headline}
                 </span>
                 {impact ? (
-                  <span className="mt-1.5 font-mono text-[9px] leading-snug text-[#9aa8c4]">{impact}</span>
+                  <span className="mt-1.5 font-mono text-[10px] leading-snug text-[#9aa8c4]">{impact}</span>
                 ) : null}
                 {assets.length > 0 ? (
                   <div className="dash-news-hover-reveal">
-                    <div className="font-mono text-[7px] uppercase tracking-wide text-muted">Affected</div>
-                    <div className="font-figtree text-[10px] text-boom">{assets.join(' · ')}</div>
+                    <div className="font-mono text-[8px] uppercase tracking-wide text-muted">Affected</div>
+                    <div className="font-figtree text-[11px] text-boom">{assets.join(' · ')}</div>
                   </div>
                 ) : null}
-                <span className="mt-2 font-mono text-[8px] text-muted">{formatTimeAgo(item.publishedAt)} ago</span>
+                <span className="mt-2 font-mono text-[9px] text-muted">{formatTimeAgo(item.publishedAt)} ago</span>
               </button>
             );
           })}

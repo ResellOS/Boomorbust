@@ -109,9 +109,9 @@ function GradeRow({ label, grade }: { label: string; grade: string }) {
     <div className="flex items-center justify-between py-1.5 border-b border-white/[0.04] last:border-0">
       <div className="flex items-center gap-2">
         <div className="w-1.5 h-1.5 rounded-full" style={{ background: color }} />
-        <span className="text-[11px] text-slate-400">{label}</span>
+        <span className="text-[12px] text-slate-400">{label}</span>
       </div>
-      <span className="text-[12px] font-bold" style={{ color, fontFamily: 'JetBrains Mono, monospace' }}>
+      <span className="text-[13px] font-bold" style={{ color, fontFamily: 'JetBrains Mono, monospace' }}>
         {grade}
       </span>
     </div>
@@ -136,8 +136,8 @@ export default function LandingSpotAnalyzer({ prospect, loading }: Props) {
   if (!prospect) {
     return (
       <div className="glass-card p-4">
-        <h2 className="text-[12px] font-bold text-white tracking-wide uppercase mb-3">LANDING SPOT ANALYZER</h2>
-        <p className="text-[12px] text-slate-500 py-4 text-center">Select a player from the board</p>
+        <h2 className="text-[13px] font-bold text-white tracking-wide uppercase mb-3">LANDING SPOT ANALYZER</h2>
+        <p className="text-[13px] text-slate-500 py-4 text-center">Select a player from the board</p>
       </div>
     );
   }
@@ -149,8 +149,8 @@ export default function LandingSpotAnalyzer({ prospect, loading }: Props) {
   return (
     <div className="glass-card p-4">
       <div className="flex items-center justify-between mb-3">
-        <h2 className="text-[12px] font-bold text-white tracking-wide uppercase">LANDING SPOT ANALYZER</h2>
-        <button className="text-[10px] font-semibold text-cyan-400 hover:text-cyan-300 transition-colors">
+        <h2 className="text-[13px] font-bold text-white tracking-wide uppercase">LANDING SPOT ANALYZER</h2>
+        <button className="text-[11px] font-semibold text-cyan-400 hover:text-cyan-300 transition-colors">
           View Full Analysis
         </button>
       </div>
@@ -170,9 +170,9 @@ export default function LandingSpotAnalyzer({ prospect, loading }: Props) {
             <GradeRow label="Coaching Grade" grade={grades.coachingGrade} />
             <GradeRow label="Scheme Fit" grade={grades.schemeFit} />
             <div className="mt-3 pt-2.5 border-t border-white/[0.08] flex items-center justify-between">
-              <span className="text-[11px] text-slate-400 font-semibold">Overall Landing Spot Grade</span>
+              <span className="text-[12px] text-slate-400 font-semibold">Overall Landing Spot Grade</span>
               <span
-                className="text-[14px] font-bold px-2 py-0.5 rounded-lg"
+                className="text-[15px] font-bold px-2 py-0.5 rounded-lg"
                 style={{
                   fontFamily: 'JetBrains Mono, monospace',
                   color: gradeColor(grades.overall),

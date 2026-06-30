@@ -345,10 +345,10 @@ export default function DraftRoomClient({
         {phase !== 'landing' && phase !== 'drafting' && (
         <>
         <div>
-          <div className="font-figtree text-[16px] font-extrabold text-text">
+          <div className="font-figtree text-[17px] font-extrabold text-text">
             {phase === 'complete' ? 'DRAFT COMPLETE' : 'DRAFT ROOM'}
           </div>
-          <div className="font-mono text-[9px] text-muted">Mock smarter · Draft better</div>
+          <div className="font-mono text-[10px] text-muted">Mock smarter · Draft better</div>
         </div>
         {phase === 'complete' && summary && (
           <TopStat label="Grade" value={summary.grade} tone="boom" />
@@ -483,15 +483,15 @@ export default function DraftRoomClient({
           {showLeaveConfirm && (
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
               <div className="w-full max-w-sm rounded-lg border border-border bg-[#0f1420] p-4">
-                <div className="font-mono text-[12px] uppercase text-text">Leave Draft Room?</div>
-                <p className="mt-2 font-mono text-[10px] text-muted">
+                <div className="font-mono text-[13px] uppercase text-text">Leave Draft Room?</div>
+                <p className="mt-2 font-mono text-[11px] text-muted">
                   Mock progress is saved if a session exists. You can resume from the lobby.
                 </p>
                 <div className="mt-4 flex gap-2">
                   <button
                     type="button"
                     onClick={() => setShowLeaveConfirm(false)}
-                    className="flex-1 rounded border border-border py-2 font-mono text-[10px] uppercase text-muted"
+                    className="flex-1 rounded border border-border py-2 font-mono text-[11px] uppercase text-muted"
                   >
                     Stay
                   </button>
@@ -501,7 +501,7 @@ export default function DraftRoomClient({
                       setShowLeaveConfirm(false);
                       setPhase('landing');
                     }}
-                    className="flex-1 rounded bg-[#7c3aed] py-2 font-mono text-[10px] uppercase text-white"
+                    className="flex-1 rounded bg-[#7c3aed] py-2 font-mono text-[11px] uppercase text-white"
                   >
                     Leave
                   </button>
@@ -542,7 +542,7 @@ export default function DraftRoomClient({
       )}
 
       <footer
-        className="col-span-4 flex items-center gap-4 border-t border-border/50 bg-bg px-4 font-mono text-[7.5px] uppercase tracking-wide text-muted"
+        className="col-span-4 flex items-center gap-4 border-t border-border/50 bg-bg px-4 font-mono text-[8.5px] uppercase tracking-wide text-muted"
         style={{
           height: phase === 'drafting' ? 0 : 28,
           gridColumn: '1 / -1',
@@ -577,9 +577,9 @@ function TopStat({
 }) {
   return (
     <div className="text-right">
-      <div className="font-mono text-[7px] uppercase tracking-wide text-muted">{label}</div>
+      <div className="font-mono text-[8px] uppercase tracking-wide text-muted">{label}</div>
       <div
-        className={`font-mono text-[14px] ${tone === 'boom' ? 'text-boom' : color ? '' : 'text-text'}`}
+        className={`font-mono text-[15px] ${tone === 'boom' ? 'text-boom' : color ? '' : 'text-text'}`}
         style={color ? { color } : undefined}
       >
         {value}

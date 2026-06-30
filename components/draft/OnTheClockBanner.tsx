@@ -35,13 +35,13 @@ export default function OnTheClockBanner({
         }}
       >
         <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-center">
-          <span className="font-mono text-[13px] uppercase tracking-wide" style={{ color: '#0a0d14' }}>
+          <span className="font-mono text-[14px] uppercase tracking-wide" style={{ color: '#0a0d14' }}>
             ⚡ You Are On The Clock
           </span>
-          <span className="font-mono text-[13px]" style={{ color: '#0a0d14', opacity: 0.7 }}>
+          <span className="font-mono text-[14px]" style={{ color: '#0a0d14', opacity: 0.7 }}>
             •
           </span>
-          <span className="font-mono text-[13px] uppercase" style={{ color: '#0a0d14' }}>
+          <span className="font-mono text-[14px] uppercase" style={{ color: '#0a0d14' }}>
             {label}
           </span>
         </div>
@@ -58,10 +58,10 @@ export default function OnTheClockBanner({
   return (
     <div className="relative shrink-0 overflow-hidden px-4 py-3" style={{ background: '#1e2640' }}>
       <div className="absolute inset-0 animate-pulse bg-gradient-to-r from-transparent via-white/5 to-transparent" />
-      <div className="relative text-center font-mono text-[12px] uppercase tracking-wide text-muted">
+      <div className="relative text-center font-mono text-[13px] uppercase tracking-wide text-muted">
         CPU On The Clock — Picking…
       </div>
-      <div className="relative mt-0.5 text-center font-mono text-[11px] text-muted/80">
+      <div className="relative mt-0.5 text-center font-mono text-[12px] text-muted/80">
         {cpuTeamName ?? 'Opponent'} · {label}
       </div>
     </div>

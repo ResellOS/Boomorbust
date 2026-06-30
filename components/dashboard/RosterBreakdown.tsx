@@ -15,11 +15,11 @@ export default function RosterBreakdown({ breakdown }: { breakdown: RosterBreakd
   return (
     <div className="flex flex-col overflow-hidden rounded-lg border border-border bg-surface">
       <div className="flex shrink-0 items-center justify-between border-b border-border bg-bg px-[13px] py-2">
-        <span className="font-figtree text-[9.5px] uppercase tracking-[1.5px] text-text">
+        <span className="font-figtree text-[10.5px] uppercase tracking-[1.5px] text-text">
           Dynasty GPS
         </span>
         <span
-          className="rounded-[3px] px-1.5 py-0.5 font-mono text-[8px] font-bold uppercase tracking-wide"
+          className="rounded-[3px] px-1.5 py-0.5 font-mono text-[9px] font-bold uppercase tracking-wide"
           style={{ color: status.color, background: `${status.color}1f` }}
         >
           {status.label}
@@ -27,7 +27,7 @@ export default function RosterBreakdown({ breakdown }: { breakdown: RosterBreakd
       </div>
 
       <div className="p-3">
-        <div className="mb-1.5 font-mono text-[7.5px] uppercase tracking-[1.5px] text-muted">
+        <div className="mb-1.5 font-mono text-[8.5px] uppercase tracking-[1.5px] text-muted">
           Position Grades
         </div>
         <div className="mb-2.5 grid grid-cols-4 gap-1.5">
@@ -37,21 +37,21 @@ export default function RosterBreakdown({ breakdown }: { breakdown: RosterBreakd
               className="rounded-[6px] border border-border bg-bg/40 px-1.5 py-1.5 text-center"
               title={`${g.have} rostered · ${g.required} starter slot(s)`}
             >
-              <div className="font-mono text-[8px] text-muted">{g.position}</div>
+              <div className="font-mono text-[9px] text-muted">{g.position}</div>
               <div
-                className="font-figtree text-[11px] font-bold leading-tight"
+                className="font-figtree text-[12px] font-bold leading-tight"
                 style={{ color: GRADE_COLOR[g.grade] ?? '#6b7a99' }}
               >
                 {g.grade}
               </div>
-              <div className="font-mono text-[8px] text-muted">
+              <div className="font-mono text-[9px] text-muted">
                 {g.avgTfo > 0 ? g.avgTfo.toFixed(0) : '—'}
               </div>
             </div>
           ))}
         </div>
 
-        <div className="rounded-[6px] border border-border bg-bg/40 px-2.5 py-2 font-figtree text-[10px] leading-snug text-muted">
+        <div className="rounded-[6px] border border-border bg-bg/40 px-2.5 py-2 font-figtree text-[11px] leading-snug text-muted">
           {breakdown.actionSummary}
         </div>
       </div>

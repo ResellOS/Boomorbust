@@ -26,7 +26,7 @@ function tierStyles(tier: SmartCounterCardDto['tier']) {
         borderLeft: 'border-l-[3px] border-l-[#36E7A1]',
         labelClass: 'text-[#36E7A1]',
         buttonClass:
-          'min-h-[44px] w-full bg-emerald-500 hover:bg-emerald-400 text-black text-[12px] font-semibold px-4 py-2.5 rounded-lg mt-3 transition-colors',
+          'min-h-[44px] w-full bg-emerald-500 hover:bg-emerald-400 text-black text-[13px] font-semibold px-4 py-2.5 rounded-lg mt-3 transition-colors',
         cardExtra: 'shadow-[0_0_16px_rgba(54,231,161,0.2)]',
       };
     case 'balanced':
@@ -34,7 +34,7 @@ function tierStyles(tier: SmartCounterCardDto['tier']) {
         borderLeft: 'border-l-[3px] border-l-[#FBBF24]',
         labelClass: 'text-[#FBBF24]',
         buttonClass:
-          'min-h-[44px] w-full bg-amber-500 hover:bg-amber-400 text-black text-[12px] font-semibold px-4 py-2.5 rounded-lg mt-3 transition-colors',
+          'min-h-[44px] w-full bg-amber-500 hover:bg-amber-400 text-black text-[13px] font-semibold px-4 py-2.5 rounded-lg mt-3 transition-colors',
         cardExtra: '',
       };
     case 'conservative':
@@ -42,7 +42,7 @@ function tierStyles(tier: SmartCounterCardDto['tier']) {
         borderLeft: 'border-l-[3px] border-l-[#64748B]',
         labelClass: 'text-[#94a3b8]',
         buttonClass:
-          'min-h-[44px] w-full bg-slate-600 hover:bg-slate-500 text-white text-[12px] font-semibold px-4 py-2.5 rounded-lg mt-3 transition-colors',
+          'min-h-[44px] w-full bg-slate-600 hover:bg-slate-500 text-white text-[13px] font-semibold px-4 py-2.5 rounded-lg mt-3 transition-colors',
         cardExtra: '',
       };
   }
@@ -82,25 +82,25 @@ function CounterResponseCard({ card, offerId }: { card: SmartCounterCardDto; off
       <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-start sm:gap-3">
         <div className="min-w-0 flex-1">
           <p
-            className={`text-[9px] font-semibold uppercase tracking-wide ${styles.labelClass}`}
+            className={`text-[10px] font-semibold uppercase tracking-wide ${styles.labelClass}`}
             style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}
           >
             {card.label}
           </p>
           <p
-            className="mt-1 truncate text-[15px] font-semibold text-white sm:whitespace-normal"
+            className="mt-1 truncate text-[16px] font-semibold text-white sm:whitespace-normal"
             style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}
           >
             {card.title}
           </p>
           <p
-            className="text-[12px] text-[#64748B]"
+            className="text-[13px] text-[#64748B]"
             style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}
           >
             {card.description}
           </p>
           <p
-            className="mt-2 text-[11px] text-[#64748B]"
+            className="mt-2 text-[12px] text-[#64748B]"
             style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}
           >
             {card.modification}
@@ -108,7 +108,7 @@ function CounterResponseCard({ card, offerId }: { card: SmartCounterCardDto; off
         </div>
         <div className="flex w-full shrink-0 flex-row items-center justify-between gap-3 sm:w-auto sm:flex-col sm:items-end sm:justify-start sm:text-right">
           <p
-            className="text-[9px] font-semibold uppercase tracking-wide text-[#64748B]"
+            className="text-[10px] font-semibold uppercase tracking-wide text-[#64748B]"
             style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}
           >
             TRE SCORE
@@ -140,14 +140,14 @@ function LockedOverlay() {
     <div className="absolute inset-0 z-10 flex flex-col items-center justify-center rounded-xl bg-black/60 px-6 text-center backdrop-blur-sm">
       <Lock className="h-7 w-7 text-[#64748B]" aria-hidden />
       <p
-        className="mt-3 max-w-[260px] text-[14px] font-medium text-white"
+        className="mt-3 max-w-[260px] text-[15px] font-medium text-white"
         style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}
       >
         Smart Counter is locked on Free and Rookie. Upgrade to Veteran or All-Pro Terminal.
       </p>
       <Link
         href="/pricing"
-        className="mt-4 inline-flex min-h-[44px] items-center justify-center rounded-lg bg-emerald-500 px-5 py-2 text-[13px] font-semibold text-black transition-colors hover:bg-emerald-400"
+        className="mt-4 inline-flex min-h-[44px] items-center justify-center rounded-lg bg-emerald-500 px-5 py-2 text-[14px] font-semibold text-black transition-colors hover:bg-emerald-400"
         style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}
       >
         Upgrade Now →
@@ -267,13 +267,13 @@ export default function SmartCounterPanel({ className }: SmartCounterPanelProps)
 
       <div className="shrink-0 border-b border-white/[0.06] px-3 py-3 sm:px-4">
         <p
-          className="text-[13px] font-semibold text-white"
+          className="text-[14px] font-semibold text-white"
           style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}
         >
           SMART COUNTER (3 RESPONSES)
         </p>
         <p
-          className="text-[11px] text-[#64748B]"
+          className="text-[12px] text-[#64748B]"
           style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}
         >
           Powered by TRE Engine
@@ -285,7 +285,7 @@ export default function SmartCounterPanel({ className }: SmartCounterPanelProps)
           <div className="min-h-[360px]" aria-hidden />
         ) : !selectedOfferId ? (
           <div className="flex flex-col items-center justify-center py-10 text-center">
-            <p className="text-[13px] text-[#64748B]" style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}>
+            <p className="text-[14px] text-[#64748B]" style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}>
               Select an incoming offer to generate counter responses.
             </p>
           </div>
@@ -297,7 +297,7 @@ export default function SmartCounterPanel({ className }: SmartCounterPanelProps)
           </div>
         ) : counterError ? (
           <div className="flex flex-col items-center gap-3 py-6 text-center">
-            <p className="text-[13px] text-red-400" style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}>
+            <p className="text-[14px] text-red-400" style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}>
               {counterError}
             </p>
             <button
@@ -309,7 +309,7 @@ export default function SmartCounterPanel({ className }: SmartCounterPanelProps)
                 abortRef.current = c;
                 void loadCounters(selectedOffer, c.signal);
               }}
-              className="min-h-[44px] rounded-lg border border-white/[0.12] bg-white/[0.05] px-4 text-[13px] text-white hover:bg-white/[0.08]"
+              className="min-h-[44px] rounded-lg border border-white/[0.12] bg-white/[0.05] px-4 text-[14px] text-white hover:bg-white/[0.08]"
               style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}
             >
               Retry
@@ -331,7 +331,7 @@ export default function SmartCounterPanel({ className }: SmartCounterPanelProps)
             <div className="mt-3 text-center">
               <Link
                 href="/dashboard/trade-hub"
-                className="inline-flex min-h-[44px] w-full max-w-full items-center justify-center text-[12px] text-[#22D3EE] hover:bg-white/[0.04] hover:underline sm:w-auto"
+                className="inline-flex min-h-[44px] w-full max-w-full items-center justify-center text-[13px] text-[#22D3EE] hover:bg-white/[0.04] hover:underline sm:w-auto"
                 style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}
               >
                 View All Smart Counters →
@@ -339,7 +339,7 @@ export default function SmartCounterPanel({ className }: SmartCounterPanelProps)
             </div>
           </>
         ) : !loadingCounters ? (
-          <p className="text-center text-[13px] text-[#64748B]" style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}>
+          <p className="text-center text-[14px] text-[#64748B]" style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}>
             No counter data for this offer.
           </p>
         ) : null}

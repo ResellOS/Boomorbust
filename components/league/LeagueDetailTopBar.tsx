@@ -75,8 +75,8 @@ export default function LeagueDetailTopBar() {
         >
           <HelpCircle className="h-3.5 w-3.5" />
         </button>
-        <div className="flex h-[30px] cursor-pointer items-center gap-1.5 rounded-[5px] border border-border bg-surface2 px-2.5 text-[11px] text-text">
-          <div className="flex h-[18px] w-[18px] items-center justify-center rounded-full bg-boom text-[8px] font-bold text-bg">
+        <div className="flex h-[30px] cursor-pointer items-center gap-1.5 rounded-[5px] border border-border bg-surface2 px-2.5 text-[12px] text-text">
+          <div className="flex h-[18px] w-[18px] items-center justify-center rounded-full bg-boom text-[9px] font-bold text-bg">
             D
           </div>
           @DynastyChampion ▾

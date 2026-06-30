@@ -95,12 +95,12 @@ export default function StarTistCard({
   return (
     <div className={`glass-panel p-4 flex flex-col ${className}`}>
       <div className="flex items-center justify-between mb-3">
-        <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-300 flex items-center gap-2">
+        <h3 className="text-[11px] font-black uppercase tracking-[0.3em] text-slate-300 flex items-center gap-2">
           <Star className="w-3 h-3 text-[#FBBF24]" />
           Portfolio MVP
         </h3>
         {typeof winSharePct === 'number' && (
-          <span className="text-[9px] font-mono text-[#36E7A1] font-black" style={{ textShadow: '0 0 10px rgba(54,231,161,0.4)' }}>
+          <span className="text-[10px] font-mono text-[#36E7A1] font-black" style={{ textShadow: '0 0 10px rgba(54,231,161,0.4)' }}>
             {winSharePct.toFixed(0)}% share
           </span>
         )}
@@ -124,11 +124,11 @@ export default function StarTistCard({
         </div>
         <div className="min-w-0 flex-1">
           <div className="text-sm font-black text-white truncate">{player.name}</div>
-          <div className="text-[10px] text-slate-500 font-mono">
+          <div className="text-[11px] text-slate-500 font-mono">
             {player.position} · {player.team}
           </div>
           {leagueLabel && (
-            <div className="text-[9px] text-slate-600 font-mono truncate mt-0.5">
+            <div className="text-[10px] text-slate-600 font-mono truncate mt-0.5">
               {leagueLabel}
             </div>
           )}
@@ -137,7 +137,7 @@ export default function StarTistCard({
 
       <div className="mt-3 pt-3 border-t border-white/[0.04]">
         <div
-          className="text-[10px] font-black uppercase tracking-widest font-mono text-[#36E7A1]"
+          className="text-[11px] font-black uppercase tracking-widest font-mono text-[#36E7A1]"
           style={{ textShadow: '0 0 12px rgba(54,231,161,0.45), 0 0 24px rgba(54,231,161,0.2)' }}
         >
           {status}
@@ -177,7 +177,7 @@ export default function StarTistCard({
             </div>
           )}
         </div>
-        <div className="text-[10px] text-slate-500 mt-1.5 font-mono">{subline}</div>
+        <div className="text-[11px] text-slate-500 mt-1.5 font-mono">{subline}</div>
         {player.player_id ? (
           <div className="mt-2 border-t border-white/[0.06] pt-2">
             <PlayerBhsActions

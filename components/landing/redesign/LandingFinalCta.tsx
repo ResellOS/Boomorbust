@@ -36,12 +36,12 @@ export default function LandingFinalCta() {
           <br />
           START MANAGING ASSETS.
         </h2>
-        <p className="mt-4 font-figtree text-[14px] text-[#e8ecf4]/55">
+        <p className="mt-4 font-figtree text-[15px] text-[#e8ecf4]/55">
           Join the dynasty managers building an edge before the 2026 season begins.
         </p>
         <Link
           href="/onboarding"
-          className="mt-8 inline-block rounded-md px-8 py-3.5 font-figtree text-[15px] text-[#0a0d14] transition hover:brightness-110"
+          className="mt-8 inline-block rounded-md px-8 py-3.5 font-figtree text-[16px] text-[#0a0d14] transition hover:brightness-110"
           style={{ background: LANDING.boom, boxShadow: '0 0 28px rgba(54,231,161,0.35)' }}
         >
           Import My Leagues →

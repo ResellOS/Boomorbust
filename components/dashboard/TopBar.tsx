@@ -69,7 +69,7 @@ export default function TopBar({
               key={stat.key}
               className="flex flex-col justify-center border-r border-border px-[18px] py-1.5 last:border-r-0"
             >
-              <div className="mb-[3px] font-mono text-[7.5px] uppercase tracking-[1.5px] text-muted">
+              <div className="mb-[3px] font-mono text-[8.5px] uppercase tracking-[1.5px] text-muted">
                 {stat.label}
               </div>
               <div
@@ -77,7 +77,7 @@ export default function TopBar({
               >
                 {display}
               </div>
-              <div className="mt-0.5 font-figtree text-[8px] text-muted">{stat.desc}</div>
+              <div className="mt-0.5 font-figtree text-[9px] text-muted">{stat.desc}</div>
             </div>
           );
         })}

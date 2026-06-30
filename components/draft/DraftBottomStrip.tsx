@@ -49,7 +49,7 @@ export default function DraftBottomStrip({
   const pickLabel = safePickLabel(currentOverall, teams);
 
   return (
-    <div className="flex shrink-0 flex-wrap items-center gap-4 border-t border-border bg-[#0f1420] px-4 py-2 font-mono text-[8px] text-muted">
+    <div className="flex shrink-0 flex-wrap items-center gap-4 border-t border-border bg-[#0f1420] px-4 py-2 font-mono text-[9px] text-muted">
       <div className="min-w-[140px]">
         <div className="uppercase tracking-wide">Draft Trends</div>
         <div className="text-text">

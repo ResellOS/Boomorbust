@@ -179,7 +179,7 @@ function VerdictBadge({ verdict }: { verdict: Verdict }) {
   const s = VERDICT_BADGE[verdict];
   return (
     <span
-      className="inline-flex items-center justify-center rounded-full px-2.5 py-0.5 text-[10px] font-black uppercase tracking-[0.08em] leading-none"
+      className="inline-flex items-center justify-center rounded-full px-2.5 py-0.5 text-[11px] font-black uppercase tracking-[0.08em] leading-none"
       style={{
         background: s.bg,
         color: s.color,
@@ -524,10 +524,10 @@ export function PlayerHubCardLegacy({
         style={{ background: `radial-gradient(120% 50% at 50% 0%, ${teamHex} 0%, transparent 65%)` }} />
 
       <div className={clsx('flex items-center justify-between relative z-10', compact ? 'px-2 pt-2 pb-0.5' : 'px-3 pt-3 pb-1')}>
-        <span className={clsx('font-black uppercase tracking-[0.28em] text-slate-500', compact ? 'text-[7px]' : 'text-[9px]')}>PLAYER HUB</span>
+        <span className={clsx('font-black uppercase tracking-[0.28em] text-slate-500', compact ? 'text-[8px]' : 'text-[10px]')}>PLAYER HUB</span>
         <div className="flex items-center gap-1.5">
           {typeof rotationIndex === 'number' && typeof rotationTotal === 'number' && rotationTotal > 1 && (
-            <span className="text-[8px] font-mono text-slate-600 uppercase tracking-wider">{rotationIndex + 1} / {rotationTotal}</span>
+            <span className="text-[9px] font-mono text-slate-600 uppercase tracking-wider">{rotationIndex + 1} / {rotationTotal}</span>
           )}
           <button type="button" className="p-0.5 rounded-md text-slate-500 hover:text-white hover:bg-white/5 transition-colors" aria-label="Hub options">
             <MoreHorizontal className={compact ? 'w-3.5 h-3.5' : 'w-4 h-4'} />
@@ -538,22 +538,22 @@ export function PlayerHubCardLegacy({
       <div className={clsx('flex items-start justify-between relative z-10 gap-1.5', compact ? 'px-2 pb-1' : 'px-4 pb-2')}>
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-1 mb-0.5">
-            <span className={clsx('font-black px-1 py-0.5 rounded uppercase tracking-wider', compact ? 'text-[7px]' : 'text-[9px]')}
+            <span className={clsx('font-black px-1 py-0.5 rounded uppercase tracking-wider', compact ? 'text-[8px]' : 'text-[10px]')}
               style={{ background: posTint, color: positionAccent.hex }}>
               {normalizedPos === 'OTHER' ? position : normalizedPos}
             </span>
           </div>
           <h3 className={clsx('font-black uppercase tracking-tight text-white leading-tight truncate', compact ? 'text-xs' : 'text-sm')}>{name}</h3>
-          <p className={clsx('font-bold text-slate-500 uppercase tracking-wider mt-0.5 font-mono truncate', compact ? 'text-[8px]' : 'text-[9px]')}>{team} • {normalizedPos === 'OTHER' ? position : normalizedPos}</p>
+          <p className={clsx('font-bold text-slate-500 uppercase tracking-wider mt-0.5 font-mono truncate', compact ? 'text-[9px]' : 'text-[10px]')}>{team} • {normalizedPos === 'OTHER' ? position : normalizedPos}</p>
           {typeof tfoScore === 'number' && tfoGrade && (
             <>
-              <p className="mt-1 text-[11px] leading-tight font-mono tracking-[0.04em]">
+              <p className="mt-1 text-[12px] leading-tight font-mono tracking-[0.04em]">
                 <span style={{ color: tfoAccentColor }}>Rating {Math.round(tfoScore)}</span>
                 <span style={{ color: '#64748B' }}> · </span>
                 <span style={{ color: '#94A3B8' }}>{tfoGrade.replace(/_/g, ' ')}</span>
               </p>
               {tfoReasoning ? (
-                <p className="mt-0.5 max-w-full overflow-hidden text-ellipsis whitespace-nowrap font-mono text-[10px] leading-snug text-[#64748B]" title={tfoReasoning}>{tfoReasoning}</p>
+                <p className="mt-0.5 max-w-full overflow-hidden text-ellipsis whitespace-nowrap font-mono text-[11px] leading-snug text-[#64748B]" title={tfoReasoning}>{tfoReasoning}</p>
               ) : null}
             </>
           )}
@@ -563,7 +563,7 @@ export function PlayerHubCardLegacy({
             style={{ color: deltaColor, textShadow: deltaGlow }}>
             {projectedDelta > 0 ? '+' : ''}{Number.isFinite(projectedDelta) ? projectedDelta.toFixed(1) : '—'}
           </div>
-          <div className={clsx('uppercase tracking-widest text-slate-500 mt-0.5 font-bold font-mono', compact ? 'text-[7px]' : 'text-[8px]')}>{projectedLabel}</div>
+          <div className={clsx('uppercase tracking-widest text-slate-500 mt-0.5 font-bold font-mono', compact ? 'text-[8px]' : 'text-[9px]')}>{projectedLabel}</div>
         </div>
       </div>
 

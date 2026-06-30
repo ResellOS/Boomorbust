@@ -59,7 +59,7 @@ function StatsBar({ data }: { data: ArbitrageResponse | null }) {
           className={`rounded-xl px-4 py-3${i === 4 ? ' col-span-2 md:col-span-1' : ''}`}
           style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}
         >
-          <p className="text-[10px] text-slate-500 uppercase tracking-wider mb-1">{c.label}</p>
+          <p className="text-[11px] text-slate-500 uppercase tracking-wider mb-1">{c.label}</p>
           {data ? (
             <>
               <p
@@ -68,7 +68,7 @@ function StatsBar({ data }: { data: ArbitrageResponse | null }) {
               >
                 {c.value}
               </p>
-              <p className="text-[10px] text-slate-500 mt-0.5">{c.sub}</p>
+              <p className="text-[11px] text-slate-500 mt-0.5">{c.sub}</p>
             </>
           ) : (
             <div className="h-7 bg-white/[0.08] rounded animate-pulse mt-1" />
@@ -91,7 +91,7 @@ function TabNav({ active, onChange }: { active: Tab; onChange: (t: Tab) => void 
         <button
           key={t}
           onClick={() => onChange(t)}
-          className="flex-shrink-0 px-4 py-3 min-h-[44px] text-[11px] font-bold uppercase tracking-wider transition-colors relative"
+          className="flex-shrink-0 px-4 py-3 min-h-[44px] text-[12px] font-bold uppercase tracking-wider transition-colors relative"
           style={{ color: active === t ? '#36E7A1' : '#64748B' }}
         >
           {t}
@@ -124,7 +124,7 @@ function FilterBar({ filters, onChange }: { filters: Filters; onChange: (f: Filt
           value={filters.q}
           onChange={(e) => onChange({ ...filters, q: e.target.value })}
           placeholder="Search players..."
-          className="bg-transparent text-[12px] text-white placeholder-slate-600 outline-none flex-1"
+          className="bg-transparent text-[13px] text-white placeholder-slate-600 outline-none flex-1"
         />
       </div>
 
@@ -141,7 +141,7 @@ function FilterBar({ filters, onChange }: { filters: Filters; onChange: (f: Filt
             const v = e.target.value.startsWith('All') ? '' : e.target.value;
             onChange({ ...filters, [key]: v });
           }}
-          className="rounded-lg px-3 py-2 text-[12px] text-slate-300 appearance-none cursor-pointer pr-7"
+          className="rounded-lg px-3 py-2 text-[13px] text-slate-300 appearance-none cursor-pointer pr-7"
           style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }}
         >
           {options.map((o) => (
@@ -152,7 +152,7 @@ function FilterBar({ filters, onChange }: { filters: Filters; onChange: (f: Filt
 
       {/* Filters button */}
       <button
-        className="flex items-center gap-2 rounded-lg px-4 py-2 text-[12px] font-medium"
+        className="flex items-center gap-2 rounded-lg px-4 py-2 text-[13px] font-medium"
         style={{ background: 'rgba(54,231,161,0.1)', border: '1px solid rgba(54,231,161,0.25)', color: '#36E7A1' }}
       >
         <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
@@ -166,7 +166,7 @@ function FilterBar({ filters, onChange }: { filters: Filters; onChange: (f: Filt
         {['list', 'grid'].map((v) => (
           <button
             key={v}
-            className="px-3 py-2 text-[11px] transition-colors"
+            className="px-3 py-2 text-[12px] transition-colors"
             style={{ background: v === 'list' ? 'rgba(54,231,161,0.12)' : 'rgba(255,255,255,0.04)', color: v === 'list' ? '#36E7A1' : '#64748B' }}
           >
             {v === 'list' ? (
@@ -196,7 +196,7 @@ function PlayerAvatar({ name, pos }: { name: string; pos: string }) {
   if (err) {
     return (
       <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: `${color}20` }}>
-        <span className="text-[10px] font-bold" style={{ color }}>{name.split(' ').map((s) => s[0]).join('').slice(0, 2)}</span>
+        <span className="text-[11px] font-bold" style={{ color }}>{name.split(' ').map((s) => s[0]).join('').slice(0, 2)}</span>
       </div>
     );
   }
@@ -216,16 +216,16 @@ function DivergenceTable({ players, total, page, onPage }: {
     <div className="rounded-xl overflow-hidden mb-5" style={{ border: '1px solid rgba(255,255,255,0.08)' }}>
       {/* Header */}
       <div className="px-4 py-3 border-b" style={{ borderColor: 'rgba(255,255,255,0.06)', background: 'rgba(255,255,255,0.03)' }}>
-        <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">BVI vs KTC Divergence Board</p>
+        <p className="text-[12px] font-bold text-slate-400 uppercase tracking-widest">BVI vs KTC Divergence Board</p>
       </div>
 
       {/* Table */}
       <div className="overflow-x-auto">
-        <table className="w-full text-[11px]">
+        <table className="w-full text-[12px]">
           <thead>
             <tr className="border-b" style={{ borderColor: 'rgba(255,255,255,0.05)' }}>
               {['RANK', 'PLAYER', 'POS', 'TEAM', 'BVI', 'KTC', 'DIVERGENCE', 'DIV %', 'SIGNAL', 'OPP SCORE'].map((h) => (
-                <th key={h} className="text-left px-3 py-2.5 text-[10px] text-slate-600 font-semibold uppercase tracking-wider whitespace-nowrap">
+                <th key={h} className="text-left px-3 py-2.5 text-[11px] text-slate-600 font-semibold uppercase tracking-wider whitespace-nowrap">
                   {h}
                 </th>
               ))}
@@ -246,12 +246,12 @@ function DivergenceTable({ players, total, page, onPage }: {
                   </div>
                 </td>
                 <td className="px-3 py-3">
-                  <span className="text-[10px] font-bold px-1.5 py-0.5 rounded" style={{ color: posColor(p.position), background: `${posColor(p.position)}18` }}>
+                  <span className="text-[11px] font-bold px-1.5 py-0.5 rounded" style={{ color: posColor(p.position), background: `${posColor(p.position)}18` }}>
                     {p.position}
                   </span>
                 </td>
                 <td className="px-3 py-3">
-                  <div className="w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold text-white bg-white/[0.08]">
+                  <div className="w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-bold text-white bg-white/[0.08]">
                     {p.team.slice(0, 2)}
                   </div>
                 </td>
@@ -269,7 +269,7 @@ function DivergenceTable({ players, total, page, onPage }: {
                 </td>
                 <td className="px-3 py-3">
                   <span
-                    className="text-[10px] font-bold px-2 py-1 rounded"
+                    className="text-[11px] font-bold px-2 py-1 rounded"
                     style={
                       p.signal === 'UNDERVALUED'
                         ? { color: '#36E7A1', background: 'rgba(54,231,161,0.12)', border: '1px solid rgba(54,231,161,0.25)' }
@@ -289,7 +289,7 @@ function DivergenceTable({ players, total, page, onPage }: {
 
             {players.length === 0 && (
               <tr>
-                <td colSpan={10} className="px-4 py-8 text-center text-slate-600 text-[12px]">No players match your filters</td>
+                <td colSpan={10} className="px-4 py-8 text-center text-slate-600 text-[13px]">No players match your filters</td>
               </tr>
             )}
           </tbody>
@@ -298,13 +298,13 @@ function DivergenceTable({ players, total, page, onPage }: {
 
       {/* Pagination */}
       <div className="flex items-center justify-between px-4 py-3 border-t" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
-        <p className="text-[11px] text-slate-500">Showing {(page - 1) * 10 + 1}–{Math.min(page * 10, total)} of {total} players</p>
+        <p className="text-[12px] text-slate-500">Showing {(page - 1) * 10 + 1}–{Math.min(page * 10, total)} of {total} players</p>
         <div className="flex items-center gap-1">
           {[1, 2, 3, '...', totalPages].filter((v, i, a) => a.indexOf(v) === i).slice(0, 6).map((pg, i) => (
             <button
               key={i}
               onClick={() => typeof pg === 'number' && onPage(pg)}
-              className="w-7 h-7 rounded text-[11px] font-medium transition-colors"
+              className="w-7 h-7 rounded text-[12px] font-medium transition-colors"
               style={{
                 background: pg === page ? '#36E7A1' : 'rgba(255,255,255,0.04)',
                 color: pg === page ? '#0a0d14' : pg === '...' ? '#64748B' : '#94a3b8',
@@ -345,7 +345,7 @@ function MarketGauge({ score }: { score: number }) {
       className="rounded-xl p-5 flex flex-col items-center"
       style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}
     >
-      <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-4">MARKET EFFICIENCY</p>
+      <p className="text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-4">MARKET EFFICIENCY</p>
       <svg width="190" height="110" viewBox="0 0 190 110">
         {/* Track */}
         <path
@@ -379,9 +379,9 @@ function MarketGauge({ score }: { score: number }) {
       >
         {score}
       </p>
-      <p className="text-[12px] font-semibold text-slate-300 mt-1">Moderate Inefficiency</p>
-      <p className="text-[10px] text-slate-600 mt-0.5">Higher inefficiency = more opportunities</p>
-      <p className="text-[10px] mt-2" style={{ color: '#36E7A1' }}>This is +14 higher than last week</p>
+      <p className="text-[13px] font-semibold text-slate-300 mt-1">Moderate Inefficiency</p>
+      <p className="text-[11px] text-slate-600 mt-0.5">Higher inefficiency = more opportunities</p>
+      <p className="text-[11px] mt-2" style={{ color: '#36E7A1' }}>This is +14 higher than last week</p>
     </div>
   );
 }
@@ -396,15 +396,15 @@ function TopOpportunities({ players }: { players: ArbitragePlayer[] }) {
       style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)' }}
     >
       <div className="px-4 py-3 border-b flex items-center justify-between" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
-        <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">TOP ARBITRAGE OPPORTUNITIES</p>
-        <button className="text-[11px]" style={{ color: '#36E7A1' }}>View All Opportunities →</button>
+        <p className="text-[12px] font-bold text-slate-400 uppercase tracking-widest">TOP ARBITRAGE OPPORTUNITIES</p>
+        <button className="text-[12px]" style={{ color: '#36E7A1' }}>View All Opportunities →</button>
       </div>
       <div className="overflow-x-auto">
-        <table className="w-full text-[11px]">
+        <table className="w-full text-[12px]">
           <thead>
             <tr className="border-b" style={{ borderColor: 'rgba(255,255,255,0.05)' }}>
               {['', 'PLAYER', 'BVI', 'KTC', 'EDGE', 'BEST LEAGUE TYPE', 'ACTION'].map((h) => (
-                <th key={h} className="text-left px-4 py-2.5 text-[10px] text-slate-600 font-semibold uppercase tracking-wider whitespace-nowrap">{h}</th>
+                <th key={h} className="text-left px-4 py-2.5 text-[11px] text-slate-600 font-semibold uppercase tracking-wider whitespace-nowrap">{h}</th>
               ))}
             </tr>
           </thead>
@@ -417,7 +417,7 @@ function TopOpportunities({ players }: { players: ArbitragePlayer[] }) {
                     <PlayerAvatar name={p.name} pos={p.position} />
                     <div>
                       <p className="text-white font-medium">{p.name}</p>
-                      <p className="text-[10px] text-slate-500">{p.position} · {p.team}</p>
+                      <p className="text-[11px] text-slate-500">{p.position} · {p.team}</p>
                     </div>
                   </div>
                 </td>
@@ -427,7 +427,7 @@ function TopOpportunities({ players }: { players: ArbitragePlayer[] }) {
                 <td className="px-4 py-3 text-slate-400">{i === 0 ? 'All Leagues' : i === 1 ? 'Contending' : 'Rebuilding'}</td>
                 <td className="px-4 py-3">
                   <button
-                    className="px-3 py-1.5 rounded-lg text-[10px] font-bold"
+                    className="px-3 py-1.5 rounded-lg text-[11px] font-bold"
                     style={{ background: 'rgba(54,231,161,0.15)', color: '#36E7A1', border: '1px solid rgba(54,231,161,0.3)' }}
                   >
                     BUY LOW
@@ -450,8 +450,8 @@ function PlaceholderTab({ label }: { label: string }) {
       <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ background: 'rgba(54,231,161,0.1)', border: '1px solid rgba(54,231,161,0.2)' }}>
         <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><circle cx="11" cy="11" r="9" stroke="#36E7A1" strokeWidth="1.5"/><path d="M11 7v4l2 2" stroke="#36E7A1" strokeWidth="1.5" strokeLinecap="round"/></svg>
       </div>
-      <p className="text-[14px] font-semibold text-white">{label}</p>
-      <p className="text-[12px] text-slate-500">Coming soon — data loading from BVI engine</p>
+      <p className="text-[15px] font-semibold text-white">{label}</p>
+      <p className="text-[13px] text-slate-500">Coming soon — data loading from BVI engine</p>
     </div>
   );
 }
@@ -497,12 +497,12 @@ export default function ArbitragePage() {
         <div className="flex items-start justify-between flex-wrap gap-3">
           <div>
             <h1 className="text-[26px] font-bold text-white">Arbitrage</h1>
-            <p className="text-[13px] text-slate-500 mt-0.5">Find market inefficiencies. Buy low, sell high, win your league.</p>
+            <p className="text-[14px] text-slate-500 mt-0.5">Find market inefficiencies. Buy low, sell high, win your league.</p>
           </div>
 
           {/* Data sources legend */}
           <div
-            className="rounded-xl px-4 py-3 text-[11px] flex flex-col gap-1.5"
+            className="rounded-xl px-4 py-3 text-[12px] flex flex-col gap-1.5"
             style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}
           >
             <p className="text-slate-500 font-semibold">Data Sources</p>
@@ -565,12 +565,12 @@ export default function ArbitragePage() {
           {/* What is Arbitrage section */}
           <div className="mt-5 pt-5 border-t flex items-start justify-between" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
             <div>
-              <p className="text-[12px] font-bold text-white mb-1">What is Arbitrage?</p>
-              <p className="text-[11px] text-slate-500 max-w-xl">
+              <p className="text-[13px] font-bold text-white mb-1">What is Arbitrage?</p>
+              <p className="text-[12px] text-slate-500 max-w-xl">
                 Arbitrage identifies players with a significant gap between our proprietary BVI score and public market values (KTC).
               </p>
             </div>
-            <button className="text-[11px] flex-shrink-0" style={{ color: '#36E7A1' }}>Learn More</button>
+            <button className="text-[12px] flex-shrink-0" style={{ color: '#36E7A1' }}>Learn More</button>
           </div>
         </>
       ) : tab === 'BUY LOW TARGETS' ? (

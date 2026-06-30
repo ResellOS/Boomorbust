@@ -41,10 +41,10 @@ export default function StartSitRightPanel({
     <aside className="flex w-[272px] shrink-0 flex-col overflow-y-auto border-l border-border bg-surface">
       {/* BOB Track Record */}
       <div className="border-b border-border px-3.5 py-3">
-        <div className="mb-2 font-mono text-[8px] uppercase tracking-[1.5px] text-muted">
+        <div className="mb-2 font-mono text-[9px] uppercase tracking-[1.5px] text-muted">
           BOB Track Record
         </div>
-        <div className="space-y-1.5 font-mono text-[11px]">
+        <div className="space-y-1.5 font-mono text-[12px]">
           <div className="flex justify-between">
             <span className="text-muted">Season</span>
             <span className="text-text">
@@ -69,13 +69,13 @@ export default function StartSitRightPanel({
           </div>
         </div>
         {!hasTracking && (
-          <p className="mt-2 font-mono text-[9px] leading-relaxed text-muted">
+          <p className="mt-2 font-mono text-[10px] leading-relaxed text-muted">
             Tracking begins Week 1
           </p>
         )}
         <Link
           href="/performance"
-          className="mt-2 inline-block font-mono text-[9px] text-boom hover:underline"
+          className="mt-2 inline-block font-mono text-[10px] text-boom hover:underline"
         >
           View Full Record →
         </Link>
@@ -83,11 +83,11 @@ export default function StartSitRightPanel({
 
       {/* High Confidence Alerts */}
       <div className="border-b border-border px-3.5 py-3">
-        <div className="mb-2 font-mono text-[8px] uppercase tracking-[1.5px] text-muted">
+        <div className="mb-2 font-mono text-[9px] uppercase tracking-[1.5px] text-muted">
           High Confidence Alerts
         </div>
         {highConfAlerts.length === 0 ? (
-          <p className="font-mono text-[9px] text-muted">
+          <p className="font-mono text-[10px] text-muted">
             {preseason
               ? 'Alerts appear when confidence exceeds 70%'
               : 'No high-confidence alerts this week'}
@@ -103,7 +103,7 @@ export default function StartSitRightPanel({
               }`}
             >
               <div
-                className={`mb-1.5 font-mono text-[8px] uppercase tracking-wide ${
+                className={`mb-1.5 font-mono text-[9px] uppercase tracking-wide ${
                   type === 'start' ? 'text-boom' : 'text-bust'
                 }`}
               >
@@ -112,16 +112,16 @@ export default function StartSitRightPanel({
               <div className="flex items-start gap-2">
                 <PlayerAvatar playerId={rec.playerId} name={rec.fullName} size={32} />
                 <div className="min-w-0 flex-1">
-                  <div className="font-mono text-[11px] text-text">{rec.fullName}</div>
-                  <div className="font-mono text-[9px] text-muted">
+                  <div className="font-mono text-[12px] text-text">{rec.fullName}</div>
+                  <div className="font-mono text-[10px] text-muted">
                     {rec.position} · {rec.opponent}
                   </div>
                   {rec.projectedPoints != null && (
-                    <div className="mt-0.5 font-mono text-[9px] text-boom">
+                    <div className="mt-0.5 font-mono text-[10px] text-boom">
                       {rec.projectedPoints.toFixed(1)} proj pts
                     </div>
                   )}
-                  <div className="mt-0.5 font-mono text-[8px] text-muted">{rec.reasoning}</div>
+                  <div className="mt-0.5 font-mono text-[9px] text-muted">{rec.reasoning}</div>
                 </div>
                 <ConfidenceBadge pct={rec.confidence} obviousCall={rec.obviousCall} />
               </div>
@@ -132,10 +132,10 @@ export default function StartSitRightPanel({
 
       {/* Preseason Context */}
       <div className="px-3.5 py-3">
-        <div className="mb-2 font-mono text-[8px] uppercase tracking-[1.5px] text-muted">
+        <div className="mb-2 font-mono text-[9px] uppercase tracking-[1.5px] text-muted">
           Preseason Context
         </div>
-        <div className="space-y-1.5 font-mono text-[10px]">
+        <div className="space-y-1.5 font-mono text-[11px]">
           <div className="flex justify-between">
             <span className="text-muted">NFL Week</span>
             <span className="text-text">{preseason ? 'Preseason' : weekContext.nflWeek}</span>
@@ -161,7 +161,7 @@ export default function StartSitRightPanel({
         </div>
         <Link
           href="/startsit#matrix"
-          className="mt-3 inline-block font-mono text-[9px] text-boom hover:underline"
+          className="mt-3 inline-block font-mono text-[10px] text-boom hover:underline"
         >
           View Matchup Matrix →
         </Link>

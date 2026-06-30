@@ -31,7 +31,7 @@ function TargetAvatar({ playerId, playerName }: { playerId: string; playerName: 
           onError={() => setFailed(true)}
         />
       ) : (
-        <span className="relative z-[1] font-mono text-[8px] font-bold text-muted">
+        <span className="relative z-[1] font-mono text-[9px] font-bold text-muted">
           {initials(playerName)}
         </span>
       )}
@@ -43,7 +43,7 @@ export default function TradeTargetsTable({ targets, leagueId }: TradeTargetsTab
   return (
     <div className="flex min-h-0 flex-col overflow-hidden rounded-[7px] border border-border bg-surface">
       <div className="flex shrink-0 items-center justify-between border-b border-border bg-bg px-3 py-[7px]">
-        <span className="font-figtree text-[10px] font-bold uppercase tracking-[1.5px] text-text">
+        <span className="font-figtree text-[11px] font-bold uppercase tracking-[1.5px] text-text">
           Recommended Trade Targets
         </span>
       </div>
@@ -54,7 +54,7 @@ export default function TradeTargetsTable({ targets, leagueId }: TradeTargetsTab
               {['Player', 'League', 'Why Target', 'Acquire Cost'].map((col, i) => (
                 <th
                   key={col}
-                  className="border-b border-border bg-bg px-3 py-1.5 text-left font-mono text-[10px] font-normal uppercase tracking-[1.5px] text-muted"
+                  className="border-b border-border bg-bg px-3 py-1.5 text-left font-mono text-[11px] font-normal uppercase tracking-[1.5px] text-muted"
                   style={i === 0 ? { width: '30%' } : undefined}
                 >
                   {col}
@@ -72,22 +72,22 @@ export default function TradeTargetsTable({ targets, leagueId }: TradeTargetsTab
                   >
                     <TargetAvatar playerId={target.playerId} playerName={target.playerName} />
                     <div>
-                      <div className="font-figtree text-[12px] font-semibold leading-tight text-text">
+                      <div className="font-figtree text-[13px] font-semibold leading-tight text-text">
                         {target.playerName}
                       </div>
-                      <div className="font-mono text-[10px] text-muted">
+                      <div className="font-mono text-[11px] text-muted">
                         {target.position} · {target.team} · {target.tfoScore.toFixed(1)}
                       </div>
                     </div>
                   </Link>
                 </td>
-                <td className="border-b border-border/50 px-3 py-2 align-middle font-figtree text-[12px] text-text">
+                <td className="border-b border-border/50 px-3 py-2 align-middle font-figtree text-[13px] text-text">
                   {target.leagueName}
                 </td>
-                <td className="border-b border-border/50 px-3 py-2 align-middle font-figtree text-[11px] leading-snug text-muted">
+                <td className="border-b border-border/50 px-3 py-2 align-middle font-figtree text-[12px] leading-snug text-muted">
                   {target.reason}
                 </td>
-                <td className="border-b border-border/50 px-3 py-2 align-middle font-mono text-[11px] text-boom">
+                <td className="border-b border-border/50 px-3 py-2 align-middle font-mono text-[12px] text-boom">
                   {target.acquireCost}
                 </td>
               </tr>

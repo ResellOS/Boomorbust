@@ -50,7 +50,7 @@ export default function ResetPasswordPage() {
           <h1 className="text-[22px] font-bold text-white" style={{ fontFamily: 'var(--font-display), "Bebas Neue", sans-serif', letterSpacing: '0.04em' }}>
             New Password
           </h1>
-          <p className="mt-1 text-[13px] text-[#64748B]" style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}>
+          <p className="mt-1 text-[14px] text-[#64748B]" style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}>
             Choose a strong password for your account
           </p>
         </div>
@@ -61,7 +61,7 @@ export default function ResetPasswordPage() {
         >
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-[12px] font-medium text-[#94A3B8] mb-1.5" style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}>
+              <label className="block text-[13px] font-medium text-[#94A3B8] mb-1.5" style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}>
                 New Password
               </label>
               <input
@@ -71,12 +71,12 @@ export default function ResetPasswordPage() {
                 required
                 minLength={8}
                 placeholder="••••••••"
-                className="w-full rounded-lg border border-white/[0.1] bg-white/[0.04] px-4 py-2.5 text-[13px] text-white placeholder-[#475569] outline-none transition focus:border-[#22D3EE]/50"
+                className="w-full rounded-lg border border-white/[0.1] bg-white/[0.04] px-4 py-2.5 text-[14px] text-white placeholder-[#475569] outline-none transition focus:border-[#22D3EE]/50"
                 style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}
               />
             </div>
             <div>
-              <label className="block text-[12px] font-medium text-[#94A3B8] mb-1.5" style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}>
+              <label className="block text-[13px] font-medium text-[#94A3B8] mb-1.5" style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}>
                 Confirm Password
               </label>
               <input
@@ -86,13 +86,13 @@ export default function ResetPasswordPage() {
                 required
                 minLength={8}
                 placeholder="••••••••"
-                className="w-full rounded-lg border border-white/[0.1] bg-white/[0.04] px-4 py-2.5 text-[13px] text-white placeholder-[#475569] outline-none transition focus:border-[#22D3EE]/50"
+                className="w-full rounded-lg border border-white/[0.1] bg-white/[0.04] px-4 py-2.5 text-[14px] text-white placeholder-[#475569] outline-none transition focus:border-[#22D3EE]/50"
                 style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}
               />
             </div>
 
             {error ? (
-              <p className="rounded-lg border border-red-400/20 bg-red-400/10 px-4 py-2.5 text-[12px] text-red-400" style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}>
+              <p className="rounded-lg border border-red-400/20 bg-red-400/10 px-4 py-2.5 text-[13px] text-red-400" style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}>
                 {error}
               </p>
             ) : null}
@@ -100,7 +100,7 @@ export default function ResetPasswordPage() {
             <button
               type="submit"
               disabled={loading}
-              className="flex min-h-[44px] w-full items-center justify-center rounded-lg text-[13px] font-semibold text-[#0a0d14] transition disabled:opacity-60"
+              className="flex min-h-[44px] w-full items-center justify-center rounded-lg text-[14px] font-semibold text-[#0a0d14] transition disabled:opacity-60"
               style={{ background: BOOM, fontFamily: 'var(--font-body), Inter, sans-serif' }}
             >
               {loading ? 'Updating…' : 'Set New Password'}

@@ -83,7 +83,7 @@ export function RatingGauge({
         />
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center">
-        <div className="font-mono text-[8px] uppercase tracking-[2px] text-muted">OVR</div>
+        <div className="font-mono text-[9px] uppercase tracking-[2px] text-muted">OVR</div>
         <div className="font-mono text-[32px] leading-none tabular-nums" style={{ color }}>
           {displayScore.toFixed(1)}
         </div>
@@ -103,7 +103,7 @@ export function PeakWindowTimeline({ years, activeYear }: { years: number[]; act
               className={`h-2 w-full rounded-full ${active ? 'bg-boom' : 'bg-[#1e2640]'}`}
               style={active ? { boxShadow: '0 0 10px rgba(54,231,161,0.45)' } : undefined}
             />
-            <span className={`font-mono text-[8px] ${active ? 'text-boom' : 'text-muted'}`}>{y}</span>
+            <span className={`font-mono text-[9px] ${active ? 'text-boom' : 'text-muted'}`}>{y}</span>
           </div>
         );
       })}
@@ -148,7 +148,7 @@ export function RatingHistoryChart({
 
   if (values.length < 2) {
     return (
-      <p className="py-4 text-center font-figtree text-[11px] text-muted">
+      <p className="py-4 text-center font-figtree text-[12px] text-muted">
         Historical tracking begins today — BOB will chart this player&apos;s rating over time.
       </p>
     );
@@ -180,7 +180,7 @@ export function RatingHistoryChart({
             key={r}
             type="button"
             onClick={() => setRange(r)}
-            className={`cursor-pointer rounded px-2 py-0.5 font-mono text-[8px] ${
+            className={`cursor-pointer rounded px-2 py-0.5 font-mono text-[9px] ${
               range === r ? 'bg-boom/15 text-boom' : 'text-muted hover:text-text'
             }`}
           >
@@ -201,7 +201,7 @@ export function RatingHistoryChart({
           <circle key={i} cx={p.x} cy={p.y} r={3} fill="#36E7A1" />
         ))}
       </svg>
-      <div className="mt-1 flex justify-between font-mono text-[8px] text-muted">
+      <div className="mt-1 flex justify-between font-mono text-[9px] text-muted">
         <span>{formatShortDate(sliced.dates[0])}</span>
         <span className="text-boom">{sliced.values[sliced.values.length - 1]?.toFixed(1)} now</span>
       </div>
@@ -246,18 +246,18 @@ export function MarketRangeBar({
           title={`Market ${marketRank}`}
         />
       </div>
-      <div className="mt-2 flex justify-between font-mono text-[8px] text-muted">
+      <div className="mt-2 flex justify-between font-mono text-[9px] text-muted">
         <span>1</span>
         <span>{maxRank}</span>
       </div>
-      <div className="mt-2 flex flex-wrap gap-4 font-mono text-[9px]">
+      <div className="mt-2 flex flex-wrap gap-4 font-mono text-[10px]">
         <span className="text-boom">BOB {bobRank}</span>
         <span className="text-bust">Market {marketRank}</span>
         <span className="text-muted">
           Gap {Math.abs(marketRank - bobRank)} spots
         </span>
       </div>
-      <p className="mt-2 font-figtree text-[9px] leading-relaxed text-muted">
+      <p className="mt-2 font-figtree text-[10px] leading-relaxed text-muted">
         Higher BOB rank = BOB sees more value than market consensus
       </p>
     </div>

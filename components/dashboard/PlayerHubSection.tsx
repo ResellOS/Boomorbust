@@ -155,7 +155,7 @@ export default function PlayerHubSection({ className }: PlayerHubSectionProps) {
           }}
         >
           <p
-            className="text-center text-[13px]"
+            className="text-center text-[14px]"
             style={{
               fontFamily: 'var(--font-body), Inter, sans-serif',
               color: '#64748B',

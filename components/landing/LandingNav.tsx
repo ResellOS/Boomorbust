@@ -67,7 +67,7 @@ export default function LandingNav() {
   }, []);
 
   const linkClass =
-    'text-[14px] font-medium text-white/80 transition-colors duration-200 hover:text-white';
+    'text-[15px] font-medium text-white/80 transition-colors duration-200 hover:text-white';
   const linkStyle = { fontFamily: 'var(--font-body)' } as const;
 
   return (
@@ -118,7 +118,7 @@ export default function LandingNav() {
                     key={r.label}
                     role="menuitem"
                     href={r.href}
-                    className="flex min-h-[44px] items-center px-4 py-2 text-[13px] text-white/90 transition-colors hover:bg-white/[0.06] hover:text-white"
+                    className="flex min-h-[44px] items-center px-4 py-2 text-[14px] text-white/90 transition-colors hover:bg-white/[0.06] hover:text-white"
                     style={linkStyle}
                     onClick={() => setResourcesOpen(false)}
                   >
@@ -133,7 +133,7 @@ export default function LandingNav() {
         <div className="flex shrink-0 items-center gap-2 sm:gap-3">
           <Link
             href="/login"
-            className="hidden min-h-[44px] items-center rounded-lg border border-white/[0.12] bg-transparent px-4 py-2 text-[14px] font-semibold text-white/90 transition-colors duration-200 hover:border-white/[0.2] hover:bg-white/[0.04] hover:text-white lg:inline-flex"
+            className="hidden min-h-[44px] items-center rounded-lg border border-white/[0.12] bg-transparent px-4 py-2 text-[15px] font-semibold text-white/90 transition-colors duration-200 hover:border-white/[0.2] hover:bg-white/[0.04] hover:text-white lg:inline-flex"
             style={linkStyle}
           >
             Sign In
@@ -141,7 +141,7 @@ export default function LandingNav() {
 
           <Link
             href="/signup"
-            className="hidden min-h-[44px] items-center justify-center rounded-xl px-5 py-2.5 text-center text-[14px] font-bold text-[#0a0d14] shadow-[0_0_28px_rgba(62,207,173,0.45)] transition-[filter,box-shadow] duration-200 hover:brightness-110 hover:shadow-[0_0_32px_rgba(62,207,173,0.5)] lg:inline-flex"
+            className="hidden min-h-[44px] items-center justify-center rounded-xl px-5 py-2.5 text-center text-[15px] font-bold text-[#0a0d14] shadow-[0_0_28px_rgba(62,207,173,0.45)] transition-[filter,box-shadow] duration-200 hover:brightness-110 hover:shadow-[0_0_32px_rgba(62,207,173,0.5)] lg:inline-flex"
             style={{
               fontFamily: 'var(--font-body)',
               background: BOOM,
@@ -196,21 +196,21 @@ export default function LandingNav() {
               <Link
                 key={item.href}
                 href={item.href}
-                className="flex min-h-[44px] items-center rounded-lg px-3 py-3 text-[15px] font-medium text-white hover:bg-white/[0.06]"
+                className="flex min-h-[44px] items-center rounded-lg px-3 py-3 text-[16px] font-medium text-white hover:bg-white/[0.06]"
                 onClick={closeMobile}
               >
                 {item.label}
               </Link>
             ))}
             <div className="border-t border-white/[0.06] pt-2">
-              <span className="flex min-h-[44px] items-center px-3 py-2 text-[11px] font-semibold uppercase tracking-wider text-white/45">
+              <span className="flex min-h-[44px] items-center px-3 py-2 text-[12px] font-semibold uppercase tracking-wider text-white/45">
                 Resources
               </span>
               {RESOURCES_ITEMS.map((r) => (
                 <Link
                   key={r.label}
                   href={r.href}
-                  className="flex min-h-[44px] items-center rounded-lg px-3 py-2.5 text-[14px] text-white/90 hover:bg-white/[0.06]"
+                  className="flex min-h-[44px] items-center rounded-lg px-3 py-2.5 text-[15px] text-white/90 hover:bg-white/[0.06]"
                   onClick={closeMobile}
                 >
                   {r.label}
@@ -222,14 +222,14 @@ export default function LandingNav() {
           <div className="mt-auto flex flex-col gap-3 border-t border-white/[0.06] p-4">
             <Link
               href="/login"
-              className="flex min-h-[44px] items-center justify-center rounded-lg border border-white/[0.12] bg-transparent py-3 text-center text-[15px] font-semibold text-white hover:bg-white/[0.04]"
+              className="flex min-h-[44px] items-center justify-center rounded-lg border border-white/[0.12] bg-transparent py-3 text-center text-[16px] font-semibold text-white hover:bg-white/[0.04]"
               onClick={closeMobile}
             >
               Sign In
             </Link>
             <Link
               href="/signup"
-              className="flex min-h-[48px] items-center justify-center rounded-xl py-3 text-[15px] font-bold text-[#0a0d14] shadow-[0_0_28px_rgba(62,207,173,0.45)] transition-[filter,box-shadow] duration-200 hover:brightness-110 hover:shadow-[0_0_32px_rgba(62,207,173,0.5)]"
+              className="flex min-h-[48px] items-center justify-center rounded-xl py-3 text-[16px] font-bold text-[#0a0d14] shadow-[0_0_28px_rgba(62,207,173,0.45)] transition-[filter,box-shadow] duration-200 hover:brightness-110 hover:shadow-[0_0_32px_rgba(62,207,173,0.5)]"
               style={{ background: BOOM, fontFamily: 'var(--font-body)' }}
               onClick={closeMobile}
             >

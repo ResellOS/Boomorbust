@@ -61,16 +61,16 @@ export default function DraftOutlookPanel({ outlook, loading }: Props) {
 
   return (
     <div className="glass-card p-4">
-      <h2 className="text-[12px] font-bold text-white tracking-wide uppercase mb-3">ROOKIE DRAFT OUTLOOK</h2>
+      <h2 className="text-[13px] font-bold text-white tracking-wide uppercase mb-3">ROOKIE DRAFT OUTLOOK</h2>
       <div className="flex items-center gap-4">
         {/* Description + class strength */}
         <div className="flex-1 min-w-0">
-          <p className="text-[11px] text-slate-400 leading-relaxed mb-3">{outlook.description}</p>
+          <p className="text-[12px] text-slate-400 leading-relaxed mb-3">{outlook.description}</p>
           <div className="flex items-center gap-3">
             <div>
-              <p className="text-[9px] text-slate-500 uppercase tracking-widest">Class Strength</p>
+              <p className="text-[10px] text-slate-500 uppercase tracking-widest">Class Strength</p>
               <p
-                className="text-[16px] font-bold text-white mt-0.5"
+                className="text-[17px] font-bold text-white mt-0.5"
                 style={{ fontFamily: 'JetBrains Mono, monospace' }}
               >
                 {outlook.classStrength}

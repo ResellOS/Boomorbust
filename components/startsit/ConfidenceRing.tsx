@@ -22,7 +22,7 @@ export default function ConfidenceRing({
         <div className="font-figtree text-[22px] font-bold leading-none tracking-wide text-hold">
           Preseason
         </div>
-        <div className="font-mono text-[8px] uppercase tracking-[1.5px] text-muted">
+        <div className="font-mono text-[9px] uppercase tracking-[1.5px] text-muted">
           Limited Season Data
         </div>
       </div>
@@ -40,7 +40,7 @@ export default function ConfidenceRing({
       >
         {tier}
       </div>
-      <div className="font-mono text-[8px] uppercase tracking-[1.5px] text-muted">
+      <div className="font-mono text-[9px] uppercase tracking-[1.5px] text-muted">
         Lineup Confidence
       </div>
     </div>

@@ -72,7 +72,7 @@ function ReasonChip({ label }: { label: string }) {
 
   return (
 
-    <span className="inline-flex items-center gap-1 rounded-full border border-[#1e2640] bg-[#141929]/80 px-2 py-0.5 font-figtree text-[10px] text-[#e8ecf4]">
+    <span className="inline-flex items-center gap-1 rounded-full border border-[#1e2640] bg-[#141929]/80 px-2 py-0.5 font-figtree text-[11px] text-[#e8ecf4]">
 
       <span className="text-boom">✓</span>
 
@@ -110,7 +110,7 @@ export default function BestTradeHero({
 
       <section className="rounded-[10px] border border-dashed border-[#1e2640] bg-[#0f1420] px-5 py-8 text-center">
 
-        <p className="font-figtree text-[13px] text-[#6b7a99]">
+        <p className="font-figtree text-[14px] text-[#6b7a99]">
 
           No ranked trade opportunities yet — sync leagues and wait for BOB intelligence.
 
@@ -144,7 +144,7 @@ export default function BestTradeHero({
 
     >
 
-      <div className="mb-3 font-figtree text-[10px] uppercase tracking-[1.5px] text-[#6b7a99]">
+      <div className="mb-3 font-figtree text-[11px] uppercase tracking-[1.5px] text-[#6b7a99]">
 
         Best Trade Available Right Now
 
@@ -162,13 +162,13 @@ export default function BestTradeHero({
 
             <div className="font-figtree text-xl text-[#e8ecf4] md:text-2xl">{o.playerName}</div>
 
-            <div className="font-mono text-[10px] text-[#6b7a99]">
+            <div className="font-mono text-[11px] text-[#6b7a99]">
 
               {o.position} · {o.team}
 
             </div>
 
-            <div className="mt-1 font-mono text-[10px] tabular-nums text-[#6b7a99]">
+            <div className="mt-1 font-mono text-[11px] tabular-nums text-[#6b7a99]">
 
               BOB Rank: <span className="text-boom">{o.bobRank ?? '—'}</span> · Market Rank:{' '}
 
@@ -184,13 +184,13 @@ export default function BestTradeHero({
 
         <div className="min-w-0">
 
-          <div className="font-mono text-[9px] uppercase text-[#6b7a99]">League: {o.leagueName}</div>
+          <div className="font-mono text-[10px] uppercase text-[#6b7a99]">League: {o.leagueName}</div>
 
-          <div className="font-mono text-[9px] uppercase text-[#6b7a99]">Owner: {o.managerName}</div>
+          <div className="font-mono text-[10px] uppercase text-[#6b7a99]">Owner: {o.managerName}</div>
 
 
 
-          <div className="mt-3 font-mono text-[8px] uppercase tracking-wide text-[#6b7a99]">
+          <div className="mt-3 font-mono text-[9px] uppercase tracking-wide text-[#6b7a99]">
 
             Why This Works
 
@@ -214,13 +214,13 @@ export default function BestTradeHero({
 
           <div className="rounded-[8px] border border-[#1e2640] bg-[#0a0d14] px-3 py-2">
 
-            <div className="font-mono text-[8px] uppercase tracking-wide text-[#6b7a99]">
+            <div className="font-mono text-[9px] uppercase tracking-wide text-[#6b7a99]">
 
               Suggested Offer
 
             </div>
 
-            <div className="mt-1 font-figtree text-[11px] text-[#e8ecf4]">
+            <div className="mt-1 font-figtree text-[12px] text-[#e8ecf4]">
 
               Give: {o.givePlayerName}
 
@@ -228,13 +228,13 @@ export default function BestTradeHero({
 
             </div>
 
-            <div className="font-figtree text-[11px] text-boom">Get: {o.getPlayerName}</div>
+            <div className="font-figtree text-[12px] text-boom">Get: {o.getPlayerName}</div>
 
           </div>
 
 
 
-          <div className="font-mono text-[8px] uppercase tracking-wide text-[#6b7a99]">
+          <div className="font-mono text-[9px] uppercase tracking-wide text-[#6b7a99]">
 
             Expected Outcome
 
@@ -252,7 +252,7 @@ export default function BestTradeHero({
 
                 <div>
 
-                  <div className="font-mono text-[7px] uppercase text-[#6b7a99]">Acceptance Probability</div>
+                  <div className="font-mono text-[8px] uppercase text-[#6b7a99]">Acceptance Probability</div>
 
                   <div
 
@@ -270,7 +270,7 @@ export default function BestTradeHero({
 
                 <span
 
-                  className="rounded px-2 py-1 font-mono text-[9px] uppercase tracking-wide"
+                  className="rounded px-2 py-1 font-mono text-[10px] uppercase tracking-wide"
 
                   style={{ background: confStyle.bg, color: confStyle.text }}
 
@@ -286,7 +286,7 @@ export default function BestTradeHero({
 
             <div className="col-span-2 rounded-[8px] border border-boom/25 bg-boom/5 px-3 py-2">
 
-              <div className="font-mono text-[7px] uppercase text-[#6b7a99]">Portfolio Impact</div>
+              <div className="font-mono text-[8px] uppercase text-[#6b7a99]">Portfolio Impact</div>
 
               <div className="font-mono text-xl tabular-nums text-boom">
 
@@ -296,7 +296,7 @@ export default function BestTradeHero({
 
               </div>
 
-              <p className="mt-0.5 font-figtree text-[10px] leading-snug text-[#6b7a99]">
+              <p className="mt-0.5 font-figtree text-[11px] leading-snug text-[#6b7a99]">
 
                 {o.portfolioImpactNote}
 
@@ -320,7 +320,7 @@ export default function BestTradeHero({
 
           onClick={() => onViewTrade(o)}
 
-          className="rounded-[6px] border border-boom/40 bg-boom px-4 py-2 font-mono text-[10px] uppercase tracking-wide text-[#0a0d14] hover:brightness-110"
+          className="rounded-[6px] border border-boom/40 bg-boom px-4 py-2 font-mono text-[11px] uppercase tracking-wide text-[#0a0d14] hover:brightness-110"
 
         >
 
@@ -334,7 +334,7 @@ export default function BestTradeHero({
 
           onClick={() => onSendCalculator(o)}
 
-          className="rounded-[6px] border border-[#1e2640] px-4 py-2 font-mono text-[10px] uppercase tracking-wide text-[#e8ecf4] hover:bg-white/[0.03]"
+          className="rounded-[6px] border border-[#1e2640] px-4 py-2 font-mono text-[11px] uppercase tracking-wide text-[#e8ecf4] hover:bg-white/[0.03]"
 
         >
 
@@ -358,9 +358,9 @@ function OutcomeStat({ label, value, accent }: { label: string; value: string; a
 
     <div className="rounded-md border border-[#1e2640]/60 bg-[#141929]/50 px-2 py-1.5">
 
-      <div className="font-mono text-[7px] uppercase text-[#6b7a99]">{label}</div>
+      <div className="font-mono text-[8px] uppercase text-[#6b7a99]">{label}</div>
 
-      <div className={`font-mono text-[11px] tabular-nums ${accent ? 'text-boom' : 'text-[#e8ecf4]'}`}>
+      <div className={`font-mono text-[12px] tabular-nums ${accent ? 'text-boom' : 'text-[#e8ecf4]'}`}>
 
         {value}
 

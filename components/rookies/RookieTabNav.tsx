@@ -27,7 +27,7 @@ export default function RookieTabNav({ active, onChange }: Props) {
           <button
             key={tab.id}
             onClick={() => onChange(tab.id)}
-            className="flex-shrink-0 px-4 py-2.5 text-[11px] font-semibold tracking-wider transition-colors whitespace-nowrap"
+            className="flex-shrink-0 px-4 py-2.5 text-[12px] font-semibold tracking-wider transition-colors whitespace-nowrap"
             style={{
               color: isActive ? '#36E7A1' : '#64748B',
               borderBottom: isActive ? '2px solid #36E7A1' : '2px solid transparent',

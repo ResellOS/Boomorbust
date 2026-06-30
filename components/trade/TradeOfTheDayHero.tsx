@@ -67,7 +67,7 @@ export default function TradeOfTheDayHero({
   if (pool.length === 0) {
     return (
       <section className="rounded-[10px] border border-dashed border-[#1e2640] bg-[#0f1420] px-4 py-8 text-center">
-        <p className="font-figtree text-[13px] text-[#6b7a99]">
+        <p className="font-figtree text-[14px] text-[#6b7a99]">
           Building trade intelligence… sync leagues to surface today&apos;s highest-leverage move.
         </p>
       </section>
@@ -98,10 +98,10 @@ export default function TradeOfTheDayHero({
     >
       <div className="flex items-center justify-between border-b border-[#1e2640]/80 bg-[#0a0d14]/60 px-4 py-2">
         <div>
-          <h2 className="font-figtree text-[11px] uppercase tracking-[2px] text-[#e8ecf4]">
+          <h2 className="font-figtree text-[12px] uppercase tracking-[2px] text-[#e8ecf4]">
             Trade of the Day
           </h2>
-          <p className="font-mono text-[8px] text-boom/90">Today&apos;s highest-leverage move</p>
+          <p className="font-mono text-[9px] text-boom/90">Today&apos;s highest-leverage move</p>
         </div>
         <div className="flex items-center gap-3">
           {pool.length > 1 ? (
@@ -109,7 +109,7 @@ export default function TradeOfTheDayHero({
               <button type="button" onClick={() => goTo(index - 1)} className="text-[#6b7a99] hover:text-boom">
                 <ChevronLeft className="h-4 w-4" />
               </button>
-              <span className="font-mono text-[9px] tabular-nums text-[#8b9bb8]">
+              <span className="font-mono text-[10px] tabular-nums text-[#8b9bb8]">
                 {index + 1} / {pool.length}
               </span>
               <button type="button" onClick={() => goTo(index + 1)} className="text-[#6b7a99] hover:text-boom">
@@ -117,7 +117,7 @@ export default function TradeOfTheDayHero({
               </button>
             </div>
           ) : null}
-          <span className="font-mono text-[9px] text-[#6b7a99]">{o.leagueName}</span>
+          <span className="font-mono text-[10px] text-[#6b7a99]">{o.leagueName}</span>
         </div>
       </div>
 
@@ -126,7 +126,7 @@ export default function TradeOfTheDayHero({
           <TradePlayerHeadshot playerId={o.playerId} name={o.playerName} size={52} />
           <div className="min-w-0 flex-1">
             <div className="font-figtree text-lg font-bold text-[#e8ecf4] md:text-xl">{o.playerName}</div>
-            <div className="font-mono text-[9px] uppercase text-[#8b9bb8]">
+            <div className="font-mono text-[10px] uppercase text-[#8b9bb8]">
               {o.position} · {o.team} · vs {o.managerName}
             </div>
           </div>
@@ -138,7 +138,7 @@ export default function TradeOfTheDayHero({
         >
           <ScoreChip label="Acceptance" color={acceptanceColor(o.acceptanceProbability)}>
             <CountUpDelta key={`${o.id}-acc`} value={o.acceptanceProbability} />
-            <span className="text-[10px]">%</span>
+            <span className="text-[11px]">%</span>
           </ScoreChip>
           <ScoreChip label="Impact" color={impactColor(o.championshipImpact)}>
             +<CountUpDelta key={`${o.id}-imp`} value={Math.round(o.championshipImpact * 10) / 10} />%
@@ -160,10 +160,10 @@ export default function TradeOfTheDayHero({
 
         <div className="grid gap-3 px-4 pb-3 lg:grid-cols-2">
           <div>
-            <div className="font-mono text-[8px] uppercase tracking-wide text-boom">Why This Matters</div>
+            <div className="font-mono text-[9px] uppercase tracking-wide text-boom">Why This Matters</div>
             <ul className="mt-1.5 space-y-1">
               {whyMatters.map((b) => (
-                <li key={b} className="font-figtree text-[11px] leading-snug text-[#b8c4dc]">
+                <li key={b} className="font-figtree text-[12px] leading-snug text-[#b8c4dc]">
                   <span className="text-boom">✓ </span>
                   {b}
                 </li>
@@ -171,13 +171,13 @@ export default function TradeOfTheDayHero({
             </ul>
           </div>
           <div className="rounded-md border border-[#1e2640]/60 bg-[#141929]/50 px-3 py-2.5">
-            <div className="font-mono text-[8px] uppercase text-[#6b7a99]">Suggested Package</div>
-            <div className="mt-1 font-figtree text-[11px] text-[#e8ecf4]">
+            <div className="font-mono text-[9px] uppercase text-[#6b7a99]">Suggested Package</div>
+            <div className="mt-1 font-figtree text-[12px] text-[#e8ecf4]">
               You give: {o.givePlayerName}
               {o.suggestedAddOn ? ` + ${o.suggestedAddOn}` : ''}
               {o.suggestedPrice ? ` + ${o.suggestedPrice}` : ''}
             </div>
-            <div className="font-figtree text-[11px] font-semibold text-boom">You get: {o.getPlayerName}</div>
+            <div className="font-figtree text-[12px] font-semibold text-boom">You get: {o.getPlayerName}</div>
           </div>
         </div>
       </div>
@@ -186,21 +186,21 @@ export default function TradeOfTheDayHero({
         <button
           type="button"
           onClick={() => onStageOffer(o)}
-          className="dash-action-btn rounded-md bg-bust px-4 py-2 font-mono text-[10px] font-semibold uppercase text-white"
+          className="dash-action-btn rounded-md bg-bust px-4 py-2 font-mono text-[11px] font-semibold uppercase text-white"
         >
           Stage Offer
         </button>
         <button
           type="button"
           onClick={() => onViewTrade(o)}
-          className="dash-action-btn rounded-md border border-[#1e2640] px-4 py-2 font-mono text-[10px] text-boom"
+          className="dash-action-btn rounded-md border border-[#1e2640] px-4 py-2 font-mono text-[11px] text-boom"
         >
           View Full Trade
         </button>
         <button
           type="button"
           onClick={() => onSendCalculator(o)}
-          className="dash-action-btn rounded-md border border-[#1e2640] px-4 py-2 font-mono text-[10px] text-[#8b9bb8]"
+          className="dash-action-btn rounded-md border border-[#1e2640] px-4 py-2 font-mono text-[11px] text-[#8b9bb8]"
         >
           Send to Calculator
         </button>
@@ -220,7 +220,7 @@ function ScoreChip({
 }) {
   return (
     <div className="flex min-w-[72px] flex-1 flex-col items-center rounded border border-[#1e2640]/50 bg-[#0a0d14]/50 px-2 py-1">
-      <div className="font-mono text-[6px] uppercase tracking-wide text-[#6b7a99]">{label}</div>
+      <div className="font-mono text-[7px] uppercase tracking-wide text-[#6b7a99]">{label}</div>
       <div className="font-mono text-sm font-semibold tabular-nums" style={{ color }}>
         {children}
       </div>

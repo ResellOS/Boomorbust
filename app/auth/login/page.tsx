@@ -97,24 +97,24 @@ function GhostPanelLeft() {
   return (
     <div className="pointer-events-none absolute left-6 top-1/2 hidden w-[230px] -translate-y-1/2 flex-col gap-4 opacity-[0.15] xl:flex" aria-hidden>
       <div className="rounded-lg border border-boom/40 bg-surface p-3">
-        <div className="mb-2 text-[8px] uppercase tracking-[2px] text-boom">Top Buy Targets</div>
+        <div className="mb-2 text-[9px] uppercase tracking-[2px] text-boom">Top Buy Targets</div>
         {players.map((p) => (
           <div key={p.name} className="flex items-center gap-2 border-b border-border/40 py-1.5 last:border-b-0">
             <div className="h-5 w-5 shrink-0 rounded-full bg-surface2" />
             <div className="min-w-0 flex-1">
-              <div className="truncate text-[9px] text-text">{p.name}</div>
-              <div className="text-[7px] text-muted">{p.meta}</div>
+              <div className="truncate text-[10px] text-text">{p.name}</div>
+              <div className="text-[8px] text-muted">{p.meta}</div>
             </div>
-            <span className="font-mono text-[10px] text-text">{p.score}</span>
-            <span className="rounded-sm bg-boom/10 px-1 py-0.5 text-[6px] font-semibold text-boom">{formatPerformanceVerdictLabel(p.badge)}</span>
+            <span className="font-mono text-[11px] text-text">{p.score}</span>
+            <span className="rounded-sm bg-boom/10 px-1 py-0.5 text-[7px] font-semibold text-boom">{formatPerformanceVerdictLabel(p.badge)}</span>
           </div>
         ))}
       </div>
       <div className="rounded-lg border border-boom/40 bg-surface p-3">
-        <div className="mb-2 text-[8px] uppercase tracking-[2px] text-boom">Lineup Confidence</div>
+        <div className="mb-2 text-[9px] uppercase tracking-[2px] text-boom">Lineup Confidence</div>
         <div className="relative mx-auto flex h-[90px] w-[90px] flex-col items-center justify-center">
           <span className="font-figtree text-lg font-bold text-boom">Strong</span>
-          <span className="text-[6px] uppercase text-muted">Start / Sit</span>
+          <span className="text-[7px] uppercase text-muted">Start / Sit</span>
         </div>
       </div>
     </div>
@@ -130,14 +130,14 @@ function GhostPanelRight() {
   return (
     <div className="pointer-events-none absolute right-6 top-1/2 hidden w-[230px] -translate-y-1/2 flex-col gap-4 opacity-[0.15] xl:flex" aria-hidden>
       <div className="rounded-lg border border-bust/40 bg-surface p-3">
-        <div className="mb-2 text-[8px] uppercase tracking-[2px] text-muted">League Overview</div>
+        <div className="mb-2 text-[9px] uppercase tracking-[2px] text-muted">League Overview</div>
         <div className="mb-2 flex items-center gap-2">
           <div className="h-6 w-6 rounded-full bg-gradient-to-br from-boom to-bust" />
           <div className="flex-1">
-            <div className="text-[9px] text-text">Dynasty Alpha</div>
-            <div className="text-[7px] text-muted">12 Teams · Superflex · PPR</div>
+            <div className="text-[10px] text-text">Dynasty Alpha</div>
+            <div className="text-[8px] text-muted">12 Teams · Superflex · PPR</div>
           </div>
-          <span className="rounded-sm bg-boom/10 px-1.5 py-0.5 text-[6px] text-boom">Contender</span>
+          <span className="rounded-sm bg-boom/10 px-1.5 py-0.5 text-[7px] text-boom">Contender</span>
         </div>
         <div className="grid grid-cols-4 gap-1 text-center">
           {[
@@ -147,33 +147,33 @@ function GhostPanelRight() {
             ['94%', 'Playoff Odds'],
           ].map(([v, l]) => (
             <div key={l}>
-              <div className="font-mono text-[10px] text-boom">{v}</div>
-              <div className="text-[6px] uppercase text-muted">{l}</div>
+              <div className="font-mono text-[11px] text-boom">{v}</div>
+              <div className="text-[7px] uppercase text-muted">{l}</div>
             </div>
           ))}
         </div>
       </div>
       <div className="rounded-lg border border-bust/40 bg-surface p-3">
-        <div className="mb-2 text-[8px] uppercase tracking-[2px] text-muted">Trade Opportunities</div>
+        <div className="mb-2 text-[9px] uppercase tracking-[2px] text-muted">Trade Opportunities</div>
         {targets.map((t) => (
           <div key={t.name} className="flex items-center gap-2 border-b border-border/40 py-1.5 last:border-b-0">
             <div className="h-5 w-5 shrink-0 rounded-full bg-surface2" />
             <div className="min-w-0 flex-1">
-              <div className="truncate text-[9px] text-text">{t.name}</div>
-              <div className="text-[7px] text-muted">{t.meta}</div>
+              <div className="truncate text-[10px] text-text">{t.name}</div>
+              <div className="text-[8px] text-muted">{t.meta}</div>
             </div>
-            <span className="font-mono text-[10px] text-text">{t.score}</span>
-            <span className="rounded-sm border border-boom/30 bg-boom/10 px-1 py-0.5 text-[6px] text-boom">TARGET</span>
+            <span className="font-mono text-[11px] text-text">{t.score}</span>
+            <span className="rounded-sm border border-boom/30 bg-boom/10 px-1 py-0.5 text-[7px] text-boom">TARGET</span>
           </div>
         ))}
       </div>
       <div className="rounded-lg border border-bust/40 bg-surface p-3">
-        <div className="mb-1 text-[8px] uppercase tracking-[2px] text-muted">Weeks Ahead Signal</div>
+        <div className="mb-1 text-[9px] uppercase tracking-[2px] text-muted">Weeks Ahead Signal</div>
         <div className="flex items-end justify-between">
           <div>
             <span className="font-mono text-xl text-boom">3</span>
-            <span className="ml-1 text-[8px] text-text">Weeks</span>
-            <div className="text-[6px] text-muted">Ahead of the Field</div>
+            <span className="ml-1 text-[9px] text-text">Weeks</span>
+            <div className="text-[7px] text-muted">Ahead of the Field</div>
           </div>
           <svg viewBox="0 0 80 30" className="h-7 w-20">
             <polyline points="2,26 14,22 26,24 38,16 50,18 62,9 78,4" fill="none" stroke="#36E7A1" strokeWidth="1.5" />
@@ -282,7 +282,7 @@ function LoginForm() {
               }}
             />
           </div>
-          <div className="mt-1 flex items-center gap-2 text-[10px] font-normal uppercase tracking-[4px] text-text/80">
+          <div className="mt-1 flex items-center gap-2 text-[11px] font-normal uppercase tracking-[4px] text-text/80">
             <span className="h-px w-8 bg-gradient-to-r from-transparent to-boom" />
             The Dynasty
             <span className="text-boom">⚡</span>
@@ -306,13 +306,13 @@ function LoginForm() {
           <h1 className="text-center text-sm font-normal uppercase tracking-[2px] text-boom">
             Welcome Back, Champion
           </h1>
-          <p className="mb-6 mt-1.5 text-center text-[11px] text-muted">
+          <p className="mb-6 mt-1.5 text-center text-[12px] text-muted">
             Log in to your Boom or Bust account
           </p>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label htmlFor="email" className="mb-1.5 block text-[9px] font-normal uppercase tracking-[1.5px] text-muted">
+              <label htmlFor="email" className="mb-1.5 block text-[10px] font-normal uppercase tracking-[1.5px] text-muted">
                 Email
               </label>
               <div className="relative">
@@ -336,10 +336,10 @@ function LoginForm() {
 
             <div>
               <div className="mb-1.5 flex items-center justify-between">
-                <label htmlFor="password" className="block text-[9px] font-normal uppercase tracking-[1.5px] text-muted">
+                <label htmlFor="password" className="block text-[10px] font-normal uppercase tracking-[1.5px] text-muted">
                   Password
                 </label>
-                <Link href="/auth/forgot-password" className="text-[10px] text-bust no-underline hover:text-bust/80">
+                <Link href="/auth/forgot-password" className="text-[11px] text-bust no-underline hover:text-bust/80">
                   Forgot password?
                 </Link>
               </div>
@@ -364,7 +364,7 @@ function LoginForm() {
             </div>
 
             {error ? (
-              <p className="rounded-md border border-[#ef4444]/25 bg-[#ef4444]/10 px-3 py-2 text-[11px] text-[#ef4444]">
+              <p className="rounded-md border border-[#ef4444]/25 bg-[#ef4444]/10 px-3 py-2 text-[12px] text-[#ef4444]">
                 {error}
               </p>
             ) : null}
@@ -385,14 +385,14 @@ function LoginForm() {
 
           <div className="my-5 flex items-center gap-3">
             <span className="h-px flex-1 bg-white/10" />
-            <span className="text-[9px] uppercase tracking-[2px] text-muted">or</span>
+            <span className="text-[10px] uppercase tracking-[2px] text-muted">or</span>
             <span className="h-px flex-1 bg-white/10" />
           </div>
 
           <div className="space-y-2">
             <Link
               href="/auth/signup?via=sleeper"
-              className="flex min-h-[44px] w-full items-center justify-center gap-2 rounded-md border border-white/15 bg-bg/60 py-2.5 text-[11px] font-normal uppercase tracking-[1px] text-text no-underline transition hover:border-boom/40 hover:bg-bg/80"
+              className="flex min-h-[44px] w-full items-center justify-center gap-2 rounded-md border border-white/15 bg-bg/60 py-2.5 text-[12px] font-normal uppercase tracking-[1px] text-text no-underline transition hover:border-boom/40 hover:bg-bg/80"
             >
               <SleeperIcon />
               Sign In with Sleeper
@@ -401,7 +401,7 @@ function LoginForm() {
               <button
                 type="button"
                 onClick={() => handleOAuth('google')}
-                className="flex min-h-[44px] items-center justify-center gap-2 rounded-md border border-white/15 bg-bg/60 py-2.5 text-[11px] font-normal text-text transition hover:border-white/30 hover:bg-bg/80"
+                className="flex min-h-[44px] items-center justify-center gap-2 rounded-md border border-white/15 bg-bg/60 py-2.5 text-[12px] font-normal text-text transition hover:border-white/30 hover:bg-bg/80"
               >
                 <GoogleIcon />
                 Google
@@ -409,7 +409,7 @@ function LoginForm() {
               <button
                 type="button"
                 onClick={() => handleOAuth('apple')}
-                className="flex min-h-[44px] items-center justify-center gap-2 rounded-md border border-white/15 bg-bg/60 py-2.5 text-[11px] font-normal text-text transition hover:border-white/30 hover:bg-bg/80"
+                className="flex min-h-[44px] items-center justify-center gap-2 rounded-md border border-white/15 bg-bg/60 py-2.5 text-[12px] font-normal text-text transition hover:border-white/30 hover:bg-bg/80"
               >
                 <AppleIcon />
                 Apple
@@ -417,7 +417,7 @@ function LoginForm() {
             </div>
           </div>
 
-          <p className="mt-6 text-center text-[11px] text-muted">
+          <p className="mt-6 text-center text-[12px] text-muted">
             New to Boom or Bust?{' '}
             <Link href="/auth/signup" className="font-normal text-boom no-underline hover:underline">
               Create an account
@@ -432,14 +432,14 @@ function LoginForm() {
             ['🏈', '68+ Leagues Synced'],
             ['⚡', 'BOB-POWERED Analytics'],
           ].map(([icon, text]) => (
-            <div key={text} className="flex items-center gap-1.5 text-[10px] text-muted">
+            <div key={text} className="flex items-center gap-1.5 text-[11px] text-muted">
               <span aria-hidden>{icon}</span>
               {text}
             </div>
           ))}
           <Link
             href="/performance"
-            className="flex items-center gap-1.5 text-[10px] text-boom no-underline hover:underline"
+            className="flex items-center gap-1.5 text-[11px] text-boom no-underline hover:underline"
           >
             Every call tracked publicly →
           </Link>

@@ -20,14 +20,14 @@ export default function OvervaluedAssets({ players, contextLeagueId = null, clas
   return (
     <div className={`glass-panel p-4 flex flex-col ${className}`}>
       <div className="flex items-center justify-between mb-3">
-        <h3 className="text-[10px] font-black uppercase tracking-[0.28em] text-slate-300">
+        <h3 className="text-[11px] font-black uppercase tracking-[0.28em] text-slate-300">
           Top 3 Overvalued
         </h3>
-        <span className="text-[8px] font-mono text-slate-600 uppercase">MO · PPG</span>
+        <span className="text-[9px] font-mono text-slate-600 uppercase">MO · PPG</span>
       </div>
 
       {players.length === 0 ? (
-        <p className="text-[10px] text-slate-600 font-mono py-4 text-center">
+        <p className="text-[11px] text-slate-600 font-mono py-4 text-center">
           No sell signals — market aligned with production.
         </p>
       ) : (
@@ -47,9 +47,9 @@ export default function OvervaluedAssets({ players, contextLeagueId = null, clas
               />
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <span className="text-[11px] font-bold text-white truncate">{p.name}</span>
+                  <span className="text-[12px] font-bold text-white truncate">{p.name}</span>
                   <span
-                    className="text-[9px] font-black uppercase px-2 py-0.5 rounded-md shrink-0 tracking-[0.12em]"
+                    className="text-[10px] font-black uppercase px-2 py-0.5 rounded-md shrink-0 tracking-[0.12em]"
                     style={{
                       color: '#0b0e14',
                       background: 'linear-gradient(180deg, #FF6B6B 0%, #EF4444 100%)',
@@ -62,20 +62,20 @@ export default function OvervaluedAssets({ players, contextLeagueId = null, clas
                     SELL
                   </span>
                 </div>
-                <div className="text-[9px] text-slate-500 font-mono">
+                <div className="text-[10px] text-slate-500 font-mono">
                   {p.position} · {p.team} · {p.seasonAvgPpg?.toFixed(1) ?? '—'} PPG roll ·{' '}
                   {p.weeklyPts.toFixed(1)} wk
                 </div>
               </div>
               <div className="text-right shrink-0">
-                <div className="text-[10px] font-mono font-black text-[#36E7A1]">
+                <div className="text-[11px] font-mono font-black text-[#36E7A1]">
                   {formatKtc(p.ktcValue)}
                 </div>
-                <div className="text-[8px] text-[#EF4444] font-mono font-bold">
+                <div className="text-[9px] text-[#EF4444] font-mono font-bold">
                   MO {p.moPts >= 0 ? '+' : ''}
                   {p.moPts?.toFixed(1) ?? '—'}
                 </div>
-                <div className="text-[8px] text-slate-600">KTC</div>
+                <div className="text-[9px] text-slate-600">KTC</div>
               </div>
               </div>
               <PlayerBhsActions

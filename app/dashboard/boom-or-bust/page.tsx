@@ -94,7 +94,7 @@ export default function BoomOrBustComingSoonPage() {
         {/* HERO */}
         <section>
           <span
-            className="inline-block rounded-[20px] border px-4 py-1.5 text-[11px] font-bold font-mono uppercase tracking-[0.15em]"
+            className="inline-block rounded-[20px] border px-4 py-1.5 text-[12px] font-bold font-mono uppercase tracking-[0.15em]"
             style={{
               background: 'rgba(251,191,36,0.1)',
               borderColor: 'rgba(251,191,36,0.25)',
@@ -232,7 +232,7 @@ export default function BoomOrBustComingSoonPage() {
                 <p className="text-sm font-semibold text-white" style={{ fontFamily: 'var(--font-body)' }}>
                   {f.title}
                 </p>
-                <p className="mt-2 text-[13px] leading-relaxed" style={{ color: '#94A3B8', fontFamily: 'var(--font-body)' }}>
+                <p className="mt-2 text-[14px] leading-relaxed" style={{ color: '#94A3B8', fontFamily: 'var(--font-body)' }}>
                   {f.body}
                 </p>
               </div>

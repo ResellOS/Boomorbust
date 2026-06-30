@@ -31,7 +31,7 @@ function Select<T extends string>({
     <select
       value={value}
       onChange={(e) => onChange(e.target.value as T)}
-      className="w-full text-[12px] font-medium bg-white/[0.06] border border-white/[0.12] rounded-lg px-3 py-1.5 text-white appearance-none cursor-pointer"
+      className="w-full text-[13px] font-medium bg-white/[0.06] border border-white/[0.12] rounded-lg px-3 py-1.5 text-white appearance-none cursor-pointer"
     >
       {options.map((o) => (
         <option key={o} value={o} className="bg-[#0a0d14]">{o}</option>
@@ -56,11 +56,11 @@ export default function CoachSettings({ settings, onChange }: Props) {
       className="rounded-xl p-4 space-y-4"
       style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}
     >
-      <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">COACH SETTINGS</p>
+      <p className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">COACH SETTINGS</p>
 
       {/* AI Personality */}
       <div className="space-y-1.5">
-        <label className="text-[11px] text-slate-400 font-medium">AI Personality</label>
+        <label className="text-[12px] text-slate-400 font-medium">AI Personality</label>
         <Select<CoachPersonality>
           value={settings.personality}
           options={['Competitive', 'Balanced', 'Conservative']}
@@ -70,7 +70,7 @@ export default function CoachSettings({ settings, onChange }: Props) {
 
       {/* Response Detail */}
       <div className="space-y-1.5">
-        <label className="text-[11px] text-slate-400 font-medium">Response Detail</label>
+        <label className="text-[12px] text-slate-400 font-medium">Response Detail</label>
         <Select<CoachDetail>
           value={settings.detail}
           options={['Detailed', 'Brief', 'Data-Only']}
@@ -80,11 +80,11 @@ export default function CoachSettings({ settings, onChange }: Props) {
 
       {/* Include toggles */}
       <div className="space-y-1.5">
-        <label className="text-[11px] text-slate-400 font-medium">Include</label>
+        <label className="text-[12px] text-slate-400 font-medium">Include</label>
         <div className="space-y-2.5 pt-1">
           {TOGGLES.map(({ key, label }) => (
             <div key={key} className="flex items-center justify-between">
-              <span className="text-[12px] text-slate-300">{label}</span>
+              <span className="text-[13px] text-slate-300">{label}</span>
               <Toggle
                 on={settings[key] as boolean}
                 onToggle={() => update(key, !settings[key] as CoachSettings[typeof key])}

@@ -1,6 +1,7 @@
 'use client';
 
 import PlayerAvatar from '@/components/PlayerAvatar';
+import RecommendationFeedback from '@/components/feedback/RecommendationFeedback';
 import { schemeForTeam } from '@/lib/lineup/teamSchemeMap';
 import {
   calculateTFOScore,
@@ -115,7 +116,7 @@ export default function TfoTradeCard({
         <div className="min-w-0 flex-1">
           <p className="text-white font-semibold truncate text-sm">{player.name}</p>
           <span
-            className="inline-block mt-1 text-[10px] font-black px-2 py-0.5 rounded text-black"
+            className="inline-block mt-1 text-[11px] font-black px-2 py-0.5 rounded text-black"
             style={{ background: border }}
           >
             {player.position}
@@ -126,11 +127,11 @@ export default function TfoTradeCard({
         <span className="tabular-nums text-xl font-bold" style={{ color: gradeHex(primary.grade) }}>
           {primary.tfoScore.toFixed(1)}
         </span>
-        <span className="text-[11px] font-bold uppercase tracking-wide" style={{ color: gradeHex(primary.grade) }}>
+        <span className="text-[12px] font-bold uppercase tracking-wide" style={{ color: gradeHex(primary.grade) }}>
           {primary.grade.replace(/_/g, ' ')}
         </span>
       </div>
-      <div className="flex flex-wrap gap-2 mb-3 text-[11px] font-mono">
+      <div className="flex flex-wrap gap-2 mb-3 text-[12px] font-mono">
         {triple.map(({ label, r }, i) => {
           const prev = i > 0 ? triple[i - 1]!.r?.tfoScore : null;
           const cur = r?.tfoScore;
@@ -149,7 +150,7 @@ export default function TfoTradeCard({
       </div>
       <div className="flex flex-wrap items-center gap-2">
         <span
-          className="text-[10px] font-black uppercase px-2 py-0.5 rounded border"
+          className="text-[11px] font-black uppercase px-2 py-0.5 rounded border"
           style={{
             color: verdictHex(primary.verdict),
             borderColor: `${verdictHex(primary.verdict)}55`,
@@ -158,13 +159,21 @@ export default function TfoTradeCard({
         >
           {primary.verdict.replace(/_/g, ' ')}
         </span>
-        <p className="text-[11px] text-[#94A3B8] truncate flex-1 min-w-0" title={primary.reasoning}>
+        <p className="text-[12px] text-[#94A3B8] truncate flex-1 min-w-0" title={primary.reasoning}>
           {primary.reasoning.length > 120 ? `${primary.reasoning.slice(0, 117)}…` : primary.reasoning}
         </p>
       </div>
-      <p className="text-[9px] text-[#475569] mt-2 font-mono uppercase">
-        {side === 'give' ? 'You give' : 'You get'}
-      </p>
+      <div className="mt-2 flex items-center justify-between gap-2">
+        <p className="text-[10px] text-[#475569] font-mono uppercase">
+          {side === 'give' ? 'You give' : 'You get'}
+        </p>
+        <RecommendationFeedback
+          surface="trade"
+          subjectType="player"
+          subjectId={player.player_id}
+          context={{ verdict: primary.verdict, grade: primary.grade, side }}
+        />
+      </div>
     </div>
   );
 }

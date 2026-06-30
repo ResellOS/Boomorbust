@@ -22,7 +22,7 @@ export function LandingTrustStrip({ stats }: { stats: LandingStats }) {
     <section style={{ background: LANDING.surface }}>
       <div className="mx-auto flex max-w-[1280px] flex-wrap items-center justify-center gap-x-8 gap-y-3 px-4 py-4 sm:px-6 lg:px-8">
         {items.map((item) => (
-          <div key={item.label} className="flex items-center gap-2 font-mono text-[10px] tracking-wide text-[#e8ecf4]/70">
+          <div key={item.label} className="flex items-center gap-2 font-mono text-[11px] tracking-wide text-[#e8ecf4]/70">
             <span>{item.icon}</span>
             {item.label}
           </div>
@@ -41,22 +41,22 @@ export function LandingProblem() {
         </h2>
         <div className="mt-10 grid gap-5 md:grid-cols-3">
           <div className="rounded-lg border p-5" style={{ background: LANDING.surface, borderColor: LANDING.border }}>
-            <div className="font-mono text-[9px] uppercase tracking-wide text-[#e8ecf4]/45">Rankings</div>
-            <div className="mt-3 space-y-1 font-mono text-[11px] text-[#e8ecf4]/70">
+            <div className="font-mono text-[10px] uppercase tracking-wide text-[#e8ecf4]/45">Rankings</div>
+            <div className="mt-3 space-y-1 font-mono text-[12px] text-[#e8ecf4]/70">
               <div>Player #14</div>
               <div>Player #15</div>
               <div>Player #16</div>
             </div>
-            <p className="mt-4 font-figtree text-[13px] text-[#e8ecf4]/55">What do I do with this?</p>
+            <p className="mt-4 font-figtree text-[14px] text-[#e8ecf4]/55">What do I do with this?</p>
           </div>
 
           <div className="rounded-lg border p-5" style={{ background: LANDING.surface, borderColor: LANDING.border }}>
-            <div className="font-mono text-[9px] uppercase tracking-wide text-[#e8ecf4]/45">Trade Calculators</div>
-            <div className="mt-3 font-mono text-[12px] text-[#e8ecf4]/75">
+            <div className="font-mono text-[10px] uppercase tracking-wide text-[#e8ecf4]/45">Trade Calculators</div>
+            <div className="mt-3 font-mono text-[13px] text-[#e8ecf4]/75">
               <div>You win: 54</div>
               <div>They win: 52</div>
             </div>
-            <p className="mt-4 font-figtree text-[13px] text-[#e8ecf4]/55">Will they actually accept?</p>
+            <p className="mt-4 font-figtree text-[14px] text-[#e8ecf4]/55">Will they actually accept?</p>
           </div>
 
           <div
@@ -67,14 +67,14 @@ export function LandingProblem() {
               boxShadow: '0 0 24px rgba(54,231,161,0.08)',
             }}
           >
-            <div className="font-mono text-[9px] uppercase tracking-wide text-[#36E7A1]">Boom or Bust</div>
-            <div className="mt-3 space-y-1 font-figtree text-[12px] text-[#e8ecf4]/80">
+            <div className="font-mono text-[10px] uppercase tracking-wide text-[#36E7A1]">Boom or Bust</div>
+            <div className="mt-3 space-y-1 font-figtree text-[13px] text-[#e8ecf4]/80">
               <div>Offer: 2027 2nd Round Pick</div>
               <div>Target: Trey McBride</div>
               <div className="font-mono text-[#36E7A1]">Acceptance: 62%</div>
               <div className="text-[#e8ecf4]/55">Reason: Manager needs RB help</div>
             </div>
-            <p className="mt-4 font-figtree text-[13px] text-[#36E7A1]">That&apos;s actionable insight.</p>
+            <p className="mt-4 font-figtree text-[14px] text-[#36E7A1]">That&apos;s actionable insight.</p>
           </div>
         </div>
       </div>
@@ -104,10 +104,10 @@ export function LandingFeatures() {
                   background: `linear-gradient(135deg, ${f.accent}12, transparent 60%)`,
                 }}
               />
-              <div className="font-mono text-[10px] uppercase tracking-[1.5px]" style={{ color: f.accent }}>
+              <div className="font-mono text-[11px] uppercase tracking-[1.5px]" style={{ color: f.accent }}>
                 {f.title}
               </div>
-              <p className="mt-2 font-figtree text-[13px] leading-snug text-[#e8ecf4]/65">{f.desc}</p>
+              <p className="mt-2 font-figtree text-[14px] leading-snug text-[#e8ecf4]/65">{f.desc}</p>
             </Link>
           ))}
         </div>
@@ -134,18 +134,18 @@ export function LandingTrackRecord() {
 
         <div className="mt-10 grid gap-5 lg:grid-cols-3">
           <div className="rounded-lg border p-4" style={{ background: LANDING.surface, borderColor: LANDING.border }}>
-            <div className="font-mono text-[9px] uppercase tracking-wide text-[#e8ecf4]/45">
+            <div className="font-mono text-[10px] uppercase tracking-wide text-[#e8ecf4]/45">
               BOB vs Consensus Accuracy
             </div>
             <svg viewBox={`0 0 ${w} ${h}`} className="mt-4 w-full">
               <polyline fill="none" stroke="#A78BFA" strokeWidth="2" opacity="0.6" points={toLine(consensusPoints)} />
               <polyline fill="none" stroke="#36E7A1" strokeWidth="2.5" points={toLine(chartPoints)} />
             </svg>
-            <div className="mt-2 flex justify-between font-mono text-[8px] text-[#e8ecf4]/40">
+            <div className="mt-2 flex justify-between font-mono text-[9px] text-[#e8ecf4]/40">
               <span>Week 1</span>
               <span>Week 17</span>
             </div>
-            <p className="mt-3 font-figtree text-[10px] text-[#e8ecf4]/45">
+            <p className="mt-3 font-figtree text-[11px] text-[#e8ecf4]/45">
               2026 season tracking begins Week 1 — chart updates live
             </p>
           </div>
@@ -162,16 +162,16 @@ export function LandingTrackRecord() {
                 <div className="font-mono text-[28px] tabular-nums" style={{ color }}>
                   {val}
                 </div>
-                <div className="font-mono text-[9px] uppercase tracking-wide text-[#e8ecf4]/45">{lbl}</div>
+                <div className="font-mono text-[10px] uppercase tracking-wide text-[#e8ecf4]/45">{lbl}</div>
               </div>
             ))}
-            <p className="mt-4 font-figtree text-[10px] leading-relaxed text-[#e8ecf4]/45">
+            <p className="mt-4 font-figtree text-[11px] leading-relaxed text-[#e8ecf4]/45">
               Numbers update live as the 2026 season progresses. Placeholders shown — real data begins Week 1.
             </p>
           </div>
 
           <div className="rounded-lg border p-4" style={{ background: LANDING.surface, borderColor: LANDING.border }}>
-            <div className="font-mono text-[9px] uppercase tracking-wide text-[#e8ecf4]/45">
+            <div className="font-mono text-[10px] uppercase tracking-wide text-[#e8ecf4]/45">
               Confidence Calibration
             </div>
             <div className="mt-3 space-y-2">
@@ -182,13 +182,13 @@ export function LandingTrackRecord() {
                 ['60-69%', '56%'],
                 ['<60%', '41%'],
               ].map(([range, acc]) => (
-                <div key={range} className="flex justify-between font-mono text-[11px]">
+                <div key={range} className="flex justify-between font-mono text-[12px]">
                   <span className="text-[#e8ecf4]/55">{range}</span>
                   <span className="text-[#36E7A1]">{acc}</span>
                 </div>
               ))}
             </div>
-            <p className="mt-4 font-figtree text-[10px] text-[#e8ecf4]/45">Placeholder — builds Week 1</p>
+            <p className="mt-4 font-figtree text-[11px] text-[#e8ecf4]/45">Placeholder — builds Week 1</p>
           </div>
         </div>
       </div>
@@ -206,17 +206,17 @@ export function LandingLeagueIntel() {
             <br />
             <span style={{ color: LANDING.boom }}>KNOW YOUR LEAGUES.</span>
           </h2>
-          <p className="mt-4 max-w-md font-figtree text-[14px] leading-relaxed text-[#e8ecf4]/60">
+          <p className="mt-4 max-w-md font-figtree text-[15px] leading-relaxed text-[#e8ecf4]/60">
             BOB analyzes every manager in your leagues so you know exactly how to win deals and championships.
           </p>
           <Link
             href="/onboarding"
-            className="mt-6 inline-block rounded-md border px-5 py-2.5 font-figtree text-[13px] text-[#36E7A1] transition hover:bg-[#36E7A1]/10"
+            className="mt-6 inline-block rounded-md border px-5 py-2.5 font-figtree text-[14px] text-[#36E7A1] transition hover:bg-[#36E7A1]/10"
             style={{ borderColor: 'rgba(54,231,161,0.35)' }}
           >
             View Your Leagues
           </Link>
-          <p className="mt-4 font-figtree text-[10px] text-[#e8ecf4]/40">
+          <p className="mt-4 font-figtree text-[11px] text-[#e8ecf4]/40">
             Manager profiles are generated from Sleeper transaction history.
           </p>
         </div>
@@ -230,11 +230,11 @@ export function LandingLeagueIntel() {
             >
               <div className="flex items-start justify-between gap-2">
                 <div>
-                  <div className="font-figtree text-[15px] text-[#e8ecf4]">{m.name}</div>
-                  <div className="font-figtree text-[12px] text-[#e8ecf4]/55">&quot;{m.title}&quot;</div>
+                  <div className="font-figtree text-[16px] text-[#e8ecf4]">{m.name}</div>
+                  <div className="font-figtree text-[13px] text-[#e8ecf4]/55">&quot;{m.title}&quot;</div>
                 </div>
                 <div
-                  className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border font-mono text-[11px] tabular-nums"
+                  className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border font-mono text-[12px] tabular-nums"
                   style={{ borderColor: m.color, color: m.color }}
                 >
                   {m.fit}
@@ -244,14 +244,14 @@ export function LandingLeagueIntel() {
                 {m.tags.map((t) => (
                   <span
                     key={t}
-                    className="rounded px-1.5 py-0.5 font-mono text-[8px] text-[#e8ecf4]/55"
+                    className="rounded px-1.5 py-0.5 font-mono text-[9px] text-[#e8ecf4]/55"
                     style={{ background: 'rgba(255,255,255,0.04)' }}
                   >
                     {t}
                   </span>
                 ))}
               </div>
-              <div className="mt-2 font-mono text-[9px] text-[#e8ecf4]/40">Fit Score</div>
+              <div className="mt-2 font-mono text-[10px] text-[#e8ecf4]/40">Fit Score</div>
             </div>
           ))}
         </div>
@@ -271,12 +271,12 @@ export function LandingOrphanChallenge() {
           >
             THE ORPHAN CHALLENGE 2026
           </h2>
-          <p className="mt-4 font-figtree text-[14px] leading-relaxed text-[#e8ecf4]/60">
+          <p className="mt-4 font-figtree text-[15px] leading-relaxed text-[#e8ecf4]/60">
             Watch BOB rebuild real orphan teams. Every move. Every decision. Every result.
           </p>
           <ul className="mt-6 space-y-2">
             {['2 orphan teams', 'Starting August 1', 'Everything tracked'].map((t) => (
-              <li key={t} className="flex items-center gap-2 font-figtree text-[13px] text-[#e8ecf4]/70">
+              <li key={t} className="flex items-center gap-2 font-figtree text-[14px] text-[#e8ecf4]/70">
                 <span style={{ color: LANDING.boom }}>✓</span>
                 {t}
               </li>
@@ -284,12 +284,12 @@ export function LandingOrphanChallenge() {
           </ul>
           <Link
             href="/resources"
-            className="mt-8 inline-block rounded-md px-5 py-2.5 font-figtree text-[13px] text-[#0a0d14]"
+            className="mt-8 inline-block rounded-md px-5 py-2.5 font-figtree text-[14px] text-[#0a0d14]"
             style={{ background: LANDING.boom }}
           >
             Follow the Rebuild →
           </Link>
-          <p className="mt-4 font-figtree text-[10px] text-[#e8ecf4]/40">
+          <p className="mt-4 font-figtree text-[11px] text-[#e8ecf4]/40">
             Real orphan teams selected at launch August 1, 2026.
           </p>
         </div>
@@ -304,12 +304,12 @@ export function LandingOrphanChallenge() {
               className="rounded-lg border p-4"
               style={{ background: LANDING.surface, borderColor: LANDING.border }}
             >
-              <div className="font-mono text-[10px] uppercase tracking-wide text-[#36E7A1]">{team.name}</div>
-              <div className="mt-3 space-y-1 font-mono text-[11px] text-[#e8ecf4]/70">
+              <div className="font-mono text-[11px] uppercase tracking-wide text-[#36E7A1]">{team.name}</div>
+              <div className="mt-3 space-y-1 font-mono text-[12px] text-[#e8ecf4]/70">
                 <div>Roster Value: {team.value}</div>
                 <div>Picks: {team.picks}</div>
               </div>
-              <div className="mt-3 font-mono text-[12px] text-[#e8ecf4]">
+              <div className="mt-3 font-mono text-[13px] text-[#e8ecf4]">
                 Rebuild Grade: <span className="text-[#36E7A1]">{team.grade}</span>
               </div>
             </div>
@@ -338,13 +338,13 @@ export function LandingLiveSignals({ cards, updatedAt }: { cards: PublicSignalCa
       <div className="mx-auto max-w-[1280px]">
         <div className="flex flex-wrap items-end justify-between gap-3">
           <h2 className="font-figtree text-[clamp(1.35rem,3vw,1.75rem)] text-[#e8ecf4]">LIVE SIGNALS FROM BOB</h2>
-          <div className="font-mono text-[10px] text-[#e8ecf4]/50">
+          <div className="font-mono text-[11px] text-[#e8ecf4]/50">
             Updated {ago} · <span className="live-pulse text-[#36E7A1]">● Live</span>
           </div>
         </div>
 
         {cards.length === 0 ? (
-          <p className="mt-8 text-center font-figtree text-[13px] text-[#e8ecf4]/50">
+          <p className="mt-8 text-center font-figtree text-[14px] text-[#e8ecf4]/50">
             Live signals activate at season launch.
           </p>
         ) : (
@@ -356,16 +356,16 @@ export function LandingLiveSignals({ cards, updatedAt }: { cards: PublicSignalCa
                 style={{ background: LANDING.surface, borderColor: LANDING.border }}
               >
                 <div
-                  className="font-mono text-[9px] uppercase tracking-wide"
+                  className="font-mono text-[10px] uppercase tracking-wide"
                   style={{ color: SIGNAL_COLORS[c.category] ?? LANDING.boom }}
                 >
                   [{c.signalType}]
                 </div>
-                <div className="mt-2 font-figtree text-[15px] text-[#e8ecf4]">{c.playerName}</div>
-                <div className="font-mono text-[10px] text-[#e8ecf4]/50">
+                <div className="mt-2 font-figtree text-[16px] text-[#e8ecf4]">{c.playerName}</div>
+                <div className="font-mono text-[11px] text-[#e8ecf4]/50">
                   {c.position} · {c.team}
                 </div>
-                <div className="mt-3 font-mono text-[11px] text-[#e8ecf4]/70">
+                <div className="mt-3 font-mono text-[12px] text-[#e8ecf4]/70">
                   {c.confidence} Confidence · {c.detail}
                 </div>
               </div>
@@ -382,12 +382,12 @@ export function LandingFooterFeed() {
   return (
     <div className="overflow-hidden border-t py-3" style={{ borderColor: LANDING.border, background: LANDING.surface }}>
       <style dangerouslySetInnerHTML={{ __html: FEED_CSS }} />
-      <div className="mb-2 text-center font-mono text-[9px] uppercase tracking-[1.5px] text-[#e8ecf4]/45">
+      <div className="mb-2 text-center font-mono text-[10px] uppercase tracking-[1.5px] text-[#e8ecf4]/45">
         The Front Office Feed · Live updates from BOB
       </div>
       <div className="landing-ticker-track flex w-max gap-8 whitespace-nowrap px-4">
         {items.map((t, i) => (
-          <span key={`${t}-${i}`} className="font-mono text-[11px] text-[#36E7A1]/70">
+          <span key={`${t}-${i}`} className="font-mono text-[12px] text-[#36E7A1]/70">
             {t}
           </span>
         ))}

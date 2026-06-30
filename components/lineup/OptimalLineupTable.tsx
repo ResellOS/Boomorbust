@@ -16,7 +16,7 @@ function VerdictBadge({ verdict }: { verdict: PlayerRow['verdict'] }) {
   const color = verdictColor(verdict);
   return (
     <span
-      className="px-2 py-0.5 rounded text-[11px] font-bold tracking-wide"
+      className="px-2 py-0.5 rounded text-[12px] font-bold tracking-wide"
       style={{ color, border: `1px solid ${color}30`, background: `${color}14` }}
     >
       {verdict}
@@ -31,7 +31,7 @@ function PlayerAvatar({ playerId, name }: { playerId: string; name: string }) {
   if (err) {
     return (
       <div className="w-7 h-7 rounded-full bg-white/[0.08] flex items-center justify-center flex-shrink-0">
-        <span className="text-[9px] font-bold text-slate-300">{initials}</span>
+        <span className="text-[10px] font-bold text-slate-300">{initials}</span>
       </div>
     );
   }
@@ -56,7 +56,7 @@ function SsasCell({ team, rank, grade }: { team: string; rank: number; grade: nu
   return (
     <div className="flex items-center gap-1.5">
       <div className="flex flex-col gap-0.5">
-        <span className="text-[11px] font-mono font-semibold" style={{ color, fontFamily: 'JetBrains Mono, monospace' }}>
+        <span className="text-[12px] font-mono font-semibold" style={{ color, fontFamily: 'JetBrains Mono, monospace' }}>
           {team} ({ordinalSuffix(rank)})
         </span>
         <div className="h-1 rounded-full bg-white/[0.08] w-[60px]">
@@ -88,7 +88,7 @@ function TableRow({ row, dim }: { row: PlayerRow; dim?: boolean }) {
       {/* SLOT */}
       <td className="px-3 py-2.5 w-12">
         <span
-          className="text-[11px] font-mono font-semibold text-slate-400"
+          className="text-[12px] font-mono font-semibold text-slate-400"
           style={{ fontFamily: 'JetBrains Mono, monospace' }}
         >
           {row.slot}
@@ -100,15 +100,15 @@ function TableRow({ row, dim }: { row: PlayerRow; dim?: boolean }) {
         <div className="flex items-center gap-2">
           <PlayerAvatar playerId={row.playerId} name={row.name} />
           <div>
-            <p className="text-[12px] font-semibold text-white leading-tight truncate max-w-[120px]">{row.name}</p>
-            <p className="text-[10px] text-slate-500 uppercase">{row.position} · {row.team}</p>
+            <p className="text-[13px] font-semibold text-white leading-tight truncate max-w-[120px]">{row.name}</p>
+            <p className="text-[11px] text-slate-500 uppercase">{row.position} · {row.team}</p>
           </div>
         </div>
       </td>
 
       {/* OPP */}
       <td className="px-3 py-2.5 hidden sm:table-cell">
-        <span className="text-[12px] text-white font-mono" style={{ fontFamily: 'JetBrains Mono, monospace' }}>
+        <span className="text-[13px] text-white font-mono" style={{ fontFamily: 'JetBrains Mono, monospace' }}>
           {row.matchupLabel}
         </span>
       </td>
@@ -125,7 +125,7 @@ function TableRow({ row, dim }: { row: PlayerRow; dim?: boolean }) {
 
       {/* PROJ POINTS */}
       <td className="px-3 py-2.5 text-right">
-        <span className="text-[13px] font-mono font-semibold text-white" style={{ fontFamily: 'JetBrains Mono, monospace' }}>
+        <span className="text-[14px] font-mono font-semibold text-white" style={{ fontFamily: 'JetBrains Mono, monospace' }}>
           {row.projectedPoints.toFixed(1)}
         </span>
       </td>
@@ -133,7 +133,7 @@ function TableRow({ row, dim }: { row: PlayerRow; dim?: boolean }) {
       {/* TRE EDGE */}
       <td className="px-3 py-2.5 text-right">
         <span
-          className="text-[12px] font-mono font-semibold"
+          className="text-[13px] font-mono font-semibold"
           style={{
             fontFamily: 'JetBrains Mono, monospace',
             color: row.treEdge >= 0 ? '#36E7A1' : '#EF4444',
@@ -161,7 +161,7 @@ function TableHeader() {
         ].map(({ label, className }) => (
           <th
             key={label}
-            className={`px-3 py-2 text-[10px] font-semibold text-slate-500 uppercase tracking-wider ${className}`}
+            className={`px-3 py-2 text-[11px] font-semibold text-slate-500 uppercase tracking-wider ${className}`}
           >
             {label}
           </th>
@@ -183,12 +183,12 @@ export default function OptimalLineupTable({ data, loading, week, onWeekChange }
       {/* Main starters table */}
       <div className="glass-card overflow-hidden">
         <div className="flex items-center justify-between px-4 py-3 border-b border-white/[0.08]">
-          <h2 className="text-[13px] font-bold text-white tracking-wide">YOUR OPTIMAL LINEUP</h2>
+          <h2 className="text-[14px] font-bold text-white tracking-wide">YOUR OPTIMAL LINEUP</h2>
           <div className="flex items-center gap-2">
             <select
               value={currentWeek}
               onChange={(e) => onWeekChange(parseInt(e.target.value, 10))}
-              className="text-[11px] font-mono bg-white/[0.06] border border-white/[0.12] rounded px-2 py-2 min-h-[36px] text-white appearance-none cursor-pointer"
+              className="text-[12px] font-mono bg-white/[0.06] border border-white/[0.12] rounded px-2 py-2 min-h-[36px] text-white appearance-none cursor-pointer"
               style={{ fontFamily: 'JetBrains Mono, monospace' }}
             >
               {Array.from({ length: 18 }, (_, i) => i + 1).map((w) => (
@@ -210,19 +210,19 @@ export default function OptimalLineupTable({ data, loading, week, onWeekChange }
               {/* TOTAL row */}
               {!loading && starters.length > 0 && (
                 <tr className="border-t border-white/[0.1]">
-                  <td className="px-3 py-2.5 text-[11px] font-bold text-slate-400 font-mono uppercase" colSpan={2}
+                  <td className="px-3 py-2.5 text-[12px] font-bold text-slate-400 font-mono uppercase" colSpan={2}
                     style={{ fontFamily: 'JetBrains Mono, monospace' }}>
                     TOTAL PROJECTED
                   </td>
                   <td colSpan={3} />
                   <td className="px-3 py-2.5 text-right">
-                    <span className="text-[13px] font-mono font-bold text-white" style={{ fontFamily: 'JetBrains Mono, monospace' }}>
+                    <span className="text-[14px] font-mono font-bold text-white" style={{ fontFamily: 'JetBrains Mono, monospace' }}>
                       {totalProjected.toFixed(1)}
                     </span>
                   </td>
                   <td className="px-3 py-2.5 text-right">
                     <span
-                      className="text-[12px] font-mono font-bold"
+                      className="text-[13px] font-mono font-bold"
                       style={{
                         fontFamily: 'JetBrains Mono, monospace',
                         color: totalTreEdge >= 0 ? '#36E7A1' : '#EF4444',
@@ -241,7 +241,7 @@ export default function OptimalLineupTable({ data, loading, week, onWeekChange }
       {/* Bench panel */}
       <div className="glass-card overflow-hidden">
         <div className="px-4 py-3 border-b border-white/[0.08]">
-          <h2 className="text-[11px] font-bold text-slate-400 tracking-widest uppercase">BENCH</h2>
+          <h2 className="text-[12px] font-bold text-slate-400 tracking-widest uppercase">BENCH</h2>
         </div>
         <div className="overflow-x-auto opacity-70">
           <table className="w-full">
@@ -252,7 +252,7 @@ export default function OptimalLineupTable({ data, loading, week, onWeekChange }
                 : bench.length === 0
                   ? (
                     <tr>
-                      <td colSpan={7} className="px-4 py-6 text-center text-slate-500 text-[12px]">
+                      <td colSpan={7} className="px-4 py-6 text-center text-slate-500 text-[13px]">
                         No bench players loaded
                       </td>
                     </tr>

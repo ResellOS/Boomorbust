@@ -13,7 +13,7 @@ function UserBubble({ content }: { content: string }) {
   return (
     <div className="flex justify-end">
       <div
-        className="max-w-[75%] rounded-2xl rounded-br-none px-4 py-3 text-[14px] text-white leading-relaxed"
+        className="max-w-[75%] rounded-2xl rounded-br-none px-4 py-3 text-[15px] text-white leading-relaxed"
         style={{ background: 'linear-gradient(135deg, #7c3aed 0%, #2563eb 100%)' }}
       >
         {content}
@@ -58,7 +58,7 @@ function AssistantBubble({ msg, onFollowUp }: { msg: ChatMessage; onFollowUp: (p
             animation: 'pulse 2s ease-in-out infinite',
           }}
         />
-        <span className="text-[11px] font-bold tracking-wider" style={{ color: '#36E7A1' }}>BOB COACH</span>
+        <span className="text-[12px] font-bold tracking-wider" style={{ color: '#36E7A1' }}>BOB COACH</span>
       </div>
 
       {/* Bubble */}
@@ -70,7 +70,7 @@ function AssistantBubble({ msg, onFollowUp }: { msg: ChatMessage; onFollowUp: (p
           <TypingDots />
         ) : (
           <>
-            <p className="text-[14px] text-white leading-relaxed whitespace-pre-wrap">{msg.content}</p>
+            <p className="text-[15px] text-white leading-relaxed whitespace-pre-wrap">{msg.content}</p>
             {msg.tradeCard && <TradeAnalysisCard data={msg.tradeCard} />}
           </>
         )}
@@ -80,7 +80,7 @@ function AssistantBubble({ msg, onFollowUp }: { msg: ChatMessage; onFollowUp: (p
       {msg.followUp && !msg.streaming && (
         <button
           onClick={() => onFollowUp(msg.followUp!)}
-          className="self-start flex items-center gap-2 rounded-full px-4 py-2 text-[12px] font-medium text-slate-300 border border-white/[0.12] hover:border-white/[0.25] hover:text-white transition-all"
+          className="self-start flex items-center gap-2 rounded-full px-4 py-2 text-[13px] font-medium text-slate-300 border border-white/[0.12] hover:border-white/[0.25] hover:text-white transition-all"
           style={{ background: 'rgba(255,255,255,0.04)' }}
         >
           {msg.followUp}
@@ -112,8 +112,8 @@ export default function ChatMessages({ messages, onFollowUp }: Props) {
           </svg>
         </div>
         <div className="text-center">
-          <p className="text-[16px] font-semibold text-white mb-1">Dynasty Coach is ready</p>
-          <p className="text-[13px] text-slate-500 max-w-xs leading-relaxed">Ask anything about your roster, trades, or strategy. I have full context of your leagues.</p>
+          <p className="text-[17px] font-semibold text-white mb-1">Dynasty Coach is ready</p>
+          <p className="text-[14px] text-slate-500 max-w-xs leading-relaxed">Ask anything about your roster, trades, or strategy. I have full context of your leagues.</p>
         </div>
       </div>
     );

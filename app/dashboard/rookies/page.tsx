@@ -499,7 +499,7 @@ export default function RookiesPage() {
           <h1 className="display text-[48px] leading-none uppercase tracking-[0.04em] bg-gradient-to-b from-white to-[#22D3EE] bg-clip-text text-transparent">
             ROOKIE DRAFT INTELLIGENCE
           </h1>
-          <p className="font-mono mt-3 text-[11px] tracking-[0.2em] text-[#22D3EE]">
+          <p className="font-mono mt-3 text-[12px] tracking-[0.2em] text-[#22D3EE]">
             F-FIG SCOUTING GRADES · {displayYear} CLASS
           </p>
           <p className="mt-4 text-[var(--text-secondary)] text-sm md:text-base max-w-2xl">
@@ -530,7 +530,7 @@ export default function RookiesPage() {
 
         <div className="sticky top-2 z-30 rounded-2xl border border-[var(--border)] bg-[var(--bg-card)]/90 backdrop-blur-xl shadow-lg p-4 space-y-4">
           <div className="flex flex-wrap gap-2 items-center">
-            <span className="text-[10px] uppercase tracking-[0.2em] text-[var(--text-muted)] mr-2 w-full sm:w-auto">Position</span>
+            <span className="text-[11px] uppercase tracking-[0.2em] text-[var(--text-muted)] mr-2 w-full sm:w-auto">Position</span>
             {POSITIONS.map((p) => (
               <button
                 key={p}
@@ -549,7 +549,7 @@ export default function RookiesPage() {
           </div>
 
           <div className="flex flex-wrap gap-2 items-center">
-            <span className="text-[10px] uppercase tracking-[0.2em] text-[var(--text-muted)] mr-2 w-full sm:w-auto">
+            <span className="text-[11px] uppercase tracking-[0.2em] text-[var(--text-muted)] mr-2 w-full sm:w-auto">
               Draft class
             </span>
             {([2025, 2024, 2023] as const).map((y) => {
@@ -597,11 +597,11 @@ export default function RookiesPage() {
           </div>
 
           <div className="flex flex-wrap gap-2 items-center">
-            <span className="text-[10px] uppercase tracking-[0.2em] text-[var(--text-muted)] mr-2 w-full sm:w-auto">Grade</span>
+            <span className="text-[11px] uppercase tracking-[0.2em] text-[var(--text-muted)] mr-2 w-full sm:w-auto">Grade</span>
             {UI_GRADES.map((g) => {
               const active = gradeTier === g;
               const ghost = clsx(
-                'glass-panel text-[10px] font-bold uppercase px-3 py-2 rounded-full border border-white/[0.08] bg-white/[0.03]',
+                'glass-panel text-[11px] font-bold uppercase px-3 py-2 rounded-full border border-white/[0.08] bg-white/[0.03]',
                 'text-[var(--text-muted)] hover:border-white/15 hover:text-[var(--text-secondary)] transition'
               );
               if (g === 'ALL') {
@@ -613,7 +613,7 @@ export default function RookiesPage() {
                     className={
                       active
                         ? clsx(
-                            'text-[10px] font-bold uppercase px-3 py-2 rounded-full border transition',
+                            'text-[11px] font-bold uppercase px-3 py-2 rounded-full border transition',
                             'bg-[#22D3EE]/14 border-[#22D3EE]/45 text-white shadow-[0_0_18px_rgba(34,211,238,0.22)]'
                           )
                         : ghost
@@ -631,7 +631,7 @@ export default function RookiesPage() {
                   onClick={() => setGradeTier(g)}
                   className={
                     active
-                      ? clsx('text-[10px] font-bold uppercase px-3 py-2 rounded-full border transition', meta.activeClass)
+                      ? clsx('text-[11px] font-bold uppercase px-3 py-2 rounded-full border transition', meta.activeClass)
                       : ghost
                   }
                 >
@@ -740,7 +740,7 @@ function ProspectRow(props: {
     watched,
   } = props;
   const posBadge = clsx(
-    'text-[10px] font-bold uppercase px-1.5 rounded',
+    'text-[11px] font-bold uppercase px-1.5 rounded',
     p.position === 'QB'
       ? 'bg-purple-500/20 text-purple-300'
       : p.position === 'RB'
@@ -817,13 +817,13 @@ function ProspectRow(props: {
                 {p.draft_year} NFL DRAFT
               </span>
               {roundPickSlotLabel(p.draft_round, p.draft_pick) ? (
-                <span className="font-mono text-[9px] text-[#64748B]">
+                <span className="font-mono text-[10px] text-[#64748B]">
                   {roundPickSlotLabel(p.draft_round, p.draft_pick)}
                 </span>
               ) : null}
             </div>
             {p.college && (
-              <span className="inline-block mt-1 text-[10px] px-2 py-0.5 rounded bg-white/[0.06] border border-[var(--border)] text-[var(--text-muted)] truncate max-w-[14rem]">
+              <span className="inline-block mt-1 text-[11px] px-2 py-0.5 rounded bg-white/[0.06] border border-[var(--border)] text-[var(--text-muted)] truncate max-w-[14rem]">
                 {p.college}
               </span>
             )}
@@ -850,17 +850,17 @@ function ProspectRow(props: {
         <div className={landingWrap}>
           <div className="flex items-center gap-2">
             {logoUrl ? <Image src={logoUrl} alt="" width={22} height={22} className="shrink-0" unoptimized /> : null}
-            <span className="font-mono text-[11px] font-black tracking-tight" style={{ color: teamPrimary }}>
+            <span className="font-mono text-[12px] font-black tracking-tight" style={{ color: teamPrimary }}>
               {p.nfl_team ?? '—'}
             </span>
           </div>
-          <span className="font-mono text-[9px] font-bold tracking-[0.08em] text-[var(--text-muted)]">
+          <span className="font-mono text-[10px] font-bold tracking-[0.08em] text-[var(--text-muted)]">
             {landing.label} · Rating {Math.round(tfo)}
           </span>
         </div>
 
         <div className="flex items-center gap-2 shrink-0">
-          <span className="text-[10px] uppercase tracking-wider text-[var(--text-muted)]">Opp</span>
+          <span className="text-[11px] uppercase tracking-wider text-[var(--text-muted)]">Opp</span>
           <span className="tabular-nums font-semibold text-white">{opp}</span>
         </div>
 
@@ -872,7 +872,7 @@ function ProspectRow(props: {
             >
               {p.ffig_grade}
             </p>
-            <p className="font-mono text-[9px] font-bold tracking-[0.12em] mt-0.5" style={{ color: gradeStyle.color }}>
+            <p className="font-mono text-[10px] font-bold tracking-[0.12em] mt-0.5" style={{ color: gradeStyle.color }}>
               {gradeStyle.band}
             </p>
           </div>
@@ -886,22 +886,22 @@ function ProspectRow(props: {
         <div className="border-b border-[var(--border)] bg-[var(--bg-secondary)]/40 px-4 md:px-6 py-6">
           <div className="grid md:grid-cols-2 gap-6">
               <div className="space-y-4">
-                <h4 className="text-[11px] uppercase tracking-[0.2em] text-[var(--text-muted)]">F-FIG breakdown</h4>
+                <h4 className="text-[12px] uppercase tracking-[0.2em] text-[var(--text-muted)]">F-FIG breakdown</h4>
                 <dl className="grid grid-cols-2 gap-3 text-sm">
                   <div className="rounded-xl border border-[var(--border)] bg-[var(--bg-card)]/80 p-3">
-                    <dt className="text-[var(--text-muted)] text-[10px] uppercase">Production</dt>
+                    <dt className="text-[var(--text-muted)] text-[11px] uppercase">Production</dt>
                     <dd className="text-white font-semibold">{Number(p.dom_score).toFixed(1)} Dom</dd>
                   </div>
                   <div className="rounded-xl border border-[var(--border)] bg-[var(--bg-card)]/80 p-3">
-                    <dt className="text-[var(--text-muted)] text-[10px] uppercase">Athleticism</dt>
+                    <dt className="text-[var(--text-muted)] text-[11px] uppercase">Athleticism</dt>
                     <dd className="text-white font-semibold">RAS {Number(p.ras_score).toFixed(1)}</dd>
                   </div>
                   <div className="rounded-xl border border-[var(--border)] bg-[var(--bg-card)]/80 p-3">
-                    <dt className="text-[var(--text-muted)] text-[10px] uppercase">Landing spot</dt>
+                    <dt className="text-[var(--text-muted)] text-[11px] uppercase">Landing spot</dt>
                     <dd className="text-white font-semibold">{(Number(p.lsm_total) ?? 1).toFixed(3)}× LSM</dd>
                   </div>
                   <div className="rounded-xl border border-[var(--border)] bg-[var(--bg-card)]/80 p-3">
-                    <dt className="text-[var(--text-muted)] text-[10px] uppercase">Opportunity</dt>
+                    <dt className="text-[var(--text-muted)] text-[11px] uppercase">Opportunity</dt>
                     <dd className="text-white font-semibold">
                       Mods Δ{' '}
                       {(
@@ -915,20 +915,20 @@ function ProspectRow(props: {
               </div>
               <div className="space-y-4">
                 <div>
-                  <h4 className="text-[11px] uppercase tracking-[0.2em] text-[var(--text-muted)] mb-2">College stats</h4>
+                  <h4 className="text-[12px] uppercase tracking-[0.2em] text-[var(--text-muted)] mb-2">College stats</h4>
                   <p className="text-xs text-[var(--text-muted)] border border-[var(--border)] rounded-xl p-3 bg-black/20">
                     ESPN college feeds not wired in this UI yet — dominance & targets are reflected in Dom / target share elsewhere in the pipeline.
                   </p>
                 </div>
                 <div>
-                  <h4 className="text-[11px] uppercase tracking-[0.2em] text-[var(--text-muted)] mb-1">Draft capital</h4>
+                  <h4 className="text-[12px] uppercase tracking-[0.2em] text-[var(--text-muted)] mb-1">Draft capital</h4>
                   <p className="text-sm text-white">
                     Round {p.draft_round ?? '—'}, overall {p.draft_pick ?? '—'}, age{' '}
                     {p.age_at_draft != null ? Number(p.age_at_draft).toFixed(1) : '—'}
                   </p>
                 </div>
                 <div>
-                  <h4 className="text-[11px] uppercase tracking-[0.2em] text-[var(--text-muted)] mb-1">
+                  <h4 className="text-[12px] uppercase tracking-[0.2em] text-[var(--text-muted)] mb-1">
                     Comparable / similar archetypes
                   </h4>
                   <p className="text-sm text-[var(--text-secondary)]">
@@ -998,7 +998,7 @@ function HistoricalAccuracy({
       <div className="overflow-x-auto">
         <table className="w-full text-sm min-w-[720px]">
           <thead>
-            <tr className="text-left text-[10px] uppercase text-[var(--text-muted)] tracking-[0.12em]">
+            <tr className="text-left text-[11px] uppercase text-[var(--text-muted)] tracking-[0.12em]">
               <th className="pb-3 pr-4">{tab === 'year' ? 'Year' : tab === 'pos' ? 'Position' : 'Round'}</th>
               <th className="pb-3 pr-4">Graded</th>
               <th className="pb-3 pr-4">Elite tier hits</th>

@@ -15,7 +15,7 @@ export default function PositionConcentrationBars({
 
   return (
     <div className="mb-4 rounded-[7px] border border-border bg-surface px-3 py-3">
-      <div className="mb-2.5 font-figtree text-[10px] font-bold uppercase tracking-[1.5px] text-muted">
+      <div className="mb-2.5 font-figtree text-[11px] font-bold uppercase tracking-[1.5px] text-muted">
         Position Concentration
       </div>
       <div className="space-y-2.5">
@@ -24,7 +24,7 @@ export default function PositionConcentrationBars({
           return (
             <div key={row.position}>
               <div className="mb-1 flex items-center justify-between gap-2">
-                <span className="font-mono text-[10px] text-text">
+                <span className="font-mono text-[11px] text-text">
                   {row.position} exposure:{' '}
                   <span className="tabular-nums">{row.playerCount}</span> player
                   {row.playerCount === 1 ? '' : 's'} in{' '}
@@ -32,7 +32,7 @@ export default function PositionConcentrationBars({
                   {row.leagueSlots === 1 ? '' : 's'}
                 </span>
                 {leaguesConnected > 0 && row.playerCount > 0 ? (
-                  <span className="shrink-0 font-mono text-[8px] text-muted">
+                  <span className="shrink-0 font-mono text-[9px] text-muted">
                     / {leaguesConnected} max
                   </span>
                 ) : null}

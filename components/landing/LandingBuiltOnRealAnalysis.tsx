@@ -27,7 +27,7 @@ export default function LandingBuiltOnRealAnalysis() {
           Built on Real Analysis—Not Just Projections
         </h2>
         <p
-          className="mx-auto mt-3 max-w-[560px] text-center text-[14px] text-[#64748B] sm:text-[15px]"
+          className="mx-auto mt-3 max-w-[560px] text-center text-[15px] text-[#64748B] sm:text-[16px]"
           style={{ fontFamily: 'var(--font-body)' }}
         >
           Every signal is grounded in usage, markets, health, and your league rules — not a single model output in a vacuum.
@@ -49,7 +49,7 @@ export default function LandingBuiltOnRealAnalysis() {
               >
                 <path d={c.d} stroke="currentColor" strokeWidth={1.45} strokeLinecap="round" strokeLinejoin="round" />
               </svg>
-              <p className="text-[13px] font-semibold leading-snug text-white sm:text-[14px]" style={{ fontFamily: 'var(--font-body)' }}>
+              <p className="text-[14px] font-semibold leading-snug text-white sm:text-[15px]" style={{ fontFamily: 'var(--font-body)' }}>
                 {c.label}
               </p>
             </div>

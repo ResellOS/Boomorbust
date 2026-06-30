@@ -210,7 +210,7 @@ export default function TradeDatabase({
 
     return (
 
-      <section className="rounded-[10px] border border-[#1e2640] bg-[#0f1420] px-4 py-6 text-center font-figtree text-[12px] text-[#6b7a99]">
+      <section className="rounded-[10px] border border-[#1e2640] bg-[#0f1420] px-4 py-6 text-center font-figtree text-[13px] text-[#6b7a99]">
 
         No trades in database yet — market signals populate after sync.
 
@@ -230,9 +230,9 @@ export default function TradeDatabase({
 
         <div>
 
-          <h3 className="font-figtree text-[10px] uppercase tracking-[1.5px] text-[#e8ecf4]">Trade Database</h3>
+          <h3 className="font-figtree text-[11px] uppercase tracking-[1.5px] text-[#e8ecf4]">Trade Database</h3>
 
-          <p className="font-mono text-[8px] text-[#6b7a99]">
+          <p className="font-mono text-[9px] text-[#6b7a99]">
 
             {filtered.length} opportunities · expand for full list
 
@@ -246,7 +246,7 @@ export default function TradeDatabase({
 
           onChange={(e) => setLeagueFilter(e.target.value)}
 
-          className="rounded border border-[#1e2640] bg-[#0f1420] px-2 py-0.5 font-mono text-[8px] text-[#e8ecf4]"
+          className="rounded border border-[#1e2640] bg-[#0f1420] px-2 py-0.5 font-mono text-[9px] text-[#e8ecf4]"
 
         >
 
@@ -276,7 +276,7 @@ export default function TradeDatabase({
 
           onClick={() => setQuickChip('all')}
 
-          className={`rounded border px-2 py-0.5 font-mono text-[8px] ${
+          className={`rounded border px-2 py-0.5 font-mono text-[9px] ${
 
             quickChip === 'all'
 
@@ -310,7 +310,7 @@ export default function TradeDatabase({
 
             }}
 
-            className={`rounded border px-2 py-0.5 font-mono text-[8px] ${
+            className={`rounded border px-2 py-0.5 font-mono text-[9px] ${
 
               quickChip === c.id
 
@@ -338,7 +338,7 @@ export default function TradeDatabase({
 
           <thead>
 
-            <tr className="border-b border-[#1e2640] font-mono text-[7px] uppercase tracking-wide text-[#6b7a99]">
+            <tr className="border-b border-[#1e2640] font-mono text-[8px] uppercase tracking-wide text-[#6b7a99]">
 
               <th className="px-2 py-2">Target</th>
 
@@ -400,9 +400,9 @@ export default function TradeDatabase({
 
                       <div>
 
-                        <div className="font-figtree text-[11px] text-[#e8ecf4]">{o.playerName}</div>
+                        <div className="font-figtree text-[12px] text-[#e8ecf4]">{o.playerName}</div>
 
-                        <div className="font-mono text-[8px] text-[#6b7a99]">
+                        <div className="font-mono text-[9px] text-[#6b7a99]">
 
                           BOB #{o.bobRank ?? '—'} · Mkt #{o.marketRank ?? '—'}
 
@@ -414,7 +414,7 @@ export default function TradeDatabase({
 
                   </td>
 
-                  <td className="px-2 py-2 font-figtree text-[9px] text-[#9aa8c4]">
+                  <td className="px-2 py-2 font-figtree text-[10px] text-[#9aa8c4]">
 
                     {o.givePlayerName}
 
@@ -422,9 +422,9 @@ export default function TradeDatabase({
 
                   </td>
 
-                  <td className="px-2 py-2 font-figtree text-[9px] text-boom">{o.getPlayerName}</td>
+                  <td className="px-2 py-2 font-figtree text-[10px] text-boom">{o.getPlayerName}</td>
 
-                  <td className="px-2 py-2 font-figtree text-[9px] text-[#8b9bb8]">
+                  <td className="px-2 py-2 font-figtree text-[10px] text-[#8b9bb8]">
 
                     {o.leagueName}
 
@@ -438,7 +438,7 @@ export default function TradeDatabase({
 
                     <span
 
-                      className="rounded px-1 py-px font-mono text-[7px] uppercase"
+                      className="rounded px-1 py-px font-mono text-[8px] uppercase"
 
                       style={{ color: badge.color, background: badge.bg }}
 
@@ -450,7 +450,7 @@ export default function TradeDatabase({
 
                   </td>
 
-                  <td className="px-2 py-2 font-mono text-[11px] font-semibold tabular-nums">
+                  <td className="px-2 py-2 font-mono text-[12px] font-semibold tabular-nums">
 
                     {delta != null ? (
 
@@ -466,7 +466,7 @@ export default function TradeDatabase({
 
                   <td
 
-                    className="px-2 py-2 font-mono text-[10px] tabular-nums"
+                    className="px-2 py-2 font-mono text-[11px] tabular-nums"
 
                     style={{ color: acceptanceColor(o.acceptanceProbability) }}
 
@@ -476,13 +476,13 @@ export default function TradeDatabase({
 
                   </td>
 
-                  <td className="px-2 py-2 font-mono text-[10px] tabular-nums text-boom">
+                  <td className="px-2 py-2 font-mono text-[11px] tabular-nums text-boom">
 
                     +{o.championshipImpact.toFixed(1)}%
 
                   </td>
 
-                  <td className="max-w-[140px] truncate px-2 py-2 font-figtree text-[9px] text-[#8b9bb8]">
+                  <td className="max-w-[140px] truncate px-2 py-2 font-figtree text-[10px] text-[#8b9bb8]">
 
                     {o.whyReasons[0] ?? o.reasonChips[0] ?? '—'}
 
@@ -510,7 +510,7 @@ export default function TradeDatabase({
 
           onClick={() => setExpanded((v) => !v)}
 
-          className="mt-2 font-mono text-[9px] text-boom hover:underline"
+          className="mt-2 font-mono text-[10px] text-boom hover:underline"
 
         >
 

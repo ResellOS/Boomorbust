@@ -50,7 +50,7 @@ export default function LandingPricing({ foundingSpots }: { foundingSpots: numbe
           Start Free. Upgrade When You&apos;re Ready.
         </h2>
         {foundingSpots > 0 && (
-          <p className="mt-3 text-center font-figtree text-[13px] text-[#36E7A1]">
+          <p className="mt-3 text-center font-figtree text-[14px] text-[#36E7A1]">
             First 100 signups: 50% off 3 months ·{' '}
             <span className="font-mono tabular-nums">{foundingSpots}</span> founding spots remaining
           </p>
@@ -69,21 +69,21 @@ export default function LandingPricing({ foundingSpots }: { foundingSpots: numbe
             >
               {tier.featured && (
                 <span
-                  className="absolute -top-2.5 left-1/2 -translate-x-1/2 rounded-full px-3 py-0.5 font-mono text-[8px] uppercase tracking-wide text-[#0a0d14]"
+                  className="absolute -top-2.5 left-1/2 -translate-x-1/2 rounded-full px-3 py-0.5 font-mono text-[9px] uppercase tracking-wide text-[#0a0d14]"
                   style={{ background: LANDING.boom }}
                 >
                   Most Popular
                 </span>
               )}
-              <div className="font-mono text-[10px] uppercase tracking-[1.5px] text-[#e8ecf4]/50">{tier.name}</div>
+              <div className="font-mono text-[11px] uppercase tracking-[1.5px] text-[#e8ecf4]/50">{tier.name}</div>
               <div className="mt-2 font-mono text-[32px] tabular-nums text-[#e8ecf4]">
                 ${tier.price}
-                <span className="text-[12px] text-[#e8ecf4]/45">/mo</span>
+                <span className="text-[13px] text-[#e8ecf4]/45">/mo</span>
               </div>
-              <p className="mt-2 font-figtree text-[12px] leading-snug text-[#e8ecf4]/55">{tier.desc}</p>
+              <p className="mt-2 font-figtree text-[13px] leading-snug text-[#e8ecf4]/55">{tier.desc}</p>
               <ul className="mt-4 flex-1 space-y-1.5">
                 {tier.features.map((f) => (
-                  <li key={f} className="flex gap-2 font-figtree text-[11px] text-[#e8ecf4]/75">
+                  <li key={f} className="flex gap-2 font-figtree text-[12px] text-[#e8ecf4]/75">
                     <span style={{ color: LANDING.boom }}>✓</span>
                     {f}
                   </li>
@@ -91,7 +91,7 @@ export default function LandingPricing({ foundingSpots }: { foundingSpots: numbe
               </ul>
               <Link
                 href={tier.href}
-                className="mt-5 block rounded-md py-2.5 text-center font-figtree text-[13px] transition hover:brightness-110"
+                className="mt-5 block rounded-md py-2.5 text-center font-figtree text-[14px] transition hover:brightness-110"
                 style={
                   tier.featured
                     ? { background: LANDING.boom, color: '#0a0d14' }

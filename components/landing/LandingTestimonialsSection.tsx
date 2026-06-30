@@ -53,7 +53,7 @@ export default function LandingTestimonialsSection() {
         >
           Loved by Dynasty Managers
         </h2>
-        <p className="mx-auto mt-2 max-w-[560px] text-center text-[13px] text-[#64748B] sm:text-[14px]" style={{ fontFamily: 'var(--font-body)' }}>
+        <p className="mx-auto mt-2 max-w-[560px] text-center text-[14px] text-[#64748B] sm:text-[15px]" style={{ fontFamily: 'var(--font-body)' }}>
           Real managers. Real leagues. Real results.
         </p>
 
@@ -62,26 +62,26 @@ export default function LandingTestimonialsSection() {
             <article key={c.handle} className={GLASS}>
               <div className="flex items-start gap-3">
                 <div
-                  className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-white/[0.1] font-mono text-[13px] font-bold text-white/90"
+                  className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-white/[0.1] font-mono text-[14px] font-bold text-white/90"
                   style={{ background: 'rgba(62,207,173,0.12)', boxShadow: '0 0 16px rgba(62,207,173,0.2)' }}
                   aria-hidden
                 >
                   {c.initials}
                 </div>
                 <div className="min-w-0">
-                  <p className="text-[15px] font-bold text-white" style={{ fontFamily: 'var(--font-body)' }}>
+                  <p className="text-[16px] font-bold text-white" style={{ fontFamily: 'var(--font-body)' }}>
                     {c.name}
                   </p>
-                  <p className="text-[13px]" style={{ fontFamily: 'var(--font-body)', color: MUTED }}>
+                  <p className="text-[14px]" style={{ fontFamily: 'var(--font-body)', color: MUTED }}>
                     {c.handle}
                   </p>
                 </div>
               </div>
-              <p className="mt-4 flex-1 text-[14px] leading-relaxed text-white/90" style={{ fontFamily: 'var(--font-body)' }}>
+              <p className="mt-4 flex-1 text-[15px] leading-relaxed text-white/90" style={{ fontFamily: 'var(--font-body)' }}>
                 &ldquo;{c.quote}&rdquo;
               </p>
               <span
-                className="mt-5 inline-flex self-start rounded-full px-3 py-1.5 text-[11px] font-bold uppercase tracking-wide text-[#0a0d14]"
+                className="mt-5 inline-flex self-start rounded-full px-3 py-1.5 text-[12px] font-bold uppercase tracking-wide text-[#0a0d14]"
                 style={{
                   fontFamily: 'var(--font-body)',
                   background: BOOM,

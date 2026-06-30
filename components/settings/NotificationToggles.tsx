@@ -61,8 +61,8 @@ export default function NotificationToggles({ notifications, onChange }: Props) 
       style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}
     >
       <div className="flex items-center justify-between px-5 py-4 border-b" style={{ borderColor: 'rgba(255,255,255,0.07)' }}>
-        <p className="text-[12px] font-bold text-slate-400 uppercase tracking-widest">NOTIFICATION PREFERENCES</p>
-        <button className="text-[11px] font-medium" style={{ color: '#36E7A1' }}>Manage All</button>
+        <p className="text-[13px] font-bold text-slate-400 uppercase tracking-widest">NOTIFICATION PREFERENCES</p>
+        <button className="text-[12px] font-medium" style={{ color: '#36E7A1' }}>Manage All</button>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-0">
@@ -82,8 +82,8 @@ export default function NotificationToggles({ notifications, onChange }: Props) 
 
             {/* Label + desc */}
             <div className="flex-1 min-w-0">
-              <p className="text-[13px] font-semibold text-white">{label}</p>
-              <p className="text-[11px] text-slate-500">{desc}</p>
+              <p className="text-[14px] font-semibold text-white">{label}</p>
+              <p className="text-[12px] text-slate-500">{desc}</p>
             </div>
 
             {/* Toggle */}

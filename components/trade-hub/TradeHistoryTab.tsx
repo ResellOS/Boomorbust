@@ -21,7 +21,7 @@ function VerdictBadge({ verdict, score }: VerdictBadgeProps) {
   return (
     <div className="flex items-center gap-1.5">
       <span
-        className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium uppercase"
+        className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium uppercase"
         style={{
           background:    s.bg,
           color:         s.text,

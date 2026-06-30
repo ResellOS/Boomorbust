@@ -33,7 +33,7 @@ export default function DataFeedBackground() {
           {lines.map((line, i) => (
             <div
               key={`${line}-${i}`}
-              className="whitespace-nowrap font-mono text-[10px] tracking-wide sm:text-[11px]"
+              className="whitespace-nowrap font-mono text-[11px] tracking-wide sm:text-[12px]"
               style={{
                 color: '#36E7A1',
                 opacity: 0.04 + (i % 3) * 0.008,

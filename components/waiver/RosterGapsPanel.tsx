@@ -14,7 +14,7 @@ interface Props {
 function NeedBadge({ level }: { level: RosterGap['needLevel'] }) {
   const color = needColor(level);
   return (
-    <span className="text-[11px] font-semibold" style={{ color }}>{level}</span>
+    <span className="text-[12px] font-semibold" style={{ color }}>{level}</span>
   );
 }
 
@@ -27,7 +27,7 @@ function TrendingAvatar({ t }: { t: TrendingAdd }) {
   if (err) {
     return (
       <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: `${color}20` }}>
-        <span className="text-[10px] font-bold" style={{ color }}>{initials}</span>
+        <span className="text-[11px] font-bold" style={{ color }}>{initials}</span>
       </div>
     );
   }
@@ -54,16 +54,16 @@ export default function RosterGapsPanel({ gaps, trending, loading }: Props) {
       {/* Roster Gaps table */}
       <div className="glass-card overflow-hidden">
         <div className="px-4 py-3 border-b border-white/[0.08] flex items-center justify-between">
-          <h2 className="text-[12px] font-bold text-white tracking-wide">ROSTER GAPS</h2>
-          <span className="text-[10px] text-slate-500 uppercase">YOUR LEAGUES</span>
+          <h2 className="text-[13px] font-bold text-white tracking-wide">ROSTER GAPS</h2>
+          <span className="text-[11px] text-slate-500 uppercase">YOUR LEAGUES</span>
         </div>
 
         <table className="w-full">
           <thead>
             <tr className="border-b border-white/[0.06]">
-              <th className="px-3 py-2 text-left text-[10px] font-semibold text-slate-500 uppercase tracking-wider">POSITION</th>
-              <th className="px-3 py-2 text-left text-[10px] font-semibold text-slate-500 uppercase tracking-wider">NEED LEVEL</th>
-              <th className="px-3 py-2 text-right text-[10px] font-semibold text-slate-500 uppercase tracking-wider">AVAILABLE IMPACT</th>
+              <th className="px-3 py-2 text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider">POSITION</th>
+              <th className="px-3 py-2 text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider">NEED LEVEL</th>
+              <th className="px-3 py-2 text-right text-[11px] font-semibold text-slate-500 uppercase tracking-wider">AVAILABLE IMPACT</th>
             </tr>
           </thead>
           <tbody>
@@ -72,7 +72,7 @@ export default function RosterGapsPanel({ gaps, trending, loading }: Props) {
               : gaps.map((g) => (
                 <tr key={g.position} className="border-b border-white/[0.04] hover:bg-white/[0.02] transition-colors">
                   <td className="px-3 py-2.5">
-                    <span className="text-[12px] font-semibold text-white font-mono" style={{ fontFamily: 'JetBrains Mono, monospace' }}>
+                    <span className="text-[13px] font-semibold text-white font-mono" style={{ fontFamily: 'JetBrains Mono, monospace' }}>
                       {g.position}
                     </span>
                   </td>
@@ -80,7 +80,7 @@ export default function RosterGapsPanel({ gaps, trending, loading }: Props) {
                     <NeedBadge level={g.needLevel} />
                   </td>
                   <td className="px-3 py-2.5 text-right">
-                    <span className="text-[12px] font-mono font-semibold text-white" style={{ fontFamily: 'JetBrains Mono, monospace' }}>
+                    <span className="text-[13px] font-mono font-semibold text-white" style={{ fontFamily: 'JetBrains Mono, monospace' }}>
                       {g.availableImpact}
                     </span>
                   </td>
@@ -91,7 +91,7 @@ export default function RosterGapsPanel({ gaps, trending, loading }: Props) {
         </table>
 
         <div className="px-4 py-2.5 border-t border-white/[0.06]">
-          <button className="text-[11px] font-semibold text-cyan-400 hover:text-cyan-300 transition-colors">
+          <button className="text-[12px] font-semibold text-cyan-400 hover:text-cyan-300 transition-colors">
             View Full Breakdown →
           </button>
         </div>
@@ -100,8 +100,8 @@ export default function RosterGapsPanel({ gaps, trending, loading }: Props) {
       {/* Trending Adds */}
       <div className="glass-card p-4">
         <div className="flex items-center justify-between mb-3">
-          <h2 className="text-[12px] font-bold text-white tracking-wide">TRENDING ADDS</h2>
-          <span className="text-[10px] text-slate-500 uppercase">LAST 7 DAYS</span>
+          <h2 className="text-[13px] font-bold text-white tracking-wide">TRENDING ADDS</h2>
+          <span className="text-[11px] text-slate-500 uppercase">LAST 7 DAYS</span>
         </div>
 
         {loading ? (
@@ -123,11 +123,11 @@ export default function RosterGapsPanel({ gaps, trending, loading }: Props) {
               <div key={t.playerId} className="flex items-center gap-3 py-1 hover:bg-white/[0.02] rounded-lg px-1 transition-colors">
                 <TrendingAvatar t={t} />
                 <div className="flex-1 min-w-0">
-                  <p className="text-[12px] font-semibold text-white truncate">{t.name}</p>
-                  <p className="text-[10px] text-slate-500 uppercase">{t.position} · {t.team}</p>
+                  <p className="text-[13px] font-semibold text-white truncate">{t.name}</p>
+                  <p className="text-[11px] text-slate-500 uppercase">{t.position} · {t.team}</p>
                 </div>
                 <span
-                  className="text-[12px] font-bold flex-shrink-0"
+                  className="text-[13px] font-bold flex-shrink-0"
                   style={{ fontFamily: 'JetBrains Mono, monospace', color: '#36E7A1' }}
                 >
                   +{t.pctChange}%
@@ -138,7 +138,7 @@ export default function RosterGapsPanel({ gaps, trending, loading }: Props) {
         )}
 
         <div className="mt-3 pt-2.5 border-t border-white/[0.06]">
-          <button className="text-[11px] font-semibold text-cyan-400 hover:text-cyan-300 transition-colors">
+          <button className="text-[12px] font-semibold text-cyan-400 hover:text-cyan-300 transition-colors">
             View All Trending →
           </button>
         </div>

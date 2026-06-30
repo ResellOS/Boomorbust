@@ -41,7 +41,7 @@ export default function LandingMarketingFooter() {
                 priority
               />
             </Link>
-            <p className="mt-3 text-[14px] leading-relaxed text-[#64748B]" style={{ fontFamily: 'var(--font-body)' }}>
+            <p className="mt-3 text-[15px] leading-relaxed text-[#64748B]" style={{ fontFamily: 'var(--font-body)' }}>
               Your fantasy edge, every single week.
             </p>
           </div>
@@ -54,7 +54,7 @@ export default function LandingMarketingFooter() {
           </div>
 
           <div className="flex flex-col items-start gap-3 lg:items-end">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#64748B]" style={{ fontFamily: 'var(--font-body)' }}>
+            <p className="text-[12px] font-semibold uppercase tracking-[0.14em] text-[#64748B]" style={{ fontFamily: 'var(--font-body)' }}>
               Connect
             </p>
             <div className="flex items-center gap-5">
@@ -65,7 +65,7 @@ export default function LandingMarketingFooter() {
           </div>
         </div>
 
-        <div className="mt-12 border-t border-white/[0.06] pt-6 text-center text-[12px] text-[#475569] sm:text-left" style={{ fontFamily: 'var(--font-body)' }}>
+        <div className="mt-12 border-t border-white/[0.06] pt-6 text-center text-[13px] text-[#475569] sm:text-left" style={{ fontFamily: 'var(--font-body)' }}>
           © {new Date().getFullYear()} Boom or Bust. All rights reserved.
         </div>
       </div>
@@ -76,7 +76,7 @@ export default function LandingMarketingFooter() {
 function FooterCol({ title, links }: { title: string; links: readonly { label: string; href: string }[] }) {
   return (
     <div>
-      <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-[#64748B]" style={{ fontFamily: 'var(--font-body)' }}>
+      <p className="text-[12px] font-bold uppercase tracking-[0.14em] text-[#64748B]" style={{ fontFamily: 'var(--font-body)' }}>
         {title}
       </p>
       <ul className="mt-3 space-y-2">
@@ -87,13 +87,13 @@ function FooterCol({ title, links }: { title: string; links: readonly { label: s
                 href={l.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-[13px] text-white/75 transition-colors hover:text-white"
+                className="text-[14px] text-white/75 transition-colors hover:text-white"
                 style={{ fontFamily: 'var(--font-body)' }}
               >
                 {l.label}
               </a>
             ) : (
-              <Link href={l.href} className="text-[13px] text-white/75 transition-colors hover:text-white" style={{ fontFamily: 'var(--font-body)' }}>
+              <Link href={l.href} className="text-[14px] text-white/75 transition-colors hover:text-white" style={{ fontFamily: 'var(--font-body)' }}>
                 {l.label}
               </Link>
             )}

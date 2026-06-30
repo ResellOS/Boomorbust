@@ -41,7 +41,7 @@ function VerdictBadge({
 }) {
   return (
     <span
-      className="shrink-0 rounded-[3px] px-2 py-0.5 font-mono text-[9px] uppercase tracking-wide"
+      className="shrink-0 rounded-[3px] px-2 py-0.5 font-mono text-[10px] uppercase tracking-wide"
       style={{ color, background: `${color}1a`, border: `1px solid ${color}40` }}
     >
       {formatMarketVerdictLabel(verdict as Parameters<typeof formatMarketVerdictLabel>[0])}
@@ -82,7 +82,7 @@ export default function ExposureClient({ data }: { data: ExposurePageData }) {
         <h1 className="font-mono text-[22px] uppercase tracking-[-0.5px] text-text md:text-[26px]">
           Dynasty Portfolio
         </h1>
-        <p className="mt-1 font-mono text-[10px] text-muted">
+        <p className="mt-1 font-mono text-[11px] text-muted">
           Command Center · Overview → Opportunities → Risks → Holdings
         </p>
       </div>
@@ -101,10 +101,10 @@ export default function ExposureClient({ data }: { data: ExposurePageData }) {
       {/* Section 8 — Multi-League Holdings (bottom) */}
       <section className="mt-2 border-t border-border pt-4">
         <div className="mb-3">
-          <div className="font-mono text-[10px] uppercase tracking-[1.5px] text-muted">
+          <div className="font-mono text-[11px] uppercase tracking-[1.5px] text-muted">
             Multi-League Holdings
           </div>
-          <p className="mt-0.5 font-mono text-[9px] text-muted">Context view · grouped by verdict</p>
+          <p className="mt-0.5 font-mono text-[10px] text-muted">Context view · grouped by verdict</p>
         </div>
 
         <div className="mb-4 flex h-9 max-w-md items-center gap-2 rounded-md border border-border bg-surface2 px-3">
@@ -114,16 +114,16 @@ export default function ExposureClient({ data }: { data: ExposurePageData }) {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search player, position, team…"
-            className="w-full border-none bg-transparent font-mono text-[11px] text-text outline-none placeholder:text-muted"
+            className="w-full border-none bg-transparent font-mono text-[12px] text-text outline-none placeholder:text-muted"
           />
         </div>
 
         {players.length === 0 ? (
-          <div className="rounded-lg border border-border bg-surface px-6 py-10 text-center font-mono text-[11px] text-muted">
+          <div className="rounded-lg border border-border bg-surface px-6 py-10 text-center font-mono text-[12px] text-muted">
             No multi-league overlap yet. Players rostered in 2+ leagues appear here.
           </div>
         ) : filtered.length === 0 ? (
-          <div className="py-8 text-center font-mono text-[11px] text-muted">
+          <div className="py-8 text-center font-mono text-[12px] text-muted">
             No players match your search.
           </div>
         ) : (
@@ -134,10 +134,10 @@ export default function ExposureClient({ data }: { data: ExposurePageData }) {
             return (
               <section key={key} className="mb-6">
                 <div className="mb-2 border-b border-border pb-2">
-                  <div className="font-mono text-[10px] uppercase tracking-[1.5px] text-text">
+                  <div className="font-mono text-[11px] uppercase tracking-[1.5px] text-text">
                     {meta.title}
                   </div>
-                  <div className="mt-0.5 font-mono text-[9px] text-muted">{meta.sub}</div>
+                  <div className="mt-0.5 font-mono text-[10px] text-muted">{meta.sub}</div>
                 </div>
                 <div className="overflow-hidden rounded-[7px] border border-border bg-surface">
                   {list.map((p, idx) => (
@@ -155,29 +155,29 @@ export default function ExposureClient({ data }: { data: ExposurePageData }) {
                       />
                       <div className="min-w-0 flex-1">
                         <div className="flex flex-wrap items-center gap-2">
-                          <span className="font-mono text-[12px] text-text">{p.fullName}</span>
+                          <span className="font-mono text-[13px] text-text">{p.fullName}</span>
                           <span
-                            className="font-mono text-[9px] uppercase"
+                            className="font-mono text-[10px] uppercase"
                             style={{ color: positionAccent(p.position) }}
                           >
                             {p.position}
                           </span>
-                          <span className="font-mono text-[9px] text-muted">{p.team}</span>
+                          <span className="font-mono text-[10px] text-muted">{p.team}</span>
                         </div>
-                        <div className="mt-0.5 font-mono text-[9px] text-muted">
+                        <div className="mt-0.5 font-mono text-[10px] text-muted">
                           {opportunityFraming(p)}
                         </div>
                       </div>
                       <div className="shrink-0 text-right">
-                        <div className="font-mono text-[14px] tabular-nums text-text">
+                        <div className="font-mono text-[15px] tabular-nums text-text">
                           {p.leagueCount}
                         </div>
-                        <div className="font-mono text-[8px] uppercase text-muted">leagues</div>
+                        <div className="font-mono text-[9px] uppercase text-muted">leagues</div>
                       </div>
                       {p.portfolioPct != null && (
                         <div className="shrink-0 text-right">
-                          <div className="font-mono text-[11px] text-boom">{p.portfolioPct}%</div>
-                          <div className="font-mono text-[8px] text-muted">portfolio</div>
+                          <div className="font-mono text-[12px] text-boom">{p.portfolioPct}%</div>
+                          <div className="font-mono text-[9px] text-muted">portfolio</div>
                         </div>
                       )}
                       <VerdictBadge

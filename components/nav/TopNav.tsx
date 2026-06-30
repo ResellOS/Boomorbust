@@ -163,7 +163,7 @@ function NavEmpireWidget() {
     >
       <div className="flex flex-col gap-0.5 min-w-0">
         <span
-          className="text-[10px] uppercase tracking-widest leading-none text-[#64748B]"
+          className="text-[11px] uppercase tracking-widest leading-none text-[#64748B]"
           style={{ fontFamily: 'var(--font-mono), JetBrains Mono, monospace' }}
         >
           DYNASTY POWER RATING
@@ -176,12 +176,12 @@ function NavEmpireWidget() {
         </span>
         <div className="flex items-center gap-1.5">
           <span
-            className="inline-flex items-center rounded-full border border-emerald-500/35 bg-emerald-950/50 px-2 py-0.5 text-[10px] font-semibold text-emerald-400"
+            className="inline-flex items-center rounded-full border border-emerald-500/35 bg-emerald-950/50 px-2 py-0.5 text-[11px] font-semibold text-emerald-400"
             style={{ fontFamily: 'var(--font-mono), JetBrains Mono, monospace' }}
           >
             {data.grade}
           </span>
-          <span className="text-[11px] text-[#64748B]" style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}>
+          <span className="text-[12px] text-[#64748B]" style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}>
             {data.percentile}
           </span>
         </div>
@@ -245,14 +245,14 @@ function UserAccountMenu({
         </div>
         <div className="hidden md:flex flex-col items-start min-w-0 max-w-[120px]">
           <span
-            className="truncate text-[13px] font-medium text-white leading-tight"
+            className="truncate text-[14px] font-medium text-white leading-tight"
             style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}
           >
             {displayName}
           </span>
           {tierBadge ? (
             <span
-              className="truncate text-[10px] font-semibold leading-tight"
+              className="truncate text-[11px] font-semibold leading-tight"
               style={{
                 fontFamily: 'var(--font-mono), JetBrains Mono, monospace',
                 color: tierBadge.color,
@@ -277,7 +277,7 @@ function UserAccountMenu({
         >
           <div className="px-3 py-2 border-b border-white/[0.06] mb-1">
             <p
-              className="text-[10px] uppercase tracking-widest text-[#64748B]"
+              className="text-[11px] uppercase tracking-widest text-[#64748B]"
               style={{ fontFamily: 'var(--font-mono), JetBrains Mono, monospace' }}
             >
               Signed in
@@ -401,7 +401,7 @@ function MobileDrawer({
                 key={`${link.label}-${link.href}`}
                 href={link.href}
                 onClick={onClose}
-                className="mb-0.5 flex items-center rounded-lg px-3 py-3 text-[14px] font-medium transition-colors"
+                className="mb-0.5 flex items-center rounded-lg px-3 py-3 text-[15px] font-medium transition-colors"
                 style={{
                   fontFamily: 'var(--font-body), Inter, sans-serif',
                   color: active ? '#ffffff' : INACTIVE,

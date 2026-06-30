@@ -74,7 +74,7 @@ export default function SuggestedPrompts({ onSelect }: Props) {
       className="rounded-xl p-4"
       style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}
     >
-      <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-3">SUGGESTED PROMPTS</p>
+      <p className="text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-3">SUGGESTED PROMPTS</p>
       <div className="space-y-1">
         {SUGGESTED_PROMPTS.map((p) => (
           <button
@@ -86,8 +86,8 @@ export default function SuggestedPrompts({ onSelect }: Props) {
               {ICONS[p.icon as keyof typeof ICONS]}
             </div>
             <div>
-              <p className="text-[12px] font-semibold text-white group-hover:text-white transition-colors">{p.title}</p>
-              <p className="text-[10px] text-slate-500 leading-tight">{p.description}</p>
+              <p className="text-[13px] font-semibold text-white group-hover:text-white transition-colors">{p.title}</p>
+              <p className="text-[11px] text-slate-500 leading-tight">{p.description}</p>
             </div>
           </button>
         ))}

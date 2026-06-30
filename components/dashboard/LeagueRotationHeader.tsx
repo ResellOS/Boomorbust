@@ -25,13 +25,13 @@ export default function LeagueRotationHeader({
         style={{ borderLeftWidth: 3, borderLeftColor: '#36E7A1' }}
       >
         <span className="h-2 w-2 rounded-full bg-boom" style={{ boxShadow: '0 0 8px rgba(54,231,161,0.6)' }} />
-        <span className="font-figtree text-[14px] font-semibold tracking-[0.5px] text-[#e8ecf4]">
+        <span className="font-figtree text-[15px] font-semibold tracking-[0.5px] text-[#e8ecf4]">
           ALL LEAGUES
         </span>
         <span className="text-[#6b7a99]">•</span>
-        <span className="font-figtree text-[12px] text-[#8b9bb8]">Portfolio</span>
+        <span className="font-figtree text-[13px] text-[#8b9bb8]">Portfolio</span>
         <span className="text-[#6b7a99]">•</span>
-        <span className="font-mono text-[12px] text-[#8b9bb8]">{leagueCount} leagues</span>
+        <span className="font-mono text-[13px] text-[#8b9bb8]">{leagueCount} leagues</span>
       </div>
     );
   }
@@ -52,23 +52,23 @@ export default function LeagueRotationHeader({
           boxShadow: `0 0 8px ${statusMeta.color}`,
         }}
       />
-      <span className="font-figtree text-[14px] font-semibold uppercase tracking-[0.5px] text-[#e8ecf4]">
+      <span className="font-figtree text-[15px] font-semibold uppercase tracking-[0.5px] text-[#e8ecf4]">
         {league.name}
       </span>
       <span className="text-[#6b7a99]">•</span>
       <span
-        className="font-figtree text-[12px] font-medium uppercase tracking-[1px]"
+        className="font-figtree text-[13px] font-medium uppercase tracking-[1px]"
         style={{ color: statusMeta.color }}
       >
         {statusMeta.label}
       </span>
       <span className="text-[#6b7a99]">•</span>
       {league.standingRank > 0 ? (
-        <span className="font-mono text-[12px] text-[#8b9bb8]">
+        <span className="font-mono text-[13px] text-[#8b9bb8]">
           {league.record} · #{league.standingRank}/{league.totalTeams}
         </span>
       ) : (
-        <span className="font-mono text-[12px] text-[#8b9bb8]">{league.record}</span>
+        <span className="font-mono text-[13px] text-[#8b9bb8]">{league.record}</span>
       )}
 
       {isRotating && (
@@ -79,7 +79,7 @@ export default function LeagueRotationHeader({
               style={{ width: `${pct}%`, boxShadow: '0 0 8px rgba(54,231,161,0.6)' }}
             />
           </div>
-          <span className="w-9 text-right font-mono text-[13px] tabular-nums text-boom">
+          <span className="w-9 text-right font-mono text-[14px] tabular-nums text-boom">
             {secondsLeft}s
           </span>
         </div>

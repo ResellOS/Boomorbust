@@ -28,7 +28,7 @@ function PlayerAvatar({ playerId, name }: { playerId?: string | null; name: stri
 
   if (!playerId || err) {
     return (
-      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/[0.08] text-[10px] font-bold text-white">
+      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/[0.08] text-[11px] font-bold text-white">
         {initials}
       </div>
     );
@@ -53,7 +53,7 @@ function ReceiveLine({ item }: { item: IncomingReceiveItem }) {
   if (item.kind === 'pick') {
     return (
       <div className="flex min-w-0 items-center justify-between gap-2">
-        <span className="min-w-0 truncate text-[13px] font-medium text-white" style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}>
+        <span className="min-w-0 truncate text-[14px] font-medium text-white" style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}>
           {item.label}
         </span>
         <ChevronRight className="h-3.5 w-3.5 shrink-0 text-[#64748B]" aria-hidden />
@@ -65,10 +65,10 @@ function ReceiveLine({ item }: { item: IncomingReceiveItem }) {
     <div className="flex items-center gap-2">
       <PlayerAvatar playerId={item.playerId} name={item.name} />
       <div className="min-w-0">
-        <p className="truncate text-[13px] font-medium text-white" style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}>
+        <p className="truncate text-[14px] font-medium text-white" style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}>
           {item.name}
         </p>
-        <p className="truncate text-[11px] text-[#64748B]" style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}>
+        <p className="truncate text-[12px] text-[#64748B]" style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}>
           {item.position} · {item.team}
         </p>
       </div>
@@ -87,14 +87,14 @@ function TeamColumn({
 }) {
   return (
     <div className="min-w-0 flex-1">
-      <p className="truncate text-[13px] font-medium text-white" style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}>
+      <p className="truncate text-[14px] font-medium text-white" style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}>
         {teamName}
       </p>
-      <p className="truncate text-[11px] text-[#64748B]" style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}>
+      <p className="truncate text-[12px] text-[#64748B]" style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}>
         {handle}
       </p>
       <p
-        className="mt-2 text-[9px] font-semibold uppercase tracking-wide text-[#64748B]"
+        className="mt-2 text-[10px] font-semibold uppercase tracking-wide text-[#64748B]"
         style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}
       >
         RECEIVES
@@ -145,13 +145,13 @@ function OfferCard({
       <div className="mb-3 flex flex-wrap items-start justify-between gap-2">
         <div className="flex min-w-0 items-center gap-2">
           <div
-            className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[11px] font-bold text-white"
+            className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[12px] font-bold text-white"
             style={{ background: offer.leagueIconBg }}
           >
             {offer.leagueLetter}
           </div>
           <span
-            className="truncate text-[13px] font-medium text-[#22D3EE]"
+            className="truncate text-[14px] font-medium text-[#22D3EE]"
             style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}
           >
             {offer.leagueName}
@@ -159,14 +159,14 @@ function OfferCard({
         </div>
         <div className="ml-auto flex shrink-0 items-center gap-2">
           <span
-            className="text-[11px] tabular-nums text-[#64748B]"
+            className="text-[12px] tabular-nums text-[#64748B]"
             style={{ fontFamily: 'var(--font-mono), JetBrains Mono, monospace' }}
           >
             {offer.timeAgo}
           </span>
           {offer.isNew ? (
             <span
-              className="rounded-full border border-cyan-500/30 bg-cyan-950/80 px-2 py-0.5 text-[10px] font-bold uppercase text-cyan-300"
+              className="rounded-full border border-cyan-500/30 bg-cyan-950/80 px-2 py-0.5 text-[11px] font-bold uppercase text-cyan-300"
               style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}
             >
               NEW
@@ -178,7 +178,7 @@ function OfferCard({
       <div className="flex min-w-0 flex-col gap-4 sm:flex-row sm:gap-3">
         <TeamColumn teamName={offer.proposerTeam} handle={offer.proposerHandle} receives={offer.proposerReceives} />
         <div
-          className="flex shrink-0 items-center justify-center py-0.5 text-[11px] text-[#475569] sm:w-auto sm:self-stretch sm:pt-8 sm:pb-0"
+          className="flex shrink-0 items-center justify-center py-0.5 text-[12px] text-[#475569] sm:w-auto sm:self-stretch sm:pt-8 sm:pb-0"
           style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}
         >
           VS
@@ -189,7 +189,7 @@ function OfferCard({
       <div className="mt-3 flex justify-end sm:mt-3">
         <div className="text-right">
           <p
-            className="text-[9px] font-semibold uppercase tracking-wide text-[#64748B]"
+            className="text-[10px] font-semibold uppercase tracking-wide text-[#64748B]"
             style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}
           >
             OFFER VALUE
@@ -204,7 +204,7 @@ function OfferCard({
             {offer.treEdge}
           </p>
           <p
-            className="text-[9px] font-semibold uppercase tracking-wide text-[#64748B]"
+            className="text-[10px] font-semibold uppercase tracking-wide text-[#64748B]"
             style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}
           >
             TRE EDGE
@@ -294,7 +294,7 @@ export default function IncomingOffersPanel({ totalOfferCount, hideViewAllLink }
       <div className={`${GLASS} flex h-full min-h-0 flex-1 flex-col overflow-hidden`}>
         <div className="flex shrink-0 flex-col gap-3 border-b border-white/[0.06] px-3 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-4">
           <p
-            className="text-[12px] font-semibold uppercase tracking-widest text-[#64748B]"
+            className="text-[13px] font-semibold uppercase tracking-widest text-[#64748B]"
             style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}
           >
             ALL INCOMING OFFERS
@@ -306,7 +306,7 @@ export default function IncomingOffersPanel({ totalOfferCount, hideViewAllLink }
                 const v = e.target.value;
                 useDashboardLeagueStore.getState().setActiveLeagueId(v === 'all' ? 'all' : v);
               }}
-              className="min-h-[44px] w-full min-w-0 cursor-pointer appearance-none rounded-lg border border-white/[0.08] bg-white/[0.03] px-3 py-2.5 pr-9 text-[12px] text-white outline-none transition hover:bg-white/[0.05] focus:border-emerald-500/40 sm:w-auto sm:min-w-[160px]"
+              className="min-h-[44px] w-full min-w-0 cursor-pointer appearance-none rounded-lg border border-white/[0.08] bg-white/[0.03] px-3 py-2.5 pr-9 text-[13px] text-white outline-none transition hover:bg-white/[0.05] focus:border-emerald-500/40 sm:w-auto sm:min-w-[160px]"
               style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}
               aria-label="League filter"
             >
@@ -317,7 +317,7 @@ export default function IncomingOffersPanel({ totalOfferCount, hideViewAllLink }
                 </option>
               ))}
             </select>
-            <span className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-[10px] text-[#94a3b8]">
+            <span className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-[11px] text-[#94a3b8]">
               ▾
             </span>
           </div>
@@ -326,13 +326,13 @@ export default function IncomingOffersPanel({ totalOfferCount, hideViewAllLink }
         <div className="flex min-h-0 flex-1 flex-col px-3 pb-4 pt-3 sm:px-4">
           {error ? (
             <div className="mb-3 shrink-0 flex flex-col items-center gap-2 text-center">
-              <p className="text-[13px] text-red-400" style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}>
+              <p className="text-[14px] text-red-400" style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}>
                 {error}
               </p>
               <button
                 type="button"
                 onClick={() => void load()}
-                className="min-h-[44px] rounded-lg border border-white/[0.12] bg-white/[0.05] px-4 text-[13px] text-white hover:bg-white/[0.08]"
+                className="min-h-[44px] rounded-lg border border-white/[0.12] bg-white/[0.05] px-4 text-[14px] text-white hover:bg-white/[0.08]"
                 style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}
               >
                 Retry
@@ -358,7 +358,7 @@ export default function IncomingOffersPanel({ totalOfferCount, hideViewAllLink }
               <div className="mt-3 shrink-0 pb-1 text-center">
                 <Link
                   href="/dashboard/trade-hub/offers"
-                  className="inline-flex min-h-[44px] w-full max-w-full items-center justify-center rounded-lg px-2 text-[12px] text-[#22D3EE] hover:bg-white/[0.04] hover:underline sm:w-auto sm:px-3"
+                  className="inline-flex min-h-[44px] w-full max-w-full items-center justify-center rounded-lg px-2 text-[13px] text-[#22D3EE] hover:bg-white/[0.04] hover:underline sm:w-auto sm:px-3"
                   style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}
                 >
                   View All {viewAllCount} Offers →

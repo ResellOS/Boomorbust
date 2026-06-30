@@ -34,7 +34,7 @@ function LandingNav() {
           />
         </Link>
 
-        <nav className="hidden lg:flex items-center gap-8 text-[14px]" style={{ color: 'var(--text-secondary)' }}>
+        <nav className="hidden lg:flex items-center gap-8 text-[15px]" style={{ color: 'var(--text-secondary)' }}>
           {[
             ['#features', 'Features'],
             ['#how', 'How it Works'],
@@ -60,7 +60,7 @@ function LandingNav() {
           </Link>
           <Link
             href="/auth/signup"
-            className="inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-[15px] font-bold text-[#0a0d14] shadow-[0_0_28px_rgba(54,231,161,0.45)] transition hover:-translate-y-0.5 hover:brightness-110"
+            className="inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-[16px] font-bold text-[#0a0d14] shadow-[0_0_28px_rgba(54,231,161,0.45)] transition hover:-translate-y-0.5 hover:brightness-110"
             style={{ background: '#36E7A1' }}
           >
             Import FB/Leagues
@@ -209,7 +209,7 @@ export default function LandingPage({ buildSha = 'local' }: { buildSha?: string 
                 >
                   🏈 Import My Leagues
                 </Link>
-                <p className="text-[12px] text-[var(--text-muted)] mt-2">Takes less than 10 seconds</p>
+                <p className="text-[13px] text-[var(--text-muted)] mt-2">Takes less than 10 seconds</p>
               </div>
               <Link
                 href="#mockup"
@@ -225,7 +225,7 @@ export default function LandingPage({ buildSha = 'local' }: { buildSha?: string 
               <span>No Credit Card</span>
               <span>·</span>
               <span>Secure with Sleeper</span>
-              <span className="ml-2 text-[11px] uppercase tracking-wider border-l border-[var(--border)] pl-4">
+              <span className="ml-2 text-[12px] uppercase tracking-wider border-l border-[var(--border)] pl-4">
                 Works with <span className="text-[var(--text-secondary)]"> Sleeper</span>
               </span>
             </div>
@@ -248,7 +248,7 @@ export default function LandingPage({ buildSha = 'local' }: { buildSha?: string 
                 </div>
                 <h3 className="text-white mb-2">{f.title}</h3>
                 <p className="text-sm leading-relaxed text-[var(--text-secondary)] flex-1">{f.body}</p>
-                <div className="mt-4 rounded-lg border border-[var(--border)] p-3 bg-[var(--bg-secondary)]/80 text-[11px] text-[var(--text-muted)] min-h-[72px]">
+                <div className="mt-4 rounded-lg border border-[var(--border)] p-3 bg-[var(--bg-secondary)]/80 text-[12px] text-[var(--text-muted)] min-h-[72px]">
                   {f.preview === 'list' && (
                     <ul className="space-y-1">
                       <li>• North Star · 6-2 · A-</li>
@@ -401,7 +401,7 @@ export default function LandingPage({ buildSha = 'local' }: { buildSha?: string 
               </Link>
             </div>
           </div>
-          <p className="mt-6 text-center text-[10px] font-mono text-[var(--text-muted)]/80 tracking-wide">
+          <p className="mt-6 text-center text-[11px] font-mono text-[var(--text-muted)]/80 tracking-wide">
             Deploy {buildSha.length >= 7 ? buildSha.slice(0, 7) : buildSha}
           </p>
         </footer>

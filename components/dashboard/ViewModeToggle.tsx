@@ -17,7 +17,7 @@ export default function ViewModeToggle({ mode, onChange, leagueName }: ViewModeT
         <button
           type="button"
           onClick={() => onChange('global')}
-          className={`rounded-[5px] px-3 py-1.5 font-figtree text-[11px] font-semibold transition-all ${
+          className={`rounded-[5px] px-3 py-1.5 font-figtree text-[12px] font-semibold transition-all ${
             isGlobal
               ? 'bg-boom/20 text-boom ring-1 ring-boom/40'
               : 'text-[#6b7a99] hover:text-[#e8ecf4]'
@@ -28,7 +28,7 @@ export default function ViewModeToggle({ mode, onChange, leagueName }: ViewModeT
         <button
           type="button"
           onClick={() => onChange('league')}
-          className={`rounded-[5px] px-3 py-1.5 font-figtree text-[11px] font-semibold transition-all ${
+          className={`rounded-[5px] px-3 py-1.5 font-figtree text-[12px] font-semibold transition-all ${
             !isGlobal
               ? 'bg-boom/20 text-boom ring-1 ring-boom/40'
               : 'text-[#6b7a99] hover:text-[#e8ecf4]'
@@ -38,7 +38,7 @@ export default function ViewModeToggle({ mode, onChange, leagueName }: ViewModeT
         </button>
       </div>
       <p
-        className={`font-mono text-[9px] ${isGlobal ? 'text-boom/80' : 'text-[#A78BFA]'}`}
+        className={`font-mono text-[10px] ${isGlobal ? 'text-boom/80' : 'text-[#A78BFA]'}`}
       >
         {isGlobal
           ? '● Portfolio command center — cross-league priorities'

@@ -93,7 +93,7 @@ export default function LandingHowItWorksSection() {
                 <h3 className="text-[20px] tracking-[0.03em] text-white sm:text-[22px]" style={{ fontFamily: 'var(--font-display)' }}>
                   {s.title}
                 </h3>
-                <p className="mt-3 text-[14px] leading-relaxed text-[#94A3B8]" style={{ fontFamily: 'var(--font-body)' }}>
+                <p className="mt-3 text-[15px] leading-relaxed text-[#94A3B8]" style={{ fontFamily: 'var(--font-body)' }}>
                   {s.body}
                 </p>
               </article>
@@ -115,7 +115,7 @@ export default function LandingHowItWorksSection() {
               <h3 className="text-[19px] tracking-[0.03em] text-white" style={{ fontFamily: 'var(--font-display)' }}>
                 {s.title}
               </h3>
-              <p className="mt-3 text-[14px] leading-relaxed text-[#94A3B8]" style={{ fontFamily: 'var(--font-body)' }}>
+              <p className="mt-3 text-[15px] leading-relaxed text-[#94A3B8]" style={{ fontFamily: 'var(--font-body)' }}>
                 {s.body}
               </p>
             </article>

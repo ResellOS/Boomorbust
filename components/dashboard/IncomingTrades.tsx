@@ -32,7 +32,7 @@ function TradeAvatar({
   if (!playerId || playerId === '0') {
     return (
       <div
-        className="flex h-[30px] w-[30px] shrink-0 items-center justify-center rounded-full border-2 bg-surface2 font-mono text-[9px]"
+        className="flex h-[30px] w-[30px] shrink-0 items-center justify-center rounded-full border-2 bg-surface2 font-mono text-[10px]"
         style={{ borderColor, color: borderColor }}
       >
         PK
@@ -55,7 +55,7 @@ function TradeAvatar({
           onError={() => setFailed(true)}
         />
       ) : (
-        <span className="relative z-[1] font-mono text-[9px] font-bold" style={{ color: borderColor }}>
+        <span className="relative z-[1] font-mono text-[10px] font-bold" style={{ color: borderColor }}>
           {initials(playerName)}
         </span>
       )}
@@ -83,12 +83,12 @@ export default function IncomingTrades({ trades }: IncomingTradesProps) {
     return (
       <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-[7px] border border-border bg-surface">
         <div className="flex shrink-0 items-center justify-between border-b border-border bg-bg px-3 py-[7px]">
-          <span className="font-figtree text-[10px] font-bold uppercase tracking-[1.5px] text-text">
+          <span className="font-figtree text-[11px] font-bold uppercase tracking-[1.5px] text-text">
             Incoming Trades
           </span>
         </div>
         <div className="flex flex-1 flex-col items-center justify-center px-4 py-6 text-center">
-          <p className="font-figtree text-[12px] text-muted">
+          <p className="font-figtree text-[13px] text-muted">
             No pending offers —{' '}
             <Link href="/trade" className="text-boom no-underline hover:underline">
               View trade targets to make a move →
@@ -107,10 +107,10 @@ export default function IncomingTrades({ trades }: IncomingTradesProps) {
   return (
     <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-[7px] border border-border bg-surface">
       <div className="flex shrink-0 items-center justify-between border-b border-border bg-bg px-3 py-[7px]">
-        <span className="font-figtree text-[10px] font-bold uppercase tracking-[1.5px] text-text">
+        <span className="font-figtree text-[11px] font-bold uppercase tracking-[1.5px] text-text">
           Incoming Trades
         </span>
-        <Link href="/trade" className="font-mono text-[10px] text-boom no-underline">
+        <Link href="/trade" className="font-mono text-[11px] text-boom no-underline">
           View All {trades.length} →
         </Link>
       </div>
@@ -132,22 +132,22 @@ export default function IncomingTrades({ trades }: IncomingTradesProps) {
                 borderColor={verdict.color}
               />
               <div className="min-w-0 flex-1">
-                <div className="font-figtree text-[12px] font-semibold text-text">
+                <div className="font-figtree text-[13px] font-semibold text-text">
                   {trade.playerName}
                 </div>
-                <div className="mt-0.5 font-mono text-[10px] text-muted">
+                <div className="mt-0.5 font-mono text-[11px] text-muted">
                   Wants: {trade.askingFor}
                 </div>
-                <div className="mt-0.5 font-mono text-[10px] text-muted">
+                <div className="mt-0.5 font-mono text-[11px] text-muted">
                   {trade.leagueName} · {trade.managerName}
                 </div>
               </div>
               <div className="shrink-0 text-right">
-                <div className="font-mono text-[12px] font-bold text-boom">
+                <div className="font-mono text-[13px] font-bold text-boom">
                   +{trade.dynastyEdge.toFixed(1)}
                 </div>
                 <span
-                  className={`mt-0.5 inline-block rounded-[3px] px-[7px] py-0.5 font-figtree text-[10px] font-semibold ${
+                  className={`mt-0.5 inline-block rounded-[3px] px-[7px] py-0.5 font-figtree text-[11px] font-semibold ${
                     trade.status === 'NEW'
                       ? 'border border-boom/30 bg-boom/10 text-boom'
                       : 'border border-hold/20 bg-hold/[0.07] text-hold'

@@ -210,7 +210,7 @@ export default function LeagueWinningMoves({
 
     <section onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)}>
 
-      <div className="mb-2 font-figtree text-[10px] uppercase tracking-[1.5px] text-[#e8ecf4]">
+      <div className="mb-2 font-figtree text-[11px] uppercase tracking-[1.5px] text-[#e8ecf4]">
 
         League-Winning Moves
 
@@ -244,7 +244,7 @@ export default function LeagueWinningMoves({
 
             >
 
-              <div className="font-mono text-[7px] uppercase tracking-wide text-[#6b7a99]">{kind}</div>
+              <div className="font-mono text-[8px] uppercase tracking-wide text-[#6b7a99]">{kind}</div>
 
               <div className="mt-1.5 flex items-center gap-2">
 
@@ -252,21 +252,21 @@ export default function LeagueWinningMoves({
 
                 <div className="min-w-0">
 
-                  <div className="truncate font-figtree text-[12px] font-semibold text-[#e8ecf4]">
+                  <div className="truncate font-figtree text-[13px] font-semibold text-[#e8ecf4]">
 
                     {o.playerName}
 
                   </div>
 
-                  <div className="font-mono text-[8px] text-[#6b7a99]">{o.leagueName}</div>
+                  <div className="font-mono text-[9px] text-[#6b7a99]">{o.leagueName}</div>
 
                 </div>
 
               </div>
 
-              <div className="mt-1 font-mono text-[8px] uppercase text-boom">{o.actionVerb}</div>
+              <div className="mt-1 font-mono text-[9px] uppercase text-boom">{o.actionVerb}</div>
 
-              <div className="mt-1.5 flex gap-3 font-mono text-[9px] tabular-nums">
+              <div className="mt-1.5 flex gap-3 font-mono text-[10px] tabular-nums">
 
                 <span className="text-boom">
 
@@ -282,9 +282,9 @@ export default function LeagueWinningMoves({
 
               </div>
 
-              <p className="mt-1 line-clamp-2 font-figtree text-[9px] leading-snug text-[#9aa8c4]">{reason}</p>
+              <p className="mt-1 line-clamp-2 font-figtree text-[10px] leading-snug text-[#9aa8c4]">{reason}</p>
 
-              <span className="mt-1.5 inline-block font-mono text-[8px] text-boom">View Trade →</span>
+              <span className="mt-1.5 inline-block font-mono text-[9px] text-boom">View Trade →</span>
 
             </button>
 

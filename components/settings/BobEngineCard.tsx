@@ -86,14 +86,14 @@ export default function BobEngineCard() {
       className="rounded-xl p-6"
       style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}
     >
-      <p className="text-[13px] font-bold text-slate-400 uppercase tracking-widest mb-1">BOB Engine</p>
-      <p className="text-[12px] text-slate-500 mb-5">
+      <p className="text-[14px] font-bold text-slate-400 uppercase tracking-widest mb-1">BOB Engine</p>
+      <p className="text-[13px] text-slate-500 mb-5">
         Proprietary scoring engine. Trigger a full rescore of every player across dynasty contexts.
       </p>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5">
         <div className="p-4 rounded-xl" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
-          <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Engine Status</p>
+          <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">Engine Status</p>
           <div className="flex items-center gap-2">
             <span
               className="h-2 w-2 rounded-full"
@@ -102,32 +102,32 @@ export default function BobEngineCard() {
                 boxShadow: !loadingStatus && online ? '0 0 8px #36E7A1' : undefined,
               }}
             />
-            <span className="text-[14px] font-semibold" style={{ color: loadingStatus ? '#94a3b8' : online ? '#36E7A1' : '#EF4444' }}>
+            <span className="text-[15px] font-semibold" style={{ color: loadingStatus ? '#94a3b8' : online ? '#36E7A1' : '#EF4444' }}>
               {loadingStatus ? 'Checking…' : online ? 'Online' : 'Offline'}
             </span>
           </div>
         </div>
 
         <div className="p-4 rounded-xl" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
-          <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Last Rescore</p>
-          <p className="font-mono text-[13px] text-white">{loadingStatus ? '…' : fmtTime(status?.lastRun ?? null)}</p>
+          <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">Last Rescore</p>
+          <p className="font-mono text-[14px] text-white">{loadingStatus ? '…' : fmtTime(status?.lastRun ?? null)}</p>
         </div>
 
         <div className="p-4 rounded-xl" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
-          <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Players Scored</p>
-          <p className="font-mono text-[16px] font-semibold text-[#36E7A1]">
+          <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">Players Scored</p>
+          <p className="font-mono text-[17px] font-semibold text-[#36E7A1]">
             {loadingStatus ? '…' : (status?.dynastyCount ?? 0).toLocaleString()}
           </p>
         </div>
       </div>
 
       <div className="p-4 rounded-xl mb-5" style={{ background: 'rgba(124,58,237,0.08)', border: '1px solid rgba(124,58,237,0.2)' }}>
-        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-3">TFO Weights</p>
+        <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-3">TFO Weights</p>
         <div className="flex flex-wrap gap-2">
           {WEIGHTS.map((w) => (
             <div key={w.label} className="flex items-baseline gap-1.5 px-3 py-1.5 rounded-lg" style={{ background: 'rgba(255,255,255,0.04)' }}>
-              <span className="font-mono text-[11px] text-slate-400">{w.label}</span>
-              <span className="font-mono text-[13px] font-semibold text-white">{w.value}</span>
+              <span className="font-mono text-[12px] text-slate-400">{w.label}</span>
+              <span className="font-mono text-[14px] font-semibold text-white">{w.value}</span>
             </div>
           ))}
         </div>
@@ -137,18 +137,18 @@ export default function BobEngineCard() {
         <button
           onClick={rescore}
           disabled={rescoring}
-          className="px-5 py-2.5 rounded-xl text-[12px] font-bold transition-all disabled:opacity-60"
+          className="px-5 py-2.5 rounded-xl text-[13px] font-bold transition-all disabled:opacity-60"
           style={{ background: '#36E7A1', color: '#0a0d14' }}
         >
           {rescoring ? 'Rescoring…' : 'Rescore All Players'}
         </button>
         {result && (
-          <span className="text-[12px] font-medium" style={{ color: result.ok ? '#36E7A1' : '#EF4444' }}>
+          <span className="text-[13px] font-medium" style={{ color: result.ok ? '#36E7A1' : '#EF4444' }}>
             {result.message}
           </span>
         )}
       </div>
-      <p className="mt-3 text-[10px] text-slate-600">
+      <p className="mt-3 text-[11px] text-slate-600">
         Admin-only. Reads bbv_values, writes formula_scores (dynasty / PPR).
       </p>
     </div>

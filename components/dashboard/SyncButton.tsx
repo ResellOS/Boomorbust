@@ -100,7 +100,7 @@ export function SyncButton() {
   // ─── Styles ─────────────────────────────────────────────────────────────────
 
   const base =
-    'flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg font-mono text-[10px] uppercase tracking-[0.08em] border transition-all duration-200 shrink-0 select-none';
+    'flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg font-mono text-[11px] uppercase tracking-[0.08em] border transition-all duration-200 shrink-0 select-none';
 
   const stateStyle: Record<SyncState, string> = {
     idle: 'text-[#64748B] border-white/[0.08] hover:text-white hover:border-white/20 bg-transparent',
@@ -138,13 +138,13 @@ export function SyncButton() {
       />
       <span className="hidden sm:inline">{label[syncState]}</span>
       {syncState === 'idle' && lastSyncLabel && (
-        <span className="hidden lg:inline text-[9px] opacity-50 normal-case tracking-normal">
+        <span className="hidden lg:inline text-[10px] opacity-50 normal-case tracking-normal">
           {lastSyncLabel}
         </span>
       )}
       {syncState === 'stale' && (
         <span
-          className="ml-0.5 px-1 py-0.5 rounded text-[8px] font-bold bg-[#FBBF24]/20 text-[#FBBF24] hidden sm:inline"
+          className="ml-0.5 px-1 py-0.5 rounded text-[9px] font-bold bg-[#FBBF24]/20 text-[#FBBF24] hidden sm:inline"
         >
           STALE
         </span>

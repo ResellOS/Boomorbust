@@ -33,16 +33,16 @@ export default function TradePreviewModal({ suggestion, givePicks, onClose }: Tr
         aria-labelledby="trade-preview-title"
       >
         <div className="shrink-0 border-b border-border px-4 py-3">
-          <div id="trade-preview-title" className="font-figtree text-[14px] font-bold text-text">
+          <div id="trade-preview-title" className="font-figtree text-[15px] font-bold text-text">
             Trade Preview
           </div>
-          <div className="mt-0.5 font-figtree text-[11px] text-muted">
+          <div className="mt-0.5 font-figtree text-[12px] text-muted">
             {suggestion.type === 'buy' ? (
               <>
                 <span className="font-semibold" style={{ color: suggestion.verdictColor }}>Buy</span> low on{' '}
                 {suggestion.playerName}
                 {suggestion.managerName ? (
-                  <span className="ml-1 font-mono text-[9px]">via {suggestion.managerName}</span>
+                  <span className="ml-1 font-mono text-[10px]">via {suggestion.managerName}</span>
                 ) : null}
               </>
             ) : (
@@ -51,7 +51,7 @@ export default function TradePreviewModal({ suggestion, givePicks, onClose }: Tr
                 {suggestion.playerName}
               </>
             )}
-            <span className="ml-2 font-mono text-[9px] text-muted">· {suggestion.leagueName}</span>
+            <span className="ml-2 font-mono text-[10px] text-muted">· {suggestion.leagueName}</span>
           </div>
         </div>
 
@@ -69,7 +69,7 @@ export default function TradePreviewModal({ suggestion, givePicks, onClose }: Tr
           <button
             type="button"
             onClick={onClose}
-            className="w-full rounded-[6px] border border-border bg-bg px-4 py-2 font-figtree text-[11px] font-semibold text-text transition-colors hover:border-boom/50 hover:text-boom"
+            className="w-full rounded-[6px] border border-border bg-bg px-4 py-2 font-figtree text-[12px] font-semibold text-text transition-colors hover:border-boom/50 hover:text-boom"
           >
             Close
           </button>

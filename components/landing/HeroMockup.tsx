@@ -122,19 +122,19 @@ export default function HeroMockup() {
           <span className="h-2.5 w-2.5 rounded-full bg-[#28C840]" />
         </div>
         <div className="min-w-0 flex-1 rounded-md border border-white/[0.08] bg-black/30 px-3 py-1.5 text-center">
-          <span className="truncate font-mono text-[11px] text-white/50 sm:text-[12px]">boomorbust.app/dashboard</span>
+          <span className="truncate font-mono text-[12px] text-white/50 sm:text-[13px]">boomorbust.app/dashboard</span>
         </div>
       </div>
 
       <div className="space-y-4 p-3 sm:space-y-5 sm:p-5">
         <div className="text-center">
-          <h2 className="inline-flex items-center justify-center gap-0.5 text-[12px] font-semibold text-white sm:text-[13px]" style={{ fontFamily: 'var(--font-body)' }}>
+          <h2 className="inline-flex items-center justify-center gap-0.5 text-[13px] font-semibold text-white sm:text-[14px]" style={{ fontFamily: 'var(--font-body)' }}>
             <span>{TITLE}</span>
             {cursorOn ? (
               <span className="ml-0.5 inline-block h-4 w-px animate-pulse bg-[#3ECFAD]" aria-hidden />
             ) : null}
           </h2>
-          <p className="mt-1 font-mono text-[10px] text-white/40 sm:text-[11px]">
+          <p className="mt-1 font-mono text-[11px] text-white/40 sm:text-[12px]">
             <span className="tabular-nums">Week 8</span>
             <span> · </span>
             <span className="tabular-nums">6</span> of <span className="tabular-nums">9</span> matchups
@@ -143,7 +143,7 @@ export default function HeroMockup() {
 
         <div className="grid grid-cols-1 gap-2 sm:grid-cols-3 sm:gap-3">
           <div className="rounded-xl border border-white/[0.08] bg-white/[0.03] px-3 py-3 backdrop-blur-[24px]">
-            <div className="text-[9px] font-semibold uppercase tracking-[0.14em] text-white/45" style={{ fontFamily: 'var(--font-body)' }}>
+            <div className="text-[10px] font-semibold uppercase tracking-[0.14em] text-white/45" style={{ fontFamily: 'var(--font-body)' }}>
               Empire Score
             </div>
             <div
@@ -154,7 +154,7 @@ export default function HeroMockup() {
             </div>
           </div>
           <div className="rounded-xl border border-white/[0.08] bg-white/[0.03] px-3 py-3 backdrop-blur-[24px]">
-            <div className="text-[9px] font-semibold uppercase tracking-[0.14em] text-white/45" style={{ fontFamily: 'var(--font-body)' }}>
+            <div className="text-[10px] font-semibold uppercase tracking-[0.14em] text-white/45" style={{ fontFamily: 'var(--font-body)' }}>
               Trade Edge
             </div>
             <div
@@ -165,7 +165,7 @@ export default function HeroMockup() {
             </div>
           </div>
           <div className="rounded-xl border border-white/[0.08] bg-white/[0.03] px-3 py-3 backdrop-blur-[24px]">
-            <div className="text-[9px] font-semibold uppercase tracking-[0.14em] text-white/45" style={{ fontFamily: 'var(--font-body)' }}>
+            <div className="text-[10px] font-semibold uppercase tracking-[0.14em] text-white/45" style={{ fontFamily: 'var(--font-body)' }}>
               Win Probability
             </div>
             <div
@@ -178,10 +178,10 @@ export default function HeroMockup() {
         </div>
 
         <div className="flex flex-wrap items-center justify-between gap-2 border-t border-white/[0.06] pt-3">
-          <span className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/50" style={{ fontFamily: 'var(--font-body)' }}>
+          <span className="text-[11px] font-bold uppercase tracking-[0.16em] text-white/50" style={{ fontFamily: 'var(--font-body)' }}>
             Your top players
           </span>
-          <span className="text-[10px] font-semibold text-[#22D3EE]" style={{ fontFamily: 'var(--font-body)' }}>
+          <span className="text-[11px] font-semibold text-[#22D3EE]" style={{ fontFamily: 'var(--font-body)' }}>
             View roster →
           </span>
         </div>
@@ -195,7 +195,7 @@ export default function HeroMockup() {
             >
               <div className="mb-2 flex items-start gap-1.5">
                 <div
-                  className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-white/10 font-mono text-[9px] font-bold text-white/85"
+                  className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-white/10 font-mono text-[10px] font-bold text-white/85"
                   style={{ background: `${p.posColor}22` }}
                 >
                   {p.name
@@ -205,14 +205,14 @@ export default function HeroMockup() {
                     .slice(0, 2)}
                 </div>
                 <div className="min-w-0 leading-tight">
-                  <div className="truncate text-[10px] font-semibold text-white" style={{ fontFamily: 'var(--font-body)' }}>
+                  <div className="truncate text-[11px] font-semibold text-white" style={{ fontFamily: 'var(--font-body)' }}>
                     {p.name}
                   </div>
-                  <div className="truncate font-mono text-[9px] text-white/45">{p.line}</div>
+                  <div className="truncate font-mono text-[10px] text-white/45">{p.line}</div>
                 </div>
               </div>
               <MiniPentagon vals={[...p.vals]} stroke={p.posColor} visible={chartOn[i] ?? false} />
-              <div className="mt-1 text-center font-mono text-[15px] font-semibold tabular-nums text-white">{p.score}</div>
+              <div className="mt-1 text-center font-mono text-[16px] font-semibold tabular-nums text-white">{p.score}</div>
             </div>
           ))}
         </div>

@@ -55,7 +55,7 @@ export default function TestLoaderPage() {
       />
 
       <div
-        className="fixed left-3 top-3 z-[10000] rounded border border-white/10 bg-black/70 px-2 py-1.5 font-mono text-[9px] leading-relaxed text-[#6b7a99]"
+        className="fixed left-3 top-3 z-[10000] rounded border border-white/10 bg-black/70 px-2 py-1.5 font-mono text-[10px] leading-relaxed text-[#6b7a99]"
         style={{ backdropFilter: 'blur(8px)' }}
       >
         <div>elapsed: {elapsed}ms</div>
@@ -67,7 +67,7 @@ export default function TestLoaderPage() {
         <button
           type="button"
           onClick={() => forceMegaRef.current?.()}
-          className="mt-1 rounded border border-boom/40 px-1.5 py-0.5 text-[9px] uppercase text-boom hover:bg-boom/10"
+          className="mt-1 rounded border border-boom/40 px-1.5 py-0.5 text-[10px] uppercase text-boom hover:bg-boom/10"
         >
           Force Final Strike
         </button>
@@ -83,7 +83,7 @@ export default function TestLoaderPage() {
             Replay
           </button>
         ) : (
-          <p className="font-mono text-[10px] uppercase tracking-wider text-[#6b7a99]">
+          <p className="font-mono text-[11px] uppercase tracking-wider text-[#6b7a99]">
             Playing cinematic sequence…
           </p>
         )}

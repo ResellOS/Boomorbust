@@ -58,7 +58,7 @@ function PlayerAvatar({ playerId, name, position }: { playerId: string; name: st
   if (err) {
     return (
       <div className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: `${color}20` }}>
-        <span className="text-[9px] font-bold" style={{ color }}>{initials}</span>
+        <span className="text-[10px] font-bold" style={{ color }}>{initials}</span>
       </div>
     );
   }
@@ -75,7 +75,7 @@ function PriorityBadge({ priority }: { priority: WaiverPlayer['priority'] }) {
   const color = priorityColor(priority);
   return (
     <span
-      className="px-2 py-0.5 rounded text-[10px] font-bold tracking-wide"
+      className="px-2 py-0.5 rounded text-[11px] font-bold tracking-wide"
       style={{ color, background: `${color}18`, border: `1px solid ${color}30` }}
     >
       {priority}
@@ -103,7 +103,7 @@ function PosTag({ position }: { position: string }) {
   const colors: Record<string, string> = { QB: '#FBBF24', RB: '#36E7A1', WR: '#22D3EE', TE: '#A78BFA', K: '#64748B', DEF: '#94a3b8', DST: '#94a3b8' };
   const c = colors[position] ?? '#64748B';
   return (
-    <span className="text-[10px] font-bold ml-1.5" style={{ color: c }}>{position}</span>
+    <span className="text-[11px] font-bold ml-1.5" style={{ color: c }}>{position}</span>
   );
 }
 
@@ -115,7 +115,7 @@ export default function RankedPickupsTable({ players, loading, total }: Props) {
   return (
     <div className="glass-card overflow-hidden">
       <div className="px-4 py-3 border-b border-white/[0.08] flex items-center justify-between">
-        <h2 className="text-[13px] font-bold text-white tracking-wide">RANKED PICKUP TARGETS</h2>
+        <h2 className="text-[14px] font-bold text-white tracking-wide">RANKED PICKUP TARGETS</h2>
       </div>
 
       <div className="overflow-x-auto">
@@ -133,7 +133,7 @@ export default function RankedPickupsTable({ players, loading, total }: Props) {
                 { label: 'ADP',       cls: 'hidden lg:table-cell text-right' },
                 { label: 'PRIORITY',  cls: 'hidden sm:table-cell' },
               ].map(({ label, cls }) => (
-                <th key={label} className={`px-3 py-2 text-left text-[10px] font-semibold text-slate-500 uppercase tracking-wider ${cls}`}>
+                <th key={label} className={`px-3 py-2 text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider ${cls}`}>
                   {label}
                 </th>
               ))}
@@ -146,7 +146,7 @@ export default function RankedPickupsTable({ players, loading, total }: Props) {
                 <tr key={p.playerId} className="border-b border-white/[0.04] hover:bg-white/[0.02] transition-colors">
                   {/* Rank */}
                   <td className="px-3 py-2.5 text-center">
-                    <span className="text-[11px] font-mono font-bold text-slate-400" style={{ fontFamily: 'JetBrains Mono, monospace' }}>
+                    <span className="text-[12px] font-mono font-bold text-slate-400" style={{ fontFamily: 'JetBrains Mono, monospace' }}>
                       {p.rank}
                     </span>
                   </td>
@@ -156,9 +156,9 @@ export default function RankedPickupsTable({ players, loading, total }: Props) {
                     <div className="flex items-center gap-2">
                       <PlayerAvatar playerId={p.playerId} name={p.name} position={p.position} />
                       <div>
-                        <p className="text-[12px] font-semibold text-white leading-tight truncate max-w-[130px]">{p.name}</p>
+                        <p className="text-[13px] font-semibold text-white leading-tight truncate max-w-[130px]">{p.name}</p>
                         <div className="flex items-center sm:hidden">
-                          <span className="text-[10px] text-slate-500">{p.team}</span>
+                          <span className="text-[11px] text-slate-500">{p.team}</span>
                           <PosTag position={p.position} />
                         </div>
                       </div>
@@ -172,7 +172,7 @@ export default function RankedPickupsTable({ players, loading, total }: Props) {
 
                   {/* TEAM */}
                   <td className="px-3 py-2.5 hidden sm:table-cell">
-                    <span className="text-[11px] text-slate-400">{p.team}</span>
+                    <span className="text-[12px] text-slate-400">{p.team}</span>
                   </td>
 
                   {/* BBSM */}
@@ -192,14 +192,14 @@ export default function RankedPickupsTable({ players, loading, total }: Props) {
 
                   {/* % Rostered */}
                   <td className="px-3 py-2.5 hidden lg:table-cell text-right">
-                    <span className="text-[11px] font-mono text-slate-300" style={{ fontFamily: 'JetBrains Mono, monospace' }}>
+                    <span className="text-[12px] font-mono text-slate-300" style={{ fontFamily: 'JetBrains Mono, monospace' }}>
                       {p.pctRostered}%
                     </span>
                   </td>
 
                   {/* ADP */}
                   <td className="px-3 py-2.5 hidden lg:table-cell text-right">
-                    <span className="text-[11px] font-mono text-slate-400" style={{ fontFamily: 'JetBrains Mono, monospace' }}>
+                    <span className="text-[12px] font-mono text-slate-400" style={{ fontFamily: 'JetBrains Mono, monospace' }}>
                       {p.adpLabel}
                     </span>
                   </td>
@@ -218,8 +218,8 @@ export default function RankedPickupsTable({ players, loading, total }: Props) {
       {/* View All link */}
       {!loading && total > 12 && (
         <div className="px-4 py-3 border-t border-white/[0.06] flex items-center justify-between">
-          <span className="text-[11px] text-slate-500">Showing 12 of {total} available players</span>
-          <button className="text-[11px] font-semibold text-cyan-400 hover:text-cyan-300 transition-colors">
+          <span className="text-[12px] text-slate-500">Showing 12 of {total} available players</span>
+          <button className="text-[12px] font-semibold text-cyan-400 hover:text-cyan-300 transition-colors">
             View All {total} Available Players →
           </button>
         </div>

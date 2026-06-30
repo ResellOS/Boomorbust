@@ -27,15 +27,15 @@ function FooterItem({
   return (
     <div className="flex items-center gap-2">
       <div
-        className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[13px]"
+        className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[14px]"
         style={{ background: iconBg, border: `1px solid ${iconBorder}` }}
       >
         {icon}
       </div>
       <div>
-        <div className={`font-mono text-[13px] font-medium ${valueClass}`}>{value}</div>
-        <div className="text-[8px] text-muted">{label}</div>
-        {sub ? <div className="text-[8px] text-muted">{sub}</div> : null}
+        <div className={`font-mono text-[14px] font-medium ${valueClass}`}>{value}</div>
+        <div className="text-[9px] text-muted">{label}</div>
+        {sub ? <div className="text-[9px] text-muted">{sub}</div> : null}
       </div>
     </div>
   );

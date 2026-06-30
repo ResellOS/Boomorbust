@@ -77,7 +77,7 @@ export default function MobileTabBar() {
         }}
       >
         <div className="flex items-center justify-between px-4 py-3 border-b border-white/[0.06]">
-          <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-muted">More</span>
+          <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-muted">More</span>
           <button
             type="button"
             onClick={() => setSheetOpen(false)}
@@ -94,7 +94,7 @@ export default function MobileTabBar() {
               href={href}
               onClick={() => setSheetOpen(false)}
               className={clsx(
-                'flex min-h-[44px] items-center gap-3 rounded-lg px-3 font-figtree text-[14px] transition-colors',
+                'flex min-h-[44px] items-center gap-3 rounded-lg px-3 font-figtree text-[15px] transition-colors',
                 isActive(pathname, href)
                   ? 'bg-boom/10 text-boom'
                   : 'text-text hover:bg-white/[0.04]',
@@ -107,7 +107,7 @@ export default function MobileTabBar() {
           <button
             type="button"
             onClick={() => void handleSignOut()}
-            className="flex min-h-[44px] items-center gap-3 rounded-lg px-3 font-figtree text-[14px] text-[#ef4444] hover:bg-[#ef4444]/10 transition-colors"
+            className="flex min-h-[44px] items-center gap-3 rounded-lg px-3 font-figtree text-[15px] text-[#ef4444] hover:bg-[#ef4444]/10 transition-colors"
           >
             <LogOut className="h-5 w-5 shrink-0" strokeWidth={2} />
             Log Out
@@ -134,7 +134,7 @@ export default function MobileTabBar() {
               style={{ color: active ? '#36E7A1' : '#64748b' }}
             >
               <Icon className="h-5 w-5 shrink-0" strokeWidth={active ? 2.5 : 2} />
-              <span className="w-full truncate text-center font-mono text-[9px] uppercase tracking-[0.04em]">
+              <span className="w-full truncate text-center font-mono text-[10px] uppercase tracking-[0.04em]">
                 {label}
               </span>
             </Link>
@@ -151,7 +151,7 @@ export default function MobileTabBar() {
           aria-expanded={sheetOpen}
         >
           <MoreHorizontal className="h-5 w-5 shrink-0" strokeWidth={sheetOpen || isMoreActive(pathname) ? 2.5 : 2} />
-          <span className="font-mono text-[9px] uppercase tracking-[0.04em]">More</span>
+          <span className="font-mono text-[10px] uppercase tracking-[0.04em]">More</span>
         </button>
       </nav>
     </>

@@ -569,7 +569,7 @@ export default function CoachPage() {
               )}
 
               <div className="pt-2 border-t border-[var(--border)]">
-                <p className="text-[10px] uppercase tracking-[0.2em] text-[var(--text-muted)] mb-2 px-2">Recent</p>
+                <p className="text-[11px] uppercase tracking-[0.2em] text-[var(--text-muted)] mb-2 px-2">Recent</p>
                 <ul className="space-y-1 max-h-[40vh] overflow-y-auto">
                   {sessions.map((s) => (
                     <li key={s.id}>
@@ -584,7 +584,7 @@ export default function CoachPage() {
                         )}
                       >
                         <span className="block truncate font-medium">{s.preview}</span>
-                        <span className="block text-[10px] text-[var(--text-muted)] mt-0.5">
+                        <span className="block text-[11px] text-[var(--text-muted)] mt-0.5">
                           {formatSessionTs(s.updatedAt)}
                         </span>
                       </button>
@@ -633,7 +633,7 @@ export default function CoachPage() {
                 </div>
               </div>
             </div>
-            <p className="shrink-0 px-4 sm:px-6 lg:px-10 pb-4 text-[11px] text-[var(--text-muted)]">
+            <p className="shrink-0 px-4 sm:px-6 lg:px-10 pb-4 text-[12px] text-[var(--text-muted)]">
               Analyst has context on:{' '}
               <span className="text-[var(--text-secondary)]">
                 {leagueLabel}, your roster, KTC values, recent trades where synced.
@@ -704,7 +704,7 @@ export default function CoachPage() {
                       <span className="whitespace-pre-wrap break-words">{m.content}</span>
                     )}
                   </div>
-                  <span className="text-[10px] px-2 text-[var(--text-muted)]">{formatTime(m.at)}</span>
+                  <span className="text-[11px] px-2 text-[var(--text-muted)]">{formatTime(m.at)}</span>
                 </div>
               ))}
 
@@ -828,7 +828,7 @@ export default function CoachPage() {
                     )}
                   >
                     <span className="block truncate">{s.preview}</span>
-                    <span className="block text-[10px] text-[var(--text-muted)]">{formatSessionTs(s.updatedAt)}</span>
+                    <span className="block text-[11px] text-[var(--text-muted)]">{formatSessionTs(s.updatedAt)}</span>
                   </button>
                 </li>
               ))}
@@ -914,11 +914,11 @@ export default function CoachPage() {
                 </div>
                 <div className="grid grid-cols-2 gap-2 text-sm mb-4">
                   <div className="rounded-lg bg-[var(--bg-secondary)] px-3 py-2 border border-[var(--border)]">
-                    <span className="text-[10px] text-[var(--text-muted)] block">KTC</span>
+                    <span className="text-[11px] text-[var(--text-muted)] block">KTC</span>
                     <span className="text-white font-semibold">{modalPlayer.ktc ? Math.round(modalPlayer.ktc) : '—'}</span>
                   </div>
                   <div className="rounded-lg bg-[var(--bg-secondary)] px-3 py-2 border border-[var(--border)]">
-                    <span className="text-[10px] text-[var(--text-muted)] block">BBV</span>
+                    <span className="text-[11px] text-[var(--text-muted)] block">BBV</span>
                     <span className="text-white font-semibold">
                       {modalData.bbv != null ? Math.round(modalData.bbv) : '—'}
                     </span>

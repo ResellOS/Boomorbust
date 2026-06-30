@@ -65,7 +65,7 @@ export default function LineupStatsBar({ data, loading }: Props) {
     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 mb-4">
       {/* Projected Points */}
       <div className="glass-card p-4">
-        <p className="text-[10px] text-slate-400 uppercase tracking-widest mb-1">Projected Points</p>
+        <p className="text-[11px] text-slate-400 uppercase tracking-widest mb-1">Projected Points</p>
         {loading || !data ? (
           <Skeleton className="h-8 w-24 mt-1" />
         ) : (
@@ -77,7 +77,7 @@ export default function LineupStatsBar({ data, loading }: Props) {
 
       {/* Optimal Record */}
       <div className="glass-card p-4">
-        <p className="text-[10px] text-slate-400 uppercase tracking-widest mb-1">Optimal Record</p>
+        <p className="text-[11px] text-slate-400 uppercase tracking-widest mb-1">Optimal Record</p>
         {loading || !data ? (
           <Skeleton className="h-8 w-16 mt-1" />
         ) : (
@@ -89,7 +89,7 @@ export default function LineupStatsBar({ data, loading }: Props) {
 
       {/* Lineup Confidence */}
       <div className="glass-card p-4">
-        <p className="text-[10px] text-slate-400 uppercase tracking-widest mb-1">Lineup Confidence</p>
+        <p className="text-[11px] text-slate-400 uppercase tracking-widest mb-1">Lineup Confidence</p>
         {loading || !data ? (
           <Skeleton className="h-8 w-20 mt-1" />
         ) : (
@@ -101,7 +101,7 @@ export default function LineupStatsBar({ data, loading }: Props) {
 
       {/* TRE Edge */}
       <div className="glass-card p-4">
-        <p className="text-[10px] text-slate-400 uppercase tracking-widest mb-1">TRE Edge</p>
+        <p className="text-[11px] text-slate-400 uppercase tracking-widest mb-1">TRE Edge</p>
         {loading || !data ? (
           <Skeleton className="h-8 w-16 mt-1" />
         ) : (
@@ -119,7 +119,7 @@ export default function LineupStatsBar({ data, loading }: Props) {
 
       {/* Weather Outlook */}
       <div className="glass-card p-4 col-span-2 sm:col-span-1">
-        <p className="text-[10px] text-slate-400 uppercase tracking-widest mb-1">Weather Outlook</p>
+        <p className="text-[11px] text-slate-400 uppercase tracking-widest mb-1">Weather Outlook</p>
         {loading || !data ? (
           <Skeleton className="h-8 w-20 mt-1" />
         ) : (

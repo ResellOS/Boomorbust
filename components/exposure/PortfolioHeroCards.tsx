@@ -16,7 +16,7 @@ function RiskBadge({ level }: { level: 'HIGH' | 'MEDIUM' | 'LOW' }) {
   const label =
     level === 'HIGH' ? 'HIGH CONCENTRATION' : level === 'MEDIUM' ? 'MODERATE' : 'DIVERSIFIED';
   return (
-    <span className={`rounded px-1.5 py-0.5 font-mono text-[8px] uppercase ${styles} border`}>
+    <span className={`rounded px-1.5 py-0.5 font-mono text-[9px] uppercase ${styles} border`}>
       {label}
     </span>
   );
@@ -42,7 +42,7 @@ export default function PortfolioHeroCards({
             boxShadow: 'inset 3px 0 12px -4px rgba(54,231,161,0.35)',
           }}
         >
-          <div className="font-mono text-[9px] uppercase tracking-[1.5px] text-boom">
+          <div className="font-mono text-[10px] uppercase tracking-[1.5px] text-boom">
             Biggest Portfolio Edge
           </div>
           <div className="mt-3 flex items-start gap-3">
@@ -53,13 +53,13 @@ export default function PortfolioHeroCards({
               fallbackColor={positionAccent(opportunity.position)}
             />
             <div className="min-w-0 flex-1">
-              <div className="font-mono text-[13px] text-text">{opportunity.fullName}</div>
-              <div className="font-mono text-[10px] text-muted">
+              <div className="font-mono text-[14px] text-text">{opportunity.fullName}</div>
+              <div className="font-mono text-[11px] text-muted">
                 {opportunity.position} · {opportunity.team}
               </div>
             </div>
           </div>
-          <div className="mt-3 space-y-1 font-mono text-[10px]">
+          <div className="mt-3 space-y-1 font-mono text-[11px]">
             <div className="flex justify-between">
               <span className="text-muted">Owned</span>
               <span className="text-text">0 leagues</span>
@@ -83,10 +83,10 @@ export default function PortfolioHeroCards({
               <span className="truncate text-text">{opportunity.targetLeague}</span>
             </div>
           </div>
-          <div className="mt-1 font-mono text-[8px] text-muted">Estimated impact</div>
+          <div className="mt-1 font-mono text-[9px] text-muted">Estimated impact</div>
           <Link
             href={`/trade?target=${opportunity.playerId}&league=${opportunity.targetLeagueId}`}
-            className="mt-3 inline-block font-mono text-[10px] uppercase text-boom hover:underline"
+            className="mt-3 inline-block font-mono text-[11px] uppercase text-boom hover:underline"
           >
             Find Trade →
           </Link>
@@ -102,7 +102,7 @@ export default function PortfolioHeroCards({
             boxShadow: 'inset 3px 0 12px -4px rgba(167,139,250,0.35)',
           }}
         >
-          <div className="font-mono text-[9px] uppercase tracking-[1.5px] text-bust">
+          <div className="font-mono text-[10px] uppercase tracking-[1.5px] text-bust">
             Portfolio Warning
           </div>
           <div className="mt-3 flex items-start gap-3">
@@ -113,14 +113,14 @@ export default function PortfolioHeroCards({
               fallbackColor={positionAccent(risk.position)}
             />
             <div className="min-w-0 flex-1">
-              <div className="font-mono text-[13px] text-text">{risk.fullName}</div>
-              <div className="font-mono text-[10px] text-muted">
+              <div className="font-mono text-[14px] text-text">{risk.fullName}</div>
+              <div className="font-mono text-[11px] text-muted">
                 {risk.position} · {risk.team}
               </div>
             </div>
             <RiskBadge level={risk.riskLevel} />
           </div>
-          <div className="mt-3 space-y-1 font-mono text-[10px]">
+          <div className="mt-3 space-y-1 font-mono text-[11px]">
             <div className="flex justify-between">
               <span className="text-muted">Owned</span>
               <span className="text-text">
@@ -138,7 +138,7 @@ export default function PortfolioHeroCards({
               </span>
             </div>
           </div>
-          <p className="mt-3 font-mono text-[9px] leading-relaxed text-muted">
+          <p className="mt-3 font-mono text-[10px] leading-relaxed text-muted">
             Single injury affects {risk.portfolioPct}% of portfolio value across{' '}
             {risk.leagueCount} leagues.
           </p>

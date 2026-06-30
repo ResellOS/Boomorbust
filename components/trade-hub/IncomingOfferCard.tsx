@@ -20,7 +20,7 @@ function AssetAvatar({ asset }: { asset: TradeHubAsset }) {
   if (isPick) {
     return (
       <div
-        className="flex items-center justify-center rounded-full shrink-0 text-[9px] font-bold"
+        className="flex items-center justify-center rounded-full shrink-0 text-[10px] font-bold"
         style={{ width: 32, height: 32, background: 'rgba(251,191,36,0.15)', color: '#FBBF24', border: '1px solid rgba(251,191,36,0.3)' }}
       >
         PK
@@ -46,7 +46,7 @@ function AssetAvatar({ asset }: { asset: TradeHubAsset }) {
 
   return (
     <div
-      className="flex items-center justify-center rounded-full shrink-0 text-[10px] font-semibold"
+      className="flex items-center justify-center rounded-full shrink-0 text-[11px] font-semibold"
       style={{ width: 32, height: 32, background: `${color}22`, color }}
     >
       {initials}
@@ -179,7 +179,7 @@ export default function IncomingOfferCard({ offer, isSelected, onClick, leagueId
         <div className="flex items-center gap-2">
           {isNew && (
             <span
-              className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase"
+              className="px-2 py-0.5 rounded-full text-[11px] font-bold uppercase"
               style={{ background: 'rgba(54,231,161,0.2)', color: '#36E7A1', letterSpacing: '0.05em', fontFamily: 'var(--font-mono), monospace' }}
             >
               NEW

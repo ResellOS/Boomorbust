@@ -20,19 +20,19 @@ function FfigGradesTab({ prospects }: { prospects: RookieProspect[] }) {
   return (
     <div className="glass-card overflow-hidden">
       <div className="px-4 py-3 border-b border-white/[0.08]">
-        <h2 className="text-[13px] font-bold text-white tracking-wide">F-FIG GRADE BREAKDOWN</h2>
-        <p className="text-[11px] text-slate-500 mt-0.5">F-FIG Pentagon score → letter grade, all 2025 prospects</p>
+        <h2 className="text-[14px] font-bold text-white tracking-wide">F-FIG GRADE BREAKDOWN</h2>
+        <p className="text-[12px] text-slate-500 mt-0.5">F-FIG Pentagon score → letter grade, all 2025 prospects</p>
       </div>
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead>
             <tr className="border-b border-white/[0.08]">
-              <th className="px-3 py-2 text-left text-[10px] font-semibold text-slate-500 uppercase tracking-wider">PLAYER</th>
-              <th className="px-3 py-2 text-left text-[10px] font-semibold text-slate-500 uppercase tracking-wider">POS</th>
-              <th className="px-3 py-2 text-left text-[10px] font-semibold text-slate-500 uppercase tracking-wider">F-FIG GRADE</th>
-              <th className="px-3 py-2 text-right text-[10px] font-semibold text-slate-500 uppercase tracking-wider">F-FIG SCORE</th>
-              <th className="px-3 py-2 text-right text-[10px] font-semibold text-slate-500 uppercase tracking-wider">DOM SCORE</th>
-              <th className="px-3 py-2 text-right text-[10px] font-semibold text-slate-500 uppercase tracking-wider">RAS</th>
+              <th className="px-3 py-2 text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider">PLAYER</th>
+              <th className="px-3 py-2 text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider">POS</th>
+              <th className="px-3 py-2 text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider">F-FIG GRADE</th>
+              <th className="px-3 py-2 text-right text-[11px] font-semibold text-slate-500 uppercase tracking-wider">F-FIG SCORE</th>
+              <th className="px-3 py-2 text-right text-[11px] font-semibold text-slate-500 uppercase tracking-wider">DOM SCORE</th>
+              <th className="px-3 py-2 text-right text-[11px] font-semibold text-slate-500 uppercase tracking-wider">RAS</th>
             </tr>
           </thead>
           <tbody>
@@ -40,14 +40,14 @@ function FfigGradesTab({ prospects }: { prospects: RookieProspect[] }) {
               const { bg, color } = ffigGradeStyle(p.ffigGrade);
               return (
                 <tr key={p.id} className="border-b border-white/[0.04] hover:bg-white/[0.02] transition-colors">
-                  <td className="px-3 py-2.5"><span className="text-[12px] font-semibold text-white">{p.name}</span></td>
-                  <td className="px-3 py-2.5"><span className="text-[11px] font-bold" style={{ color: posColor(p.position) }}>{p.position}</span></td>
+                  <td className="px-3 py-2.5"><span className="text-[13px] font-semibold text-white">{p.name}</span></td>
+                  <td className="px-3 py-2.5"><span className="text-[12px] font-bold" style={{ color: posColor(p.position) }}>{p.position}</span></td>
                   <td className="px-3 py-2.5">
-                    <span className="text-[13px] font-bold px-2 py-0.5 rounded-md" style={{ background: bg, color, border: `1px solid ${color}40` }}>{p.ffigGrade}</span>
+                    <span className="text-[14px] font-bold px-2 py-0.5 rounded-md" style={{ background: bg, color, border: `1px solid ${color}40` }}>{p.ffigGrade}</span>
                   </td>
-                  <td className="px-3 py-2.5 text-right"><span className="text-[12px] font-mono text-white" style={{ fontFamily: 'JetBrains Mono, monospace' }}>{p.ffigScore.toFixed(1)}</span></td>
-                  <td className="px-3 py-2.5 text-right"><span className="text-[12px] font-mono text-slate-300" style={{ fontFamily: 'JetBrains Mono, monospace' }}>{p.domScore}</span></td>
-                  <td className="px-3 py-2.5 text-right"><span className="text-[12px] font-mono text-slate-300" style={{ fontFamily: 'JetBrains Mono, monospace' }}>{p.rasScore.toFixed(1)}</span></td>
+                  <td className="px-3 py-2.5 text-right"><span className="text-[13px] font-mono text-white" style={{ fontFamily: 'JetBrains Mono, monospace' }}>{p.ffigScore.toFixed(1)}</span></td>
+                  <td className="px-3 py-2.5 text-right"><span className="text-[13px] font-mono text-slate-300" style={{ fontFamily: 'JetBrains Mono, monospace' }}>{p.domScore}</span></td>
+                  <td className="px-3 py-2.5 text-right"><span className="text-[13px] font-mono text-slate-300" style={{ fontFamily: 'JetBrains Mono, monospace' }}>{p.rasScore.toFixed(1)}</span></td>
                 </tr>
               );
             })}
@@ -63,19 +63,19 @@ function SleepersTab({ prospects }: { prospects: RookieProspect[] }) {
   return (
     <div className="glass-card overflow-hidden">
       <div className="px-4 py-3 border-b border-white/[0.08]">
-        <h2 className="text-[13px] font-bold text-white tracking-wide">DYNASTY SLEEPERS</h2>
-        <p className="text-[11px] text-slate-500 mt-0.5">Round 3+ picks with RTS ≥ 70 — high value, low ADP cost</p>
+        <h2 className="text-[14px] font-bold text-white tracking-wide">DYNASTY SLEEPERS</h2>
+        <p className="text-[12px] text-slate-500 mt-0.5">Round 3+ picks with RTS ≥ 70 — high value, low ADP cost</p>
       </div>
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead>
             <tr className="border-b border-white/[0.08]">
-              <th className="px-3 py-2 text-left text-[10px] font-semibold text-slate-500 uppercase tracking-wider">PLAYER</th>
-              <th className="px-3 py-2 text-left text-[10px] font-semibold text-slate-500 uppercase tracking-wider">DRAFT CAPITAL</th>
-              <th className="px-3 py-2 text-right text-[10px] font-semibold text-slate-500 uppercase tracking-wider">RTS SCORE</th>
-              <th className="px-3 py-2 text-right text-[10px] font-semibold text-slate-500 uppercase tracking-wider">SLEEPER %</th>
-              <th className="px-3 py-2 text-right text-[10px] font-semibold text-slate-500 uppercase tracking-wider">IDEAL RANGE</th>
-              <th className="px-3 py-2 text-left text-[10px] font-semibold text-slate-500 uppercase tracking-wider">VERDICT</th>
+              <th className="px-3 py-2 text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider">PLAYER</th>
+              <th className="px-3 py-2 text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider">DRAFT CAPITAL</th>
+              <th className="px-3 py-2 text-right text-[11px] font-semibold text-slate-500 uppercase tracking-wider">RTS SCORE</th>
+              <th className="px-3 py-2 text-right text-[11px] font-semibold text-slate-500 uppercase tracking-wider">SLEEPER %</th>
+              <th className="px-3 py-2 text-right text-[11px] font-semibold text-slate-500 uppercase tracking-wider">IDEAL RANGE</th>
+              <th className="px-3 py-2 text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider">VERDICT</th>
             </tr>
           </thead>
           <tbody>
@@ -84,15 +84,15 @@ function SleepersTab({ prospects }: { prospects: RookieProspect[] }) {
               return (
                 <tr key={p.id} className="border-b border-white/[0.04] hover:bg-white/[0.02] transition-colors">
                   <td className="px-3 py-2.5">
-                    <p className="text-[12px] font-semibold text-white">{p.name}</p>
-                    <p className="text-[10px] uppercase" style={{ color: posColor(p.position) }}>{p.position} · {p.team}</p>
+                    <p className="text-[13px] font-semibold text-white">{p.name}</p>
+                    <p className="text-[11px] uppercase" style={{ color: posColor(p.position) }}>{p.position} · {p.team}</p>
                   </td>
-                  <td className="px-3 py-2.5"><span className="text-[11px] text-slate-300 font-mono" style={{ fontFamily: 'JetBrains Mono, monospace' }}>{p.draftCapital}</span></td>
-                  <td className="px-3 py-2.5 text-right"><span className="text-[14px] font-bold" style={{ fontFamily: 'JetBrains Mono, monospace', color: '#36E7A1' }}>{p.rtsScore}</span></td>
-                  <td className="px-3 py-2.5 text-right"><span className="text-[12px] font-mono text-slate-300" style={{ fontFamily: 'JetBrains Mono, monospace' }}>{p.sleeperPct}%</span></td>
-                  <td className="px-3 py-2.5 text-right"><span className="text-[11px] font-mono text-slate-400" style={{ fontFamily: 'JetBrains Mono, monospace' }}>{p.idealRange}</span></td>
+                  <td className="px-3 py-2.5"><span className="text-[12px] text-slate-300 font-mono" style={{ fontFamily: 'JetBrains Mono, monospace' }}>{p.draftCapital}</span></td>
+                  <td className="px-3 py-2.5 text-right"><span className="text-[15px] font-bold" style={{ fontFamily: 'JetBrains Mono, monospace', color: '#36E7A1' }}>{p.rtsScore}</span></td>
+                  <td className="px-3 py-2.5 text-right"><span className="text-[13px] font-mono text-slate-300" style={{ fontFamily: 'JetBrains Mono, monospace' }}>{p.sleeperPct}%</span></td>
+                  <td className="px-3 py-2.5 text-right"><span className="text-[12px] font-mono text-slate-400" style={{ fontFamily: 'JetBrains Mono, monospace' }}>{p.idealRange}</span></td>
                   <td className="px-3 py-2.5">
-                    <span className="text-[10px] font-bold px-2 py-0.5 rounded" style={{ color, background: `${color}18`, border: `1px solid ${color}30` }}>{p.verdict}</span>
+                    <span className="text-[11px] font-bold px-2 py-0.5 rounded" style={{ color, background: `${color}18`, border: `1px solid ${color}30` }}>{p.verdict}</span>
                   </td>
                 </tr>
               );
@@ -109,17 +109,17 @@ function DraftCapitalTab({ prospects }: { prospects: RookieProspect[] }) {
   return (
     <div className="glass-card overflow-hidden">
       <div className="px-4 py-3 border-b border-white/[0.08]">
-        <h2 className="text-[13px] font-bold text-white tracking-wide">DRAFT CAPITAL RANKINGS</h2>
-        <p className="text-[11px] text-slate-500 mt-0.5">Sorted by overall draft position — earlier picks highlighted</p>
+        <h2 className="text-[14px] font-bold text-white tracking-wide">DRAFT CAPITAL RANKINGS</h2>
+        <p className="text-[12px] text-slate-500 mt-0.5">Sorted by overall draft position — earlier picks highlighted</p>
       </div>
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead>
             <tr className="border-b border-white/[0.08]">
-              <th className="px-3 py-2 text-left text-[10px] font-semibold text-slate-500 uppercase tracking-wider">PLAYER</th>
-              <th className="px-3 py-2 text-left text-[10px] font-semibold text-slate-500 uppercase tracking-wider">DRAFT SLOT</th>
-              <th className="px-3 py-2 text-right text-[10px] font-semibold text-slate-500 uppercase tracking-wider">RTS SCORE</th>
-              <th className="px-3 py-2 text-left text-[10px] font-semibold text-slate-500 uppercase tracking-wider">VERDICT</th>
+              <th className="px-3 py-2 text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider">PLAYER</th>
+              <th className="px-3 py-2 text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider">DRAFT SLOT</th>
+              <th className="px-3 py-2 text-right text-[11px] font-semibold text-slate-500 uppercase tracking-wider">RTS SCORE</th>
+              <th className="px-3 py-2 text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider">VERDICT</th>
             </tr>
           </thead>
           <tbody>
@@ -129,17 +129,17 @@ function DraftCapitalTab({ prospects }: { prospects: RookieProspect[] }) {
               return (
                 <tr key={p.id} className="border-b border-white/[0.04] hover:bg-white/[0.02] transition-colors">
                   <td className="px-3 py-2.5">
-                    <p className="text-[12px] font-semibold text-white">{p.name}</p>
-                    <p className="text-[10px] uppercase" style={{ color: posColor(p.position) }}>{p.position} · {p.college}</p>
+                    <p className="text-[13px] font-semibold text-white">{p.name}</p>
+                    <p className="text-[11px] uppercase" style={{ color: posColor(p.position) }}>{p.position} · {p.college}</p>
                   </td>
                   <td className="px-3 py-2.5">
-                    <span className="text-[12px] font-mono font-bold" style={{ fontFamily: 'JetBrains Mono, monospace', color: capColor }}>
+                    <span className="text-[13px] font-mono font-bold" style={{ fontFamily: 'JetBrains Mono, monospace', color: capColor }}>
                       {p.draftCapital}
                     </span>
                   </td>
-                  <td className="px-3 py-2.5 text-right"><span className="text-[14px] font-bold" style={{ fontFamily: 'JetBrains Mono, monospace', color: '#36E7A1' }}>{p.rtsScore}</span></td>
+                  <td className="px-3 py-2.5 text-right"><span className="text-[15px] font-bold" style={{ fontFamily: 'JetBrains Mono, monospace', color: '#36E7A1' }}>{p.rtsScore}</span></td>
                   <td className="px-3 py-2.5">
-                    <span className="text-[10px] font-bold px-2 py-0.5 rounded" style={{ color, background: `${color}18`, border: `1px solid ${color}30` }}>{p.verdict}</span>
+                    <span className="text-[11px] font-bold px-2 py-0.5 rounded" style={{ color, background: `${color}18`, border: `1px solid ${color}30` }}>{p.verdict}</span>
                   </td>
                 </tr>
               );
@@ -159,8 +159,8 @@ function MeasurablesTab({ prospects }: { prospects: RookieProspect[] }) {
           <div className="flex items-center gap-3 mb-3">
             <div className="w-1.5 h-6 rounded-full" style={{ background: posColor(p.position) }} />
             <div>
-              <p className="text-[13px] font-bold text-white">{p.name}</p>
-              <p className="text-[10px] uppercase text-slate-500">{p.position} · {p.team}</p>
+              <p className="text-[14px] font-bold text-white">{p.name}</p>
+              <p className="text-[11px] uppercase text-slate-500">{p.position} · {p.team}</p>
             </div>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -173,10 +173,10 @@ function MeasurablesTab({ prospects }: { prospects: RookieProspect[] }) {
               const c = pct >= 80 ? '#36E7A1' : pct >= 60 ? '#22D3EE' : pct >= 40 ? '#FBBF24' : '#EF4444';
               return (
                 <div key={label}>
-                  <p className="text-[9px] text-slate-500 uppercase tracking-widest mb-1">{label}</p>
-                  <p className="text-[16px] font-bold text-white font-mono" style={{ fontFamily: 'JetBrains Mono, monospace' }}>{value}</p>
+                  <p className="text-[10px] text-slate-500 uppercase tracking-widest mb-1">{label}</p>
+                  <p className="text-[17px] font-bold text-white font-mono" style={{ fontFamily: 'JetBrains Mono, monospace' }}>{value}</p>
                   <div className="h-1 rounded-full bg-white/[0.06] mt-1"><div className="h-1 rounded-full" style={{ width: `${pct}%`, background: c }} /></div>
-                  <p className="text-[10px] mt-0.5" style={{ color: c }}>{pct}th pct</p>
+                  <p className="text-[11px] mt-0.5" style={{ color: c }}>{pct}th pct</p>
                 </div>
               );
             })}
@@ -191,8 +191,8 @@ function FilmNotesTab({ prospects: _prospects }: { prospects: RookieProspect[] }
   return (
     <div className="glass-card p-6 text-center">
       <p className="text-[24px] mb-2">🎬</p>
-      <p className="text-[13px] font-semibold text-white mb-1">Film Notes Coming Soon</p>
-      <p className="text-[12px] text-slate-500">AI-powered film analysis for all 2025 prospects will appear here.</p>
+      <p className="text-[14px] font-semibold text-white mb-1">Film Notes Coming Soon</p>
+      <p className="text-[13px] text-slate-500">AI-powered film analysis for all 2025 prospects will appear here.</p>
     </div>
   );
 }
@@ -201,8 +201,8 @@ function RankingsTab({ prospects }: { prospects: RookieProspect[] }) {
   return (
     <div className="glass-card overflow-hidden">
       <div className="px-4 py-3 border-b border-white/[0.08]">
-        <h2 className="text-[13px] font-bold text-white tracking-wide">DYNASTY ROOKIE RANKINGS</h2>
-        <p className="text-[11px] text-slate-500 mt-0.5">Overall dynasty value ranking weighted by rookie score, dynasty rating, and scouting profile</p>
+        <h2 className="text-[14px] font-bold text-white tracking-wide">DYNASTY ROOKIE RANKINGS</h2>
+        <p className="text-[12px] text-slate-500 mt-0.5">Overall dynasty value ranking weighted by rookie score, dynasty rating, and scouting profile</p>
       </div>
       <div className="divide-y divide-white/[0.04]">
         {prospects.map((p) => {
@@ -210,15 +210,15 @@ function RankingsTab({ prospects }: { prospects: RookieProspect[] }) {
           const { bg: gradeBg, color: gradeColor } = ffigGradeStyle(p.ffigGrade);
           return (
             <div key={p.id} className="flex items-center gap-4 px-4 py-3 hover:bg-white/[0.02] transition-colors">
-              <span className="text-[13px] font-mono font-bold text-slate-400 w-6 text-right flex-shrink-0" style={{ fontFamily: 'JetBrains Mono, monospace' }}>{p.rank}</span>
+              <span className="text-[14px] font-mono font-bold text-slate-400 w-6 text-right flex-shrink-0" style={{ fontFamily: 'JetBrains Mono, monospace' }}>{p.rank}</span>
               <div className="w-1.5 h-8 rounded-full flex-shrink-0" style={{ background: posColor(p.position) }} />
               <div className="flex-1 min-w-0">
-                <p className="text-[12px] font-semibold text-white truncate">{p.name}</p>
-                <p className="text-[10px] text-slate-500 uppercase">{p.position} · {p.college} · {p.team}</p>
+                <p className="text-[13px] font-semibold text-white truncate">{p.name}</p>
+                <p className="text-[11px] text-slate-500 uppercase">{p.position} · {p.college} · {p.team}</p>
               </div>
-              <span className="text-[12px] font-bold px-1.5 py-0.5 rounded" style={{ background: gradeBg, color: gradeColor }}>{p.ffigGrade}</span>
-              <span className="text-[14px] font-bold w-8 text-right" style={{ fontFamily: 'JetBrains Mono, monospace', color: '#36E7A1' }}>{p.rtsScore}</span>
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded whitespace-nowrap hidden sm:inline" style={{ color, background: `${color}18`, border: `1px solid ${color}30` }}>{p.verdict}</span>
+              <span className="text-[13px] font-bold px-1.5 py-0.5 rounded" style={{ background: gradeBg, color: gradeColor }}>{p.ffigGrade}</span>
+              <span className="text-[15px] font-bold w-8 text-right" style={{ fontFamily: 'JetBrains Mono, monospace', color: '#36E7A1' }}>{p.rtsScore}</span>
+              <span className="text-[11px] font-bold px-2 py-0.5 rounded whitespace-nowrap hidden sm:inline" style={{ color, background: `${color}18`, border: `1px solid ${color}30` }}>{p.verdict}</span>
             </div>
           );
         })}
@@ -297,7 +297,7 @@ export default function RookiesPage() {
         {/* Header */}
         <div className="mb-2">
           <h1 className="text-2xl font-bold text-white tracking-tight">Rookies</h1>
-          <p className="text-[13px] text-slate-500 mt-0.5">Draft smarter. Before your league catches up.</p>
+          <p className="text-[14px] text-slate-500 mt-0.5">Draft smarter. Before your league catches up.</p>
         </div>
 
         {/* Stats bar */}

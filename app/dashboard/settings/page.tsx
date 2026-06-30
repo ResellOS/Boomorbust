@@ -1155,7 +1155,7 @@ export default function SettingsPage() {
                     )}
                   >
                     {tier.key === displayTierBadge && (
-                      <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-[var(--cyan)] px-3 py-0.5 text-[10px] font-bold uppercase text-[var(--bg-primary)]">
+                      <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-[var(--cyan)] px-3 py-0.5 text-[11px] font-bold uppercase text-[var(--bg-primary)]">
                         Current Plan
                       </span>
                     )}

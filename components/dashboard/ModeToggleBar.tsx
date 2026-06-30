@@ -14,7 +14,7 @@ interface ModeToggleBarProps {
 
 export default function ModeToggleBar({ leagues, mode, onSelect }: ModeToggleBarProps) {
   const baseBtn =
-    'shrink-0 rounded-[6px] border px-3 py-1.5 font-figtree text-[12px] transition-colors';
+    'shrink-0 rounded-[6px] border px-3 py-1.5 font-figtree text-[13px] transition-colors';
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const nudge = useCallback((direction: -1 | 1) => {
@@ -102,7 +102,7 @@ export default function ModeToggleBar({ leagues, mode, onSelect }: ModeToggleBar
               <span className="max-w-[100px] truncate">{lg.name}</span>
               {active ? (
                 <span
-                  className="shrink-0 rounded px-1 py-0.5 font-mono text-[7px] uppercase tracking-wide"
+                  className="shrink-0 rounded px-1 py-0.5 font-mono text-[8px] uppercase tracking-wide"
                   style={{ color: meta.color, background: `${meta.color}18` }}
                 >
                   {meta.label}

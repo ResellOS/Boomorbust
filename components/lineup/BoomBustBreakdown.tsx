@@ -106,21 +106,21 @@ function DonutChart({ total, boom, hold, bust, label }: DonutProps) {
         </text>
       </svg>
 
-      <p className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider mt-1">{label}</p>
+      <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider mt-1">{label}</p>
 
       {/* Legend */}
       <div className="flex flex-col gap-1 mt-2">
         <div className="flex items-center gap-2">
           <div className="w-2.5 h-2.5 rounded-sm" style={{ background: '#36E7A1' }} />
-          <span className="text-[10px] text-slate-400">{boom} BOOM</span>
+          <span className="text-[11px] text-slate-400">{boom} BOOM</span>
         </div>
         <div className="flex items-center gap-2">
           <div className="w-2.5 h-2.5 rounded-sm" style={{ background: '#FBBF24' }} />
-          <span className="text-[10px] text-slate-400">{hold} HOLD</span>
+          <span className="text-[11px] text-slate-400">{hold} HOLD</span>
         </div>
         <div className="flex items-center gap-2">
           <div className="w-2.5 h-2.5 rounded-sm" style={{ background: '#EF4444' }} />
-          <span className="text-[10px] text-slate-400">{bust} BUST</span>
+          <span className="text-[11px] text-slate-400">{bust} BUST</span>
         </div>
       </div>
     </div>
@@ -130,7 +130,7 @@ function DonutChart({ total, boom, hold, bust, label }: DonutProps) {
 export default function BoomBustBreakdownPanel({ breakdown, loading }: Props) {
   return (
     <div className="glass-card p-4 h-full">
-      <h2 className="text-[11px] font-bold text-slate-400 tracking-widest uppercase mb-4">BOOM / BUST BREAKDOWN</h2>
+      <h2 className="text-[12px] font-bold text-slate-400 tracking-widest uppercase mb-4">BOOM / BUST BREAKDOWN</h2>
 
       {loading || !breakdown ? (
         <div className="flex justify-around animate-pulse">

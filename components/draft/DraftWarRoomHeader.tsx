@@ -41,8 +41,8 @@ export default function DraftWarRoomHeader({
           <div className="font-figtree text-[18px] font-extrabold uppercase tracking-[-0.5px] text-text md:text-[22px]">
             Draft Room
           </div>
-          <div className="font-mono text-[10px] text-boom">{sub}</div>
-          <div className="mt-0.5 font-mono text-[8px] uppercase tracking-wide text-muted">
+          <div className="font-mono text-[11px] text-boom">{sub}</div>
+          <div className="mt-0.5 font-mono text-[9px] uppercase tracking-wide text-muted">
             Simulated Mock Draft · Not live Sleeper
           </div>
         </div>
@@ -51,7 +51,7 @@ export default function DraftWarRoomHeader({
           <button
             type="button"
             onClick={onSettings}
-            className="flex items-center gap-1.5 rounded border border-border bg-[#141929] px-2.5 py-1.5 font-mono text-[9px] uppercase text-muted hover:text-text"
+            className="flex items-center gap-1.5 rounded border border-border bg-[#141929] px-2.5 py-1.5 font-mono text-[10px] uppercase text-muted hover:text-text"
           >
             <Settings className="h-3.5 w-3.5" strokeWidth={2} />
             Room Settings
@@ -59,7 +59,7 @@ export default function DraftWarRoomHeader({
           <button
             type="button"
             onClick={onLeave}
-            className="flex items-center gap-1.5 rounded border border-[#7c3aed]/40 bg-[#7c3aed]/10 px-2.5 py-1.5 font-mono text-[9px] uppercase text-[#A78BFA] hover:bg-[#7c3aed]/20"
+            className="flex items-center gap-1.5 rounded border border-[#7c3aed]/40 bg-[#7c3aed]/10 px-2.5 py-1.5 font-mono text-[10px] uppercase text-[#A78BFA] hover:bg-[#7c3aed]/20"
           >
             <LogOut className="h-3.5 w-3.5" strokeWidth={2} />
             Leave Draft Room
@@ -108,15 +108,15 @@ function StatChip({
         accent ? 'border-boom/35 bg-boom/[0.06]' : 'border-border/70 bg-[#0f1420]'
       }`}
     >
-      <div className="font-mono text-[7px] uppercase tracking-wide text-muted">{label}</div>
+      <div className="font-mono text-[8px] uppercase tracking-wide text-muted">{label}</div>
       <div
-        className={`font-mono text-[14px] tabular-nums leading-tight ${
+        className={`font-mono text-[15px] tabular-nums leading-tight ${
           accent || boom ? 'text-boom' : 'text-text'
         }`}
       >
         {value}
       </div>
-      {sub && <div className="font-mono text-[8px] text-muted">{sub}</div>}
+      {sub && <div className="font-mono text-[9px] text-muted">{sub}</div>}
     </div>
   );
 }

@@ -290,7 +290,7 @@ export default function WarRoomLoader({
         <div className="mt-8 flex min-h-[72px] flex-col items-center gap-2">
           {warRoomVisible ? (
             <p
-              className="font-mono text-[11px] uppercase text-[#36E7A1] sm:text-[12px]"
+              className="font-mono text-[12px] uppercase text-[#36E7A1] sm:text-[13px]"
               style={{ letterSpacing: '0.28em' }}
               aria-live="polite"
             >
@@ -300,7 +300,7 @@ export default function WarRoomLoader({
             <>
               {msgVisible && (
                 <p
-                  className={`font-mono text-[10px] uppercase text-[#6b7a99] sm:text-[11px] ${msgVisible ? 'wr-msg-in' : 'wr-msg-out'}`}
+                  className={`font-mono text-[11px] uppercase text-[#6b7a99] sm:text-[12px] ${msgVisible ? 'wr-msg-in' : 'wr-msg-out'}`}
                   style={{ letterSpacing: '0.22em' }}
                 >
                   {displayStatus}
@@ -309,7 +309,7 @@ export default function WarRoomLoader({
 
               {msgVisible && pct >= 8 && (
                 <p
-                  className="font-mono text-[8px] uppercase text-[#6b7a99]/55 sm:text-[9px]"
+                  className="font-mono text-[9px] uppercase text-[#6b7a99]/55 sm:text-[10px]"
                   style={{ letterSpacing: '0.12em' }}
                 >
                   {SYSTEM_STATS}

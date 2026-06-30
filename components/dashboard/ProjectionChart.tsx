@@ -291,7 +291,7 @@ export default function ProjectionChart({
     <div className={`glass-panel p-5 ${className}`}>
       <div className="flex items-start justify-between mb-3 gap-3">
         <div className="min-w-0 flex-1">
-          <h3 className="text-[11px] font-black uppercase tracking-[0.3em] text-slate-300 flex items-center gap-2">
+          <h3 className="text-[12px] font-black uppercase tracking-[0.3em] text-slate-300 flex items-center gap-2">
             <span
               className="w-1 h-3 inline-block"
               style={{
@@ -311,7 +311,7 @@ export default function ProjectionChart({
               scoreHighlightNumeric &&
               scoreHighlightSuffix ? (
                 <>
-                  <p className="text-[9px] font-bold uppercase tracking-[0.28em] text-slate-500">
+                  <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-slate-500">
                     {scoreHighlightLabel}
                   </p>
                   <p className="flex items-baseline gap-1.5 leading-none">
@@ -333,7 +333,7 @@ export default function ProjectionChart({
                 </>
               ) : scoreHighlightLabel && scoreHighlightValue ? (
                 <>
-                  <p className="text-[9px] font-bold uppercase tracking-[0.28em] text-slate-500">
+                  <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-slate-500">
                     {scoreHighlightLabel}
                   </p>
                   <p
@@ -349,7 +349,7 @@ export default function ProjectionChart({
                 </>
               ) : null}
               {subtitle ? (
-                <p className="text-[10px] uppercase tracking-wider text-slate-500 font-mono pt-0.5">
+                <p className="text-[11px] uppercase tracking-wider text-slate-500 font-mono pt-0.5">
                   {subtitle}
                 </p>
               ) : null}
@@ -361,7 +361,7 @@ export default function ProjectionChart({
           {rightActionLabel ? (
             <Link
               href={rightActionHref}
-              className="text-[10px] font-bold text-[#22D3EE] hover:text-white transition-colors flex items-center gap-1"
+              className="text-[11px] font-bold text-[#22D3EE] hover:text-white transition-colors flex items-center gap-1"
             >
               {rightActionLabel}
               <span aria-hidden>→</span>
@@ -552,11 +552,11 @@ export default function ProjectionChart({
         </svg>
 
         <div className="flex flex-col gap-1 mt-1 px-1">
-          <span className="text-[9px] font-mono text-slate-600 uppercase tracking-wider">
+          <span className="text-[10px] font-mono text-slate-600 uppercase tracking-wider">
             {bench !== null ? `${benchmarkLabel}: ${fmt(bench)}` : '\u00a0'}
           </span>
           {positionMode && multiPaths.length ? (
-            <div className="flex flex-wrap items-center gap-x-[12px] gap-y-1 font-mono text-[8px] text-[#94A3B8]">
+            <div className="flex flex-wrap items-center gap-x-[12px] gap-y-1 font-mono text-[9px] text-[#94A3B8]">
               {multiPaths.map((s) => (
                 <span key={s.position} className="inline-flex items-center gap-1.5">
                   <span className="w-2 h-2 rounded-full shrink-0" style={{ background: s.color }} aria-hidden />
@@ -565,7 +565,7 @@ export default function ProjectionChart({
               ))}
             </div>
           ) : !positionMode ? (
-            <div className="flex flex-wrap items-center gap-x-[12px] gap-y-1 font-mono text-[8px] text-[#94A3B8]">
+            <div className="flex flex-wrap items-center gap-x-[12px] gap-y-1 font-mono text-[9px] text-[#94A3B8]">
               <span className="inline-flex items-center gap-1.5">
                 <span className="w-2 h-2 rounded-full shrink-0 bg-[#36E7A1]" aria-hidden />
                 AGGREGATE
@@ -587,12 +587,12 @@ export default function ProjectionChart({
                   style={{ left: `${left}%`, maxWidth: 110 }}
                 >
                   <div
-                    className="text-[9px] font-mono font-bold leading-tight"
+                    className="text-[10px] font-mono font-bold leading-tight"
                     style={{ color: EMERALD, textShadow: '0 0 10px rgba(54,231,161,0.45)' }}
                   >
                     {a.player}
                   </div>
-                  {a.note ? <div className="text-[8px] text-slate-500 leading-tight">{a.note}</div> : null}
+                  {a.note ? <div className="text-[9px] text-slate-500 leading-tight">{a.note}</div> : null}
                 </div>
               );
             })}

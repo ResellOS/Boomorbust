@@ -31,18 +31,18 @@ export default function LandingComparisonTable() {
             <br />
             We Give Decisions.
           </h2>
-          <p className="mt-4 max-w-[480px] text-[15px] leading-relaxed text-[#64748B]" style={{ fontFamily: 'var(--font-body)' }}>
+          <p className="mt-4 max-w-[480px] text-[16px] leading-relaxed text-[#64748B]" style={{ fontFamily: 'var(--font-body)' }}>
             Rankings without context are trivia. Boom or Bust turns your leagues, markets, and matchups into a single actionable portfolio layer.
           </p>
         </div>
 
         <div className="rounded-xl border border-white/[0.08] bg-white/[0.03] p-6 backdrop-blur-[24px] sm:p-8">
-          <p className="mb-4 text-[11px] font-bold uppercase tracking-[0.14em] text-[#64748B]" style={{ fontFamily: 'var(--font-body)' }}>
+          <p className="mb-4 text-[12px] font-bold uppercase tracking-[0.14em] text-[#64748B]" style={{ fontFamily: 'var(--font-body)' }}>
             What you get
           </p>
           <ul className="flex flex-col gap-3">
             {FEATURES.map((f) => (
-              <li key={f} className="flex items-center gap-3 text-[14px] text-white/90" style={{ fontFamily: 'var(--font-body)' }}>
+              <li key={f} className="flex items-center gap-3 text-[15px] text-white/90" style={{ fontFamily: 'var(--font-body)' }}>
                 <span className="shrink-0 font-bold" style={{ color: BOOM, filter: 'drop-shadow(0 0 6px rgba(62,207,173,0.45))' }}>✓</span>
                 {f}
               </li>
@@ -50,9 +50,9 @@ export default function LandingComparisonTable() {
           </ul>
           <div className="mt-6 border-t border-white/[0.06] pt-5">
             <p className="font-mono text-[clamp(1.5rem,4vw,2rem)] font-bold tabular-nums" style={{ color: BOOM, textShadow: '0 0 20px rgba(62,207,173,0.3)' }}>
-              $0–$35<span className="text-[16px] font-normal text-white/50">/mo</span>
+              $0–$35<span className="text-[17px] font-normal text-white/50">/mo</span>
             </p>
-            <p className="mt-1 text-[13px] text-[#64748B]" style={{ fontFamily: 'var(--font-body)' }}>
+            <p className="mt-1 text-[14px] text-[#64748B]" style={{ fontFamily: 'var(--font-body)' }}>
               One terminal. Every league.
             </p>
           </div>

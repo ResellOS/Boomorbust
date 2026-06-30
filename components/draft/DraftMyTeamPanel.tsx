@@ -58,19 +58,19 @@ export default function DraftMyTeamPanel({ config, picks }: DraftMyTeamPanelProp
   return (
     <aside className="flex min-h-0 w-full flex-col overflow-hidden border-r border-border bg-[#0f1420] md:w-[200px]">
       <div className="shrink-0 border-b border-border px-3 py-2">
-        <div className="font-mono text-[9px] uppercase tracking-[1.5px] text-muted">My Team</div>
+        <div className="font-mono text-[10px] uppercase tracking-[1.5px] text-muted">My Team</div>
       </div>
 
       <div className="shrink-0 border-b border-border px-3 py-2">
-        <div className="mb-1.5 font-mono text-[8px] uppercase text-muted">Picks</div>
+        <div className="mb-1.5 font-mono text-[9px] uppercase text-muted">Picks</div>
         {userPicks.length === 0 && upcomingLabels.length === 0 ? (
-          <div className="font-mono text-[9px] text-muted/60">No picks yet</div>
+          <div className="font-mono text-[10px] text-muted/60">No picks yet</div>
         ) : (
           <div className="flex flex-wrap gap-1">
             {userPicks.map((pk) => (
               <span
                 key={pk.overall}
-                className="rounded border border-border bg-[#141929] px-1.5 py-0.5 font-mono text-[8px] text-boom"
+                className="rounded border border-border bg-[#141929] px-1.5 py-0.5 font-mono text-[9px] text-boom"
               >
                 {safePickLabel(pk.overall, teams)}
               </span>
@@ -78,7 +78,7 @@ export default function DraftMyTeamPanel({ config, picks }: DraftMyTeamPanelProp
             {upcomingLabels.map((l) => (
               <span
                 key={l}
-                className="rounded border border-border/50 px-1.5 py-0.5 font-mono text-[8px] text-muted"
+                className="rounded border border-border/50 px-1.5 py-0.5 font-mono text-[9px] text-muted"
               >
                 {l}
               </span>
@@ -93,43 +93,43 @@ export default function DraftMyTeamPanel({ config, picks }: DraftMyTeamPanelProp
             key={`${label}-${i}`}
             className="mb-1.5 flex items-center gap-2 rounded border border-border/40 bg-[#141929]/60 px-2 py-1.5"
           >
-            <span className="w-8 shrink-0 font-mono text-[7px] uppercase text-muted">{label}</span>
+            <span className="w-8 shrink-0 font-mono text-[8px] uppercase text-muted">{label}</span>
             {player ? (
               <>
                 <PlayerAvatar playerId={player.playerId} name={player.name} size={22} />
                 <span
-                  className="min-w-0 flex-1 truncate font-mono text-[9px]"
+                  className="min-w-0 flex-1 truncate font-mono text-[10px]"
                   style={{ color: positionColor(player.position) }}
                 >
                   {player.name}
                 </span>
               </>
             ) : (
-              <span className="font-mono text-[9px] text-muted/50">—</span>
+              <span className="font-mono text-[10px] text-muted/50">—</span>
             )}
           </div>
         ))}
       </div>
 
       <div className="shrink-0 border-t border-border px-3 py-3">
-        <div className="font-mono text-[8px] uppercase tracking-[1.5px] text-muted">Draft Grade</div>
+        <div className="font-mono text-[9px] uppercase tracking-[1.5px] text-muted">Draft Grade</div>
         <div
           className="mt-1 font-mono text-[32px] leading-none"
           style={{ color: draftGradeColor(analysis.grade) }}
         >
           {analysis.grade}
         </div>
-        <div className="font-mono text-[10px] text-muted">{analysis.label}</div>
+        <div className="font-mono text-[11px] text-muted">{analysis.label}</div>
         <div className="mt-2">
-          <div className="font-mono text-[7px] uppercase text-boom">Strengths</div>
+          <div className="font-mono text-[8px] uppercase text-boom">Strengths</div>
           {analysis.strengths.map((s) => (
-            <div key={s} className="font-mono text-[8px] text-muted">· {s}</div>
+            <div key={s} className="font-mono text-[9px] text-muted">· {s}</div>
           ))}
         </div>
         <div className="mt-1.5">
-          <div className="font-mono text-[7px] uppercase text-bust">Weaknesses</div>
+          <div className="font-mono text-[8px] uppercase text-bust">Weaknesses</div>
           {analysis.weaknesses.map((w) => (
-            <div key={w} className="font-mono text-[8px] text-muted">· {w}</div>
+            <div key={w} className="font-mono text-[9px] text-muted">· {w}</div>
           ))}
         </div>
       </div>

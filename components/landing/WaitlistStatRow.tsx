@@ -22,7 +22,7 @@ function StatPair({
       >
         {num}
       </div>
-      <div className="mt-0.5 text-[12px] text-[#64748B]" style={{ fontFamily: 'var(--font-body)' }}>
+      <div className="mt-0.5 text-[13px] text-[#64748B]" style={{ fontFamily: 'var(--font-body)' }}>
         {label}
       </div>
     </div>

@@ -30,8 +30,8 @@ export default function ProcessResultsPanel({ data, loading }: Props) {
   return (
     <div className={`${GLASS} overflow-hidden`}>
       <div className="flex items-center justify-between px-4 py-3 border-b border-white/[0.06]">
-        <p className="text-[12px] uppercase tracking-widest text-[#64748B] font-semibold">PROCESS VS RESULTS ENGINE</p>
-        <button type="button" className="text-[12px] text-[#22D3EE] hover:underline bg-transparent border-0 cursor-pointer">
+        <p className="text-[13px] uppercase tracking-widest text-[#64748B] font-semibold">PROCESS VS RESULTS ENGINE</p>
+        <button type="button" className="text-[13px] text-[#22D3EE] hover:underline bg-transparent border-0 cursor-pointer">
           View Full Analysis →
         </button>
       </div>
@@ -70,10 +70,10 @@ export default function ProcessResultsPanel({ data, loading }: Props) {
         </div>
 
         <div>
-          <p className="text-[14px] text-white font-medium" style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}>
+          <p className="text-[15px] text-white font-medium" style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}>
             {d.narrativeTitle}
           </p>
-          <p className="text-[12px] text-[#64748B] mt-1 leading-relaxed" style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}>
+          <p className="text-[13px] text-[#64748B] mt-1 leading-relaxed" style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}>
             {d.narrativeBody}
           </p>
         </div>
@@ -81,15 +81,15 @@ export default function ProcessResultsPanel({ data, loading }: Props) {
 
       <div className="px-4 grid grid-cols-3 gap-3 border-t border-white/[0.06] pt-3 mt-1">
         <div>
-          <p className="text-[10px] uppercase text-[#64748B] mb-0.5">EXPECTED WINS</p>
+          <p className="text-[11px] uppercase text-[#64748B] mb-0.5">EXPECTED WINS</p>
           <p className="text-[20px] tabular-nums text-white font-mono">{d.expectedWins}</p>
         </div>
         <div>
-          <p className="text-[10px] uppercase text-[#64748B] mb-0.5">ACTUAL WINS</p>
+          <p className="text-[11px] uppercase text-[#64748B] mb-0.5">ACTUAL WINS</p>
           <p className="text-[20px] tabular-nums text-white font-mono">{d.actualWins}</p>
         </div>
         <div>
-          <p className="text-[10px] uppercase text-[#64748B] mb-0.5">WIN DIFFERENCE</p>
+          <p className="text-[11px] uppercase text-[#64748B] mb-0.5">WIN DIFFERENCE</p>
           <p className="text-[20px] tabular-nums font-mono" style={{ color: '#36E7A1' }}>
             +{d.winDifference}
           </p>
@@ -97,8 +97,8 @@ export default function ProcessResultsPanel({ data, loading }: Props) {
       </div>
 
       <div className="px-4 pb-4 border-t border-white/[0.06] pt-3 mt-3">
-        <p className="text-[11px] uppercase text-[#64748B]">{d.takeawayTitle}</p>
-        <p className="text-[13px] text-white mt-1" style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}>
+        <p className="text-[12px] uppercase text-[#64748B]">{d.takeawayTitle}</p>
+        <p className="text-[14px] text-white mt-1" style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}>
           {d.takeawayBody}
         </p>
         <div className="mt-3 h-1.5 rounded-full bg-white/[0.06] overflow-hidden">

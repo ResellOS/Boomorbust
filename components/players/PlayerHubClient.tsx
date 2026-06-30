@@ -131,7 +131,7 @@ export default function PlayerHubClient({
           <div className="font-figtree text-[26px] font-extrabold leading-none tracking-[-1px] text-text md:text-[34px]">
             PLAYER HUB
           </div>
-          <div className="mt-[3px] font-mono text-[9px] text-muted">
+          <div className="mt-[3px] font-mono text-[10px] text-muted">
             Every player. Every signal. Every week.
           </div>
         </div>
@@ -147,7 +147,7 @@ export default function PlayerHubClient({
                 setPage(1);
               }}
               placeholder="Search players..."
-              className="w-full border-none bg-transparent font-figtree text-[11px] text-text outline-none placeholder:text-muted"
+              className="w-full border-none bg-transparent font-figtree text-[12px] text-text outline-none placeholder:text-muted"
             />
           </div>
           {FILTERS.map((key) => (
@@ -158,7 +158,7 @@ export default function PlayerHubClient({
                 setFilter(key);
                 setPage(1);
               }}
-              className={`cursor-pointer rounded-[5px] px-[11px] py-[7px] font-figtree text-[10px] font-medium transition-colors min-h-[44px] md:min-h-0 md:py-[5px] ${filterBtnClass(key)}`}
+              className={`cursor-pointer rounded-[5px] px-[11px] py-[7px] font-figtree text-[11px] font-medium transition-colors min-h-[44px] md:min-h-0 md:py-[5px] ${filterBtnClass(key)}`}
             >
               {FILTER_VERDICT_LABELS[key] ?? key}
             </button>
@@ -166,7 +166,7 @@ export default function PlayerHubClient({
           <select
             value={sort}
             onChange={(e) => setSort(e.target.value as SortKey)}
-            className="ml-auto cursor-pointer rounded-[5px] border border-border bg-surface px-2.5 py-[5px] font-figtree text-[10px] text-text outline-none"
+            className="ml-auto cursor-pointer rounded-[5px] border border-border bg-surface px-2.5 py-[5px] font-figtree text-[11px] text-text outline-none"
           >
             <option value="rating">Dynasty Rating</option>
             <option value="name">Name</option>
@@ -182,7 +182,7 @@ export default function PlayerHubClient({
             {['Player', 'Rating', 'Grade'].map((h) => (
               <div
                 key={h}
-                className="font-mono text-[7px] font-normal uppercase tracking-[1.5px] text-muted"
+                className="font-mono text-[8px] font-normal uppercase tracking-[1.5px] text-muted"
               >
                 {h}
               </div>
@@ -214,20 +214,20 @@ export default function PlayerHubClient({
                       fallbackColor={mvColor(p)}
                     />
                     <div>
-                      <div className="mb-px font-figtree text-[11.5px] leading-tight text-text">
+                      <div className="mb-px font-figtree text-[12.5px] leading-tight text-text">
                         {p.fullName}
                       </div>
-                      <div className="font-mono text-[8px] text-muted">
+                      <div className="font-mono text-[9px] text-muted">
                         {p.position} · {p.team}
                       </div>
                     </div>
                   </div>
-                  <div className="font-mono text-[13px]" style={{ color: mvColor(p) }}>
+                  <div className="font-mono text-[14px]" style={{ color: mvColor(p) }}>
                     {p.tfoScore.toFixed(1)}
                   </div>
                   <div>
                     <span
-                      className="inline-block whitespace-nowrap rounded border border-border bg-white/[0.03] px-[7px] py-[3px] text-center font-figtree text-[9px] font-medium text-text"
+                      className="inline-block whitespace-nowrap rounded border border-border bg-white/[0.03] px-[7px] py-[3px] text-center font-figtree text-[10px] font-medium text-text"
                     >
                       {getGradeLabel(p.tfoScore)}
                     </span>
@@ -236,11 +236,11 @@ export default function PlayerHubClient({
               );
             })
           ) : (
-            <div className="px-3 py-8 text-center font-mono text-[11px] text-muted">
+            <div className="px-3 py-8 text-center font-mono text-[12px] text-muted">
               No players match your filters.
             </div>
           )}
-          <div className="flex items-center gap-[5px] border-t border-border px-3 py-2 font-mono text-[8.5px] text-muted">
+          <div className="flex items-center gap-[5px] border-t border-border px-3 py-2 font-mono text-[9.5px] text-muted">
             <span className="mr-auto">
               Showing {(safePage - 1) * PAGE_SIZE + 1}–
               {Math.min(safePage * PAGE_SIZE, filtered.length)} of {filtered.length}
@@ -278,7 +278,7 @@ export default function PlayerHubClient({
             onSelectPlayer={setSelectedId}
           />
         ) : (
-          <div className="flex h-full items-center justify-center font-mono text-[11px] text-muted">
+          <div className="flex h-full items-center justify-center font-mono text-[12px] text-muted">
             No player data available
           </div>
         )}
@@ -289,7 +289,7 @@ export default function PlayerHubClient({
           <button
             type="button"
             onClick={() => setMobileDetailOpen(false)}
-            className="shrink-0 border-b border-border px-4 py-3 text-left font-mono text-[10px] text-boom"
+            className="shrink-0 border-b border-border px-4 py-3 text-left font-mono text-[11px] text-boom"
           >
             ← Back to list
           </button>

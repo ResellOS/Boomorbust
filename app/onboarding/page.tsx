@@ -330,8 +330,8 @@ export default function OnboardingPage() {
                 </div>
 
                 <div className="bg-[var(--bg-secondary)] rounded-xl px-4 py-3 space-y-1.5">
-                  <p className="text-[11px] text-[var(--text-muted)] font-semibold uppercase tracking-wider">Where to find your league ID</p>
-                  <ol className="space-y-1 text-[11px] text-[var(--text-muted)]">
+                  <p className="text-[12px] text-[var(--text-muted)] font-semibold uppercase tracking-wider">Where to find your league ID</p>
+                  <ol className="space-y-1 text-[12px] text-[var(--text-muted)]">
                     <li>1. Open Sleeper → tap your league</li>
                     <li>2. Tap the <span className="text-white">⚙️ Settings</span> icon</li>
                     <li>3. Scroll to <span className="text-white">League ID</span> and copy it</li>

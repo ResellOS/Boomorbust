@@ -58,7 +58,7 @@ function LeagueGroupSkeleton({ label }: { label?: string }) {
     <div>
       {label && (
         <div className="flex items-center gap-2 mb-2">
-          <p className="text-[9px] font-bold uppercase tracking-[0.15em] text-[var(--text-muted)]">{label}</p>
+          <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-[var(--text-muted)]">{label}</p>
           <div className="flex-1 h-px bg-white/[0.05]" />
         </div>
       )}
@@ -112,7 +112,7 @@ function TargetCard({ target }: { target: RecommendedTarget }) {
           </div>
           {/* Position badge */}
           <span
-            className="absolute -bottom-0.5 -right-0.5 rounded-full px-1 py-px text-[7px] font-black uppercase font-mono border"
+            className="absolute -bottom-0.5 -right-0.5 rounded-full px-1 py-px text-[8px] font-black uppercase font-mono border"
             style={{ background: `${pc}22`, borderColor: `${pc}55`, color: pc }}
           >
             {target.position}
@@ -123,13 +123,13 @@ function TargetCard({ target }: { target: RecommendedTarget }) {
         <div className="flex-1 min-w-0">
           {/* Name + team */}
           <div className="flex items-baseline gap-1.5 mb-0.5">
-            <p className="text-[13px] font-semibold leading-tight text-white truncate">{target.name}</p>
-            <span className="text-[10px] text-[var(--text-muted)] shrink-0">{target.team}</span>
+            <p className="text-[14px] font-semibold leading-tight text-white truncate">{target.name}</p>
+            <span className="text-[11px] text-[var(--text-muted)] shrink-0">{target.team}</span>
           </div>
 
           {/* Gap reason */}
           <p
-            className="text-[9px] font-bold uppercase tracking-[0.12em] mb-1.5"
+            className="text-[10px] font-bold uppercase tracking-[0.12em] mb-1.5"
             style={{ color: glowColor }}
           >
             {target.gapReason}
@@ -138,18 +138,18 @@ function TargetCard({ target }: { target: RecommendedTarget }) {
           {/* BVI line — three segments in JetBrains Mono */}
           <div className="flex flex-wrap gap-x-2 gap-y-0.5">
             {bviPart && (
-              <span className="font-mono text-[8px] text-[var(--text-secondary)]">
+              <span className="font-mono text-[9px] text-[var(--text-secondary)]">
                 {bviPart}
               </span>
             )}
             {ktcPart && (
-              <span className="font-mono text-[8px] text-[var(--text-muted)]">
+              <span className="font-mono text-[9px] text-[var(--text-muted)]">
                 {ktcPart}
               </span>
             )}
             {deltaPart && (
               <span
-                className="font-mono text-[8px] font-black"
+                className="font-mono text-[9px] font-black"
                 style={{ color: glowColor }}
               >
                 {deltaPart}
@@ -160,7 +160,7 @@ function TargetCard({ target }: { target: RecommendedTarget }) {
 
         {/* Acquire chevron */}
         <div
-          className="shrink-0 mt-1 opacity-0 group-hover:opacity-100 transition-opacity text-[10px] font-mono font-black uppercase"
+          className="shrink-0 mt-1 opacity-0 group-hover:opacity-100 transition-opacity text-[11px] font-mono font-black uppercase"
           style={{ color: glowColor }}
         >
           →
@@ -202,15 +202,15 @@ export default function RecommendedTargets({
       {/* Header */}
       <div className="flex items-center gap-2 mb-4">
         <div className="flex flex-col gap-0.5">
-          <h2 className="font-display text-[15px] tracking-wide text-white uppercase">
+          <h2 className="font-display text-[16px] tracking-wide text-white uppercase">
             Recommended Targets
           </h2>
-          <p className="text-[10px] text-[var(--text-muted)]">
+          <p className="text-[11px] text-[var(--text-muted)]">
             BVI undervalue × roster gap analysis · click any card to open Trade Finder
           </p>
         </div>
         <div className="ml-auto shrink-0 rounded-full border border-[#36E7A1]/30 bg-[#36E7A1]/08 px-2 py-0.5">
-          <span className="font-mono text-[8px] font-black text-[#36E7A1] uppercase tracking-[0.1em]">
+          <span className="font-mono text-[9px] font-black text-[#36E7A1] uppercase tracking-[0.1em]">
             BVI Engine
           </span>
         </div>
@@ -236,7 +236,7 @@ export default function RecommendedTargets({
               <div key={lid}>
                 {multiLeague && (
                   <div className="flex items-center gap-2 mb-2">
-                    <p className="text-[9px] font-bold uppercase tracking-[0.15em] text-[var(--text-muted)]">
+                    <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-[var(--text-muted)]">
                       {leagueName}
                     </p>
                     <div className="flex-1 h-px bg-white/[0.05]" />

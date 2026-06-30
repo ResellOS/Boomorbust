@@ -126,7 +126,7 @@ export default function SettingsNav({ active, onChange, onLogout }: Props) {
     <nav className="flex flex-col gap-5 py-4 px-3">
       {NAV_GROUPS.map((group) => (
         <div key={group.heading}>
-          <p className="text-[9px] font-bold text-slate-600 uppercase tracking-widest px-3 mb-1.5">{group.heading}</p>
+          <p className="text-[10px] font-bold text-slate-600 uppercase tracking-widest px-3 mb-1.5">{group.heading}</p>
           <div className="space-y-0.5">
             {group.items.map((item) => {
               const isActive = active === item.id;
@@ -142,7 +142,7 @@ export default function SettingsNav({ active, onChange, onLogout }: Props) {
                   }}
                 >
                   <span style={{ opacity: isActive ? 1 : 0.6 }}>{item.icon}</span>
-                  <span className="text-[12px] font-medium">{item.label}</span>
+                  <span className="text-[13px] font-medium">{item.label}</span>
                 </button>
               );
             })}
@@ -156,7 +156,7 @@ export default function SettingsNav({ active, onChange, onLogout }: Props) {
         style={{ color: '#94a3b8' }}
       >
         <Trophy className="h-[15px] w-[15px] shrink-0" strokeWidth={2} />
-        <span className="text-[12px] font-medium">BOB Record</span>
+        <span className="text-[13px] font-medium">BOB Record</span>
       </Link>
 
       {/* Log Out */}
@@ -166,7 +166,7 @@ export default function SettingsNav({ active, onChange, onLogout }: Props) {
         style={{ color: '#EF4444' }}
       >
         <LogoutIcon />
-        <span className="text-[12px] font-medium group-hover:text-red-400">Log Out</span>
+        <span className="text-[13px] font-medium group-hover:text-red-400">Log Out</span>
       </button>
     </nav>
   );

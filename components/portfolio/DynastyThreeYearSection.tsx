@@ -133,7 +133,7 @@ export default function DynastyThreeYearSection({
     <section className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h2 className="font-mono text-[10px] font-black uppercase tracking-[0.2em] text-[#64748B]">
+          <h2 className="font-mono text-[11px] font-black uppercase tracking-[0.2em] text-[#64748B]">
             ROSTER TRAJECTORY
           </h2>
           <p className="text-xs text-[var(--text-secondary)]">Dynasty rating outlook · 2025–2027</p>
@@ -151,7 +151,7 @@ export default function DynastyThreeYearSection({
               type="button"
               onClick={() => setSortMode(b.id)}
               className={clsx(
-                'rounded-lg border px-3 py-1.5 text-[10px] font-bold font-mono uppercase tracking-wide transition',
+                'rounded-lg border px-3 py-1.5 text-[11px] font-bold font-mono uppercase tracking-wide transition',
                 sortMode === b.id
                   ? 'border-[var(--cyan)] bg-[var(--cyan)]/15 text-white'
                   : 'border-white/10 bg-white/[0.04] text-[#94A3B8] hover:border-white/20',
@@ -165,7 +165,7 @@ export default function DynastyThreeYearSection({
 
       <div className="glass-panel relative min-h-[300px] overflow-visible rounded-xl p-4">
         {dynLoading && (
-          <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/30 text-[11px] font-mono text-[#94A3B8]">
+          <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/30 text-[12px] font-mono text-[#94A3B8]">
             Loading dynasty model…
           </div>
         )}
@@ -299,7 +299,7 @@ export default function DynastyThreeYearSection({
 
           {tip && chartWrapRef.current && (
             <div
-              className="glass-panel pointer-events-none absolute z-[80] w-[120px] rounded-lg border border-white/10 p-2 text-[10px] shadow-xl backdrop-blur-md"
+              className="glass-panel pointer-events-none absolute z-[80] w-[120px] rounded-lg border border-white/10 p-2 text-[11px] shadow-xl backdrop-blur-md"
               style={{
                 left: Math.min(chartWrapRef.current.clientWidth - 124, Math.max(4, tip.x + 12)),
                 top: Math.min(chartWrapRef.current.clientHeight - 72, Math.max(4, tip.y + 12)),
@@ -330,7 +330,7 @@ export default function DynastyThreeYearSection({
             <div className="text-[24px] font-bold tabular-nums" style={{ fontFamily: 'var(--font-display)', color: s.c }}>
               {s.v}
             </div>
-            <div className="mt-0.5 text-[9px] font-mono uppercase tracking-[0.1em] text-[#64748B]">{s.k}</div>
+            <div className="mt-0.5 text-[10px] font-mono uppercase tracking-[0.1em] text-[#64748B]">{s.k}</div>
           </div>
         ))}
       </div>
@@ -379,9 +379,9 @@ function PlayerThreeYearCard({ row }: { row: PortfolioThreeYearRow }) {
           className="h-8 w-8 shrink-0 rounded-full border border-white/10 object-cover"
         />
         <div className="min-w-0 flex-1">
-          <p className="truncate text-[13px] font-semibold text-white">{row.name}</p>
+          <p className="truncate text-[14px] font-semibold text-white">{row.name}</p>
           <span
-            className="mt-0.5 inline-block rounded px-1.5 py-0.5 text-[9px] font-black font-mono"
+            className="mt-0.5 inline-block rounded px-1.5 py-0.5 text-[10px] font-black font-mono"
             style={{
               background: `${CARD_POS_BADGE[row.position]}22`,
               color: CARD_POS_BADGE[row.position],
@@ -399,11 +399,11 @@ function PlayerThreeYearCard({ row }: { row: PortfolioThreeYearRow }) {
           const col = scoreBandColor(cell.s);
           return (
             <div key={cell.y} className={clsx('px-1 py-1 text-center', i > 0 && 'border-l border-white/[0.06]')}>
-              <p className="text-center text-[8px] font-mono text-[#64748B]">{cell.y}</p>
-              <p className="text-center text-[16px] font-bold font-mono tabular-nums" style={{ color: col }}>
+              <p className="text-center text-[9px] font-mono text-[#64748B]">{cell.y}</p>
+              <p className="text-center text-[17px] font-bold font-mono tabular-nums" style={{ color: col }}>
                 {Math.round(cell.s)}
               </p>
-              <p className="text-center text-[7px] font-bold font-mono" style={{ color: col }}>
+              <p className="text-center text-[8px] font-bold font-mono" style={{ color: col }}>
                 {abbrevGrade(g)}
               </p>
             </div>
@@ -411,11 +411,11 @@ function PlayerThreeYearCard({ row }: { row: PortfolioThreeYearRow }) {
         })}
       </div>
 
-      <p className={clsx('mt-2 text-[9px] font-black font-mono', trend.className)}>{trend.text}</p>
+      <p className={clsx('mt-2 text-[10px] font-black font-mono', trend.className)}>{trend.text}</p>
 
       <span
         className={clsx(
-          'absolute bottom-2 right-2 rounded-[20px] border px-2 py-[2px] text-[8px] font-black font-mono',
+          'absolute bottom-2 right-2 rounded-[20px] border px-2 py-[2px] text-[9px] font-black font-mono',
           badgeCls,
         )}
       >

@@ -43,11 +43,11 @@ export default function WaiverStatusBar({ data, loading }: Props) {
       <div className="max-w-[1400px] mx-auto px-4 py-2 grid grid-cols-2 md:grid-cols-4 gap-4">
         {items.map(({ label, value, sub, color }) => (
           <div key={label} className="flex flex-col">
-            <span className="text-[9px] font-semibold text-slate-500 uppercase tracking-widest">{label}</span>
-            <span className="text-[15px] font-bold mt-0.5" style={{ fontFamily: 'JetBrains Mono, monospace', color }}>
+            <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-widest">{label}</span>
+            <span className="text-[16px] font-bold mt-0.5" style={{ fontFamily: 'JetBrains Mono, monospace', color }}>
               {value}
             </span>
-            <span className="text-[10px] text-slate-500">{sub}</span>
+            <span className="text-[11px] text-slate-500">{sub}</span>
           </div>
         ))}
       </div>

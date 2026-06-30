@@ -28,7 +28,7 @@ function PlayerThumb({ playerId, name }: { playerId: string; name: string }) {
           onError={() => setFailed(true)}
         />
       ) : (
-        <span className="flex h-full items-center justify-center font-mono text-[8px] text-muted">
+        <span className="flex h-full items-center justify-center font-mono text-[9px] text-muted">
           {name.slice(0, 1)}
         </span>
       )}
@@ -40,7 +40,7 @@ function MutualBadge({ score }: { score: number }) {
   const color = mutualBenefitColor(score);
   return (
     <div
-      className="flex h-9 w-9 items-center justify-center rounded-full border font-mono text-[10px] tabular-nums"
+      className="flex h-9 w-9 items-center justify-center rounded-full border font-mono text-[11px] tabular-nums"
       style={{ borderColor: `${color}66`, color, background: `${color}14` }}
     >
       {score}
@@ -86,7 +86,7 @@ export default function SuggestedTradesTable({
 
   if (deduped.length === 0) {
     return (
-      <section className="rounded-[10px] border border-border bg-[#0f1420] px-4 py-6 text-center font-figtree text-[12px] text-muted">
+      <section className="rounded-[10px] border border-border bg-[#0f1420] px-4 py-6 text-center font-figtree text-[13px] text-muted">
         No suggested trades yet — market signals populate after sync.
       </section>
     );
@@ -94,7 +94,7 @@ export default function SuggestedTradesTable({
 
   return (
     <section>
-      <div className="mb-2 font-figtree text-[10px] uppercase tracking-[1.5px] text-text">
+      <div className="mb-2 font-figtree text-[11px] uppercase tracking-[1.5px] text-text">
         Suggested Trades
       </div>
 
@@ -136,7 +136,7 @@ export default function SuggestedTradesTable({
       <div className="overflow-x-auto rounded-[10px] border border-border bg-[#0f1420]">
         <table className="w-full min-w-[900px] border-collapse text-left">
           <thead>
-            <tr className="border-b border-border font-mono text-[8px] uppercase tracking-wide text-muted">
+            <tr className="border-b border-border font-mono text-[9px] uppercase tracking-wide text-muted">
               <th className="px-3 py-2">Player</th>
               <th className="px-3 py-2">League/Owner</th>
               <th className="px-3 py-2">Type</th>
@@ -169,41 +169,41 @@ export default function SuggestedTradesTable({
                     <div className="flex items-center gap-2">
                       <PlayerThumb playerId={o.playerId} name={o.playerName} />
                       <div>
-                        <div className="font-figtree text-[12px] text-text">{o.playerName}</div>
-                        <div className="font-mono text-[9px] text-muted">
+                        <div className="font-figtree text-[13px] text-text">{o.playerName}</div>
+                        <div className="font-mono text-[10px] text-muted">
                           {o.position} · {o.team}
                         </div>
                       </div>
                     </div>
                   </td>
-                  <td className="px-3 py-2 font-figtree text-[10px] text-muted">
+                  <td className="px-3 py-2 font-figtree text-[11px] text-muted">
                     {o.leagueName}
                     <br />
                     {o.managerName}
                   </td>
                   <td className="px-3 py-2">
                     <span
-                      className="rounded px-1.5 py-0.5 font-mono text-[8px] uppercase"
+                      className="rounded px-1.5 py-0.5 font-mono text-[9px] uppercase"
                       style={{ color: badge.color, background: badge.bg }}
                     >
                       {badge.label}
                     </span>
                   </td>
-                  <td className="px-3 py-2 font-mono text-[11px] tabular-nums text-text">
+                  <td className="px-3 py-2 font-mono text-[12px] tabular-nums text-text">
                     {o.bobRank ?? '—'}
                   </td>
-                  <td className="px-3 py-2 font-mono text-[11px] tabular-nums text-text">
+                  <td className="px-3 py-2 font-mono text-[12px] tabular-nums text-text">
                     {o.marketRank ?? '—'}
                   </td>
                   <td
-                    className="px-3 py-2 font-mono text-[11px] tabular-nums"
+                    className="px-3 py-2 font-mono text-[12px] tabular-nums"
                     style={{ color: gapColor }}
                   >
                     {o.valueGap != null ? (o.type === 'sell_high' ? '-' : '+') + o.valueGap : '—'}
                   </td>
-                  <td className="px-3 py-2 font-figtree text-[10px] text-muted">{o.suggestedPrice}</td>
+                  <td className="px-3 py-2 font-figtree text-[11px] text-muted">{o.suggestedPrice}</td>
                   <td
-                    className="px-3 py-2 font-mono text-[11px] tabular-nums"
+                    className="px-3 py-2 font-mono text-[12px] tabular-nums"
                     style={{
                       color: acceptanceColor(o.acceptanceProbability),
                       textShadow: acceptanceGlow(o.acceptanceProbability),
@@ -214,14 +214,14 @@ export default function SuggestedTradesTable({
                   <td className="px-3 py-2">
                     <MutualBadge score={o.mutualBenefitScore} />
                   </td>
-                  <td className="px-3 py-2 font-mono text-[11px] tabular-nums text-boom">
+                  <td className="px-3 py-2 font-mono text-[12px] tabular-nums text-boom">
                     +{o.championshipImpact.toFixed(1)}%
                   </td>
                   <td className="px-3 py-2">
                     <button
                       type="button"
                       onClick={() => onViewTrade(o)}
-                      className="font-mono text-[9px] text-boom hover:underline"
+                      className="font-mono text-[10px] text-boom hover:underline"
                     >
                       View Trade
                     </button>
@@ -250,7 +250,7 @@ function FilterSelect({
     <select
       value={value}
       onChange={(e) => onChange(e.target.value)}
-      className="rounded border border-border bg-bg px-2 py-1 font-mono text-[9px] text-text outline-none"
+      className="rounded border border-border bg-bg px-2 py-1 font-mono text-[10px] text-text outline-none"
     >
       {children}
     </select>

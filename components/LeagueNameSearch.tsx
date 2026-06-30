@@ -22,7 +22,7 @@ type Props = {
 };
 
 const glassInput =
-  'min-w-0 flex-1 rounded-xl border border-white/[0.12] bg-white/[0.04] px-3 py-2.5 text-[13px] text-white placeholder:text-[#475569] outline-none focus:border-[var(--indigo)] focus:ring-1 focus:ring-[var(--indigo)] font-mono shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]';
+  'min-w-0 flex-1 rounded-xl border border-white/[0.12] bg-white/[0.04] px-3 py-2.5 text-[14px] text-white placeholder:text-[#475569] outline-none focus:border-[var(--indigo)] focus:ring-1 focus:ring-[var(--indigo)] font-mono shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]';
 
 export default function LeagueNameSearch({
   existingLeagueIds = [],
@@ -108,7 +108,7 @@ export default function LeagueNameSearch({
       ) : null}
 
       {sourceNote && source === 'account' && results.length > 0 ? (
-        <p className="text-[11px] text-[var(--text-muted)] font-mono leading-snug">
+        <p className="text-[12px] text-[var(--text-muted)] font-mono leading-snug">
           Showing leagues on your Sleeper account that match this name.
         </p>
       ) : null}
@@ -129,7 +129,7 @@ export default function LeagueNameSearch({
               >
                 <div className="min-w-0">
                   <p className="text-sm font-semibold text-white truncate font-mono">{lg.name}</p>
-                  <p className="mt-1 text-[11px] text-[var(--text-secondary)] font-mono">
+                  <p className="mt-1 text-[12px] text-[var(--text-secondary)] font-mono">
                     {lg.total_rosters} teams · Season {lg.season} · {scoring}
                     {lg.status ? ` · ${lg.status}` : ''}
                   </p>
@@ -139,7 +139,7 @@ export default function LeagueNameSearch({
                   disabled={already}
                   onClick={() => onAppendLeagueId(lg.league_id)}
                   className={clsx(
-                    'self-start rounded-lg px-3 py-1.5 text-[11px] font-bold uppercase tracking-wide font-mono transition',
+                    'self-start rounded-lg px-3 py-1.5 text-[12px] font-bold uppercase tracking-wide font-mono transition',
                     already
                       ? 'border border-white/10 text-[var(--text-muted)] cursor-not-allowed'
                       : 'bg-[#22D3EE]/15 border border-[#22D3EE]/35 text-[#22D3EE] hover:bg-[#22D3EE]/25',
@@ -154,7 +154,7 @@ export default function LeagueNameSearch({
       ) : null}
 
       {hasSearched && !loading && results.length === 0 && !error ? (
-        <p className="text-[11px] text-[var(--text-muted)] font-mono">No leagues matched. Try another name.</p>
+        <p className="text-[12px] text-[var(--text-muted)] font-mono">No leagues matched. Try another name.</p>
       ) : null}
     </div>
   );

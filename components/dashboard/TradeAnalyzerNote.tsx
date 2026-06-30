@@ -35,12 +35,12 @@ export default function TradeAnalyzerNote({
     return (
       <div className={`glass-panel p-4 flex flex-col ${className}`}>
         <div className="flex items-center justify-between mb-3">
-          <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-300 flex items-center gap-2">
+          <h3 className="text-[11px] font-black uppercase tracking-[0.3em] text-slate-300 flex items-center gap-2">
             <Sparkles className="w-3 h-3 text-[#22D3EE]" />
             Trade Analyzer
           </h3>
           <span
-            className="text-[10px] font-black font-mono px-2 py-0.5 rounded border"
+            className="text-[11px] font-black font-mono px-2 py-0.5 rounded border"
             style={{
               color: '#36E7A1',
               borderColor: 'rgba(54,231,161,0.35)',
@@ -51,7 +51,7 @@ export default function TradeAnalyzerNote({
           </span>
         </div>
 
-        <p className="text-[11px] text-slate-400 leading-snug font-mono mb-3">{summaryLine}</p>
+        <p className="text-[12px] text-slate-400 leading-snug font-mono mb-3">{summaryLine}</p>
 
         <div className="flex items-center justify-center gap-2 py-2">
           <div className="flex flex-col items-center gap-1 min-w-0 flex-1">
@@ -69,10 +69,10 @@ export default function TradeAnalyzerNote({
                 className="border-2 border-[#EF4444]/50"
               />
             </div>
-            <span className="text-[8px] font-black uppercase text-[#EF4444] px-2 py-0.5 rounded border border-[#EF4444]/30 bg-[#EF4444]/10">
+            <span className="text-[9px] font-black uppercase text-[#EF4444] px-2 py-0.5 rounded border border-[#EF4444]/30 bg-[#EF4444]/10">
               Selling
             </span>
-            <span className="text-[10px] font-bold text-white truncate w-full text-center">
+            <span className="text-[11px] font-bold text-white truncate w-full text-center">
               {sell.name.split(' ').slice(-1)[0]}
             </span>
           </div>
@@ -94,16 +94,16 @@ export default function TradeAnalyzerNote({
                 className="border-2 border-[#36E7A1]/55"
               />
             </div>
-            <span className="text-[8px] font-black uppercase text-[#36E7A1] px-2 py-0.5 rounded border border-[#36E7A1]/30 bg-[#36E7A1]/10">
+            <span className="text-[9px] font-black uppercase text-[#36E7A1] px-2 py-0.5 rounded border border-[#36E7A1]/30 bg-[#36E7A1]/10">
               Buying
             </span>
-            <span className="text-[10px] font-bold text-white truncate w-full text-center">
+            <span className="text-[11px] font-bold text-white truncate w-full text-center">
               {buy.name.split(' ').slice(-1)[0]}
             </span>
           </div>
         </div>
 
-        <p className="text-[10px] text-slate-600 font-mono mt-2 border-t border-white/[0.04] pt-2">
+        <p className="text-[11px] text-slate-600 font-mono mt-2 border-t border-white/[0.04] pt-2">
           {body}
         </p>
       </div>
@@ -113,13 +113,13 @@ export default function TradeAnalyzerNote({
   return (
     <div className={`glass-panel p-4 flex flex-col ${className}`}>
       <div className="flex items-center justify-between mb-2">
-        <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-300 flex items-center gap-2">
+        <h3 className="text-[11px] font-black uppercase tracking-[0.3em] text-slate-300 flex items-center gap-2">
           <Sparkles className="w-3 h-3 text-[#22D3EE]" />
           Trade Analyzer
         </h3>
         {verdict && (
           <span
-            className="text-[10px] font-black font-mono px-2 py-0.5 rounded border"
+            className="text-[11px] font-black font-mono px-2 py-0.5 rounded border"
             style={{
               color: verdictColor,
               borderColor: `${verdictColor}40`,
@@ -131,7 +131,7 @@ export default function TradeAnalyzerNote({
         )}
       </div>
 
-      <p className="text-[11px] text-slate-500 leading-relaxed font-mono">{body}</p>
+      <p className="text-[12px] text-slate-500 leading-relaxed font-mono">{body}</p>
     </div>
   );
 }

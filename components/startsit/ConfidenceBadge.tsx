@@ -22,7 +22,7 @@ export default function ConfidenceBadge({
 
   return (
     <span
-      className={`font-mono text-[11px] font-semibold uppercase tracking-wide ${className}`}
+      className={`font-mono text-[12px] font-semibold uppercase tracking-wide ${className}`}
       style={{ color: style.color, opacity: style.opacity }}
     >
       {tier}

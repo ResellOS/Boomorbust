@@ -8,7 +8,7 @@ export default function PrivacyPage() {
       <div className="mx-auto max-w-2xl">
         <div className="mb-10 text-center">
           <p
-            className="text-[10px] uppercase tracking-[0.18em] text-[#64748B]"
+            className="text-[11px] uppercase tracking-[0.18em] text-[#64748B]"
             style={{ fontFamily: 'var(--font-mono), JetBrains Mono, monospace' }}
           >
             Legal
@@ -19,7 +19,7 @@ export default function PrivacyPage() {
           >
             Privacy Policy
           </h1>
-          <p className="mt-2 text-[13px] text-[#64748B]" style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}>
+          <p className="mt-2 text-[14px] text-[#64748B]" style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}>
             Last updated: June 22, 2026
           </p>
         </div>
@@ -68,7 +68,7 @@ export default function PrivacyPage() {
         <div className="mt-8 text-center">
           <Link
             href="/"
-            className="text-[12px] text-[#64748B] hover:text-white transition"
+            className="text-[13px] text-[#64748B] hover:text-white transition"
             style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}
           >
             ← Back to Home
@@ -83,12 +83,12 @@ function Section({ title, children }: { title: string; children: React.ReactNode
   return (
     <div>
       <h2
-        className="text-[15px] font-semibold text-white mb-2"
+        className="text-[16px] font-semibold text-white mb-2"
         style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}
       >
         {title}
       </h2>
-      <div className="text-[13px] text-[#94A3B8] leading-relaxed space-y-2">{children}</div>
+      <div className="text-[14px] text-[#94A3B8] leading-relaxed space-y-2">{children}</div>
     </div>
   );
 }

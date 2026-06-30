@@ -18,7 +18,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <span className="text-xs font-bold uppercase tracking-[0.2em] text-[var(--indigo-light)]">Admin</span>
-            <span className="hidden text-[11px] text-[var(--text-muted)] sm:inline">Operational console</span>
+            <span className="hidden text-[12px] text-[var(--text-muted)] sm:inline">Operational console</span>
           </div>
           <Link href="/dashboard" className="text-xs font-medium text-[var(--text-secondary)] transition hover:text-white">
             ← Back to app

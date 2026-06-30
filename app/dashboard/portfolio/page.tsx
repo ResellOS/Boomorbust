@@ -668,7 +668,7 @@ export default function PortfolioPage() {
           <h1 className="display font-normal leading-none tracking-tight text-[var(--gold)] text-[clamp(2rem,5vw,3rem)]">
             DYNASTY PORTFOLIO
           </h1>
-          <p className="mt-3 font-mono text-[10px] font-bold uppercase tracking-[0.22em] text-[#64748B]">
+          <p className="mt-3 font-mono text-[11px] font-bold uppercase tracking-[0.22em] text-[#64748B]">
             YOUR 3-YEAR EMPIRE WINDOW
           </p>
         </header>
@@ -709,7 +709,7 @@ export default function PortfolioPage() {
                 <section className="grid md:grid-cols-3 gap-6 lg:gap-8">
               {/* Total value */}
               <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)]/95 p-6 shadow-[var(--shadow-card)]">
-                <p className="text-[11px] uppercase tracking-[0.2em] text-[var(--text-muted)] mb-3">Total portfolio value</p>
+                <p className="text-[12px] uppercase tracking-[0.2em] text-[var(--text-muted)] mb-3">Total portfolio value</p>
                 <p className="display text-[2.65rem] sm:text-[2.85rem] text-[var(--gold)] leading-none">
                   {aggregates.headlineKtc ? aggregates.headlineKtc.toLocaleString() : '—'}
                 </p>
@@ -740,7 +740,7 @@ export default function PortfolioPage() {
                     ) : (
                       <span className="text-xs text-[var(--text-muted)]">Log more visits for week-over-week %</span>
                     )}
-                    <span className="text-[11px] text-[var(--text-muted)] uppercase tracking-wider">vs prior snapshot</span>
+                    <span className="text-[12px] text-[var(--text-muted)] uppercase tracking-wider">vs prior snapshot</span>
                   </div>
                   <SparklineGraph data={spark} width={100} height={44} />
                 </div>
@@ -748,7 +748,7 @@ export default function PortfolioPage() {
 
               {/* Exposure */}
               <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)]/95 p-6 shadow-[var(--shadow-card)]">
-                <p className="text-[11px] uppercase tracking-[0.2em] text-[var(--text-muted)] mb-4">Exposure analysis</p>
+                <p className="text-[12px] uppercase tracking-[0.2em] text-[var(--text-muted)] mb-4">Exposure analysis</p>
                 <p className="text-sm text-white display mb-3">Your top 5 holdings</p>
                 <ul className="space-y-3">
                   {aggregates.topHoldings.map((h) => (
@@ -763,7 +763,7 @@ export default function PortfolioPage() {
                       />
                       <div className="flex-1 min-w-0">
                         <p className="font-semibold text-white text-sm truncate">{h.name}</p>
-                        <p className="text-[11px] text-[var(--text-muted)]">
+                        <p className="text-[12px] text-[var(--text-muted)]">
                           {h.leagueCount} league{h.leagueCount !== 1 ? 's' : ''} · {h.position}
                         </p>
                       </div>
@@ -786,7 +786,7 @@ export default function PortfolioPage() {
 
               {/* League health */}
               <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)]/95 p-6 shadow-[var(--shadow-card)] flex flex-col">
-                <p className="text-[11px] uppercase tracking-[0.2em] text-[var(--text-muted)] mb-3">League health</p>
+                <p className="text-[12px] uppercase tracking-[0.2em] text-[var(--text-muted)] mb-3">League health</p>
                 <div className="flex items-start gap-4 flex-1">
                   <span
                     className={clsx(
@@ -836,7 +836,7 @@ export default function PortfolioPage() {
                           {Math.round(cell.ktc).toLocaleString()} KTC combined
                         </p>
                         {cell.addDepth && (
-                          <span className="mt-3 inline-flex text-[10px] font-bold uppercase tracking-wider bg-black/25 px-2 py-1 rounded border border-white/15">
+                          <span className="mt-3 inline-flex text-[11px] font-bold uppercase tracking-wider bg-black/25 px-2 py-1 rounded border border-white/15">
                             Add depth
                           </span>
                         )}
@@ -916,7 +916,7 @@ export default function PortfolioPage() {
                         <div className="overflow-x-auto scrollbar-thin">
                           <table className="w-full text-sm min-w-[640px]">
                             <thead>
-                              <tr className="border-b border-[var(--border)] text-left text-[11px] uppercase tracking-wider text-[var(--text-muted)]">
+                              <tr className="border-b border-[var(--border)] text-left text-[12px] uppercase tracking-wider text-[var(--text-muted)]">
                                 <th className="py-2 pr-3">Player</th>
                                 <th className="py-2 pr-3">Pos</th>
                                 <th className="py-2 pr-3">Team</th>

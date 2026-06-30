@@ -21,7 +21,7 @@ function Avatar({ name }: { name: string }) {
   const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
   if (err) {
     return (
-      <div className="w-9 h-9 rounded-full flex items-center justify-center text-[10px] font-bold bg-white/[0.08] text-white shrink-0">
+      <div className="w-9 h-9 rounded-full flex items-center justify-center text-[11px] font-bold bg-white/[0.08] text-white shrink-0">
         {initials}
       </div>
     );
@@ -50,10 +50,10 @@ export default function WaiverRadarPanel({ rows, loading }: Props) {
   return (
     <div className={`${GLASS} overflow-hidden`}>
       <div className="flex items-center justify-between px-4 py-3 border-b border-white/[0.06]">
-        <p className="text-[12px] uppercase tracking-widest text-[#64748B] font-semibold">WAIVER RADAR</p>
+        <p className="text-[13px] uppercase tracking-widest text-[#64748B] font-semibold">WAIVER RADAR</p>
         <button
           type="button"
-          className="rounded-lg border border-white/[0.08] bg-white/[0.03] px-3 py-1 text-[12px] text-white min-h-[36px]"
+          className="rounded-lg border border-white/[0.08] bg-white/[0.03] px-3 py-1 text-[13px] text-white min-h-[36px]"
           style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}
         >
           Next 7 Days ▾
@@ -74,7 +74,7 @@ export default function WaiverRadarPanel({ rows, loading }: Props) {
                 {['RANK', 'PLAYER', '% ROSTERED', 'TREND', '% FAAB', 'PRIORITY', 'OPPORTUNITY SCORE'].map((h) => (
                   <th
                     key={h}
-                    className={`text-left py-2 px-3 text-[10px] uppercase tracking-wider text-[#64748B] font-semibold ${h === 'OPPORTUNITY SCORE' ? 'text-right' : ''}`}
+                    className={`text-left py-2 px-3 text-[11px] uppercase tracking-wider text-[#64748B] font-semibold ${h === 'OPPORTUNITY SCORE' ? 'text-right' : ''}`}
                   >
                     {h}
                   </th>
@@ -88,33 +88,33 @@ export default function WaiverRadarPanel({ rows, loading }: Props) {
                   className="border-b border-white/[0.04] hover:bg-white/[0.03] transition-colors cursor-pointer"
                 >
                   <td className="py-2.5 px-3 w-10">
-                    <span className="text-[13px] tabular-nums text-[#64748B] font-mono">{r.rank}</span>
+                    <span className="text-[14px] tabular-nums text-[#64748B] font-mono">{r.rank}</span>
                   </td>
                   <td className="py-2.5 px-3">
                     <div className="flex items-center gap-2 min-w-0">
                       <Avatar name={r.playerName} />
                       <div className="min-w-0">
-                        <p className="text-[13px] font-medium text-white truncate">{r.playerName}</p>
-                        <p className="text-[11px] text-[#64748B]">
+                        <p className="text-[14px] font-medium text-white truncate">{r.playerName}</p>
+                        <p className="text-[12px] text-[#64748B]">
                           {r.position}·{r.team}
                         </p>
                       </div>
                     </div>
                   </td>
-                  <td className="py-2.5 px-3 text-[13px] tabular-nums text-white font-mono">{r.pctRostered}%</td>
+                  <td className="py-2.5 px-3 text-[14px] tabular-nums text-white font-mono">{r.pctRostered}%</td>
                   <td className="py-2.5 px-3">
                     {r.trendUp ? <TrendingUp className="w-[14px] h-[14px] text-[#36E7A1]" aria-label="Up" /> : null}
                   </td>
-                  <td className="py-2.5 px-3 text-[13px] tabular-nums font-mono" style={{ color: '#36E7A1' }}>
+                  <td className="py-2.5 px-3 text-[14px] tabular-nums font-mono" style={{ color: '#36E7A1' }}>
                     {r.pctFaab}%
                   </td>
                   <td className="py-2.5 px-3">
-                    <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-bold uppercase ${priorityPill(r.priority)}`}>
+                    <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-bold uppercase ${priorityPill(r.priority)}`}>
                       {r.priority}
                     </span>
                   </td>
                   <td className="py-2.5 px-3 text-right">
-                    <span className="text-[14px] font-bold tabular-nums font-mono" style={{ color: '#36E7A1' }}>
+                    <span className="text-[15px] font-bold tabular-nums font-mono" style={{ color: '#36E7A1' }}>
                       {r.opportunityScore}
                     </span>
                   </td>
@@ -126,7 +126,7 @@ export default function WaiverRadarPanel({ rows, loading }: Props) {
       )}
 
       <div className="py-3 text-center border-t border-white/[0.04]">
-        <a href="/waiver-wire" className="text-[12px] text-[#22D3EE] hover:underline" style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}>
+        <a href="/waiver-wire" className="text-[13px] text-[#22D3EE] hover:underline" style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}>
           View Full Waiver Radar →
         </a>
       </div>

@@ -184,20 +184,20 @@ export default function LandingFeaturesGrid() {
               <h3 className="text-[18px] font-semibold tracking-[0.02em] text-white sm:text-[19px]" style={{ fontFamily: 'var(--font-display)' }}>
                 {c.title}
               </h3>
-              <p className="mt-2 flex-1 text-[14px] leading-relaxed text-[#94A3B8]" style={{ fontFamily: 'var(--font-body)' }}>
+              <p className="mt-2 flex-1 text-[15px] leading-relaxed text-[#94A3B8]" style={{ fontFamily: 'var(--font-body)' }}>
                 {'desc' in c ? c.desc : c.body}
               </p>
               {'href' in c ? (
                 <Link
                   href={c.href}
-                  className="mt-5 inline-flex items-center gap-1 text-[13px] font-semibold text-[#22D3EE] transition-[filter] duration-200 hover:brightness-110"
+                  className="mt-5 inline-flex items-center gap-1 text-[14px] font-semibold text-[#22D3EE] transition-[filter] duration-200 hover:brightness-110"
                   style={{ fontFamily: 'var(--font-body)', textShadow: '0 0 14px rgba(34,211,238,0.25)' }}
                 >
                   {c.cta} <span aria-hidden>→</span>
                 </Link>
               ) : (
                 <span
-                  className="mt-5 inline-flex items-center text-[13px] font-semibold"
+                  className="mt-5 inline-flex items-center text-[14px] font-semibold"
                   style={{ fontFamily: 'var(--font-body)', color: c.iconColor }}
                 >
                   {c.link}

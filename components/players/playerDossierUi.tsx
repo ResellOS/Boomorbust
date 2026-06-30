@@ -145,7 +145,7 @@ export function StaggerBullets({ playerId, items }: { playerId: string; items: s
       {items.map((b, idx) => (
         <li
           key={b}
-          className="flex gap-2 font-figtree text-[11px] leading-snug text-muted transition-opacity duration-200"
+          className="flex gap-2 font-figtree text-[12px] leading-snug text-muted transition-opacity duration-200"
           style={{ opacity: idx < visibleCount ? 1 : 0 }}
         >
           <span className="shrink-0 text-boom">✓</span>
@@ -186,7 +186,7 @@ export function CollapsibleDossierSection({
       onClick={toggle}
       className="flex w-full items-center justify-between gap-2 text-left"
     >
-      <span className="font-mono text-[8px] uppercase tracking-[1.5px] text-muted">{title}</span>
+      <span className="font-mono text-[9px] uppercase tracking-[1.5px] text-muted">{title}</span>
       <ChevronDown
         className={`h-3.5 w-3.5 shrink-0 text-muted transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
       />
@@ -233,7 +233,7 @@ export function QuickActionBtn({
   accent?: boolean;
   external?: boolean;
 }) {
-  const cls = `rounded-md border px-2.5 py-1.5 font-mono text-[8px] uppercase tracking-wide transition-colors hover:border-boom/40 hover:text-boom ${
+  const cls = `rounded-md border px-2.5 py-1.5 font-mono text-[9px] uppercase tracking-wide transition-colors hover:border-boom/40 hover:text-boom ${
     accent
       ? 'border-boom/30 bg-boom/10 text-boom'
       : 'border-border text-muted hover:bg-white/[0.02]'

@@ -18,7 +18,7 @@ function LeagueIcon({ name }: { name: string }) {
   const color = colors[name.charCodeAt(0) % colors.length];
   return (
     <div
-      className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 text-[13px] font-bold"
+      className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 text-[14px] font-bold"
       style={{ background: `${color}15`, border: `1px solid ${color}30`, color }}
     >
       {name.split(' ').map((s) => s[0]).join('').slice(0, 2).toUpperCase()}
@@ -36,15 +36,15 @@ export default function LeagueConnections({ leagues }: Props) {
     >
       {/* Header */}
       <div className="flex items-center justify-between px-5 py-4 border-b" style={{ borderColor: 'rgba(255,255,255,0.07)' }}>
-        <p className="text-[13px] font-bold text-white">
+        <p className="text-[14px] font-bold text-white">
           LEAGUE CONNECTIONS ({leagues.length})
         </p>
-        <button className="text-[11px] font-medium" style={{ color: '#36E7A1' }}>Manage Leagues</button>
+        <button className="text-[12px] font-medium" style={{ color: '#36E7A1' }}>Manage Leagues</button>
       </div>
 
       {/* League rows */}
       {leagues.length === 0 && (
-        <div className="px-5 py-8 text-center text-slate-500 text-[12px]">
+        <div className="px-5 py-8 text-center text-slate-500 text-[13px]">
           No leagues connected. Connect your Sleeper account to get started.
         </div>
       )}
@@ -59,25 +59,25 @@ export default function LeagueConnections({ leagues }: Props) {
 
           {/* Name + format */}
           <div className="flex-1 min-w-0">
-            <p className="text-[13px] font-semibold text-white truncate">{league.name}</p>
-            <p className="text-[11px] text-slate-500">{league.format}</p>
+            <p className="text-[14px] font-semibold text-white truncate">{league.name}</p>
+            <p className="text-[12px] text-slate-500">{league.format}</p>
           </div>
 
           {/* Role badge */}
           <span
-            className="text-[10px] font-bold px-2 py-1 rounded hidden sm:block flex-shrink-0"
+            className="text-[11px] font-bold px-2 py-1 rounded hidden sm:block flex-shrink-0"
             style={{ color: ROLE_COLORS[league.role] ?? '#64748B', background: `${ROLE_COLORS[league.role] ?? '#64748B'}15`, border: `1px solid ${ROLE_COLORS[league.role] ?? '#64748B'}30` }}
           >
             {league.role}
           </span>
 
           {/* Since */}
-          <p className="text-[11px] text-slate-500 hidden md:block w-24 flex-shrink-0">{league.since}</p>
+          <p className="text-[12px] text-slate-500 hidden md:block w-24 flex-shrink-0">{league.since}</p>
 
           {/* Championships */}
           <div className="text-right hidden md:block w-24 flex-shrink-0">
-            <p className="text-[10px] text-slate-600 uppercase tracking-wider">Champions</p>
-            <p className="text-[13px] font-bold" style={{ fontFamily: 'JetBrains Mono, monospace', color: league.championships > 0 ? '#FBBF24' : '#64748B' }}>
+            <p className="text-[11px] text-slate-600 uppercase tracking-wider">Champions</p>
+            <p className="text-[14px] font-bold" style={{ fontFamily: 'JetBrains Mono, monospace', color: league.championships > 0 ? '#FBBF24' : '#64748B' }}>
               {league.championships}
             </p>
           </div>
@@ -103,7 +103,7 @@ export default function LeagueConnections({ leagues }: Props) {
                   <button
                     key={item}
                     onClick={() => setOpen(null)}
-                    className="w-full text-left px-4 py-2 text-[12px] text-slate-400 hover:text-white hover:bg-white/[0.05] transition-colors"
+                    className="w-full text-left px-4 py-2 text-[13px] text-slate-400 hover:text-white hover:bg-white/[0.05] transition-colors"
                     style={{ color: item === 'Disconnect' ? '#EF4444' : undefined }}
                   >
                     {item}
@@ -118,7 +118,7 @@ export default function LeagueConnections({ leagues }: Props) {
       {/* Connect another */}
       <div className="px-5 py-3">
         <button
-          className="text-[12px] font-medium transition-colors"
+          className="text-[13px] font-medium transition-colors"
           style={{ color: '#36E7A1' }}
         >
           + Connect Another League

@@ -98,7 +98,7 @@ export default function PerformanceTopBar({ stats }: PerformanceTopBarProps) {
             key={item.label}
             className="flex flex-col justify-center border-r border-border px-[18px] last:border-r-0"
           >
-            <div className="font-mono text-[7.5px] uppercase tracking-[1.5px] text-muted">
+            <div className="font-mono text-[8.5px] uppercase tracking-[1.5px] text-muted">
               {item.label}
             </div>
             <div
@@ -106,7 +106,7 @@ export default function PerformanceTopBar({ stats }: PerformanceTopBarProps) {
             >
               {item.value}
             </div>
-            <div className="mt-0.5 font-mono text-[7.5px] text-muted">{item.sub}</div>
+            <div className="mt-0.5 font-mono text-[8.5px] text-muted">{item.sub}</div>
           </div>
         ))}
       </div>

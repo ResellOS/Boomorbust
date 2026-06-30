@@ -11,7 +11,7 @@ export default function TradeHubOffersPage() {
         <div className="flex items-center gap-3">
           <Link
             href="/dashboard/trade-hub"
-            className="text-[13px] text-[#22D3EE] hover:underline"
+            className="text-[14px] text-[#22D3EE] hover:underline"
             style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}
           >
             ← Trade Hub
@@ -24,7 +24,7 @@ export default function TradeHubOffersPage() {
           >
             All incoming offers
           </h1>
-          <p className="mt-1 text-[13px] text-[#64748B]" style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}>
+          <p className="mt-1 text-[14px] text-[#64748B]" style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}>
             Same feed as Trade Hub — full list for your account.
           </p>
         </header>

@@ -40,7 +40,7 @@ function SlotTile({
         minHeight: 72,
       }}
     >
-      <span className="font-mono text-[7px] uppercase tracking-wide text-muted">{slot.slot}</span>
+      <span className="font-mono text-[8px] uppercase tracking-wide text-muted">{slot.slot}</span>
       {hasPlayer ? (
         <>
           <PlayerAvatar
@@ -49,21 +49,21 @@ function SlotTile({
             size={28}
             className="my-0.5"
           />
-          <span className="max-w-full truncate font-mono text-[8px] uppercase text-text">
+          <span className="max-w-full truncate font-mono text-[9px] uppercase text-text">
             {slot.playerName.split(' ').pop()}
           </span>
-          <span className="font-mono text-[8px] text-muted">
+          <span className="font-mono text-[9px] text-muted">
             {slot.team} · {slot.opponent}
           </span>
           {slot.projectedPoints != null && (
-            <span className="font-mono text-[9px] text-boom">
+            <span className="font-mono text-[10px] text-boom">
               {slot.projectedPoints.toFixed(1)} pts
             </span>
           )}
-          <span className="font-mono text-[7px] text-muted">{slot.confidence}%</span>
+          <span className="font-mono text-[8px] text-muted">{slot.confidence}%</span>
         </>
       ) : (
-        <span className="mt-2 font-mono text-[8px] text-muted">Empty</span>
+        <span className="mt-2 font-mono text-[9px] text-muted">Empty</span>
       )}
     </button>
   );
@@ -86,14 +86,14 @@ export default function ProjectedLineupField({
     <div className="flex min-h-0 flex-col">
       <div className="mb-2 flex items-center justify-between">
         <div>
-          <div className="font-mono text-[9px] uppercase tracking-[1.5px] text-muted">
+          <div className="font-mono text-[10px] uppercase tracking-[1.5px] text-muted">
             Your Projected Lineup
           </div>
-          <div className="font-mono text-[10px] text-text">{leagueName}</div>
+          <div className="font-mono text-[11px] text-text">{leagueName}</div>
         </div>
         <Link
           href="/dashboard/lineup"
-          className="font-mono text-[9px] text-boom hover:underline"
+          className="font-mono text-[10px] text-boom hover:underline"
         >
           Full Lineup →
         </Link>
@@ -107,7 +107,7 @@ export default function ProjectedLineupField({
         }}
       >
         {isPreview && (
-          <div className="mb-2 rounded border border-hold/30 bg-hold/5 px-2 py-1 font-mono text-[8px] text-hold">
+          <div className="mb-2 rounded border border-hold/30 bg-hold/5 px-2 py-1 font-mono text-[9px] text-hold">
             Preseason preview — lineup fills when scored roster data is available
           </div>
         )}
@@ -135,7 +135,7 @@ export default function ProjectedLineupField({
 
       {bench.length > 0 && (
         <div className="mt-2">
-          <div className="mb-1 font-mono text-[8px] uppercase text-muted">Bench</div>
+          <div className="mb-1 font-mono text-[9px] uppercase text-muted">Bench</div>
           <div className="flex gap-1.5 overflow-x-auto pb-1 [scrollbar-width:thin]">
             {bench.map((b) => (
               <button
@@ -146,16 +146,16 @@ export default function ProjectedLineupField({
                 style={{ borderColor: slotBorder(b.recommendation) }}
               >
                 <PlayerAvatar playerId={b.playerId ?? ''} name={b.playerName} size={24} />
-                <span className="mt-0.5 max-w-[72px] truncate font-mono text-[7px] uppercase text-text">
+                <span className="mt-0.5 max-w-[72px] truncate font-mono text-[8px] uppercase text-text">
                   {b.playerName.split(' ').pop()}
                 </span>
                 {b.projectedPoints != null && (
-                  <span className="font-mono text-[8px] text-muted">
+                  <span className="font-mono text-[9px] text-muted">
                     {b.projectedPoints.toFixed(1)} pts
                   </span>
                 )}
                 {b.recommendation === 'flex' && (
-                  <span className="font-mono text-[7px] text-hold">Regret risk</span>
+                  <span className="font-mono text-[8px] text-hold">Regret risk</span>
                 )}
               </button>
             ))}
@@ -166,13 +166,13 @@ export default function ProjectedLineupField({
       <button
         type="button"
         onClick={onApproveAll}
-        className="mt-3 w-full rounded-md border-none py-2.5 font-mono text-[10px] uppercase tracking-wide text-bg"
+        className="mt-3 w-full rounded-md border-none py-2.5 font-mono text-[11px] uppercase tracking-wide text-bg"
         style={{ background: '#7c3aed', boxShadow: '0 0 16px rgba(124,58,237,0.25)' }}
       >
         Approve All Decisions
       </button>
       {notSyncedCount > 0 && (
-        <p className="mt-1 text-center font-mono text-[9px] text-hold">
+        <p className="mt-1 text-center font-mono text-[10px] text-hold">
           {notSyncedCount} decision{notSyncedCount !== 1 ? 's' : ''} not synced
         </p>
       )}

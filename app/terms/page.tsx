@@ -25,16 +25,16 @@ function Section({
   return (
     <section className="space-y-3">
       <h2
-        className="text-[13px] font-bold uppercase tracking-[0.12em]"
+        className="text-[14px] font-bold uppercase tracking-[0.12em]"
         style={{ color: TEXT, fontFamily: 'var(--font-figtree), Figtree, sans-serif' }}
       >
-        <span className="font-mono text-[12px] tabular-nums" style={{ color: ACCENT }}>
+        <span className="font-mono text-[13px] tabular-nums" style={{ color: ACCENT }}>
           {n}.
         </span>{' '}
         {title}
       </h2>
       <div
-        className="space-y-2 text-[14px] leading-relaxed"
+        className="space-y-2 text-[15px] leading-relaxed"
         style={{ color: MUTED, fontFamily: 'var(--font-figtree), Figtree, sans-serif' }}
       >
         {children}
@@ -52,7 +52,7 @@ export default function TermsPage() {
             <Image src="/logo.png" alt="Boom or Bust" width={140} height={36} className="h-8 w-auto" unoptimized />
           </Link>
           <p
-            className="mt-8 text-[10px] font-mono uppercase tracking-[0.18em]"
+            className="mt-8 text-[11px] font-mono uppercase tracking-[0.18em]"
             style={{ color: MUTED }}
           >
             Legal
@@ -63,7 +63,7 @@ export default function TermsPage() {
           >
             Terms of Service
           </h1>
-          <p className="mt-2 text-[13px]" style={{ color: MUTED }}>
+          <p className="mt-2 text-[14px]" style={{ color: MUTED }}>
             Last updated: June 2026
           </p>
         </header>
@@ -184,7 +184,7 @@ export default function TermsPage() {
           </Section>
         </div>
 
-        <p className="mt-8 text-center text-[13px]" style={{ color: MUTED }}>
+        <p className="mt-8 text-center text-[14px]" style={{ color: MUTED }}>
           <Link href="/" className="transition hover:opacity-80" style={{ color: ACCENT }}>
             ← Back to home
           </Link>

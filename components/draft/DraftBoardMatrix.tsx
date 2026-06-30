@@ -56,8 +56,8 @@ export default function DraftBoardMatrix({
   return (
     <div className="flex min-h-[280px] shrink-0 flex-col border-b border-border bg-[#0a0d14]">
       <div className="flex shrink-0 items-center justify-between border-b border-border px-3 py-2">
-        <div className="font-mono text-[8px] uppercase tracking-[1.5px] text-muted">Draft Board</div>
-        <div className="font-mono text-[8px] text-muted">Mock · Snake · Scroll →</div>
+        <div className="font-mono text-[9px] uppercase tracking-[1.5px] text-muted">Draft Board</div>
+        <div className="font-mono text-[9px] text-muted">Mock · Snake · Scroll →</div>
       </div>
 
       <div className="min-h-0 flex-1 overflow-auto [scrollbar-width:thin]">
@@ -68,7 +68,7 @@ export default function DraftBoardMatrix({
             {teamHeaders.map((h) => (
               <div
                 key={h.slot}
-                className={`flex h-8 w-[92px] shrink-0 items-center justify-center rounded border px-1 font-mono text-[7px] uppercase ${
+                className={`flex h-8 w-[92px] shrink-0 items-center justify-center rounded border px-1 font-mono text-[8px] uppercase ${
                   h.isUser ? 'border-boom/40 bg-boom/10 text-boom' : 'border-border/60 bg-[#0f1420] text-muted'
                 }`}
               >
@@ -81,7 +81,7 @@ export default function DraftBoardMatrix({
             const round = ri + 1;
             return (
               <div key={round} className="mb-1 flex gap-1">
-                <div className="flex w-10 shrink-0 items-center justify-center font-mono text-[9px] text-boom">
+                <div className="flex w-10 shrink-0 items-center justify-center font-mono text-[10px] text-boom">
                   R{round}
                 </div>
                 {teamHeaders.map(({ slot }) => {
@@ -113,21 +113,21 @@ export default function DraftBoardMatrix({
                       >
                         <div className="absolute inset-x-0 top-0 h-0.5" style={{ background: color }} />
                         <div className="flex h-full flex-col p-1">
-                          <div className="font-mono text-[6px] text-muted">
+                          <div className="font-mono text-[7px] text-muted">
                             {safePickLabel(overall, teams)}
                           </div>
                           <div className="flex flex-1 items-center gap-0.5">
                             <PlayerAvatar playerId={pk.player.playerId} name={pk.player.name} size={22} />
                             <div className="min-w-0 flex-1">
-                              <div className="truncate font-mono text-[8px] text-text">
+                              <div className="truncate font-mono text-[9px] text-text">
                                 {abbrevName(pk.player.name)}
                               </div>
-                              <div className="font-mono text-[6px]" style={{ color }}>
+                              <div className="font-mono text-[7px]" style={{ color }}>
                                 {pos}
                               </div>
                             </div>
                           </div>
-                          <div className="font-mono text-[8px] tabular-nums" style={{ color }}>
+                          <div className="font-mono text-[9px] tabular-nums" style={{ color }}>
                             {Number.isFinite(pk.player.tfoScore) ? pk.player.tfoScore.toFixed(1) : '—'}
                           </div>
                         </div>
@@ -147,9 +147,9 @@ export default function DraftBoardMatrix({
                       }`}
                       style={onClock ? { boxShadow: '0 0 16px rgba(54,231,161,0.2)' } : undefined}
                     >
-                      <div className="font-mono text-[8px] text-muted">{safePickLabel(overall, teams)}</div>
+                      <div className="font-mono text-[9px] text-muted">{safePickLabel(overall, teams)}</div>
                       {onClock && (
-                        <div className="mt-0.5 font-mono text-[7px] uppercase text-boom">On Clock</div>
+                        <div className="mt-0.5 font-mono text-[8px] uppercase text-boom">On Clock</div>
                       )}
                     </button>
                   );

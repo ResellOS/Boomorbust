@@ -155,7 +155,7 @@ export default function EmpireScore({ sparklineData: sparklineProp, className }:
       <div className="flex flex-col gap-0.5 min-w-0">
         {/* Label */}
         <span
-          className="uppercase tracking-widest leading-none text-[10px]"
+          className="uppercase tracking-widest leading-none text-[11px]"
           style={{
             fontFamily: 'var(--font-mono), JetBrains Mono, monospace',
             color: '#64748B',
@@ -181,7 +181,7 @@ export default function EmpireScore({ sparklineData: sparklineProp, className }:
         {/* Badge row */}
         <div className="flex items-center gap-1.5 mt-0.5">
           <span
-            className="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold leading-none"
+            className="inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-semibold leading-none"
             style={{
               background: 'rgba(6,78,59,0.5)',
               color: '#34d399',
@@ -191,7 +191,7 @@ export default function EmpireScore({ sparklineData: sparklineProp, className }:
             {data.grade}
           </span>
           <span
-            className="text-[11px] leading-none whitespace-nowrap"
+            className="text-[12px] leading-none whitespace-nowrap"
             style={{
               fontFamily: 'var(--font-body), Inter, sans-serif',
               color: '#64748B',

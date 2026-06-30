@@ -26,8 +26,8 @@ function Placeholder({ title, description }: { title: string; description: strin
       <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ background: 'rgba(54,231,161,0.1)', border: '1px solid rgba(54,231,161,0.2)' }}>
         <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="8" stroke="#36E7A1" strokeWidth="1.5"/><path d="M10 7v3l1.5 1.5" stroke="#36E7A1" strokeWidth="1.5" strokeLinecap="round"/></svg>
       </div>
-      <p className="text-[14px] font-semibold text-white">{title}</p>
-      <p className="text-[12px] text-slate-500 text-center max-w-xs">{description}</p>
+      <p className="text-[15px] font-semibold text-white">{title}</p>
+      <p className="text-[13px] text-slate-500 text-center max-w-xs">{description}</p>
     </div>
   );
 }
@@ -65,8 +65,8 @@ function DynastyTitleSection({ currentTitle }: { currentTitle: string }) {
       className="rounded-xl p-6"
       style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}
     >
-      <p className="text-[13px] font-bold text-slate-400 uppercase tracking-widest mb-1">Dynasty Title</p>
-      <p className="text-[12px] text-slate-500 mb-5">Your public dynasty identity. Displayed on your profile.</p>
+      <p className="text-[14px] font-bold text-slate-400 uppercase tracking-widest mb-1">Dynasty Title</p>
+      <p className="text-[13px] text-slate-500 mb-5">Your public dynasty identity. Displayed on your profile.</p>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-5">
         {DYNASTY_TITLES.map((t) => (
           <button
@@ -78,15 +78,15 @@ function DynastyTitleSection({ currentTitle }: { currentTitle: string }) {
               border: selected === t.id ? '1px solid rgba(167,139,250,0.4)' : '1px solid rgba(255,255,255,0.07)',
             }}
           >
-            <p className="text-[12px] font-bold" style={{ color: selected === t.id ? '#A78BFA' : '#94a3b8' }}>{t.id}</p>
-            <p className="text-[10px] text-slate-500 mt-0.5">{t.desc}</p>
+            <p className="text-[13px] font-bold" style={{ color: selected === t.id ? '#A78BFA' : '#94a3b8' }}>{t.id}</p>
+            <p className="text-[11px] text-slate-500 mt-0.5">{t.desc}</p>
           </button>
         ))}
       </div>
       <button
         onClick={save}
         disabled={saving}
-        className="px-5 py-2.5 rounded-xl text-[12px] font-bold transition-all"
+        className="px-5 py-2.5 rounded-xl text-[13px] font-bold transition-all"
         style={{ background: '#36E7A1', color: '#0a0d14' }}
       >
         {saving ? 'Saving…' : 'Save Title'}
@@ -102,8 +102,8 @@ function ProfileBadges({ badges }: { badges: ProfileData['badges'] }) {
         className="rounded-xl p-6"
         style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}
       >
-        <p className="text-[13px] font-bold text-slate-400 uppercase tracking-widest mb-1">Earned Badges</p>
-        <p className="text-[12px] text-slate-500">
+        <p className="text-[14px] font-bold text-slate-400 uppercase tracking-widest mb-1">Earned Badges</p>
+        <p className="text-[13px] text-slate-500">
           Share feedback when prompted to earn your first badge.
         </p>
       </div>
@@ -115,12 +115,12 @@ function ProfileBadges({ badges }: { badges: ProfileData['badges'] }) {
       className="rounded-xl p-6"
       style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}
     >
-      <p className="text-[13px] font-bold text-slate-400 uppercase tracking-widest mb-3">Earned Badges</p>
+      <p className="text-[14px] font-bold text-slate-400 uppercase tracking-widest mb-3">Earned Badges</p>
       <div className="flex flex-wrap gap-2">
         {badges.map((b) => (
           <span
             key={`${b.badgeType}-${b.awardedAt}`}
-            className="inline-flex items-center rounded-full px-3 py-1.5 font-mono text-[11px] font-semibold"
+            className="inline-flex items-center rounded-full px-3 py-1.5 font-mono text-[12px] font-semibold"
             style={{
               color: '#36E7A1',
               background: 'rgba(54, 231, 161, 0.1)',
@@ -231,11 +231,11 @@ export default function SettingsPage() {
               className="rounded-xl p-6"
               style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}
             >
-              <p className="text-[13px] font-bold text-slate-400 uppercase tracking-widest mb-1">BOB Record</p>
-              <p className="text-[12px] text-slate-500 mb-4">View your prediction track record and model accuracy.</p>
+              <p className="text-[14px] font-bold text-slate-400 uppercase tracking-widest mb-1">BOB Record</p>
+              <p className="text-[13px] text-slate-500 mb-4">View your prediction track record and model accuracy.</p>
               <Link
                 href="/performance"
-                className="inline-flex items-center gap-2 rounded-xl px-5 py-2.5 text-[12px] font-bold no-underline transition hover:opacity-90"
+                className="inline-flex items-center gap-2 rounded-xl px-5 py-2.5 text-[13px] font-bold no-underline transition hover:opacity-90"
                 style={{ background: 'rgba(54,231,161,0.12)', color: '#36E7A1', border: '1px solid rgba(54,231,161,0.25)' }}
               >
                 View BOB Record →
@@ -285,10 +285,10 @@ export default function SettingsPage() {
               className="rounded-xl p-6"
               style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}
             >
-              <p className="text-[13px] font-bold text-slate-400 uppercase tracking-widest mb-1">
+              <p className="text-[14px] font-bold text-slate-400 uppercase tracking-widest mb-1">
                 Privacy Settings
               </p>
-              <p className="text-[12px] text-slate-500 mb-4 leading-relaxed">
+              <p className="text-[13px] text-slate-500 mb-4 leading-relaxed">
                 We sync your Sleeper league data to power BOB — we do not sell your personal data.
                 Free-tier ads are programmatic only. Export or delete your data anytime from Export
                 My Data in the sidebar.
@@ -296,7 +296,7 @@ export default function SettingsPage() {
               <div className="flex flex-wrap gap-3">
                 <Link
                   href="/privacy"
-                  className="inline-flex items-center rounded-lg px-4 py-2 text-[11px] font-semibold transition hover:opacity-90"
+                  className="inline-flex items-center rounded-lg px-4 py-2 text-[12px] font-semibold transition hover:opacity-90"
                   style={{
                     background: 'rgba(54, 231, 161, 0.12)',
                     color: '#36E7A1',
@@ -307,7 +307,7 @@ export default function SettingsPage() {
                 </Link>
                 <Link
                   href="/terms"
-                  className="inline-flex items-center rounded-lg px-4 py-2 text-[11px] font-semibold transition hover:opacity-90"
+                  className="inline-flex items-center rounded-lg px-4 py-2 text-[12px] font-semibold transition hover:opacity-90"
                   style={{
                     background: 'rgba(255,255,255,0.05)',
                     color: '#e8ecf4',
@@ -327,13 +327,13 @@ export default function SettingsPage() {
             className="rounded-xl p-6"
             style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}
           >
-            <p className="text-[13px] font-bold text-slate-400 uppercase tracking-widest mb-1">Export My Data</p>
-            <p className="text-[12px] text-slate-500 mb-5">Download a full export of your dynasty data, trade history, and league stats.</p>
+            <p className="text-[14px] font-bold text-slate-400 uppercase tracking-widest mb-1">Export My Data</p>
+            <p className="text-[13px] text-slate-500 mb-5">Download a full export of your dynasty data, trade history, and league stats.</p>
             <div className="space-y-3">
               {['Roster History (.csv)', 'Trade History (.csv)', 'Empire Score History (.json)', 'Full Account Data (.zip)'].map((item) => (
                 <div key={item} className="flex items-center justify-between p-4 rounded-xl" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
-                  <p className="text-[13px] text-white">{item}</p>
-                  <button className="px-4 py-1.5 rounded-lg text-[11px] font-semibold" style={{ background: 'rgba(54,231,161,0.12)', color: '#36E7A1', border: '1px solid rgba(54,231,161,0.25)' }}>
+                  <p className="text-[14px] text-white">{item}</p>
+                  <button className="px-4 py-1.5 rounded-lg text-[12px] font-semibold" style={{ background: 'rgba(54,231,161,0.12)', color: '#36E7A1', border: '1px solid rgba(54,231,161,0.25)' }}>
                     Export
                   </button>
                 </div>
@@ -348,7 +348,7 @@ export default function SettingsPage() {
             className="rounded-xl p-6"
             style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}
           >
-            <p className="text-[13px] font-bold text-slate-400 uppercase tracking-widest mb-5">Integrations</p>
+            <p className="text-[14px] font-bold text-slate-400 uppercase tracking-widest mb-5">Integrations</p>
             <div className="space-y-3">
               {[
                 { name: 'Sleeper',   connected: true,  desc: 'Dynasty leagues & rosters' },
@@ -357,11 +357,11 @@ export default function SettingsPage() {
               ].map((int) => (
                 <div key={int.name} className="flex items-center justify-between p-4 rounded-xl" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
                   <div>
-                    <p className="text-[13px] font-semibold text-white">{int.name}</p>
-                    <p className="text-[11px] text-slate-500">{int.desc}</p>
+                    <p className="text-[14px] font-semibold text-white">{int.name}</p>
+                    <p className="text-[12px] text-slate-500">{int.desc}</p>
                   </div>
                   <button
-                    className="px-4 py-1.5 rounded-lg text-[11px] font-semibold"
+                    className="px-4 py-1.5 rounded-lg text-[12px] font-semibold"
                     style={int.connected
                       ? { background: 'rgba(54,231,161,0.1)', color: '#36E7A1', border: '1px solid rgba(54,231,161,0.25)' }
                       : { background: 'rgba(255,255,255,0.05)', color: '#94a3b8', border: '1px solid rgba(255,255,255,0.1)' }
@@ -384,17 +384,17 @@ export default function SettingsPage() {
             className="rounded-xl p-6"
             style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}
           >
-            <p className="text-[13px] font-bold text-slate-400 uppercase tracking-widest mb-1">API Access</p>
-            <p className="text-[12px] text-slate-500 mb-5">Build on top of Boom or Bust with our API. Requires All-Pro Terminal subscription.</p>
+            <p className="text-[14px] font-bold text-slate-400 uppercase tracking-widest mb-1">API Access</p>
+            <p className="text-[13px] text-slate-500 mb-5">Build on top of Boom or Bust with our API. Requires All-Pro Terminal subscription.</p>
             <div className="p-4 rounded-xl mb-4" style={{ background: 'rgba(124,58,237,0.08)', border: '1px solid rgba(124,58,237,0.2)' }}>
-              <p className="text-[11px] font-bold text-slate-400 mb-2 uppercase tracking-wider">API Key</p>
+              <p className="text-[12px] font-bold text-slate-400 mb-2 uppercase tracking-wider">API Key</p>
               <div className="flex items-center gap-3">
-                <code className="flex-1 text-[12px] text-slate-400 font-mono truncate">••••••••••••••••••••••••••••••••</code>
-                <button className="px-3 py-1.5 rounded-lg text-[11px] text-white" style={{ background: 'rgba(255,255,255,0.08)' }}>Reveal</button>
-                <button className="px-3 py-1.5 rounded-lg text-[11px] font-semibold" style={{ background: 'rgba(54,231,161,0.12)', color: '#36E7A1', border: '1px solid rgba(54,231,161,0.25)' }}>Regenerate</button>
+                <code className="flex-1 text-[13px] text-slate-400 font-mono truncate">••••••••••••••••••••••••••••••••</code>
+                <button className="px-3 py-1.5 rounded-lg text-[12px] text-white" style={{ background: 'rgba(255,255,255,0.08)' }}>Reveal</button>
+                <button className="px-3 py-1.5 rounded-lg text-[12px] font-semibold" style={{ background: 'rgba(54,231,161,0.12)', color: '#36E7A1', border: '1px solid rgba(54,231,161,0.25)' }}>Regenerate</button>
               </div>
             </div>
-            <p className="text-[11px] text-slate-500">Rate limit: 1,000 requests/day · <a href="#" style={{ color: '#36E7A1' }}>API Documentation →</a></p>
+            <p className="text-[12px] text-slate-500">Rate limit: 1,000 requests/day · <a href="#" style={{ color: '#36E7A1' }}>API Documentation →</a></p>
           </div>
         );
 
@@ -469,7 +469,7 @@ export default function SettingsPage() {
         {/* Header */}
         <div className="mb-6">
           <h1 className="text-[24px] font-bold text-white">{sectionLabels[section]}</h1>
-          <p className="text-[13px] text-slate-500 mt-0.5">Manage your account, leagues, and preferences.</p>
+          <p className="text-[14px] text-slate-500 mt-0.5">Manage your account, leagues, and preferences.</p>
         </div>
 
         {!loading && !data && (
@@ -477,11 +477,11 @@ export default function SettingsPage() {
             className="rounded-xl p-8 text-center"
             style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.25)' }}
           >
-            <p className="text-[14px] font-semibold text-red-400">Could not load profile</p>
-            <p className="text-[12px] text-slate-500 mt-2">Check your connection and try refreshing.</p>
+            <p className="text-[15px] font-semibold text-red-400">Could not load profile</p>
+            <p className="text-[13px] text-slate-500 mt-2">Check your connection and try refreshing.</p>
             <button
               onClick={() => { setLoading(true); fetchProfile(); }}
-              className="mt-4 px-4 py-2 rounded-lg text-[12px] font-semibold"
+              className="mt-4 px-4 py-2 rounded-lg text-[13px] font-semibold"
               style={{ background: '#36E7A1', color: '#0a0d14' }}
             >
               Retry

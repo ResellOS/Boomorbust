@@ -26,7 +26,7 @@ function fmtClock(s: number): string {
 function PositionBadge({ position }: { position: string }) {
   return (
     <span
-      className="inline-flex h-[18px] min-w-[26px] items-center justify-center rounded-[4px] px-1 font-mono text-[9px] font-bold"
+      className="inline-flex h-[18px] min-w-[26px] items-center justify-center rounded-[4px] px-1 font-mono text-[10px] font-bold"
       style={{ color: positionColor(position), background: `${positionColor(position)}1a` }}
     >
       {position}
@@ -85,13 +85,13 @@ export default function DraftBoard({
           />
           <div>
             <div
-              className={`font-figtree text-[13px] font-extrabold uppercase tracking-[1.5px] ${
+              className={`font-figtree text-[14px] font-extrabold uppercase tracking-[1.5px] ${
                 isUserTurn ? 'text-boom' : 'text-muted'
               }`}
             >
               {isUserTurn ? 'On the Clock — You' : `On the Clock — Team ${slotLabel(currentOverall, config.teams)}`}
             </div>
-            <div className="font-mono text-[10px] text-muted">
+            <div className="font-mono text-[11px] text-muted">
               Pick {currentOverall} of {totalPicks} · Round {round}
             </div>
           </div>
@@ -115,11 +115,11 @@ export default function DraftBoard({
               key={pk.overall}
               className="flex shrink-0 items-center gap-1.5 rounded-[6px] border border-border/60 bg-surface px-2 py-1"
             >
-              <span className="font-mono text-[8px] text-muted">{pk.overall}</span>
+              <span className="font-mono text-[9px] text-muted">{pk.overall}</span>
               <PositionBadge position={pk.player.position} />
-              <span className="font-figtree text-[10.5px] text-text">{pk.player.name}</span>
+              <span className="font-figtree text-[11.5px] text-text">{pk.player.name}</span>
               {pk.isUser && (
-                <span className="font-mono text-[7px] uppercase tracking-wide text-boom">you</span>
+                <span className="font-mono text-[8px] uppercase tracking-wide text-boom">you</span>
               )}
             </div>
           ))}
@@ -134,7 +134,7 @@ export default function DraftBoard({
               key={f}
               type="button"
               onClick={() => setFilter(f)}
-              className={`rounded-[5px] px-2.5 py-1 font-mono text-[10px] transition-colors ${
+              className={`rounded-[5px] px-2.5 py-1 font-mono text-[11px] transition-colors ${
                 filter === f ? 'bg-boom/15 text-boom' : 'text-muted hover:text-text'
               }`}
             >
@@ -146,13 +146,13 @@ export default function DraftBoard({
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search players…"
-          className="ml-auto w-48 rounded-[6px] border border-border bg-bg px-2.5 py-1.5 font-figtree text-[11px] text-text outline-none placeholder:text-muted focus:border-boom/50"
+          className="ml-auto w-48 rounded-[6px] border border-border bg-bg px-2.5 py-1.5 font-figtree text-[12px] text-text outline-none placeholder:text-muted focus:border-boom/50"
         />
       </div>
 
       {/* Available board */}
       <div className="min-h-0 flex-1 overflow-y-auto px-5 pb-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-        <div className="grid grid-cols-[36px_1fr_56px_56px_52px] items-center gap-2 border-b border-border px-2 py-1.5 font-mono text-[8px] uppercase tracking-wide text-muted">
+        <div className="grid grid-cols-[36px_1fr_56px_56px_52px] items-center gap-2 border-b border-border px-2 py-1.5 font-mono text-[9px] uppercase tracking-wide text-muted">
           <span>BOB</span>
           <span>Player</span>
           <span className="text-right">ADP</span>
@@ -169,25 +169,25 @@ export default function DraftBoard({
               isUserTurn ? 'cursor-pointer hover:bg-boom/[0.06]' : 'cursor-default'
             }`}
           >
-            <span className="font-mono text-[11px] text-muted">{p.bobRank}</span>
+            <span className="font-mono text-[12px] text-muted">{p.bobRank}</span>
             <span className="flex min-w-0 items-center gap-2">
               <PositionBadge position={p.position} />
-              <span className="truncate font-figtree text-[12.5px] font-medium text-text">
+              <span className="truncate font-figtree text-[13.5px] font-medium text-text">
                 {p.name}
               </span>
-              <span className="font-mono text-[8px] text-muted">{p.team}</span>
+              <span className="font-mono text-[9px] text-muted">{p.team}</span>
             </span>
-            <span className="text-right font-mono text-[11px] text-muted">{p.adp}</span>
-            <span className="text-right font-mono text-[11px] text-muted">
+            <span className="text-right font-mono text-[12px] text-muted">{p.adp}</span>
+            <span className="text-right font-mono text-[12px] text-muted">
               {p.age ?? '—'}
             </span>
-            <span className="text-right font-mono text-[12px] font-bold text-boom">
+            <span className="text-right font-mono text-[13px] font-bold text-boom">
               {p.tfoScore.toFixed(1)}
             </span>
           </button>
         ))}
         {available.length === 0 && (
-          <div className="px-2 py-6 text-center font-figtree text-[12px] text-muted">
+          <div className="px-2 py-6 text-center font-figtree text-[13px] text-muted">
             No players match this filter.
           </div>
         )}

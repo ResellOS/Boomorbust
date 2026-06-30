@@ -33,7 +33,7 @@ export default function ScoutingTabNav({ active, onChange }: Props) {
             role="tab"
             aria-selected={is}
             onClick={() => onChange(t.id)}
-            className="flex-shrink-0 min-h-[44px] px-4 py-3 text-[11px] font-bold tracking-wide transition-colors whitespace-nowrap border-b-2"
+            className="flex-shrink-0 min-h-[44px] px-4 py-3 text-[12px] font-bold tracking-wide transition-colors whitespace-nowrap border-b-2"
             style={{
               fontFamily: 'var(--font-body), Inter, sans-serif',
               color: is ? '#ffffff' : '#64748B',

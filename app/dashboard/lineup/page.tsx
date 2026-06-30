@@ -600,7 +600,7 @@ export default function LineupPage() {
           <h1 className="display font-normal text-[clamp(2rem,5vw,2.85rem)] text-white lg:text-[2.85rem] leading-tight">Sit/Start Optimizer</h1>
           <div className="mt-8 flex flex-col sm:flex-row flex-wrap gap-4 items-start sm:items-end">
             <label className="block min-w-[200px] flex-1">
-              <span className="block text-[11px] uppercase tracking-[0.2em] text-[var(--text-muted)] mb-2">League</span>
+              <span className="block text-[12px] uppercase tracking-[0.2em] text-[var(--text-muted)] mb-2">League</span>
               <select
                 value={selectedLeague}
                 onChange={(e) => setSelectedLeague(e.target.value)}
@@ -614,7 +614,7 @@ export default function LineupPage() {
               </select>
             </label>
             <label className="block w-full sm:w-40">
-              <span className="block text-[11px] uppercase tracking-[0.2em] text-[var(--text-muted)] mb-2">Week</span>
+              <span className="block text-[12px] uppercase tracking-[0.2em] text-[var(--text-muted)] mb-2">Week</span>
               <select
                 value={week}
                 onChange={(e) => setWeek(Number(e.target.value))}
@@ -663,7 +663,7 @@ export default function LineupPage() {
                   <div className="relative">
                     <OptimalGauge pct={data?.gaugePct ?? 0} />
                     <span className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none gap-1 px-2 text-center">
-                      <span className="font-mono text-[9px] uppercase tracking-[0.15em] text-[#64748B]">
+                      <span className="font-mono text-[10px] uppercase tracking-[0.15em] text-[#64748B]">
                         LINEUP STRENGTH
                       </span>
                       <span
@@ -702,7 +702,7 @@ export default function LineupPage() {
                           )}
                         </span>
                       ) : (
-                        <span className="block mt-3 text-[11px] text-[var(--text-muted)]">Live scores appear after Sleeper posts weekly results.</span>
+                        <span className="block mt-3 text-[12px] text-[var(--text-muted)]">Live scores appear after Sleeper posts weekly results.</span>
                       )}
                     </p>
                   </div>
@@ -736,7 +736,7 @@ export default function LineupPage() {
                     <h2 className="display text-[28px] text-white leading-tight tracking-wide">
                       WEEK {data.meta?.week ?? week} LINEUP INTELLIGENCE
                     </h2>
-                    <p className="font-mono mt-2 text-[11px] text-[#64748B] tabular-nums">
+                    <p className="font-mono mt-2 text-[12px] text-[#64748B] tabular-nums">
                       {lineupIntelCounts.starters} starters · {lineupIntelCounts.bench} bench ·{' '}
                       {data.projectedStarterPoints != null ? `${data.projectedStarterPoints.toFixed(1)}` : '—'} proj pts
                     </p>
@@ -746,7 +746,7 @@ export default function LineupPage() {
                   <div key={slot} className="space-y-3">
                     <div className="flex items-center justify-between gap-3">
                       <p className="display text-2xl text-white">{slot}</p>
-                      <span className="text-[11px] text-[var(--text-muted)] font-body uppercase tracking-wider">Starter · Bench</span>
+                      <span className="text-[12px] text-[var(--text-muted)] font-body uppercase tracking-wider">Starter · Bench</span>
                     </div>
                     <div className="grid sm:grid-cols-2 gap-4 lg:gap-6">
                       {grouped[slot]!.map((r) => {
@@ -787,7 +787,7 @@ export default function LineupPage() {
                               <div className="flex-1 min-w-0">
                                 <div className="flex flex-wrap gap-2 items-start justify-between gap-y-2">
                                   <div>
-                                    <span className={clsx('text-[11px] font-bold px-2 py-0.5 rounded', POSITION_COLORS[slotKey(r.position)] ?? POSITION_COLORS.DEF)}>
+                                    <span className={clsx('text-[12px] font-bold px-2 py-0.5 rounded', POSITION_COLORS[slotKey(r.position)] ?? POSITION_COLORS.DEF)}>
                                       {r.position}
                                     </span>
                                     <p className="text-white font-semibold text-base mt-2">{r.player_name}</p>
@@ -799,7 +799,7 @@ export default function LineupPage() {
                                           return (
                                             <span
                                               key={f}
-                                              className={clsx('text-[10px] px-2 py-0.5 rounded-md border font-semibold', fc.className)}
+                                              className={clsx('text-[11px] px-2 py-0.5 rounded-md border font-semibold', fc.className)}
                                             >
                                               {fc.label}
                                             </span>
@@ -807,11 +807,11 @@ export default function LineupPage() {
                                         })}
                                       </div>
                                     ) : null}
-                                    <p className="font-mono text-[11px] text-[var(--text-muted)] mt-2">
+                                    <p className="font-mono text-[12px] text-[var(--text-muted)] mt-2">
                                       {r.team ? `${r.position} · ${r.team}` : r.position}
                                     </p>
                                     {opt ? (
-                                      <p className="font-mono text-[11px] text-[var(--text-secondary)] mt-1 flex flex-wrap items-center gap-1.5">
+                                      <p className="font-mono text-[12px] text-[var(--text-secondary)] mt-1 flex flex-wrap items-center gap-1.5">
                                         <span className="text-[20px] leading-none shrink-0" aria-hidden>
                                           {lineupWeatherGlyph(opt.weather.condition, opt.weather.score)}
                                         </span>
@@ -824,7 +824,7 @@ export default function LineupPage() {
                                         </span>
                                       </p>
                                     ) : typeof r.matchup_rank === 'number' ? (
-                                      <p className="font-mono text-[11px] text-[var(--text-muted)] mt-1">
+                                      <p className="font-mono text-[12px] text-[var(--text-muted)] mt-1">
                                         vs {r.opponent_abbr ?? '?'} ({r.matchup_grade} matchup · def rank {r.matchup_rank})
                                       </p>
                                     ) : null}
@@ -861,7 +861,7 @@ export default function LineupPage() {
                                     </span>
                                   </div>
                                 </div>
-                                <div className="flex flex-wrap items-end gap-x-4 gap-y-2 mt-3 text-[13px] text-[var(--text-secondary)]">
+                                <div className="flex flex-wrap items-end gap-x-4 gap-y-2 mt-3 text-[14px] text-[var(--text-secondary)]">
                                   {opt ? (
                                     <>
                                       <span>
@@ -874,7 +874,7 @@ export default function LineupPage() {
                                         Matchup <span className="text-white tabular-nums font-mono">{Math.round(opt.matchupGrade)}</span>
                                       </span>
                                       <div className="flex flex-col gap-0.5">
-                                        <span className="font-mono text-[8px] uppercase tracking-[0.12em] text-[#64748B]">
+                                        <span className="font-mono text-[9px] uppercase tracking-[0.12em] text-[#64748B]">
                                           PROJ
                                         </span>
                                         <span className="font-mono text-sm font-bold text-white tabular-nums">
@@ -891,12 +891,12 @@ export default function LineupPage() {
                                     </>
                                   )}
                                   {consider ? (
-                                    <span className="text-[var(--gold)] text-[11px] font-semibold uppercase border border-[var(--gold)]/40 rounded-full px-2 py-0.5">
+                                    <span className="text-[var(--gold)] text-[12px] font-semibold uppercase border border-[var(--gold)]/40 rounded-full px-2 py-0.5">
                                       Consider starting
                                     </span>
                                   ) : (
                                     starterSetMemo.has(r.player_id) && (
-                                      <span className="text-emerald-400/90 text-[11px] font-semibold uppercase">Starter lineup</span>
+                                      <span className="text-emerald-400/90 text-[12px] font-semibold uppercase">Starter lineup</span>
                                     )
                                   )}
                                   {expanded === r.player_id ? <ChevronDown className="w-5 h-5 ml-auto" /> : <ChevronRight className="w-5 h-5 ml-auto" />}
@@ -934,11 +934,11 @@ export default function LineupPage() {
                   borderRadius: 8,
                 }}
               >
-                <p className="text-[9px] uppercase tracking-[0.15em] text-[#22D3EE] mb-3">CLOSE CALLS · FORMULA ANALYSIS</p>
+                <p className="text-[10px] uppercase tracking-[0.15em] text-[#22D3EE] mb-3">CLOSE CALLS · FORMULA ANALYSIS</p>
                 {borderlineLoading && !borderlineStream && (
                   <Loader2 className="w-5 h-5 text-[#22D3EE] animate-spin mb-2" />
                 )}
-                <div className="text-[12px] leading-relaxed text-[#94A3B8] whitespace-pre-wrap">{borderlineStream}</div>
+                <div className="text-[13px] leading-relaxed text-[#94A3B8] whitespace-pre-wrap">{borderlineStream}</div>
               </section>
             )}
 
@@ -1000,7 +1000,7 @@ export default function LineupPage() {
                   setShowCardModal(false);
                   setCardData(null);
                 }}
-                className="rounded-full border border-[rgba(255,255,255,0.12)] bg-[rgba(255,255,255,0.06)] px-3 py-1.5 text-[11px] font-semibold text-[#94A3B8] transition hover:bg-[rgba(255,255,255,0.1)] hover:text-white"
+                className="rounded-full border border-[rgba(255,255,255,0.12)] bg-[rgba(255,255,255,0.06)] px-3 py-1.5 text-[12px] font-semibold text-[#94A3B8] transition hover:bg-[rgba(255,255,255,0.1)] hover:text-white"
                 style={{ fontFamily: "'JetBrains Mono', monospace" }}
               >
                 ✕ Close
@@ -1008,7 +1008,7 @@ export default function LineupPage() {
               <button
                 type="button"
                 onClick={() => void handleDownloadCard()}
-                className="rounded-full border border-[rgba(54,231,161,0.25)] bg-[rgba(54,231,161,0.1)] px-3 py-1.5 text-[11px] font-semibold text-[#36E7A1] transition hover:bg-[rgba(54,231,161,0.18)]"
+                className="rounded-full border border-[rgba(54,231,161,0.25)] bg-[rgba(54,231,161,0.1)] px-3 py-1.5 text-[12px] font-semibold text-[#36E7A1] transition hover:bg-[rgba(54,231,161,0.18)]"
                 style={{ fontFamily: "'JetBrains Mono', monospace" }}
               >
                 ⬇ Download PNG

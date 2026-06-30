@@ -444,7 +444,7 @@ function TacticalMap({
     <div ref={wrapRef} className="relative w-full">
       {/* Y-axis label */}
       <div
-        className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-8 text-[10px] uppercase tracking-widest text-[var(--text-muted)] font-mono"
+        className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-8 text-[11px] uppercase tracking-widest text-[var(--text-muted)] font-mono"
         style={{ writingMode: 'vertical-rl', transform: 'rotate(180deg) translateX(8px) translateY(-50%)' }}
       >
         ROSTER STRENGTH
@@ -610,7 +610,7 @@ function TacticalMap({
       {/* Player TFO tooltip */}
       {playerTip && (
         <div
-          className="pointer-events-none absolute z-[60] w-[min(200px,45vw)] rounded-lg border border-white/10 bg-[var(--bg-card)]/95 px-3 py-2 text-[10px] shadow-xl backdrop-blur-sm font-mono"
+          className="pointer-events-none absolute z-[60] w-[min(200px,45vw)] rounded-lg border border-white/10 bg-[var(--bg-card)]/95 px-3 py-2 text-[11px] shadow-xl backdrop-blur-sm font-mono"
           style={{ left: playerTip.left, top: playerTip.top }}
         >
           <p className="font-semibold text-white truncate">{playerTip.dot.name}</p>
@@ -922,7 +922,7 @@ export default function WarRoomPage() {
         {/* ── TOP BAR ──────────────────────────────────────────────────── */}
         <div className="flex flex-wrap items-center gap-4 rounded-xl border border-[var(--border)] bg-[var(--bg-card)]/80 px-5 py-4 backdrop-blur-sm">
           <div className="flex flex-col shrink-0">
-            <span className="text-[10px] uppercase tracking-[0.2em] text-[var(--text-muted)] font-mono">
+            <span className="text-[11px] uppercase tracking-[0.2em] text-[var(--text-muted)] font-mono">
               DYNASTY COACH
             </span>
           </div>
@@ -947,7 +947,7 @@ export default function WarRoomPage() {
               <span className="w-3 h-3 rounded-full bg-red-500 shrink-0" />
               <span className="w-3 h-3 rounded-full bg-yellow-400 shrink-0" />
               <span className="w-3 h-3 rounded-full bg-green-500 shrink-0" />
-              <span className="ml-2 text-[10px] uppercase tracking-[0.2em] text-[var(--text-muted)] font-mono display">
+              <span className="ml-2 text-[11px] uppercase tracking-[0.2em] text-[var(--text-muted)] font-mono display">
                 EMPIRE TICKER (LEAGUE FEED)
               </span>
             </div>
@@ -966,12 +966,12 @@ export default function WarRoomPage() {
                       style={{ borderLeftWidth: 4, borderLeftColor: st.border }}
                     >
                       <div className="flex flex-wrap items-start gap-x-3 gap-y-1 pl-3">
-                        <span className="font-mono text-[9px] text-[#475569] shrink-0 tabular-nums w-[3.25rem]">
+                        <span className="font-mono text-[10px] text-[#475569] shrink-0 tabular-nums w-[3.25rem]">
                           {tickerTime(idx)}
                         </span>
                         <div className="flex flex-wrap items-center gap-1.5 shrink-0">
                           <span
-                            className="font-mono text-[9px] font-black uppercase tracking-wide px-2 py-0.5 rounded-full"
+                            className="font-mono text-[10px] font-black uppercase tracking-wide px-2 py-0.5 rounded-full"
                             style={{
                               backgroundColor: st.pillBg,
                               color: st.pillText,
@@ -981,7 +981,7 @@ export default function WarRoomPage() {
                             {entry.kind}
                           </span>
                           <span
-                            className="font-mono text-[9px] font-bold uppercase px-2 py-0.5 rounded-full"
+                            className="font-mono text-[10px] font-bold uppercase px-2 py-0.5 rounded-full"
                             style={{
                               backgroundColor: st.pillBg,
                               color: st.pillText,
@@ -991,7 +991,7 @@ export default function WarRoomPage() {
                             {entry.league}
                           </span>
                         </div>
-                        <p className="text-[11px] leading-snug text-[#94A3B8] flex-1 min-w-[min(100%,12rem)]">{entry.text}</p>
+                        <p className="text-[12px] leading-snug text-[#94A3B8] flex-1 min-w-[min(100%,12rem)]">{entry.text}</p>
                       </div>
                     </div>
                   );
@@ -999,7 +999,7 @@ export default function WarRoomPage() {
               )}
               {/* Blinking cursor */}
               <div className="flex gap-2 items-center text-xs text-[#36E7A1] py-2 px-1 opacity-80">
-                <span className="font-mono text-[9px] text-[#475569]">NOW</span>
+                <span className="font-mono text-[10px] text-[#475569]">NOW</span>
                 <span className="animate-pulse font-mono">█</span>
               </div>
             </div>
@@ -1012,7 +1012,7 @@ export default function WarRoomPage() {
               <h2 className="display text-white text-xl leading-none tracking-wide">
                 TACTICAL MAP (ASSET DENSITY MATRIX)
               </h2>
-              <p className="text-[10px] text-[var(--text-muted)] font-mono mt-1 uppercase tracking-wider">
+              <p className="text-[11px] text-[var(--text-muted)] font-mono mt-1 uppercase tracking-wider">
                 Click a node to reveal war plan
               </p>
             </div>
@@ -1030,7 +1030,7 @@ export default function WarRoomPage() {
             </div>
 
             {/* Legend */}
-            <div className="px-5 pb-4 flex flex-wrap gap-x-4 gap-y-2 text-[10px] font-mono uppercase tracking-wide">
+            <div className="px-5 pb-4 flex flex-wrap gap-x-4 gap-y-2 text-[11px] font-mono uppercase tracking-wide">
               <span className="flex items-center gap-1.5">
                 <span className="w-3 h-3 rounded-full bg-[#22d3ee] shrink-0" />
                 <span className="text-[var(--text-muted)]">League · Strong</span>
@@ -1072,7 +1072,7 @@ export default function WarRoomPage() {
                 <span className="text-lg leading-none text-[#38BDF8]" aria-hidden>
                   ⚡
                 </span>
-                <span className="text-[11px] font-mono font-semibold" style={{ color: '#36E7A1' }}>
+                <span className="text-[12px] font-mono font-semibold" style={{ color: '#36E7A1' }}>
                   Boomer
                 </span>
               </div>
@@ -1080,7 +1080,7 @@ export default function WarRoomPage() {
                 <span className="text-lg leading-none" aria-hidden>
                   🔥
                 </span>
-                <span className="text-[11px] font-mono font-semibold" style={{ color: '#EF4444' }}>
+                <span className="text-[12px] font-mono font-semibold" style={{ color: '#EF4444' }}>
                   Buster
                 </span>
               </div>
@@ -1105,7 +1105,7 @@ export default function WarRoomPage() {
                         <div className="text-sm text-[var(--text-secondary)] leading-relaxed">
                           {row.text}{' '}
                           <span
-                            className="font-bold font-mono text-[11px]"
+                            className="font-bold font-mono text-[12px]"
                             style={{ color: row.mascot === 'boomer' ? '#36E7A1' : '#EF4444' }}
                           >
                             ({row.mascot === 'boomer' ? 'Boomer' : 'Buster'}).
@@ -1117,7 +1117,7 @@ export default function WarRoomPage() {
 
                   {/* Empire Pulse */}
                   <div className="mt-5 p-3 rounded-xl border border-[var(--indigo)]/30 bg-[var(--indigo)]/10">
-                    <p className="text-[10px] uppercase tracking-widest text-[var(--indigo-light)] font-mono mb-1">
+                    <p className="text-[11px] uppercase tracking-widest text-[var(--indigo-light)] font-mono mb-1">
                       Empire Pulse
                     </p>
                     <p className="text-xs text-white leading-relaxed italic">
@@ -1128,7 +1128,7 @@ export default function WarRoomPage() {
                   {/* Health score bar */}
                   <div className="mt-4">
                     <div className="flex justify-between items-center mb-1">
-                      <span className="text-[10px] font-mono uppercase tracking-wider text-[var(--text-muted)]">
+                      <span className="text-[11px] font-mono uppercase tracking-wider text-[var(--text-muted)]">
                         Health Score
                       </span>
                       <span className="text-sm font-bold text-white display">
@@ -1149,7 +1149,7 @@ export default function WarRoomPage() {
                         }}
                       />
                     </div>
-                    <div className="mt-1 flex justify-between text-[9px] text-[var(--text-muted)] font-mono uppercase">
+                    <div className="mt-1 flex justify-between text-[10px] text-[var(--text-muted)] font-mono uppercase">
                       <span>Rebuild</span>
                       <span
                         className={
@@ -1196,7 +1196,7 @@ export default function WarRoomPage() {
                 <p className="display text-3xl text-[var(--gold)]">
                   {leagueAnalyses.length}
                 </p>
-                <p className="text-[10px] text-[var(--text-muted)] font-mono uppercase tracking-wider mt-1">
+                <p className="text-[11px] text-[var(--text-muted)] font-mono uppercase tracking-wider mt-1">
                   Leagues
                 </p>
               </div>
@@ -1204,7 +1204,7 @@ export default function WarRoomPage() {
                 <p className="display text-3xl text-[#22d3ee]">
                   {leagueAnalyses.filter((l) => l.signal === 'BOOM').length}
                 </p>
-                <p className="text-[10px] text-[var(--text-muted)] font-mono uppercase tracking-wider mt-1">
+                <p className="text-[11px] text-[var(--text-muted)] font-mono uppercase tracking-wider mt-1">
                   BOOM
                 </p>
               </div>
@@ -1212,7 +1212,7 @@ export default function WarRoomPage() {
                 <p className="display text-3xl text-red-400">
                   {leagueAnalyses.filter((l) => l.signal === 'BUST').length}
                 </p>
-                <p className="text-[10px] text-[var(--text-muted)] font-mono uppercase tracking-wider mt-1">
+                <p className="text-[11px] text-[var(--text-muted)] font-mono uppercase tracking-wider mt-1">
                   BUST
                 </p>
               </div>
@@ -1220,7 +1220,7 @@ export default function WarRoomPage() {
                 <p className="display text-3xl text-[var(--indigo-light)]">
                   {Math.round(leagueAnalyses.reduce((s, l) => s + l.healthScore, 0) / leagueAnalyses.length)}
                 </p>
-                <p className="text-[10px] text-[var(--text-muted)] font-mono uppercase tracking-wider mt-1">
+                <p className="text-[11px] text-[var(--text-muted)] font-mono uppercase tracking-wider mt-1">
                   Avg Health
                 </p>
               </div>

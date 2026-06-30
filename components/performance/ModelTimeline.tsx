@@ -10,10 +10,10 @@ interface ModelTimelineProps {
 export default function ModelTimeline({ entries }: ModelTimelineProps) {
   return (
     <section className="mb-6">
-      <div className="mb-1 font-figtree text-[11px] font-bold uppercase tracking-[1.5px] text-text">
+      <div className="mb-1 font-figtree text-[12px] font-bold uppercase tracking-[1.5px] text-text">
         How BOB Improves
       </div>
-      <p className="mb-4 font-figtree text-[11px] text-muted">
+      <p className="mb-4 font-figtree text-[12px] text-muted">
         The model adjusts based on outcomes. Here&apos;s the history.
       </p>
 
@@ -23,15 +23,15 @@ export default function ModelTimeline({ entries }: ModelTimelineProps) {
         {entries.map((entry, i) => (
           <div key={`${entry.date}-${i}`} className="relative pb-5 last:pb-0">
             <div className="absolute -left-4 top-1.5 h-2 w-2 rounded-full border-2 border-boom bg-bg" />
-            <div className="font-mono text-[10px] text-boom">{entry.date}</div>
-            <div className="mt-0.5 font-figtree text-[13px] font-semibold text-text">
+            <div className="font-mono text-[11px] text-boom">{entry.date}</div>
+            <div className="mt-0.5 font-figtree text-[14px] font-semibold text-text">
               {entry.title}
             </div>
-            <div className="mt-1 font-figtree text-[11px] leading-relaxed text-muted">
+            <div className="mt-1 font-figtree text-[12px] leading-relaxed text-muted">
               {entry.detail}
             </div>
             {(entry.accuracyBefore != null || entry.accuracyAfter != null) && (
-              <div className="mt-1 font-mono text-[9px] text-muted">
+              <div className="mt-1 font-mono text-[10px] text-muted">
                 Accuracy: {fmtPct(entry.accuracyBefore)} → {fmtPct(entry.accuracyAfter)}
               </div>
             )}
@@ -40,7 +40,7 @@ export default function ModelTimeline({ entries }: ModelTimelineProps) {
 
         <div className="relative pb-2">
           <div className="absolute -left-4 top-1.5 h-2 w-2 rounded-full border-2 border-border bg-bg" />
-          <p className="font-figtree text-[11px] italic text-muted">
+          <p className="font-figtree text-[12px] italic text-muted">
             Future entries appear automatically as Phase 3 self-refinement runs.
           </p>
         </div>

@@ -56,7 +56,7 @@ export default function AppTopNav({ username, avatarUrl }: AppTopNavProps) {
               key={href}
               href={href}
               className={clsx(
-                'shrink-0 rounded-lg px-3 py-1.5 text-[12px] font-medium transition-colors',
+                'shrink-0 rounded-lg px-3 py-1.5 text-[13px] font-medium transition-colors',
                 active
                   ? 'bg-boom/10 text-boom'
                   : 'text-slate-400 hover:bg-white/[0.04] hover:text-white',
@@ -72,7 +72,7 @@ export default function AppTopNav({ username, avatarUrl }: AppTopNavProps) {
         <Link
           href="/settings"
           className={clsx(
-            'hidden rounded-lg px-3 py-1.5 text-[12px] font-medium sm:inline-flex',
+            'hidden rounded-lg px-3 py-1.5 text-[13px] font-medium sm:inline-flex',
             isActive(pathname, '/settings')
               ? 'bg-boom/10 text-boom'
               : 'text-slate-400 hover:text-white',
@@ -90,12 +90,12 @@ export default function AppTopNav({ username, avatarUrl }: AppTopNavProps) {
             />
           ) : (
             <div
-              className="flex h-8 w-8 items-center justify-center rounded-full border border-[#A78BFA]/40 bg-[#A78BFA]/15 text-[11px] font-bold text-[#A78BFA]"
+              className="flex h-8 w-8 items-center justify-center rounded-full border border-[#A78BFA]/40 bg-[#A78BFA]/15 text-[12px] font-bold text-[#A78BFA]"
             >
               {displayName.slice(0, 2).toUpperCase()}
             </div>
           )}
-          <span className="hidden max-w-[120px] truncate font-mono text-[12px] text-white sm:block">
+          <span className="hidden max-w-[120px] truncate font-mono text-[13px] text-white sm:block">
             @{displayName}
           </span>
         </div>

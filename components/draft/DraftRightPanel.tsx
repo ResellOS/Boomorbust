@@ -18,7 +18,7 @@ interface DraftRightPanelProps {
 function PositionBadge({ position }: { position: string }) {
   return (
     <span
-      className="inline-flex h-[16px] min-w-[22px] items-center justify-center rounded-[3px] px-0.5 font-mono text-[8px] font-bold"
+      className="inline-flex h-[16px] min-w-[22px] items-center justify-center rounded-[3px] px-0.5 font-mono text-[9px] font-bold"
       style={{ color: positionColor(position), background: `${positionColor(position)}1a` }}
     >
       {position}
@@ -49,7 +49,7 @@ export default function DraftRightPanel({
             key={t.id}
             type="button"
             onClick={() => setTab(t.id)}
-            className={`flex-1 py-2 font-figtree text-[10px] font-bold uppercase tracking-wide ${
+            className={`flex-1 py-2 font-figtree text-[11px] font-bold uppercase tracking-wide ${
               tab === t.id ? 'border-b-2 border-boom text-boom' : 'text-muted'
             }`}
           >
@@ -61,7 +61,7 @@ export default function DraftRightPanel({
         {tab === 'queue' && (
           <>
             {queue.length === 0 ? (
-              <p className="px-1 py-4 text-center font-figtree text-[11px] text-muted">
+              <p className="px-1 py-4 text-center font-figtree text-[12px] text-muted">
                 Queue empty — click + on a player to add.
               </p>
             ) : (
@@ -71,21 +71,21 @@ export default function DraftRightPanel({
                   className="mb-1 flex items-center gap-2 rounded-[6px] border border-border/60 bg-bg/40 px-2 py-1.5"
                 >
                   <PositionBadge position={p.position} />
-                  <span className="min-w-0 flex-1 truncate font-figtree text-[11px] text-text">
+                  <span className="min-w-0 flex-1 truncate font-figtree text-[12px] text-text">
                     {p.name}
                   </span>
                   <button
                     type="button"
                     disabled={!isUserTurn}
                     onClick={() => onDraftFromQueue(p)}
-                    className="font-mono text-[8px] text-boom disabled:opacity-40"
+                    className="font-mono text-[9px] text-boom disabled:opacity-40"
                   >
                     Draft
                   </button>
                   <button
                     type="button"
                     onClick={() => onRemoveQueue(p.playerId)}
-                    className="font-mono text-[8px] text-muted hover:text-bust"
+                    className="font-mono text-[9px] text-muted hover:text-bust"
                   >
                     ×
                   </button>
@@ -97,7 +97,7 @@ export default function DraftRightPanel({
         {tab === 'roster' && (
           <>
             {userPicks.length === 0 ? (
-              <p className="px-1 py-4 text-center font-figtree text-[11px] text-muted">
+              <p className="px-1 py-4 text-center font-figtree text-[12px] text-muted">
                 Your picks appear here as you draft.
               </p>
             ) : (
@@ -107,15 +107,15 @@ export default function DraftRightPanel({
                   className="mb-1 flex items-center justify-between gap-2 rounded-[6px] border border-border/60 px-2 py-1.5"
                 >
                   <div className="flex min-w-0 items-center gap-2">
-                    <span className="font-mono text-[8px] text-muted">
+                    <span className="font-mono text-[9px] text-muted">
                       {pk.round}.{String(pk.slot).padStart(2, '0')}
                     </span>
                     <PositionBadge position={pk.player.position} />
-                    <span className="truncate font-figtree text-[11px] text-text">
+                    <span className="truncate font-figtree text-[12px] text-text">
                       {pk.player.name}
                     </span>
                   </div>
-                  <span className="font-mono text-[10px] text-boom">
+                  <span className="font-mono text-[11px] text-boom">
                     {pk.player.tfoScore.toFixed(1)}
                   </span>
                 </div>
@@ -126,16 +126,16 @@ export default function DraftRightPanel({
         {tab === 'chat' && (
           <div className="flex flex-col gap-2">
             {chat.length === 0 ? (
-              <p className="py-4 text-center font-figtree text-[11px] text-muted">
+              <p className="py-4 text-center font-figtree text-[12px] text-muted">
                 CPU teams will chat during the draft.
               </p>
             ) : (
               chat.map((m) => (
                 <div key={m.id} className="rounded-[6px] bg-bg/50 px-2 py-1.5">
-                  <div className="font-figtree text-[10px] font-semibold text-text">
+                  <div className="font-figtree text-[11px] font-semibold text-text">
                     {m.teamName}
                   </div>
-                  <div className="font-figtree text-[10px] text-muted">{m.text}</div>
+                  <div className="font-figtree text-[11px] text-muted">{m.text}</div>
                 </div>
               ))
             )}

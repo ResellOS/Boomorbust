@@ -26,8 +26,8 @@ function ComparisonBar({
   return (
     <div className="space-y-1">
       <div className="flex items-baseline justify-between gap-3">
-        <span className="min-w-[88px] font-figtree text-[12px] text-text">{label}</span>
-        <span className="font-mono text-[13px] tabular-nums" style={{ color }}>
+        <span className="min-w-[88px] font-figtree text-[13px] text-text">{label}</span>
+        <span className="font-mono text-[14px] tabular-nums" style={{ color }}>
           {fmtPct(value)}
         </span>
       </div>
@@ -89,7 +89,7 @@ function AccuracyLineChart({ points }: { points: WeeklyAccuracyPoint[] }) {
               x={pad.l - 6}
               y={toY(tick) + 3}
               textAnchor="end"
-              className="fill-muted font-mono text-[8px]"
+              className="fill-muted font-mono text-[9px]"
             >
               {tick}%
             </text>
@@ -110,20 +110,20 @@ function AccuracyLineChart({ points }: { points: WeeklyAccuracyPoint[] }) {
           points={bobLine}
         />
 
-        <text x={pad.l} y={h - 6} className="fill-muted font-mono text-[8px]">
+        <text x={pad.l} y={h - 6} className="fill-muted font-mono text-[9px]">
           Week {minWeek}
         </text>
         <text
           x={w - pad.r}
           y={h - 6}
           textAnchor="end"
-          className="fill-muted font-mono text-[8px]"
+          className="fill-muted font-mono text-[9px]"
         >
           Week {maxWeek}
         </text>
       </svg>
 
-      <div className="mt-2 flex flex-wrap gap-4 font-mono text-[9px]">
+      <div className="mt-2 flex flex-wrap gap-4 font-mono text-[10px]">
         <span className="flex items-center gap-1.5 text-boom">
           <span className="inline-block h-[2px] w-4 bg-boom" />
           BOB Accuracy
@@ -144,10 +144,10 @@ export default function BobVsConsensusChart({
 }: BobVsConsensusChartProps) {
   return (
     <section className="mb-6 rounded-[10px] border border-border bg-surface/50 p-4 backdrop-blur-xl md:p-5">
-      <div className="mb-1 font-figtree text-[11px] font-bold uppercase tracking-[1.5px] text-text">
+      <div className="mb-1 font-figtree text-[12px] font-bold uppercase tracking-[1.5px] text-text">
         Season Accuracy vs Consensus
       </div>
-      <p className="mb-4 font-figtree text-[11px] text-muted">
+      <p className="mb-4 font-figtree text-[12px] text-muted">
         {hasData
           ? 'Cumulative accuracy compared to expert consensus baselines.'
           : 'BOB vs Consensus tracking begins Week 1. Every week, BOB\'s calls are compared to FantasyPros consensus — automatically, publicly, without editing.'}
@@ -168,7 +168,7 @@ export default function BobVsConsensusChart({
         <AccuracyLineChart points={weeklyChart} />
       ) : (
         <div className="mt-5 flex h-[120px] items-center justify-center rounded-[8px] border border-dashed border-border/60 bg-bg/40">
-          <p className="max-w-sm px-4 text-center font-figtree text-[11px] leading-relaxed text-muted">
+          <p className="max-w-sm px-4 text-center font-figtree text-[12px] leading-relaxed text-muted">
             Weekly accuracy chart populates once calls resolve during the season.
           </p>
         </div>

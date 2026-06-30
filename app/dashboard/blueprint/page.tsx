@@ -57,7 +57,7 @@ function SkeletonBlock({ h = 'h-24', className = '' }: { h?: string; className?:
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
     <p
-      className="text-[10px] tracking-[0.18em] uppercase text-white/30 mb-3"
+      className="text-[11px] tracking-[0.18em] uppercase text-white/30 mb-3"
       style={MONO}
     >
       {children}
@@ -76,7 +76,7 @@ function StrengthBar({ score, max = 100 }: { score: number; max?: number }) {
           style={{ width: `${pct}%`, background: color, boxShadow: `0 0 6px ${color}60` }}
         />
       </div>
-      <span className="text-[11px] tabular-nums" style={{ ...MONO, color }}>
+      <span className="text-[12px] tabular-nums" style={{ ...MONO, color }}>
         {score}
       </span>
     </div>
@@ -87,7 +87,7 @@ function GradeBadge({ grade }: { grade: TeamGrade }) {
   const color = GRADE_COLOR[grade];
   return (
     <span
-      className="px-2.5 py-1 rounded-md text-[10px] font-bold tracking-wider"
+      className="px-2.5 py-1 rounded-md text-[11px] font-bold tracking-wider"
       style={{
         ...MONO,
         color,
@@ -105,7 +105,7 @@ function PosBadge({ pos }: { pos: string }) {
   const color = POS_COLOR[pos] ?? '#64748B';
   return (
     <span
-      className="px-1.5 py-0.5 rounded text-[9px] font-bold"
+      className="px-1.5 py-0.5 rounded text-[10px] font-bold"
       style={{ ...MONO, color, background: `${color}20`, border: `1px solid ${color}35` }}
     >
       {pos}
@@ -125,7 +125,7 @@ function TFOGradePill({ grade }: { grade: string | null }) {
   const c = colors[grade.toUpperCase()] ?? colors[grade] ?? '#64748B';
   return (
     <span
-      className="px-1.5 py-0.5 rounded text-[9px]"
+      className="px-1.5 py-0.5 rounded text-[10px]"
       style={{ ...MONO, color: c, background: `${c}15`, border: `1px solid ${c}30` }}
     >
       {formatEngineGradeLabel(grade)}
@@ -151,7 +151,7 @@ function YearOutlookCard({ outlook }: { outlook: YearOutlook }) {
       style={GLASS}
     >
       <div className="flex items-center justify-between">
-        <span className="text-[11px] text-white/40 uppercase tracking-widest" style={MONO}>
+        <span className="text-[12px] text-white/40 uppercase tracking-widest" style={MONO}>
           Year {outlook.year}
         </span>
         <span
@@ -164,7 +164,7 @@ function YearOutlookCard({ outlook }: { outlook: YearOutlook }) {
 
       <StrengthBar score={outlook.strength_score} />
 
-      <p className="text-[11px] text-white/60 leading-relaxed" style={MONO}>
+      <p className="text-[12px] text-white/60 leading-relaxed" style={MONO}>
         {outlook.verdict}
       </p>
 
@@ -172,8 +172,8 @@ function YearOutlookCard({ outlook }: { outlook: YearOutlook }) {
         <div className="space-y-1">
           {outlook.key_strengths.map((s, i) => (
             <div key={i} className="flex items-start gap-1.5">
-              <span className="text-[10px] mt-0.5" style={{ color: '#36E7A1' }}>▲</span>
-              <span className="text-[10px] text-white/50">{s}</span>
+              <span className="text-[11px] mt-0.5" style={{ color: '#36E7A1' }}>▲</span>
+              <span className="text-[11px] text-white/50">{s}</span>
             </div>
           ))}
         </div>
@@ -183,8 +183,8 @@ function YearOutlookCard({ outlook }: { outlook: YearOutlook }) {
         <div className="space-y-1">
           {outlook.key_risks.map((r, i) => (
             <div key={i} className="flex items-start gap-1.5">
-              <span className="text-[10px] mt-0.5" style={{ color: '#EF4444' }}>▼</span>
-              <span className="text-[10px] text-white/50">{r}</span>
+              <span className="text-[11px] mt-0.5" style={{ color: '#EF4444' }}>▼</span>
+              <span className="text-[11px] text-white/50">{r}</span>
             </div>
           ))}
         </div>
@@ -210,21 +210,21 @@ function RiskCard({ risk }: { risk: RosterRisk }) {
     >
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 flex-wrap mb-1">
-          <span className="text-[12px] font-semibold text-white truncate">{risk.name}</span>
+          <span className="text-[13px] font-semibold text-white truncate">{risk.name}</span>
           <PosBadge pos={risk.position} />
           <span
-            className="px-1.5 py-0.5 rounded text-[9px] font-bold"
+            className="px-1.5 py-0.5 rounded text-[10px] font-bold"
             style={{ ...MONO, color: sevColor, background: `${sevColor}18`, border: `1px solid ${sevColor}35` }}
           >
             {typeLabel[risk.risk_type] ?? risk.risk_type}
           </span>
         </div>
-        <p className="text-[10px] text-white/40" style={MONO}>
+        <p className="text-[11px] text-white/40" style={MONO}>
           {risk.risk_label}
         </p>
       </div>
       <span
-        className="text-[10px] font-bold shrink-0 px-2 py-1 rounded"
+        className="text-[11px] font-bold shrink-0 px-2 py-1 rounded"
         style={{ ...MONO, color: sevColor, background: `${sevColor}18` }}
       >
         {risk.severity}
@@ -240,11 +240,11 @@ function StrengthCard({ strength }: { strength: RosterStrength }) {
     <div className="rounded-xl p-4 flex gap-3 items-start" style={{ ...GLASS, borderLeft: '2px solid rgba(54,231,161,0.35)' }}>
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 flex-wrap mb-1">
-          <span className="text-[12px] font-semibold text-white truncate">{strength.name}</span>
+          <span className="text-[13px] font-semibold text-white truncate">{strength.name}</span>
           <PosBadge pos={strength.position} />
           <TFOGradePill grade={strength.tfo_grade} />
         </div>
-        <p className="text-[10px] text-white/40" style={MONO}>
+        <p className="text-[11px] text-white/40" style={MONO}>
           {strength.why}
         </p>
       </div>
@@ -282,7 +282,7 @@ function RecommendationCard({ rec, idx }: { rec: Recommendation; idx: number }) 
         style={GLASS}
       >
         <span
-          className="text-[11px] font-bold shrink-0 w-6 h-6 rounded flex items-center justify-center"
+          className="text-[12px] font-bold shrink-0 w-6 h-6 rounded flex items-center justify-center"
           style={{ ...MONO, background: `${color}20`, color }}
         >
           {idx + 1}
@@ -290,19 +290,19 @@ function RecommendationCard({ rec, idx }: { rec: Recommendation; idx: number }) 
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1">
             <span
-              className="text-[9px] font-bold tracking-widest"
+              className="text-[10px] font-bold tracking-widest"
               style={{ ...MONO, color }}
             >
               {rec.action}
             </span>
             {rec.player_name && (
-              <span className="text-[11px] text-white font-semibold">{rec.player_name}</span>
+              <span className="text-[12px] text-white font-semibold">{rec.player_name}</span>
             )}
             {rec.position && !rec.player_name && (
               <PosBadge pos={rec.position} />
             )}
           </div>
-          <p className="text-[10px] text-white/45 leading-relaxed" style={MONO}>
+          <p className="text-[11px] text-white/45 leading-relaxed" style={MONO}>
             {rec.reasoning}
           </p>
         </div>
@@ -327,7 +327,7 @@ function TradeTargetCard({ target }: { target: TradeTarget }) {
       >
         {/* Avatar */}
         <div
-          className="w-10 h-10 rounded-lg shrink-0 flex items-center justify-center text-[11px] font-bold"
+          className="w-10 h-10 rounded-lg shrink-0 flex items-center justify-center text-[12px] font-bold"
           style={{ background: `${posColor}20`, color: posColor, border: `1px solid ${posColor}30` }}
         >
           {target.name.split(' ').map((w) => w[0]).join('').slice(0, 2)}
@@ -335,16 +335,16 @@ function TradeTargetCard({ target }: { target: TradeTarget }) {
 
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap mb-1">
-            <span className="text-[12px] font-semibold text-white truncate">{target.name}</span>
+            <span className="text-[13px] font-semibold text-white truncate">{target.name}</span>
             <PosBadge pos={target.position} />
             <TFOGradePill grade={target.tfo_grade} />
           </div>
-          <p className="text-[10px] text-white/40 mb-1.5" style={MONO}>
+          <p className="text-[11px] text-white/40 mb-1.5" style={MONO}>
             {target.why}
           </p>
           {target.bvi_delta != null && (
             <span
-              className="text-[9px] font-bold"
+              className="text-[10px] font-bold"
               style={{ ...MONO, color: deltaPos ? '#36E7A1' : '#EF4444' }}
             >
               BVI △{deltaPos ? '+' : ''}{Math.round(target.bvi_delta)} {deltaPos ? 'UNDERVALUED' : 'OVERVALUED'}
@@ -354,10 +354,10 @@ function TradeTargetCard({ target }: { target: TradeTarget }) {
 
         {target.tfo_score != null && (
           <div className="text-right shrink-0">
-            <div className="text-[16px] font-bold tabular-nums" style={{ ...MONO, color: '#22D3EE' }}>
+            <div className="text-[17px] font-bold tabular-nums" style={{ ...MONO, color: '#22D3EE' }}>
               {Math.round(target.tfo_score)}
             </div>
-            <div className="text-[9px] text-white/30" style={MONO}>Rating</div>
+            <div className="text-[10px] text-white/30" style={MONO}>Rating</div>
           </div>
         )}
       </div>
@@ -441,10 +441,10 @@ export default function BlueprintPage() {
   if (error) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center gap-4" style={{ background: '#0a0d14' }}>
-        <p className="text-red-400 text-[13px]" style={MONO}>{error}</p>
+        <p className="text-red-400 text-[14px]" style={MONO}>{error}</p>
         <button
           onClick={() => void load()}
-          className="text-[11px] text-red-400/60 underline hover:text-red-400"
+          className="text-[12px] text-red-400/60 underline hover:text-red-400"
           style={MONO}
         >
           Retry
@@ -491,7 +491,7 @@ export default function BlueprintPage() {
                 data.risks.map((r) => <RiskCard key={r.player_id} risk={r} />)
               ) : (
                 <div className="rounded-xl p-6 text-center" style={GLASS}>
-                  <p className="text-[11px] text-white/30" style={MONO}>No critical risks detected</p>
+                  <p className="text-[12px] text-white/30" style={MONO}>No critical risks detected</p>
                 </div>
               )}
             </div>
@@ -505,7 +505,7 @@ export default function BlueprintPage() {
                 data.strengths.map((s) => <StrengthCard key={s.player_id} strength={s} />)
               ) : (
                 <div className="rounded-xl p-6 text-center" style={GLASS}>
-                  <p className="text-[11px] text-white/30" style={MONO}>Build your core to unlock strengths</p>
+                  <p className="text-[12px] text-white/30" style={MONO}>Build your core to unlock strengths</p>
                 </div>
               )}
             </div>
@@ -528,7 +528,7 @@ export default function BlueprintPage() {
             <SectionLabel>Trade Targets</SectionLabel>
             <Link
               href="/dashboard/trade"
-              className="text-[10px] text-cyan-400/60 hover:text-cyan-400 transition-colors"
+              className="text-[11px] text-cyan-400/60 hover:text-cyan-400 transition-colors"
               style={MONO}
             >
               Open Trade Hub →
@@ -542,7 +542,7 @@ export default function BlueprintPage() {
             </div>
           ) : (
             <div className="rounded-xl p-6 text-center" style={GLASS}>
-              <p className="text-[11px] text-white/30" style={MONO}>
+              <p className="text-[12px] text-white/30" style={MONO}>
                 No targets computed yet — dynasty ratings cache populates nightly
               </p>
             </div>
@@ -599,19 +599,19 @@ function BlueprintHeader({
             </Link>
             <div className="min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
-                <span className="text-[16px] font-bold text-white truncate">
+                <span className="text-[17px] font-bold text-white truncate">
                   {teamName ?? 'My Team'}
                 </span>
                 {teamGrade && <GradeBadge grade={teamGrade} />}
               </div>
               <div className="flex items-center gap-2 mt-0.5 flex-wrap">
-                <span className="text-[11px] text-white/40 truncate" style={MONO}>
+                <span className="text-[12px] text-white/40 truncate" style={MONO}>
                   {leagueName}
                 </span>
                 {managerTitle && (
                   <>
                     <span className="text-white/20">·</span>
-                    <span className="text-[10px] text-amber-400/70" style={MONO}>
+                    <span className="text-[11px] text-amber-400/70" style={MONO}>
                       {managerTitle}
                     </span>
                   </>
@@ -623,7 +623,7 @@ function BlueprintHeader({
           <button
             onClick={onRefresh}
             disabled={refreshing}
-            className="shrink-0 px-3 py-1.5 rounded-lg text-[10px] text-white/40 hover:text-white/70 transition-colors disabled:opacity-40"
+            className="shrink-0 px-3 py-1.5 rounded-lg text-[11px] text-white/40 hover:text-white/70 transition-colors disabled:opacity-40"
             style={{ ...MONO, border: '1px solid rgba(255,255,255,0.08)' }}
           >
             {refreshing ? '...' : '↻ Refresh'}
@@ -634,39 +634,39 @@ function BlueprintHeader({
         <div className="flex items-center gap-4 flex-wrap">
           {contentionLabel && (
             <div className="flex items-center gap-1.5">
-              <span className="text-[9px] text-white/25 uppercase tracking-widest" style={MONO}>
+              <span className="text-[10px] text-white/25 uppercase tracking-widest" style={MONO}>
                 Window
               </span>
-              <span className="text-[11px] font-bold" style={{ ...MONO, color: '#22D3EE' }}>
+              <span className="text-[12px] font-bold" style={{ ...MONO, color: '#22D3EE' }}>
                 {contentionLabel}
               </span>
             </div>
           )}
           {avgTFO != null && (
             <div className="flex items-center gap-1.5">
-              <span className="text-[9px] text-white/25 uppercase tracking-widest" style={MONO}>
+              <span className="text-[10px] text-white/25 uppercase tracking-widest" style={MONO}>
                 Avg Dynasty Rating
               </span>
-              <span className="text-[11px] font-bold tabular-nums" style={{ ...MONO, color: '#36E7A1' }}>
+              <span className="text-[12px] font-bold tabular-nums" style={{ ...MONO, color: '#36E7A1' }}>
                 {avgTFO}
               </span>
             </div>
           )}
           {avgAge != null && (
             <div className="flex items-center gap-1.5">
-              <span className="text-[9px] text-white/25 uppercase tracking-widest" style={MONO}>
+              <span className="text-[10px] text-white/25 uppercase tracking-widest" style={MONO}>
                 Avg Age
               </span>
-              <span className="text-[11px] font-bold tabular-nums" style={{ ...MONO, color: '#FBBF24' }}>
+              <span className="text-[12px] font-bold tabular-nums" style={{ ...MONO, color: '#FBBF24' }}>
                 {avgAge}
               </span>
             </div>
           )}
           <div className="flex items-center gap-1.5">
-            <span className="text-[9px] text-white/25 uppercase tracking-widest" style={MONO}>
+            <span className="text-[10px] text-white/25 uppercase tracking-widest" style={MONO}>
               Scoring
             </span>
-            <span className="text-[11px] font-bold uppercase" style={{ ...MONO, color: '#A78BFA' }}>
+            <span className="text-[12px] font-bold uppercase" style={{ ...MONO, color: '#A78BFA' }}>
               {scoringType}
             </span>
           </div>

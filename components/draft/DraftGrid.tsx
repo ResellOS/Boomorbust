@@ -66,19 +66,19 @@ export default function DraftGrid({ config, picks, currentOverall }: DraftGridPr
           >
             <div className="absolute inset-x-0 top-0 h-0.5" style={{ background: color }} />
             <div className="flex h-full flex-col p-1.5">
-              <div className="font-mono text-[7px] text-muted">{pickNum}</div>
+              <div className="font-mono text-[8px] text-muted">{pickNum}</div>
               <div className="flex flex-1 items-center gap-1">
                 <PlayerAvatar playerId={pk.player.playerId} name={pk.player.name} size={compact ? 24 : 32} />
                 <div className="min-w-0 flex-1">
-                  <div className="truncate font-mono text-[9px] font-medium text-text">
+                  <div className="truncate font-mono text-[10px] font-medium text-text">
                     {abbrevName(pk.player.name)}
                   </div>
-                  <div className="font-mono text-[7px]" style={{ color }}>
+                  <div className="font-mono text-[8px]" style={{ color }}>
                     {pos} · {pk.player.team}
                   </div>
                 </div>
               </div>
-              <div className="font-mono text-[10px] tabular-nums" style={{ color }}>
+              <div className="font-mono text-[11px] tabular-nums" style={{ color }}>
                 {Number.isFinite(pk.player.tfoScore) ? pk.player.tfoScore.toFixed(1) : '—'}
               </div>
             </div>
@@ -96,8 +96,8 @@ export default function DraftGrid({ config, picks, currentOverall }: DraftGridPr
             style={{ boxShadow: '0 0 20px rgba(54,231,161,0.25)' }}
           >
             <div className="flex h-full flex-col items-center justify-center p-2 text-center">
-              <div className="font-mono text-[8px] text-boom">{pickNum}</div>
-              <div className="mt-1 font-mono text-[9px] uppercase tracking-wide text-boom">
+              <div className="font-mono text-[9px] text-boom">{pickNum}</div>
+              <div className="mt-1 font-mono text-[10px] uppercase tracking-wide text-boom">
                 You On The Clock
               </div>
             </div>
@@ -113,11 +113,11 @@ export default function DraftGrid({ config, picks, currentOverall }: DraftGridPr
           } ${onClock ? 'border-boom/30' : ''}`}
         >
           <div className="flex h-full flex-col items-center justify-center p-2 text-center">
-            <div className="font-mono text-[9px] text-muted">{pickNum}</div>
-            <div className="mt-1 font-mono text-[8px] text-muted/60">
+            <div className="font-mono text-[10px] text-muted">{pickNum}</div>
+            <div className="mt-1 font-mono text-[9px] text-muted/60">
               {teamLabel(config, slot)}
             </div>
-            <div className="mt-2 font-mono text-[10px] text-muted/30">—</div>
+            <div className="mt-2 font-mono text-[11px] text-muted/30">—</div>
           </div>
         </div>
       );
@@ -133,14 +133,14 @@ export default function DraftGrid({ config, picks, currentOverall }: DraftGridPr
   return (
     <div className="flex shrink-0 flex-col border-b border-border bg-[#0a0d14]" style={{ minHeight: 240, maxHeight: 280 }}>
       <div className="flex shrink-0 items-center gap-3 border-b border-border px-3 py-2">
-        <div className="font-mono text-[8px] uppercase tracking-[1.5px] text-muted">Draft Board</div>
+        <div className="font-mono text-[9px] uppercase tracking-[1.5px] text-muted">Draft Board</div>
         <div className="flex gap-1">
           {[1, 2, 3].filter((r) => r <= rounds).map((r) => (
             <button
               key={r}
               type="button"
               onClick={() => setViewRound(r)}
-              className={`cursor-pointer rounded px-2 py-0.5 font-mono text-[8px] uppercase ${
+              className={`cursor-pointer rounded px-2 py-0.5 font-mono text-[9px] uppercase ${
                 viewRound === r ? 'bg-boom/15 text-boom' : 'text-muted hover:text-text'
               }`}
             >
@@ -152,14 +152,14 @@ export default function DraftGrid({ config, picks, currentOverall }: DraftGridPr
 
       <div className="min-h-0 flex-1 overflow-hidden px-3 py-2">
         <div className="mb-1 flex items-center gap-2">
-          <span className="w-14 shrink-0 font-mono text-[9px] uppercase text-boom">Round {viewRound}</span>
+          <span className="w-14 shrink-0 font-mono text-[10px] uppercase text-boom">Round {viewRound}</span>
           {renderRoundRow(viewRound)}
         </div>
 
         {viewRound === 1 && rounds >= 2 && (
           <div className="mt-2 border-t border-border/50 pt-2 opacity-70">
             <div className="mb-1 flex items-center gap-2">
-              <span className="w-14 shrink-0 font-mono text-[8px] uppercase text-muted">Round 2</span>
+              <span className="w-14 shrink-0 font-mono text-[9px] uppercase text-muted">Round 2</span>
               {renderRoundRow(previewRound2, true)}
             </div>
           </div>

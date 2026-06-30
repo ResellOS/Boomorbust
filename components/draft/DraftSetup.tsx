@@ -55,7 +55,7 @@ function PillSelector<T extends string | number>({
             key={String(opt.value)}
             type="button"
             onClick={() => onSelect(opt.value)}
-            className={`shrink-0 rounded-[6px] border px-3 py-1.5 font-figtree text-[12px] font-semibold transition-colors ${
+            className={`shrink-0 rounded-[6px] border px-3 py-1.5 font-figtree text-[13px] font-semibold transition-colors ${
               active
                 ? 'border-boom bg-boom/15 text-boom'
                 : 'border-border bg-surface text-muted hover:text-text'
@@ -86,7 +86,7 @@ function ToggleSwitch({
       onClick={() => onChange(!checked)}
       className="flex items-center justify-between gap-4 rounded-[8px] border border-border bg-bg/40 px-3 py-2.5 text-left"
     >
-      <span className="font-figtree text-[12px] text-text">{label}</span>
+      <span className="font-figtree text-[13px] text-text">{label}</span>
       <span
         className={`relative h-5 w-9 shrink-0 rounded-full transition-colors ${checked ? 'bg-boom' : 'bg-border'}`}
       >
@@ -101,7 +101,7 @@ function ToggleSwitch({
 function FieldRow({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="grid grid-cols-1 gap-2 sm:grid-cols-[140px_1fr] sm:items-start sm:gap-4">
-      <span className="pt-1 font-figtree text-[11px] font-bold uppercase tracking-[1px] text-muted">
+      <span className="pt-1 font-figtree text-[12px] font-bold uppercase tracking-[1px] text-muted">
         {label}
       </span>
       <div>{children}</div>
@@ -169,7 +169,7 @@ export default function DraftSetup({
         <h1 className="font-mono text-[28px] uppercase tracking-[-0.5px] text-text md:text-[32px]">
           Startup Mock — Pre-Game Setup
         </h1>
-        <p className="mt-1 font-mono text-[12px] text-muted">
+        <p className="mt-1 font-mono text-[13px] text-muted">
           Configure your war room before the draft clock starts.
         </p>
       </div>
@@ -180,7 +180,7 @@ export default function DraftSetup({
             key={t.id}
             type="button"
             onClick={() => setTab(t.id)}
-            className={`border-b-2 px-4 py-2.5 font-figtree text-[12px] font-semibold transition-colors ${
+            className={`border-b-2 px-4 py-2.5 font-figtree text-[13px] font-semibold transition-colors ${
               tab === t.id
                 ? 'border-boom text-boom'
                 : 'border-transparent text-muted hover:text-text'
@@ -198,7 +198,7 @@ export default function DraftSetup({
               <input
                 value={config.draftName}
                 onChange={(e) => onChange({ draftName: e.target.value })}
-                className="w-full rounded-[8px] border border-border bg-bg px-3 py-2 font-figtree text-[13px] text-text outline-none focus:border-boom/50"
+                className="w-full rounded-[8px] border border-border bg-bg px-3 py-2 font-figtree text-[14px] text-text outline-none focus:border-boom/50"
               />
             </FieldRow>
 
@@ -211,7 +211,7 @@ export default function DraftSetup({
                 ]}
                 onSelect={(v) => onChange({ draftOrderType: v })}
               />
-              <p className="mt-1 font-mono text-[9px] text-muted">Auction — coming soon</p>
+              <p className="mt-1 font-mono text-[10px] text-muted">Auction — coming soon</p>
             </FieldRow>
 
             <FieldRow label="Scoring">
@@ -276,8 +276,8 @@ export default function DraftSetup({
         {tab === 'roster' && (
           <div>
             <div className="mb-4 flex items-center justify-between">
-              <span className="font-figtree text-[13px] font-bold text-text">Roster Builder</span>
-              <span className="font-mono text-[12px] text-boom">
+              <span className="font-figtree text-[14px] font-bold text-text">Roster Builder</span>
+              <span className="font-mono text-[13px] text-boom">
                 {size} slots · {config.rounds} rounds
               </span>
             </div>
@@ -294,7 +294,7 @@ export default function DraftSetup({
                   rounds: rosterSize(DEFAULT_ROSTER_SLOTS),
                 })
               }
-              className="mt-4 font-figtree text-[11px] text-muted underline hover:text-text"
+              className="mt-4 font-figtree text-[12px] text-muted underline hover:text-text"
             >
               Reset to default
             </button>
@@ -304,11 +304,11 @@ export default function DraftSetup({
         {tab === 'order' && (
           <div>
             <div className="mb-4 flex items-center justify-between">
-              <span className="font-figtree text-[13px] font-bold text-text">Draft Slots</span>
+              <span className="font-figtree text-[14px] font-bold text-text">Draft Slots</span>
               <button
                 type="button"
                 onClick={randomizeOrder}
-                className="rounded-[6px] border border-border px-3 py-1.5 font-figtree text-[11px] font-semibold text-text hover:border-boom/40"
+                className="rounded-[6px] border border-border px-3 py-1.5 font-figtree text-[12px] font-semibold text-text hover:border-boom/40"
               >
                 Randomize Teams
               </button>
@@ -321,11 +321,11 @@ export default function DraftSetup({
                     team.isUser ? 'border-boom/40 bg-boom/[0.06]' : 'border-border bg-bg/30'
                   }`}
                 >
-                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-surface2 font-mono text-[11px] font-bold text-text">
+                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-surface2 font-mono text-[12px] font-bold text-text">
                     {team.slot}
                   </span>
                   <div
-                    className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full font-mono text-[10px] font-bold text-white"
+                    className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full font-mono text-[11px] font-bold text-white"
                     style={{
                       background: team.isUser
                         ? 'linear-gradient(135deg,#36E7A1,#22D3EE)'
@@ -344,7 +344,7 @@ export default function DraftSetup({
                         ),
                       });
                     }}
-                    className="min-w-0 flex-1 border-none bg-transparent font-figtree text-[13px] text-text outline-none"
+                    className="min-w-0 flex-1 border-none bg-transparent font-figtree text-[14px] text-text outline-none"
                   />
                   {!team.isUser && (
                     <button
@@ -357,7 +357,7 @@ export default function DraftSetup({
                         }));
                         onChange({ teamOrder: order, yourPick: team.slot });
                       }}
-                      className="shrink-0 font-mono text-[9px] text-muted hover:text-boom"
+                      className="shrink-0 font-mono text-[10px] text-muted hover:text-boom"
                     >
                       Set as me
                     </button>
@@ -370,12 +370,12 @@ export default function DraftSetup({
       </div>
 
       <div className="flex flex-col items-start gap-3">
-        <p className="font-mono text-[10px] text-muted">Startup Mock: $10 per draft</p>
+        <p className="font-mono text-[11px] text-muted">Startup Mock: $10 per draft</p>
         <button
           type="button"
           onClick={onStart}
           disabled={starting}
-          className="w-full rounded-[10px] bg-boom py-4 font-figtree text-[15px] font-extrabold uppercase tracking-[2px] text-bg transition-opacity hover:opacity-90 disabled:opacity-50 sm:w-auto sm:px-16"
+          className="w-full rounded-[10px] bg-boom py-4 font-figtree text-[16px] font-extrabold uppercase tracking-[2px] text-bg transition-opacity hover:opacity-90 disabled:opacity-50 sm:w-auto sm:px-16"
         >
           {starting ? 'Starting…' : 'Start Draft'}
         </button>
@@ -395,7 +395,7 @@ function RosterSlotRow({
   return (
     <div className="flex items-center gap-3 rounded-[8px] border border-border bg-bg/30 px-3 py-2">
       <span
-        className="w-[100px] shrink-0 font-figtree text-[12px] font-bold"
+        className="w-[100px] shrink-0 font-figtree text-[13px] font-bold"
         style={{ color }}
       >
         {SLOT_LABELS[slot.type]}
@@ -403,15 +403,15 @@ function RosterSlotRow({
       <button
         type="button"
         onClick={() => onDelta(-1)}
-        className="flex h-7 w-7 items-center justify-center rounded-[6px] border border-border font-mono text-[14px] text-muted hover:text-text"
+        className="flex h-7 w-7 items-center justify-center rounded-[6px] border border-border font-mono text-[15px] text-muted hover:text-text"
       >
         −
       </button>
-      <span className="w-8 text-center font-mono text-[14px] font-bold text-text">{slot.count}</span>
+      <span className="w-8 text-center font-mono text-[15px] font-bold text-text">{slot.count}</span>
       <button
         type="button"
         onClick={() => onDelta(1)}
-        className="flex h-7 w-7 items-center justify-center rounded-[6px] border border-border font-mono text-[14px] text-muted hover:text-text"
+        className="flex h-7 w-7 items-center justify-center rounded-[6px] border border-border font-mono text-[15px] text-muted hover:text-text"
       >
         +
       </button>

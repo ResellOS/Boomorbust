@@ -66,17 +66,17 @@ function SignalRow({
         <PlayerAvatar playerId={player.playerId} name={player.name} size={32} />
         <div className="min-w-0 flex-1">
           <div className="flex items-baseline justify-between gap-2">
-            <p className="truncate font-figtree text-[12px] font-medium text-[#e8ecf4]">{player.name}</p>
-            <span className="shrink-0 font-mono text-[8px] uppercase" style={{ color: mv.color }}>
+            <p className="truncate font-figtree text-[13px] font-medium text-[#e8ecf4]">{player.name}</p>
+            <span className="shrink-0 font-mono text-[9px] uppercase" style={{ color: mv.color }}>
               {actionLabel(mv.verdict)}
             </span>
           </div>
-          <p className="font-mono text-[8px] text-[#6b7a99]">
+          <p className="font-mono text-[9px] text-[#6b7a99]">
             {player.position} · {player.team}
           </p>
         </div>
       </div>
-      <div className="mt-1.5 flex flex-wrap gap-x-3 gap-y-0.5 font-mono text-[8px] tabular-nums text-[#8b9bb8]">
+      <div className="mt-1.5 flex flex-wrap gap-x-3 gap-y-0.5 font-mono text-[9px] tabular-nums text-[#8b9bb8]">
         <span>
           Market Rank <span className="text-[#e8ecf4]">#{ktc ?? '—'}</span>
         </span>
@@ -95,7 +95,7 @@ function SignalRow({
           Confidence: <span className="text-[#e8ecf4]">{confidenceTier(mv.rankDelta)}</span>
         </span>
       </div>
-      <div className="mt-1 flex items-center gap-1.5 font-mono text-[7px] uppercase tracking-wide">
+      <div className="mt-1 flex items-center gap-1.5 font-mono text-[8px] uppercase tracking-wide">
         <span className="h-1.5 w-1.5 rounded-full" style={{ background: action.dotColor }} />
         <span style={{ color: action.dotColor }}>{action.key}</span>
         <span className="normal-case text-[#8b9bb8]">· {action.hint}</span>
@@ -131,18 +131,18 @@ export default function MarketSignalsCompact({
     <section className="flex h-full flex-col overflow-hidden rounded-[10px] border border-[#1e2640] bg-[#0f1420]">
       <div className="flex items-center justify-between border-b border-[#1e2640]/80 px-3.5 py-2.5">
         <div>
-          <h3 className="font-figtree text-[10px] uppercase tracking-[1.5px] text-[#e8ecf4]">
+          <h3 className="font-figtree text-[11px] uppercase tracking-[1.5px] text-[#e8ecf4]">
             Mispriced Assets
           </h3>
-          <p className="font-mono text-[8px] text-[#8b9bb8]">Buy low · sell high · hold</p>
+          <p className="font-mono text-[9px] text-[#8b9bb8]">Buy low · sell high · hold</p>
         </div>
-        <Link href="/players" className="dash-action-btn font-mono text-[8px] text-boom no-underline">
+        <Link href="/players" className="dash-action-btn font-mono text-[9px] text-boom no-underline">
           View All →
         </Link>
       </div>
       <div className="flex-1 overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {sorted.length === 0 ? (
-          <p className="px-4 py-5 font-mono text-[10px] text-[#6b7a99]">
+          <p className="px-4 py-5 font-mono text-[11px] text-[#6b7a99]">
             No mispriced assets yet — sync leagues to populate.
           </p>
         ) : (

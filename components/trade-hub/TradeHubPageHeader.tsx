@@ -10,7 +10,7 @@ export default function TradeHubPageHeader() {
         Trade Hub
       </h1>
       <p
-        className="mt-1 text-[14px] text-[#64748B]"
+        className="mt-1 text-[15px] text-[#64748B]"
         style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}
       >
         All trades. All leagues. One hub.

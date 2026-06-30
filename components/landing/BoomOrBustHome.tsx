@@ -78,13 +78,13 @@ function FlipCard({ feature }: { feature: FeatureItem }) {
           className="absolute inset-0 bg-[#08090C] border border-white/5 p-8 flex flex-col items-center text-center"
           style={{ backfaceVisibility: "hidden" }}
         >
-          <div className="absolute top-4 left-4 text-[8px] font-black text-indigo-500/30 tracking-widest">{feature.id}</div>
+          <div className="absolute top-4 left-4 text-[9px] font-black text-indigo-500/30 tracking-widest">{feature.id}</div>
           <div className="mb-6 text-indigo-500">{feature.icon}</div>
           <h3 className="text-xs font-black italic mb-2 tracking-widest">{feature.title}</h3>
-          <p className="text-[10px] font-bold text-gray-500 uppercase tracking-tight leading-tight max-w-[140px]">
+          <p className="text-[11px] font-bold text-gray-500 uppercase tracking-tight leading-tight max-w-[140px]">
             {feature.frontDesc}
           </p>
-          <div className="mt-auto text-[7px] font-black text-gray-700 flex items-center gap-2 uppercase tracking-widest">
+          <div className="mt-auto text-[8px] font-black text-gray-700 flex items-center gap-2 uppercase tracking-widest">
             <RefreshCcw size={10} /> Reveal Intel
           </div>
         </div>
@@ -97,10 +97,10 @@ function FlipCard({ feature }: { feature: FeatureItem }) {
             transform: "rotateY(180deg)" 
           }}
         >
-          <div className="text-[10px] font-black text-indigo-400 uppercase tracking-[0.2em] mb-3 border-b border-indigo-500/20 pb-2">
+          <div className="text-[11px] font-black text-indigo-400 uppercase tracking-[0.2em] mb-3 border-b border-indigo-500/20 pb-2">
             {feature.backTitle}
           </div>
-          <p className="text-[11px] font-bold text-gray-400 leading-relaxed uppercase tracking-tighter">
+          <p className="text-[12px] font-bold text-gray-400 leading-relaxed uppercase tracking-tighter">
             {feature.backDesc}
           </p>
         </div>

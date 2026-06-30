@@ -200,7 +200,7 @@ function PickCard({
         </span>
       </div>
 
-      <div className={clsx('rounded-xl border px-3 py-2 text-center font-mono text-[11px] font-black tracking-wide', VERDICT_BADGE[verdict])}>
+      <div className={clsx('rounded-xl border px-3 py-2 text-center font-mono text-[12px] font-black tracking-wide', VERDICT_BADGE[verdict])}>
         {verdict === 'KEEP' ? 'KEEP' : verdict === 'SELL' ? 'SELL' : 'NEUTRAL'} ·{' '}
         {teamWindow === 'rebuild'
           ? 'Rebuild window'
@@ -211,15 +211,15 @@ function PickCard({
 
       <div className="grid gap-3 sm:grid-cols-2">
         <div className="rounded-xl border border-white/[0.07] bg-black/20 p-3">
-          <p className="text-[10px] uppercase tracking-widest text-[#64748B] font-semibold mb-1">Pick value</p>
+          <p className="text-[11px] uppercase tracking-widest text-[#64748B] font-semibold mb-1">Pick value</p>
           <p className="text-sm text-white font-medium">{pickBand}</p>
-          <p className="text-[11px] text-[#94A3B8] mt-1 leading-snug">
+          <p className="text-[12px] text-[#94A3B8] mt-1 leading-snug">
             Projected pick range from original slot & round (proxy for team finish / where this selection is likely to land).
           </p>
         </div>
         <div className="rounded-xl border border-white/[0.07] bg-black/20 p-3">
-          <p className="text-[10px] uppercase tracking-widest text-[#64748B] font-semibold mb-1">Roster fit</p>
-          <p className="text-[11px] text-[#22D3EE] font-semibold mb-1">
+          <p className="text-[11px] uppercase tracking-widest text-[#64748B] font-semibold mb-1">Roster fit</p>
+          <p className="text-[12px] text-[#22D3EE] font-semibold mb-1">
             This pick addresses: {fit.addresses.join(', ')}
           </p>
           <p className="text-xs text-[#CBD5E1] leading-snug">{fit.text}</p>
@@ -244,11 +244,11 @@ function PickCard({
       <p className="text-sm text-[#CBD5E1]">{qa.roster_context}</p>
 
       <div className="rounded-xl border border-indigo-500/20 bg-indigo-500/[0.06] px-3 py-2.5">
-        <p className="text-[10px] uppercase tracking-[0.18em] text-indigo-300/90 font-semibold mb-0.5 font-mono">
+        <p className="text-[11px] uppercase tracking-[0.18em] text-indigo-300/90 font-semibold mb-0.5 font-mono">
           LEAGUE CONTEXT
         </p>
         <p className="text-xs text-white font-medium">{leagueBlurb.headline}</p>
-        <p className="text-[11px] text-[#94A3B8] mt-1">{leagueBlurb.detail}</p>
+        <p className="text-[12px] text-[#94A3B8] mt-1">{leagueBlurb.detail}</p>
       </div>
 
       {analysis ? (
@@ -287,11 +287,11 @@ function TeamNeedsStrip({ needs }: { needs: TeamNeedsProfile }) {
   const order: Array<'QB' | 'RB' | 'WR' | 'TE'> = ['QB', 'RB', 'WR', 'TE'];
   return (
     <div className="rounded-2xl border border-white/10 bg-[#0f172a]/80 p-4 md:p-5">
-      <p className="text-[10px] uppercase tracking-[0.2em] text-[#64748B] font-semibold mb-2">YOUR TEAM NEEDS</p>
-      <p className="text-[11px] text-[#94A3B8] mb-3 leading-relaxed">
+      <p className="text-[11px] uppercase tracking-[0.2em] text-[#64748B] font-semibold mb-2">YOUR TEAM NEEDS</p>
+      <p className="text-[12px] text-[#94A3B8] mb-3 leading-relaxed">
         Position grades from average dynasty rating on your roster (QB / RB / WR / TE only).
       </p>
-      <p className="font-mono text-[13px] font-bold text-[#CBD5E1] mb-4 flex flex-wrap items-center gap-x-1 gap-y-1">
+      <p className="font-mono text-[14px] font-bold text-[#CBD5E1] mb-4 flex flex-wrap items-center gap-x-1 gap-y-1">
         {order.map((pos, i) => {
           const g = needs.byPos[pos];
           return (
@@ -316,7 +316,7 @@ function TeamNeedsStrip({ needs }: { needs: TeamNeedsProfile }) {
             >
               <span className="text-[#94A3B8]">{pos}</span>
               <span className="tabular-nums">{g.letter}</span>
-              <span className="text-[10px] opacity-80 tabular-nums">avg {g.avgTfo.toFixed(1)} rating</span>
+              <span className="text-[11px] opacity-80 tabular-nums">avg {g.avgTfo.toFixed(1)} rating</span>
             </div>
           );
         })}
@@ -504,7 +504,7 @@ export default function PicksPage() {
 
         <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div className="space-y-2 flex-1 max-w-md">
-            <label htmlFor="pick-league" className="text-[10px] uppercase tracking-widest text-[#64748B] block">
+            <label htmlFor="pick-league" className="text-[11px] uppercase tracking-widest text-[#64748B] block">
               League
             </label>
             <select
@@ -519,7 +519,7 @@ export default function PicksPage() {
                 </option>
               ))}
             </select>
-            <p className="text-[11px] text-[#64748B] leading-snug">
+            <p className="text-[12px] text-[#64748B] leading-snug">
               Shows future picks for the selected league from Sleeper traded picks. Default view is your portfolio only.
             </p>
           </div>
@@ -551,7 +551,7 @@ export default function PicksPage() {
         {!loading && teamNeeds && selectedLeagueObj ? <TeamNeedsStrip needs={teamNeeds} /> : null}
 
         {!loading && teamWindow && selectedLeagueObj ? (
-          <p className="text-[11px] text-[#64748B] mt-3 mb-6 font-mono uppercase tracking-wide">
+          <p className="text-[12px] text-[#64748B] mt-3 mb-6 font-mono uppercase tracking-wide">
             Arc · {teamWindow === 'rebuild' ? 'Rebuild bias' : teamWindow === 'contend' ? 'Contention bias' : 'Balanced'}{' '}
             (from roster trend + total KTC){userRosterId != null ? ` · Your roster #${userRosterId}` : ''}
           </p>

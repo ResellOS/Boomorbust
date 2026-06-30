@@ -56,11 +56,11 @@ export default function RosterRester({
   return (
     <div className={`glass-panel p-4 flex flex-col ${className}`}>
       <div className="flex items-center justify-between mb-3">
-        <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-300 flex items-center gap-2">
+        <h3 className="text-[11px] font-black uppercase tracking-[0.3em] text-slate-300 flex items-center gap-2">
           <ShieldCheck className="w-3 h-3 text-[#22D3EE]" />
           Roster Rester
         </h3>
-        <span className="text-[8px] font-mono text-slate-600 uppercase">
+        <span className="text-[9px] font-mono text-slate-600 uppercase">
           Battle readiness
         </span>
       </div>
@@ -139,7 +139,7 @@ export default function RosterRester({
               {Math.round(score)}
             </span>
             <span
-              className="text-[8px] font-black uppercase tracking-[0.3em] mt-1"
+              className="text-[9px] font-black uppercase tracking-[0.3em] mt-1"
               style={{
                 color: ringColor,
                 textShadow: `0 0 6px ${ringSoft}`,
@@ -154,7 +154,7 @@ export default function RosterRester({
           {entries.map((e, i) => (
             <li
               key={i}
-              className="flex items-center gap-2 text-[11px] font-mono"
+              className="flex items-center gap-2 text-[12px] font-mono"
             >
               <span
                 className="w-2 h-2 rounded-full shrink-0"
@@ -171,7 +171,7 @@ export default function RosterRester({
       </div>
 
       {leagueContext && (
-        <p className="mt-3 text-[9px] text-slate-600 font-mono uppercase tracking-wider truncate border-t border-white/[0.04] pt-2">
+        <p className="mt-3 text-[10px] text-slate-600 font-mono uppercase tracking-wider truncate border-t border-white/[0.04] pt-2">
           {leagueContext}
         </p>
       )}

@@ -29,7 +29,7 @@ export default function TradeHubHeader({
           <h1 className="font-figtree text-2xl leading-none tracking-[-1px] text-[#e8ecf4] md:text-[32px]">
             TRADE HUB
           </h1>
-          <p className="mt-1 font-figtree text-[12px] text-[#8b9bb8]">
+          <p className="mt-1 font-figtree text-[13px] text-[#8b9bb8]">
             Find league-winning trades. Make smarter moves.
           </p>
         </div>
@@ -37,7 +37,7 @@ export default function TradeHubHeader({
           <button
             type="button"
             onClick={() => onViewModeChange('global')}
-            className={`rounded-[5px] px-3 py-1.5 font-figtree text-[11px] font-semibold transition-all ${
+            className={`rounded-[5px] px-3 py-1.5 font-figtree text-[12px] font-semibold transition-all ${
               isGlobal ? 'bg-boom/20 text-boom ring-1 ring-boom/40' : 'text-[#6b7a99] hover:text-[#e8ecf4]'
             }`}
           >
@@ -46,7 +46,7 @@ export default function TradeHubHeader({
           <button
             type="button"
             onClick={() => onViewModeChange('league')}
-            className={`rounded-[5px] px-3 py-1.5 font-figtree text-[11px] font-semibold transition-all ${
+            className={`rounded-[5px] px-3 py-1.5 font-figtree text-[12px] font-semibold transition-all ${
               !isGlobal ? 'bg-boom/20 text-boom ring-1 ring-boom/40' : 'text-[#6b7a99] hover:text-[#e8ecf4]'
             }`}
           >
@@ -60,7 +60,7 @@ export default function TradeHubHeader({
           <select
             value={selectedLeagueId}
             onChange={(e) => onLeagueChange(e.target.value)}
-            className="rounded-[6px] border border-[#1e2640] bg-[#0f1420] px-3 py-1.5 font-figtree text-[12px] text-[#e8ecf4] outline-none focus:border-boom/40"
+            className="rounded-[6px] border border-[#1e2640] bg-[#0f1420] px-3 py-1.5 font-figtree text-[13px] text-[#e8ecf4] outline-none focus:border-boom/40"
           >
             {leagues.map((lg) => (
               <option key={lg.id} value={lg.id}>
@@ -69,7 +69,7 @@ export default function TradeHubHeader({
             ))}
           </select>
           {selected ? (
-            <div className="flex items-center gap-2 font-mono text-[10px] text-[#8b9bb8]">
+            <div className="flex items-center gap-2 font-mono text-[11px] text-[#8b9bb8]">
               <span
                 className="h-1.5 w-1.5 rounded-full"
                 style={{ background: selected.dotColor, boxShadow: `0 0 6px ${selected.dotColor}` }}
@@ -79,7 +79,7 @@ export default function TradeHubHeader({
           ) : null}
         </div>
       ) : isGlobal ? (
-        <p className="font-mono text-[9px] text-boom/80">● Cross-league best trades</p>
+        <p className="font-mono text-[10px] text-boom/80">● Cross-league best trades</p>
       ) : null}
     </div>
   );

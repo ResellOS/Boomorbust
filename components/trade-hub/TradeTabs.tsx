@@ -66,7 +66,7 @@ export default function TradeTabs({ stats, statsLoading }: TradeTabsProps) {
                   onClick={() => selectTab(tab.id)}
                   className={clsx(
                     'relative shrink-0 flex-none whitespace-nowrap border-0 bg-transparent px-1 pb-2 text-left uppercase tracking-wide transition-colors',
-                    'min-h-[44px] text-[12px] leading-none sm:text-[13px]',
+                    'min-h-[44px] text-[13px] leading-none sm:text-[14px]',
                     isActive ? 'font-medium text-white' : 'font-normal text-[#64748B] hover:text-[#94a3b8]',
                   )}
                   style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}

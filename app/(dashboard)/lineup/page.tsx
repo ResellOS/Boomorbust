@@ -101,10 +101,10 @@ export default function LineupOptimizerPage() {
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-1 mb-2">
           <div>
             <h1 className="text-2xl font-bold text-white tracking-tight">Lineup Optimizer</h1>
-            <p className="text-[13px] text-slate-500 mt-0.5">Start smarter. Win more. Every week.</p>
+            <p className="text-[14px] text-slate-500 mt-0.5">Start smarter. Win more. Every week.</p>
           </div>
           {!activeLeagueId && (
-            <p className="text-[12px] text-amber-400 mt-1 sm:mt-0">Select a league from the sidebar to load your lineup</p>
+            <p className="text-[13px] text-amber-400 mt-1 sm:mt-0">Select a league from the sidebar to load your lineup</p>
           )}
         </div>
 
@@ -142,7 +142,7 @@ export default function LineupOptimizerPage() {
               {/* Weather alerts compact */}
               {(data?.weatherAlerts?.length ?? 0) > 0 && !loading && (
                 <div className="glass-card p-4">
-                  <h2 className="text-[11px] font-bold text-slate-400 tracking-widest uppercase mb-3">WEATHER ALERTS</h2>
+                  <h2 className="text-[12px] font-bold text-slate-400 tracking-widest uppercase mb-3">WEATHER ALERTS</h2>
                   <div className="space-y-3">
                     {(data?.weatherAlerts ?? []).slice(0, 3).map((alert, i) => {
                       const colorMap: Record<string, string> = {
@@ -152,12 +152,12 @@ export default function LineupOptimizerPage() {
                       return (
                         <div key={i} className="space-y-0.5">
                           <div className="flex items-center justify-between">
-                            <p className="text-[12px] font-semibold text-white">{alert.game}</p>
-                            <span className="text-[10px] font-bold" style={{ color }}>{alert.icon}</span>
+                            <p className="text-[13px] font-semibold text-white">{alert.game}</p>
+                            <span className="text-[11px] font-bold" style={{ color }}>{alert.icon}</span>
                           </div>
-                          <p className="text-[10px] text-slate-500">{alert.stadium}</p>
-                          <p className="text-[11px] text-slate-400">{alert.conditions}</p>
-                          <p className="text-[10px]" style={{ color }}>Impact: {alert.impact}</p>
+                          <p className="text-[11px] text-slate-500">{alert.stadium}</p>
+                          <p className="text-[12px] text-slate-400">{alert.conditions}</p>
+                          <p className="text-[11px]" style={{ color }}>Impact: {alert.impact}</p>
                         </div>
                       );
                     })}

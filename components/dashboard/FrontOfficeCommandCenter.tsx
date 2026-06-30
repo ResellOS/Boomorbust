@@ -94,7 +94,7 @@ function MissionCard({
 
             {card.position ? (
 
-              <span className="rounded bg-[#141929] px-1.5 py-0.5 font-mono text-[8px] uppercase text-muted">
+              <span className="rounded bg-[#141929] px-1.5 py-0.5 font-mono text-[9px] uppercase text-muted">
 
                 {card.position}
 
@@ -104,7 +104,7 @@ function MissionCard({
 
             {card.marketRank != null ? (
 
-              <span className="font-mono text-[8px] text-muted">
+              <span className="font-mono text-[9px] text-muted">
 
                 Market <span className="text-text">{card.marketRank}</span>
 
@@ -114,7 +114,7 @@ function MissionCard({
 
             {card.bobRank != null ? (
 
-              <span className="font-mono text-[8px] text-muted">
+              <span className="font-mono text-[9px] text-muted">
 
                 BOB <span className="text-boom">{card.bobRank}</span>
 
@@ -128,7 +128,7 @@ function MissionCard({
 
           <div className="mt-2 flex flex-wrap items-center gap-2">
 
-            <span className="font-mono text-[8px] uppercase tracking-[1.2px] text-muted">
+            <span className="font-mono text-[9px] uppercase tracking-[1.2px] text-muted">
 
               Priority #{card.priority}
 
@@ -136,7 +136,7 @@ function MissionCard({
 
             <span
 
-              className="rounded px-1.5 py-0.5 font-mono text-[7px] uppercase tracking-wide"
+              className="rounded px-1.5 py-0.5 font-mono text-[8px] uppercase tracking-wide"
 
               style={{
 
@@ -156,17 +156,17 @@ function MissionCard({
 
 
 
-          <h3 className="mt-1.5 font-figtree text-[16px] font-semibold leading-snug text-[#e8ecf4]">
+          <h3 className="mt-1.5 font-figtree text-[17px] font-semibold leading-snug text-[#e8ecf4]">
 
             {card.title}
 
           </h3>
 
-          <p className="mt-0.5 font-mono text-[9px] text-muted">{card.leagueName}</p>
+          <p className="mt-0.5 font-mono text-[10px] text-muted">{card.leagueName}</p>
 
           {card.targetManager ? (
 
-            <p className="font-mono text-[8px] text-muted/80">vs {card.targetManager}</p>
+            <p className="font-mono text-[9px] text-muted/80">vs {card.targetManager}</p>
 
           ) : null}
 
@@ -222,7 +222,7 @@ function MissionCard({
 
 
 
-      <p className="mt-3 flex-1 font-figtree text-[11px] leading-relaxed text-[#6b7a99]">
+      <p className="mt-3 flex-1 font-figtree text-[12px] leading-relaxed text-[#6b7a99]">
 
         {card.reasonLine}
 
@@ -236,9 +236,9 @@ function MissionCard({
 
           <div key={m.label}>
 
-            <div className="font-mono text-[7px] uppercase tracking-wide text-muted">{m.label}</div>
+            <div className="font-mono text-[8px] uppercase tracking-wide text-muted">{m.label}</div>
 
-            <div className="font-mono text-[11px] tabular-nums text-[#e8ecf4]">{m.value}</div>
+            <div className="font-mono text-[12px] tabular-nums text-[#e8ecf4]">{m.value}</div>
 
           </div>
 
@@ -252,7 +252,7 @@ function MissionCard({
 
         href={card.ctaHref}
 
-        className={`mt-3 flex w-full items-center justify-center rounded-md px-3 py-2.5 font-figtree text-[11px] font-semibold no-underline ${glow.cta}`}
+        className={`mt-3 flex w-full items-center justify-center rounded-md px-3 py-2.5 font-figtree text-[12px] font-semibold no-underline ${glow.cta}`}
 
       >
 
@@ -390,13 +390,13 @@ export default function FrontOfficeCommandCenter({
 
         <div>
 
-          <h2 className="font-figtree text-[11px] font-normal uppercase tracking-[1.8px] text-[#e8ecf4]">
+          <h2 className="font-figtree text-[12px] font-normal uppercase tracking-[1.8px] text-[#e8ecf4]">
 
             Front Office Command Center
 
           </h2>
 
-          <p className="font-mono text-[9px] text-[#6b7a99]">Highest-value moves today</p>
+          <p className="font-mono text-[10px] text-[#6b7a99]">Highest-value moves today</p>
 
         </div>
 
@@ -404,7 +404,7 @@ export default function FrontOfficeCommandCenter({
 
           href="/trade"
 
-          className="flex items-center gap-0.5 font-mono text-[9px] text-boom no-underline hover:underline"
+          className="flex items-center gap-0.5 font-mono text-[10px] text-boom no-underline hover:underline"
 
         >
 
@@ -422,7 +422,7 @@ export default function FrontOfficeCommandCenter({
 
         <div className="rounded-[10px] border border-dashed border-[#1e2640] bg-[#0f1420] px-4 py-8 text-center">
 
-          <p className="font-figtree text-[12px] leading-relaxed text-[#6b7a99]">
+          <p className="font-figtree text-[13px] leading-relaxed text-[#6b7a99]">
 
             BOB is analyzing your leagues. Mission cards appear here once League Intelligence data
 

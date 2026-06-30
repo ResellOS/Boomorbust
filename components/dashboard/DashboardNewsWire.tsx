@@ -283,7 +283,7 @@ function WireLineView({ line }: { line: WireLine }) {
         p.k === 'p' ? (
           <span
             key={i}
-            className="font-mono text-[10px] font-semibold leading-none tracking-[-0.02em] [font-variant:small-caps]"
+            className="font-mono text-[11px] font-semibold leading-none tracking-[-0.02em] [font-variant:small-caps]"
             style={{ color: posHex(p.pos) }}
           >
             {p.name}
@@ -291,7 +291,7 @@ function WireLineView({ line }: { line: WireLine }) {
         ) : (
           <span
             key={i}
-            className="font-mono text-[10px] font-medium leading-none tracking-[0.04em] text-[#64748B] [font-variant:small-caps]"
+            className="font-mono text-[11px] font-medium leading-none tracking-[0.04em] text-[#64748B] [font-variant:small-caps]"
           >
             {p.s}
           </span>
@@ -337,7 +337,7 @@ export default function DashboardNewsWire({
         aria-hidden
       />
       <div className="flex h-full w-11 shrink-0 items-center justify-center border-r border-white/[0.07] bg-white/[0.03]">
-        <span className="font-mono text-[8px] font-bold leading-none tracking-[0.22em] text-[#475569] [font-variant:small-caps]">
+        <span className="font-mono text-[9px] font-bold leading-none tracking-[0.22em] text-[#475569] [font-variant:small-caps]">
           Wire
         </span>
       </div>
@@ -352,7 +352,7 @@ export default function DashboardNewsWire({
               {lines.map((line) => (
                 <span key={`${dup}-${line.id}`} className="inline-flex items-center">
                   <WireLineView line={line} />
-                  <span className="mx-1 shrink-0 text-[9px] font-light text-[#475569]/80" aria-hidden>
+                  <span className="mx-1 shrink-0 text-[10px] font-light text-[#475569]/80" aria-hidden>
                     ·
                   </span>
                 </span>

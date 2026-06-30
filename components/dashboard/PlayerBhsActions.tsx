@@ -94,7 +94,7 @@ export default function PlayerBhsActions({
       }}
       className={clsx(
         'rounded-full border font-mono font-black uppercase transition',
-        compact ? 'px-1.5 py-0.5 text-[7px] tracking-[0.06em]' : 'px-2 py-0.5 text-[8px] tracking-[0.08em]',
+        compact ? 'px-1.5 py-0.5 text-[8px] tracking-[0.06em]' : 'px-2 py-0.5 text-[9px] tracking-[0.08em]',
         disabled ? 'cursor-not-allowed opacity-35' : 'cursor-pointer',
         isActive ? 'border-opacity-90' : 'border-white/[0.12] opacity-80 hover:opacity-100',
       )}

@@ -96,7 +96,7 @@ export default function ExposureTopBar({ stats }: ExposureTopBarProps) {
             key={item.label}
             className="flex min-w-[115px] shrink-0 flex-col justify-center border-r border-border px-3 last:border-r-0 md:min-w-0 md:px-[12px]"
           >
-            <div className="whitespace-nowrap text-[8px] uppercase tracking-wide text-muted">
+            <div className="whitespace-nowrap text-[9px] uppercase tracking-wide text-muted">
               {item.label}
             </div>
             <div
@@ -107,7 +107,7 @@ export default function ExposureTopBar({ stats }: ExposureTopBarProps) {
             >
               {item.value}
             </div>
-            <div className="mt-0.5 text-[9px] text-muted">{item.sub}</div>
+            <div className="mt-0.5 text-[10px] text-muted">{item.sub}</div>
           </div>
         ))}
       </div>

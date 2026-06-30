@@ -43,8 +43,8 @@ export default function OffseasonContextBanner({ isOffseason }: OffseasonContext
       }}
     >
       <div className="min-w-0 flex-1">
-        <div className="font-figtree text-[10px] font-semibold text-text">Preseason Mode</div>
-        <p className="mt-0.5 font-mono text-[9px] leading-relaxed text-muted">
+        <div className="font-figtree text-[11px] font-semibold text-text">Preseason Mode</div>
+        <p className="mt-0.5 font-mono text-[10px] leading-relaxed text-muted">
           Preseason Mode — projections are based on 2025 historical data and will update
           significantly as 2026 training camp and preseason games provide new data. All calls are
           tracked starting Week 1.
@@ -53,7 +53,7 @@ export default function OffseasonContextBanner({ isOffseason }: OffseasonContext
       <button
         type="button"
         onClick={handleDismiss}
-        className="shrink-0 border-none bg-transparent px-1 font-mono text-[10px] text-muted hover:text-text"
+        className="shrink-0 border-none bg-transparent px-1 font-mono text-[11px] text-muted hover:text-text"
         aria-label="Dismiss preseason notice"
       >
         ✕

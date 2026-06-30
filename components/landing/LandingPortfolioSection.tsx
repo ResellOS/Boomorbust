@@ -27,7 +27,7 @@ export default function LandingPortfolioSection() {
         <div className={GLASS}>
           <div className="flex flex-wrap items-end justify-between gap-3 border-b border-white/[0.06] pb-4">
             <div>
-              <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[#64748B]" style={{ fontFamily: 'var(--font-body)' }}>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#64748B]" style={{ fontFamily: 'var(--font-body)' }}>
                 Verified record
               </p>
               <p className="mt-1 font-mono text-[clamp(2rem,8vw,3.25rem)] font-bold tabular-nums leading-none text-[#3ECFAD]">
@@ -35,13 +35,13 @@ export default function LandingPortfolioSection() {
               </p>
             </div>
             <span
-              className="rounded-full border border-emerald-500/30 px-2.5 py-1 text-[10px] font-bold uppercase text-emerald-400"
+              className="rounded-full border border-emerald-500/30 px-2.5 py-1 text-[11px] font-bold uppercase text-emerald-400"
               style={{ fontFamily: 'var(--font-body)', boxShadow: '0 0 14px rgba(62,207,173,0.25)' }}
             >
               Live
             </span>
           </div>
-          <p className="mt-4 text-[12px] font-semibold uppercase tracking-[0.12em] text-[#64748B]" style={{ fontFamily: 'var(--font-body)' }}>
+          <p className="mt-4 text-[13px] font-semibold uppercase tracking-[0.12em] text-[#64748B]" style={{ fontFamily: 'var(--font-body)' }}>
             League distribution
           </p>
           <div className="mt-3 flex h-28 items-end gap-1">
@@ -56,20 +56,20 @@ export default function LandingPortfolioSection() {
               />
             ))}
           </div>
-          <p className="mt-4 text-[12px] font-semibold uppercase tracking-[0.12em] text-[#64748B]" style={{ fontFamily: 'var(--font-body)' }}>
+          <p className="mt-4 text-[13px] font-semibold uppercase tracking-[0.12em] text-[#64748B]" style={{ fontFamily: 'var(--font-body)' }}>
             Top opponents faced
           </p>
           <ul className="mt-3 space-y-2">
             {['@NorthStarsFF', '@DynastyDorks', '@WinNowWire'].map((h) => (
               <li
                 key={h}
-                className="flex items-center gap-3 rounded-lg border border-white/[0.06] bg-white/[0.02] px-3 py-2 text-[13px] text-white/90"
+                className="flex items-center gap-3 rounded-lg border border-white/[0.06] bg-white/[0.02] px-3 py-2 text-[14px] text-white/90"
                 style={{ fontFamily: 'var(--font-body)' }}
               >
-                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white/[0.08] font-mono text-[11px] font-bold text-white/80">
+                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white/[0.08] font-mono text-[12px] font-bold text-white/80">
                   {h.slice(1, 3).toUpperCase()}
                 </span>
-                <span className="font-mono text-[12px] text-[#94A3B8]">{h}</span>
+                <span className="font-mono text-[13px] text-[#94A3B8]">{h}</span>
               </li>
             ))}
           </ul>
@@ -86,7 +86,7 @@ export default function LandingPortfolioSection() {
           </h2>
           <ul className="mt-8 space-y-4">
             {BULLETS.map((b) => (
-              <li key={b} className="flex gap-3 text-[15px] leading-relaxed text-[#94A3B8]" style={{ fontFamily: 'var(--font-body)' }}>
+              <li key={b} className="flex gap-3 text-[16px] leading-relaxed text-[#94A3B8]" style={{ fontFamily: 'var(--font-body)' }}>
                 <span className="mt-0.5 shrink-0 font-mono text-[#3ECFAD]" style={{ filter: 'drop-shadow(0 0 8px rgba(62,207,173,0.45))' }}>
                   ✓
                 </span>
@@ -96,7 +96,7 @@ export default function LandingPortfolioSection() {
           </ul>
           <Link
             href="/signup"
-            className="mt-10 inline-flex min-h-[48px] items-center justify-center rounded-xl px-8 py-3 text-[15px] font-bold text-[#0a0d14] shadow-[0_0_28px_rgba(62,207,173,0.45)] transition-[filter,box-shadow] duration-200 hover:brightness-110 hover:shadow-[0_0_32px_rgba(62,207,173,0.5)]"
+            className="mt-10 inline-flex min-h-[48px] items-center justify-center rounded-xl px-8 py-3 text-[16px] font-bold text-[#0a0d14] shadow-[0_0_28px_rgba(62,207,173,0.45)] transition-[filter,box-shadow] duration-200 hover:brightness-110 hover:shadow-[0_0_32px_rgba(62,207,173,0.5)]"
             style={{ fontFamily: 'var(--font-body)', background: BOOM }}
           >
             Start <span className="font-mono tabular-nums">7</span>-Day Free Trial

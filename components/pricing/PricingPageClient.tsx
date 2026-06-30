@@ -148,13 +148,13 @@ export default function PricingPageClient({
         <div className="flex items-center gap-2">
           <Link
             href="/auth/login"
-            className="flex h-[30px] items-center rounded border border-border px-3.5 text-[11px] text-text no-underline"
+            className="flex h-[30px] items-center rounded border border-border px-3.5 text-[12px] text-text no-underline"
           >
             Log In
           </Link>
           <Link
             href="/onboarding"
-            className="flex h-[30px] items-center rounded bg-boom px-3.5 text-[11px] font-bold text-bg no-underline"
+            className="flex h-[30px] items-center rounded bg-boom px-3.5 text-[12px] font-bold text-bg no-underline"
           >
             Import My Leagues
           </Link>
@@ -184,7 +184,7 @@ export default function PricingPageClient({
         <div className="rounded-lg border border-boom/30 bg-card p-5">
           <div className="mb-1 flex items-center gap-1.5">
             <span>🏆</span>
-            <span className="text-[9px] uppercase tracking-[2px] text-boom">Early Access Opens</span>
+            <span className="text-[10px] uppercase tracking-[2px] text-boom">Early Access Opens</span>
           </div>
           <div className="mb-4 font-mono text-[28px] font-bold tracking-tight text-boom">JULY 1ST, 2026</div>
           <div className="mb-3.5 grid grid-cols-3 gap-1.5">
@@ -194,13 +194,13 @@ export default function PricingPageClient({
               { range: '500+ Signups', discount: 'Full Price', sub: '\u00a0', btn: 'Launch', active: earlyAccessTier === 'launch' },
             ].map((t) => (
               <div key={t.btn} className="rounded-[5px] border border-border bg-surface2 p-2.5 text-center">
-                <div className="mb-1 text-[8px] uppercase tracking-wide text-muted">{t.range}</div>
+                <div className="mb-1 text-[9px] uppercase tracking-wide text-muted">{t.range}</div>
                 <div className={`font-mono text-[17px] font-bold leading-none ${t.active ? 'text-hold' : 'text-muted'}`}>
                   {t.discount}
                 </div>
-                <div className="my-0.5 text-[8px] text-muted">{t.sub}</div>
+                <div className="my-0.5 text-[9px] text-muted">{t.sub}</div>
                 <div
-                  className={`w-full rounded-[3px] py-1 text-[8px] font-bold uppercase tracking-wide ${
+                  className={`w-full rounded-[3px] py-1 text-[9px] font-bold uppercase tracking-wide ${
                     t.active
                       ? 'border border-hold/30 bg-hold/15 text-hold'
                       : 'border border-border bg-transparent text-muted'
@@ -211,7 +211,7 @@ export default function PricingPageClient({
               </div>
             ))}
           </div>
-          <div className="text-center text-[11px] text-muted">
+          <div className="text-center text-[12px] text-muted">
             👥 <span className="font-medium text-boom">{foundingSpotsRemaining} Founding Spots Remaining</span>
           </div>
         </div>
@@ -224,7 +224,7 @@ export default function PricingPageClient({
           ['🏈', 'Used across 68+ leagues'],
           ['✓', '42-18-2 verified record'],
         ].map(([icon, text]) => (
-          <div key={text} className="flex items-center gap-1.5 text-[11px] text-muted">
+          <div key={text} className="flex items-center gap-1.5 text-[12px] text-muted">
             <span>{icon}</span>
             {text}
           </div>
@@ -236,7 +236,7 @@ export default function PricingPageClient({
           <button
             type="button"
             onClick={() => setBilling('month')}
-            className={`h-[30px] rounded border px-[18px] text-[11px] font-medium ${
+            className={`h-[30px] rounded border px-[18px] text-[12px] font-medium ${
               billing === 'month' ? 'border-boom bg-boom/[0.08] text-boom' : 'border-border text-muted'
             }`}
           >
@@ -245,13 +245,13 @@ export default function PricingPageClient({
           <button
             type="button"
             onClick={() => setBilling('year')}
-            className={`h-[30px] rounded border px-[18px] text-[11px] font-medium ${
+            className={`h-[30px] rounded border px-[18px] text-[12px] font-medium ${
               billing === 'year' ? 'border-boom bg-boom/[0.08] text-boom' : 'border-border text-muted'
             }`}
           >
             Annual
           </button>
-          <span className="text-[11px] text-muted">
+          <span className="text-[12px] text-muted">
             ← <span className="text-hold">Save up to 2 months</span>
           </span>
         </div>
@@ -260,16 +260,16 @@ export default function PricingPageClient({
           {/* FREE */}
           <div className={`relative flex flex-col rounded-lg border bg-surface p-[22px_18px] ${isCurrent('free') ? 'border-boom' : 'border-border'}`}>
             {isCurrent('free') ? (
-              <span className="absolute -top-2.5 left-1/2 -translate-x-1/2 rounded-full bg-boom px-3 py-0.5 text-[8px] font-bold text-bg">
+              <span className="absolute -top-2.5 left-1/2 -translate-x-1/2 rounded-full bg-boom px-3 py-0.5 text-[9px] font-bold text-bg">
                 Current Plan
               </span>
             ) : null}
-            <div className="mb-2 text-[8px] uppercase tracking-[2px] text-muted">Rookie Scout</div>
+            <div className="mb-2 text-[9px] uppercase tracking-[2px] text-muted">Rookie Scout</div>
             <div className="font-mono text-[38px] font-bold leading-none text-text">
               <sup className="text-lg">$</sup>0<span className="font-figtree text-xs font-normal text-muted">/mo</span>
             </div>
-            <div className="mb-2.5 mt-0.5 text-[8px] uppercase tracking-wide text-muted">Forever</div>
-            <p className="mb-2.5 text-[11px] leading-snug text-muted">
+            <div className="mb-2.5 mt-0.5 text-[9px] uppercase tracking-wide text-muted">Forever</div>
+            <p className="mb-2.5 text-[12px] leading-snug text-muted">
               Track one league. Learn the system. Decide if BOB is for you.
             </p>
             <div className="my-2.5 h-px bg-border" />
@@ -281,13 +281,13 @@ export default function PricingPageClient({
               'Trade grader (1/day)',
               'Smart counter (1/day)',
             ].map((f) => (
-              <div key={f} className="mb-1 flex gap-1.5 text-[11px] text-text">
+              <div key={f} className="mb-1 flex gap-1.5 text-[12px] text-text">
                 <span className="text-boom">✓</span>
                 {f}
               </div>
             ))}
             {['Buy/sell ticker', 'Ads shown'].map((f) => (
-              <div key={f} className="mb-1 flex gap-1.5 text-[11px] text-muted">
+              <div key={f} className="mb-1 flex gap-1.5 text-[12px] text-muted">
                 <span className="text-[#ef4444]">✗</span>
                 {f}
               </div>
@@ -305,11 +305,11 @@ export default function PricingPageClient({
           {/* LEAGUE ANALYST */}
           <div className={`relative flex flex-col rounded-lg border bg-surface p-[22px_18px] ${isCurrent('league_analyst') ? 'border-boom' : 'border-border'}`}>
             {isCurrent('league_analyst') ? (
-              <span className="absolute -top-2.5 left-1/2 -translate-x-1/2 rounded-full bg-boom px-3 py-0.5 text-[8px] font-bold text-bg">
+              <span className="absolute -top-2.5 left-1/2 -translate-x-1/2 rounded-full bg-boom px-3 py-0.5 text-[9px] font-bold text-bg">
                 Current Plan
               </span>
             ) : null}
-            <div className="mb-2 text-[8px] uppercase tracking-[2px] text-boom">League Analyst</div>
+            <div className="mb-2 text-[9px] uppercase tracking-[2px] text-boom">League Analyst</div>
             <div className="font-mono text-[38px] font-bold leading-none text-text">
               <sup className="text-lg">$</sup>
               {priceDisplay('league_analyst')}
@@ -317,14 +317,14 @@ export default function PricingPageClient({
                 /{billing === 'year' ? 'yr' : 'mo'}
               </span>
             </div>
-            <div className="mb-2.5 mt-0.5 text-[8px] uppercase tracking-wide text-muted">
+            <div className="mb-2.5 mt-0.5 text-[9px] uppercase tracking-wide text-muted">
               Billed {billing === 'year' ? 'Annually' : 'Monthly'}
             </div>
-            <p className="mb-2.5 text-[11px] leading-snug text-muted">Stop guessing. Start exploiting market mistakes.</p>
+            <p className="mb-2.5 text-[12px] leading-snug text-muted">Stop guessing. Start exploiting market mistakes.</p>
             <div className="my-2.5 h-px bg-border" />
-            <div className="mb-2 text-[8px] uppercase tracking-[1.5px] text-boom">Unlocks</div>
+            <div className="mb-2 text-[9px] uppercase tracking-[1.5px] text-boom">Unlocks</div>
             {['Edge Score (BVI)', 'Momentum Score (DMS)', 'Sell Window (DAC)', 'Full Player Breakdown', 'Unlimited Trade Grading', 'Trade History Graded'].map((f) => (
-              <div key={f} className="mb-1 flex gap-1.5 text-[11px] text-text">
+              <div key={f} className="mb-1 flex gap-1.5 text-[12px] text-text">
                 <span className="text-boom">✓</span>
                 {f}
               </div>
@@ -344,7 +344,7 @@ export default function PricingPageClient({
                   >
                     {loading === 'league_analyst' ? 'Loading…' : 'Start Free Trial'}
                   </button>
-                  <div className="mt-1 text-center text-[9px] text-muted">7 Days Free</div>
+                  <div className="mt-1 text-center text-[10px] text-muted">7 Days Free</div>
                 </>
               )}
             </div>
@@ -353,11 +353,11 @@ export default function PricingPageClient({
           {/* GENERAL MANAGER */}
           <div className={`relative flex flex-col rounded-lg border bg-surface p-[22px_18px] ${isCurrent('general_manager') ? 'border-boom' : 'border-border'}`}>
             {isCurrent('general_manager') ? (
-              <span className="absolute -top-2.5 left-1/2 -translate-x-1/2 rounded-full bg-boom px-3 py-0.5 text-[8px] font-bold text-bg">
+              <span className="absolute -top-2.5 left-1/2 -translate-x-1/2 rounded-full bg-boom px-3 py-0.5 text-[9px] font-bold text-bg">
                 Current Plan
               </span>
             ) : null}
-            <div className="mb-2 text-[8px] uppercase tracking-[2px] text-hold">General Manager</div>
+            <div className="mb-2 text-[9px] uppercase tracking-[2px] text-hold">General Manager</div>
             <div className="font-mono text-[38px] font-bold leading-none text-text">
               <sup className="text-lg">$</sup>
               {priceDisplay('general_manager')}
@@ -365,14 +365,14 @@ export default function PricingPageClient({
                 /{billing === 'year' ? 'yr' : 'mo'}
               </span>
             </div>
-            <div className="mb-2.5 mt-0.5 text-[8px] uppercase tracking-wide text-muted">
+            <div className="mb-2.5 mt-0.5 text-[9px] uppercase tracking-wide text-muted">
               Billed {billing === 'year' ? 'Annually' : 'Monthly'}
             </div>
-            <p className="mb-2.5 text-[11px] leading-snug text-muted">See your league the way professionals do.</p>
+            <p className="mb-2.5 text-[12px] leading-snug text-muted">See your league the way professionals do.</p>
             <div className="my-2.5 h-px bg-border" />
-            <div className="mb-2 text-[8px] uppercase tracking-[1.5px] text-boom">Unlocks</div>
+            <div className="mb-2 text-[9px] uppercase tracking-[1.5px] text-boom">Unlocks</div>
             {['Trade Finder', 'League Intelligence (LI)', 'Scout Their Team', 'Dynasty 3-Year Outlook', 'Breakout Meter Alerts (BPS)', 'Playoff Outlook (SOSPP)', 'Luck Factor / Regression (RI)', 'Rookie Grade (RTS)', 'Rejection Predictor'].map((f) => (
-              <div key={f} className="mb-1 flex gap-1.5 text-[11px] text-text">
+              <div key={f} className="mb-1 flex gap-1.5 text-[12px] text-text">
                 <span className="text-boom">✓</span>
                 {f}
               </div>
@@ -392,7 +392,7 @@ export default function PricingPageClient({
                   >
                     {loading === 'general_manager' ? 'Loading…' : 'Start Free Trial'}
                   </button>
-                  <div className="mt-1 text-center text-[9px] text-muted">7 Days Free</div>
+                  <div className="mt-1 text-center text-[10px] text-muted">7 Days Free</div>
                 </>
               )}
             </div>
@@ -400,15 +400,15 @@ export default function PricingPageClient({
 
           {/* ALL-PRO */}
           <div className={`relative flex flex-col rounded-lg border-2 bg-card p-[22px_18px] ${isCurrent('all_pro') ? 'border-boom' : 'border-bust'}`}>
-            <span className="absolute -top-[11px] left-1/2 -translate-x-1/2 whitespace-nowrap rounded-[10px] bg-bust px-3 py-0.5 text-[8px] font-extrabold tracking-wide text-bg">
+            <span className="absolute -top-[11px] left-1/2 -translate-x-1/2 whitespace-nowrap rounded-[10px] bg-bust px-3 py-0.5 text-[9px] font-extrabold tracking-wide text-bg">
               ★ Most Popular
             </span>
             {isCurrent('all_pro') ? (
-              <span className="absolute -top-2.5 right-3 rounded-full bg-boom px-2 py-0.5 text-[7px] font-bold text-bg">
+              <span className="absolute -top-2.5 right-3 rounded-full bg-boom px-2 py-0.5 text-[8px] font-bold text-bg">
                 Current Plan
               </span>
             ) : null}
-            <div className="mb-2 text-[8px] uppercase tracking-[2px] text-bust">All-Pro Terminal</div>
+            <div className="mb-2 text-[9px] uppercase tracking-[2px] text-bust">All-Pro Terminal</div>
             <div className="font-mono text-[38px] font-bold leading-none text-boom">
               <sup className="text-lg">$</sup>
               {priceDisplay('all_pro')}
@@ -416,10 +416,10 @@ export default function PricingPageClient({
                 /{billing === 'year' ? 'yr' : 'mo'}
               </span>
             </div>
-            <div className="mb-2.5 mt-0.5 text-[8px] uppercase tracking-wide text-muted">
+            <div className="mb-2.5 mt-0.5 text-[9px] uppercase tracking-wide text-muted">
               Billed {billing === 'year' ? 'Annually' : 'Monthly'}
             </div>
-            <p className="mb-2.5 text-[11px] leading-snug text-text">
+            <p className="mb-2.5 text-[12px] leading-snug text-text">
               Every engine.
               <br />
               Every edge.
@@ -427,18 +427,18 @@ export default function PricingPageClient({
               Every signal.
             </p>
             <div className="mb-2.5 rounded-[5px] border border-boom/15 bg-boom/[0.05] p-2.5">
-              <div className="mb-1.5 text-[8px] uppercase tracking-[1.5px] text-boom">17 Engine Network</div>
+              <div className="mb-1.5 text-[9px] uppercase tracking-[1.5px] text-boom">17 Engine Network</div>
               <div className="grid grid-cols-5 gap-0.5">
                 {ENGINE_TAGS.map((e) => (
-                  <div key={e} className="rounded-[3px] border border-boom/12 bg-boom/[0.08] py-0.5 text-center font-mono text-[7px] text-boom">
+                  <div key={e} className="rounded-[3px] border border-boom/12 bg-boom/[0.08] py-0.5 text-center font-mono text-[8px] text-boom">
                     {e}
                   </div>
                 ))}
               </div>
-              <div className="mt-1 text-center text-[8px] text-muted">+2 More</div>
+              <div className="mt-1 text-center text-[9px] text-muted">+2 More</div>
             </div>
             {['Startup Draft Tracking (1 free/yr)', 'All 17 Engines Unlocked', 'Market Verdict (vs Consensus)', 'Dynasty Power Rating (Empire)', 'Portfolio Manager', 'Priority Support', 'Content Export'].map((f) => (
-              <div key={f} className="mb-1 flex gap-1.5 text-[11px] text-text">
+              <div key={f} className="mb-1 flex gap-1.5 text-[12px] text-text">
                 <span className="text-boom">✓</span>
                 {f}
               </div>
@@ -458,7 +458,7 @@ export default function PricingPageClient({
                   >
                     {loading === 'all_pro' ? 'Loading…' : 'Get All-Pro'}
                   </button>
-                  <div className="mt-1 text-center text-[9px] text-muted">3 Days Free</div>
+                  <div className="mt-1 text-center text-[10px] text-muted">3 Days Free</div>
                 </>
               )}
             </div>
@@ -468,22 +468,22 @@ export default function PricingPageClient({
 
       {/* Feature table */}
       <div className="px-9 pb-9">
-        <div className="mb-3.5 text-[10px] uppercase tracking-[1.5px] text-muted">Feature Comparison</div>
+        <div className="mb-3.5 text-[11px] uppercase tracking-[1.5px] text-muted">Feature Comparison</div>
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[640px] border-collapse text-[11px]">
+          <table className="w-full min-w-[640px] border-collapse text-[12px]">
             <thead>
               <tr>
-                <th className="w-[200px] border-b-2 border-border bg-surface px-3.5 py-2 text-left text-[9px] uppercase tracking-wide text-muted" />
+                <th className="w-[200px] border-b-2 border-border bg-surface px-3.5 py-2 text-left text-[10px] uppercase tracking-wide text-muted" />
                 {[
                   ['Free', '$0/mo'],
                   ['Analyst', '$5/mo'],
                   ['GM', '$15/mo'],
                   ['All-Pro', '$35/mo'],
                 ].map(([name, price]) => (
-                  <th key={name} className="border-b-2 border-border bg-surface px-3.5 py-2 text-center text-[9px] uppercase tracking-wide text-muted">
+                  <th key={name} className="border-b-2 border-border bg-surface px-3.5 py-2 text-center text-[10px] uppercase tracking-wide text-muted">
                     {name}
                     <br />
-                    <span className="font-mono text-[10px] font-normal text-text">{price}</span>
+                    <span className="font-mono text-[11px] font-normal text-text">{price}</span>
                   </th>
                 ))}
               </tr>
@@ -491,7 +491,7 @@ export default function PricingPageClient({
             <tbody>
               {FEATURE_TABLE.flatMap((cat) => [
                 <tr key={`${cat.category}-hdr`} className="bg-surface2">
-                  <td colSpan={5} className="px-3.5 py-1.5 text-[8px] uppercase tracking-wide text-muted">
+                  <td colSpan={5} className="px-3.5 py-1.5 text-[9px] uppercase tracking-wide text-muted">
                     <span className="mr-2">{cat.icon}</span>
                     <span className={cat.color}>{cat.category}</span>
                   </td>
@@ -505,7 +505,7 @@ export default function PricingPageClient({
                         : [];
                   return (
                     <tr key={`${cat.category}-${row.label}`} className="hover:bg-white/[0.012]">
-                      <td className="border-b border-border/50 px-3.5 py-1 text-[10px] text-muted">{row.label}</td>
+                      <td className="border-b border-border/50 px-3.5 py-1 text-[11px] text-muted">{row.label}</td>
                       {cells.map((cell, i) => (
                         <td key={i} className="border-b border-border/50 px-3.5 py-1 text-center">
                           <CellValue v={cell as string | boolean} />
@@ -529,13 +529,13 @@ export default function PricingPageClient({
             <div className="text-boom">the edge.</div>
           </h2>
           <div className="overflow-hidden rounded-[7px] border border-border bg-surface">
-            <table className="w-full border-collapse text-[11px]">
+            <table className="w-full border-collapse text-[12px]">
               <thead>
                 <tr className="bg-surface2">
-                  <th className="border-b border-border px-3.5 py-2 text-left text-[9px] uppercase tracking-wide text-muted" />
-                  <th className="border-b border-border px-3.5 py-2 text-center text-[9px] uppercase text-muted">KTC</th>
-                  <th className="border-b border-border px-3.5 py-2 text-center text-[9px] uppercase text-muted">Dynasty Nerds</th>
-                  <th className="border-b border-border px-3.5 py-2 text-center text-[9px] uppercase text-boom">BoB</th>
+                  <th className="border-b border-border px-3.5 py-2 text-left text-[10px] uppercase tracking-wide text-muted" />
+                  <th className="border-b border-border px-3.5 py-2 text-center text-[10px] uppercase text-muted">KTC</th>
+                  <th className="border-b border-border px-3.5 py-2 text-center text-[10px] uppercase text-muted">Dynasty Nerds</th>
+                  <th className="border-b border-border px-3.5 py-2 text-center text-[10px] uppercase text-boom">BoB</th>
                 </tr>
               </thead>
               <tbody>
@@ -576,7 +576,7 @@ export default function PricingPageClient({
           ].map(([val, lbl, white]) => (
             <div key={String(lbl)} className="rounded-md border border-border bg-surface px-3 py-4 text-center">
               <div className={`font-mono text-[22px] font-bold ${white ? 'text-text' : 'text-boom'}`}>{val}</div>
-              <div className="mt-1 text-[8px] uppercase tracking-wide text-muted">{lbl}</div>
+              <div className="mt-1 text-[9px] uppercase tracking-wide text-muted">{lbl}</div>
             </div>
           ))}
         </div>
@@ -584,7 +584,7 @@ export default function PricingPageClient({
 
       {/* FAQ */}
       <div className="px-9 pb-9">
-        <div className="mb-4 text-center text-[10px] uppercase tracking-[1.5px] text-muted">
+        <div className="mb-4 text-center text-[11px] uppercase tracking-[1.5px] text-muted">
           Frequently Asked Questions
         </div>
         <div className="grid gap-2.5 md:grid-cols-2 lg:grid-cols-3">
@@ -594,7 +594,7 @@ export default function PricingPageClient({
                 <span className="text-boom">Q</span>
                 {item.q}
               </div>
-              <p className="text-[10px] leading-relaxed text-muted">{item.a}</p>
+              <p className="text-[11px] leading-relaxed text-muted">{item.a}</p>
             </div>
           ))}
         </div>
@@ -618,18 +618,18 @@ export default function PricingPageClient({
           </p>
         </div>
         <div className="flex min-w-[190px] flex-col gap-2">
-          <Link href="/onboarding" className="rounded-[5px] bg-boom py-3 text-center text-[13px] font-bold text-bg no-underline">
+          <Link href="/onboarding" className="rounded-[5px] bg-boom py-3 text-center text-[14px] font-bold text-bg no-underline">
             Get Started Free
           </Link>
-          <Link href="/onboarding" className="rounded-[5px] border border-border py-3 text-center text-[13px] font-medium text-text no-underline">
+          <Link href="/onboarding" className="rounded-[5px] border border-border py-3 text-center text-[14px] font-medium text-text no-underline">
             Import My Leagues
           </Link>
-          <div className="text-center text-[9px] text-muted">No credit card required.</div>
+          <div className="text-center text-[10px] text-muted">No credit card required.</div>
         </div>
       </div>
 
       <footer className="border-t border-border bg-card px-9 py-4">
-        <p className="mx-auto max-w-[800px] text-center text-[9px] leading-relaxed text-muted">
+        <p className="mx-auto max-w-[800px] text-center text-[10px] leading-relaxed text-muted">
           *42-18-2 record based on tracked lineup recommendations across connected leagues. Past performance
           does not guarantee future results. BoB provides data-backed recommendations for informational and
           entertainment purposes only. All lineup and trade decisions are made solely by the user. Boom or Bust

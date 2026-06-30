@@ -34,7 +34,7 @@ export default function MatchupBanner({ week, totalMatchups, myScore, oppScore, 
       <div className="flex items-center justify-between px-5 py-3 border-b border-white/[0.05]">
         <div className="flex items-center gap-4">
           <div>
-            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 font-mono tabular-nums">
+            <p className="text-[11px] font-black uppercase tracking-[0.3em] text-slate-500 font-mono tabular-nums">
               WEEK {week} — {totalMatchups} of {totalMatchups} Matchups
             </p>
             <div className="flex items-center gap-2 mt-0.5 font-mono tabular-nums">
@@ -46,7 +46,7 @@ export default function MatchupBanner({ week, totalMatchups, myScore, oppScore, 
             </div>
           </div>
           <span
-            className={`px-2.5 py-1 rounded-md text-[10px] font-black uppercase tracking-wide border font-mono ${
+            className={`px-2.5 py-1 rounded-md text-[11px] font-black uppercase tracking-wide border font-mono ${
               winning
                 ? 'bg-[#36E7A1]/10 border-[#36E7A1]/20 text-[#36E7A1]'
                 : 'bg-[#EF4444]/10 border-[#EF4444]/25 text-[#EF4444]'
@@ -55,7 +55,7 @@ export default function MatchupBanner({ week, totalMatchups, myScore, oppScore, 
             {winning ? 'WINNING' : 'LOSING'}
           </span>
         </div>
-        <button className="text-[11px] font-semibold text-[#22D3EE] border border-[#22D3EE]/20 rounded-lg px-3 py-1.5 hover:bg-[#22D3EE]/5 transition-colors font-mono">
+        <button className="text-[12px] font-semibold text-[#22D3EE] border border-[#22D3EE]/20 rounded-lg px-3 py-1.5 hover:bg-[#22D3EE]/5 transition-colors font-mono">
           Close to View →
         </button>
       </div>
@@ -88,16 +88,16 @@ export default function MatchupBanner({ week, totalMatchups, myScore, oppScore, 
                 {/* Position + team */}
                 <div className="flex items-center gap-2 mb-1.5">
                   <span
-                    className="text-[9px] font-black px-1.5 py-0.5 rounded font-mono"
+                    className="text-[10px] font-black px-1.5 py-0.5 rounded font-mono"
                     style={{ background: `${posColor}20`, color: posColor }}
                   >
                     {player.position}
                   </span>
-                  <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wide">
+                  <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wide">
                     {player.team}
                   </span>
-                  <span className="text-[10px] text-slate-600">·</span>
-                  <span className="text-[10px] text-slate-600">{player.context}</span>
+                  <span className="text-[11px] text-slate-600">·</span>
+                  <span className="text-[11px] text-slate-600">{player.context}</span>
                 </div>
 
                 {/* Name + delta */}
@@ -117,7 +117,7 @@ export default function MatchupBanner({ week, totalMatchups, myScore, oppScore, 
                 {/* Projected pts + confidence ring */}
                 <div className="flex items-end justify-between">
                   <div>
-                    <div className="text-[9px] font-bold uppercase tracking-[0.2em] text-slate-600 mb-0.5">
+                    <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-600 mb-0.5">
                       Projected
                     </div>
                     <div className="text-3xl font-black text-white leading-none font-mono tabular-nums">
@@ -140,12 +140,12 @@ export default function MatchupBanner({ week, totalMatchups, myScore, oppScore, 
                       />
                     </svg>
                     <div className="absolute inset-0 flex items-center justify-center">
-                      <span className="text-[9px] font-black text-white font-mono tabular-nums">{player.confidence}%</span>
+                      <span className="text-[10px] font-black text-white font-mono tabular-nums">{player.confidence}%</span>
                     </div>
                   </div>
                 </div>
 
-                <p className="text-[9px] text-slate-600 mt-2 font-mono">
+                <p className="text-[10px] text-slate-600 mt-2 font-mono">
                   Expected to confirm ranking ·{' '}
                   <span style={{ color: posColor }}>{player.confidence}% Confidence Index</span>
                 </p>

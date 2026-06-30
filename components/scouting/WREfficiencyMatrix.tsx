@@ -56,8 +56,8 @@ export default function WREfficiencyMatrix({ data, loading }: Props) {
   return (
     <div className={`${GLASS} mt-4 overflow-hidden relative`} onMouseLeave={onLeave}>
       <div className="flex items-center justify-between px-4 py-3 border-b border-white/[0.06]">
-        <p className="text-[12px] uppercase tracking-widest text-[#64748B] font-semibold">WR EFFICIENCY MATRIX</p>
-        <button type="button" className="text-[12px] text-[#22D3EE] hover:underline bg-transparent border-0 cursor-pointer">
+        <p className="text-[13px] uppercase tracking-widest text-[#64748B] font-semibold">WR EFFICIENCY MATRIX</p>
+        <button type="button" className="text-[13px] text-[#22D3EE] hover:underline bg-transparent border-0 cursor-pointer">
           View Full Matrix →
         </button>
       </div>
@@ -156,7 +156,7 @@ export default function WREfficiencyMatrix({ data, loading }: Props) {
 
         {tip ? (
           <div
-            className="absolute z-20 rounded-lg border border-white/[0.12] bg-[#0a0d14]/95 px-2 py-1.5 text-[11px] pointer-events-none"
+            className="absolute z-20 rounded-lg border border-white/[0.12] bg-[#0a0d14]/95 px-2 py-1.5 text-[12px] pointer-events-none"
             style={{
               left: `min(calc(100% - 8rem), ${(tip.x / W) * 100}%)`,
               top: `${(tip.y / H) * 100}%`,
@@ -172,7 +172,7 @@ export default function WREfficiencyMatrix({ data, loading }: Props) {
         ) : null}
       </div>
 
-      <p className="px-4 pb-3 text-[10px] text-[#475569]" style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}>
+      <p className="px-4 pb-3 text-[11px] text-[#475569]" style={{ fontFamily: 'var(--font-body), Inter, sans-serif' }}>
         Minimum 20% Route Share
       </p>
     </div>

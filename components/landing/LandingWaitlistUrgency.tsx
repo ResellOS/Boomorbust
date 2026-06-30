@@ -41,7 +41,7 @@ export default function LandingWaitlistUrgency() {
         🚀 EARLY ACCESS IS LIMITED
       </h2>
       <p
-        className="mx-auto mt-3 max-w-[520px] text-[13px] leading-relaxed text-[#94A3B8] sm:text-[14px]"
+        className="mx-auto mt-3 max-w-[520px] text-[14px] leading-relaxed text-[#94A3B8] sm:text-[15px]"
         style={{ fontFamily: 'var(--font-body)' }}
       >
         <span className="font-mono tabular-nums font-semibold text-[#94A3B8]">{n}</span>{' '}
@@ -49,7 +49,7 @@ export default function LandingWaitlistUrgency() {
       </p>
       <Link
         href="/signup"
-        className="mt-6 inline-flex min-h-[44px] items-center justify-center gap-1 rounded-[10px] px-6 py-3 text-[14px] font-bold text-[#0a0d14] transition-opacity hover:opacity-95 sm:px-8 sm:text-[15px]"
+        className="mt-6 inline-flex min-h-[44px] items-center justify-center gap-1 rounded-[10px] px-6 py-3 text-[15px] font-bold text-[#0a0d14] transition-opacity hover:opacity-95 sm:px-8 sm:text-[16px]"
         style={{
           fontFamily: 'var(--font-body)',
           fontWeight: 700,

@@ -50,7 +50,7 @@ function PositionBars({ byPosition }: { byPosition: TrackRecordConsensusData['by
     <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
       {entries.map((e) => (
         <div key={e.key}>
-          <div className="mb-1 flex items-baseline justify-between font-mono text-[9px]">
+          <div className="mb-1 flex items-baseline justify-between font-mono text-[10px]">
             <span className="text-muted">{e.label}</span>
             <span className="tabular-nums text-text">{e.count}</span>
           </div>
@@ -74,10 +74,10 @@ export default function BobVsConsensusTrackRecord({ data }: BobVsConsensusTrackR
   if (!data) {
     return (
       <section className="mb-6 rounded-[10px] border border-border bg-surface/50 p-4 backdrop-blur-xl md:p-5">
-        <div className="mb-1 font-figtree text-[11px] font-bold uppercase tracking-[1.5px] text-text">
+        <div className="mb-1 font-figtree text-[12px] font-bold uppercase tracking-[1.5px] text-text">
           BOB vs Consensus
         </div>
-        <p className="font-figtree text-[11px] text-muted">
+        <p className="font-figtree text-[12px] text-muted">
           Expert consensus comparison is syncing. Check back shortly.
         </p>
       </section>
@@ -86,10 +86,10 @@ export default function BobVsConsensusTrackRecord({ data }: BobVsConsensusTrackR
 
   return (
     <section className="mb-6 rounded-[10px] border border-border bg-surface/50 p-4 backdrop-blur-xl md:p-5">
-      <div className="mb-1 font-figtree text-[11px] font-bold uppercase tracking-[1.5px] text-text">
+      <div className="mb-1 font-figtree text-[12px] font-bold uppercase tracking-[1.5px] text-text">
         BOB vs Consensus
       </div>
-      <p className="mb-4 font-figtree text-[11px] text-muted">
+      <p className="mb-4 font-figtree text-[12px] text-muted">
         Snapshot vs {data.source === 'fantasypros' ? 'FantasyPros' : data.source} expert ranks —{' '}
         {data.season} season.
       </p>
@@ -102,38 +102,38 @@ export default function BobVsConsensusTrackRecord({ data }: BobVsConsensusTrackR
           { label: 'Snapshot', value: data.snapshotDate },
         ].map((stat) => (
           <div key={stat.label} className="rounded-[8px] border border-border bg-[#0f1420] px-3 py-2.5">
-            <div className="font-mono text-[8px] uppercase tracking-wide text-muted">{stat.label}</div>
-            <div className="mt-0.5 font-mono text-[13px] tabular-nums text-text">{stat.value}</div>
+            <div className="font-mono text-[9px] uppercase tracking-wide text-muted">{stat.label}</div>
+            <div className="mt-0.5 font-mono text-[14px] tabular-nums text-text">{stat.value}</div>
           </div>
         ))}
       </div>
 
       <div className="mb-5">
-        <div className="mb-2 font-mono text-[8px] uppercase tracking-[1.5px] text-muted">
+        <div className="mb-2 font-mono text-[9px] uppercase tracking-[1.5px] text-muted">
           Position Breakdown
         </div>
         <PositionBars byPosition={data.byPosition} />
       </div>
 
       <div className="mb-3">
-        <div className="font-figtree text-[11px] font-bold uppercase tracking-[1.5px] text-text">
+        <div className="font-figtree text-[12px] font-bold uppercase tracking-[1.5px] text-text">
           Biggest Divergences
         </div>
-        <p className="mt-1 font-figtree text-[10px] leading-relaxed text-muted">
+        <p className="mt-1 font-figtree text-[11px] leading-relaxed text-muted">
           When FantasyPros experts and the KTC trade market disagree with each other, that&apos;s often
           the most interesting divergence to watch.
         </p>
       </div>
 
       {data.biggestDivergences.length === 0 ? (
-        <div className="rounded-[8px] border border-dashed border-border/60 bg-bg/40 px-4 py-8 text-center font-mono text-[11px] text-muted">
+        <div className="rounded-[8px] border border-dashed border-border/60 bg-bg/40 px-4 py-8 text-center font-mono text-[12px] text-muted">
           No divergences ≥ 20 spots in this snapshot.
         </div>
       ) : (
         <div className="overflow-x-auto">
           <table className="w-full min-w-[720px] border-collapse">
             <thead>
-              <tr className="border-b border-border font-mono text-[8px] uppercase tracking-[1.5px] text-muted">
+              <tr className="border-b border-border font-mono text-[9px] uppercase tracking-[1.5px] text-muted">
                 <th className="px-2 py-2 text-left font-normal">Player</th>
                 <th className="px-2 py-2 text-left font-normal">Pos</th>
                 <th className="px-2 py-2 text-left font-normal">BOB Verdict</th>
@@ -157,35 +157,35 @@ export default function BobVsConsensusTrackRecord({ data }: BobVsConsensusTrackR
                         {row.playerId ? (
                           <Link
                             href={`/players?player=${row.playerId}`}
-                            className="font-figtree text-[12px] text-text no-underline hover:text-boom"
+                            className="font-figtree text-[13px] text-text no-underline hover:text-boom"
                           >
                             {row.playerName}
                           </Link>
                         ) : (
-                          <span className="font-figtree text-[12px] text-text">{row.playerName}</span>
+                          <span className="font-figtree text-[13px] text-text">{row.playerName}</span>
                         )}
                         {split ? (
-                          <span className="rounded border border-[#FBBF24]/40 bg-[#FBBF24]/10 px-1.5 py-0.5 font-mono text-[7px] uppercase text-[#FBBF24]">
+                          <span className="rounded border border-[#FBBF24]/40 bg-[#FBBF24]/10 px-1.5 py-0.5 font-mono text-[8px] uppercase text-[#FBBF24]">
                             Markets Split
                           </span>
                         ) : null}
                       </div>
                     </td>
-                    <td className="px-2 py-2.5 font-mono text-[10px] text-muted">{row.position}</td>
-                    <td className="px-2 py-2.5 font-mono text-[10px] text-text">{row.verdict}</td>
-                    <td className="px-2 py-2.5 text-right font-mono text-[11px] tabular-nums text-text">
+                    <td className="px-2 py-2.5 font-mono text-[11px] text-muted">{row.position}</td>
+                    <td className="px-2 py-2.5 font-mono text-[11px] text-text">{row.verdict}</td>
+                    <td className="px-2 py-2.5 text-right font-mono text-[12px] tabular-nums text-text">
                       {row.bobRank || '—'}
                     </td>
-                    <td className="px-2 py-2.5 text-right font-mono text-[11px] tabular-nums text-text">
+                    <td className="px-2 py-2.5 text-right font-mono text-[12px] tabular-nums text-text">
                       {row.consensusRank || '—'}
                     </td>
                     <td className="px-2 py-2.5 text-right">
-                      <div className="font-mono text-[11px] tabular-nums" style={{ color: gap.color }}>
+                      <div className="font-mono text-[12px] tabular-nums" style={{ color: gap.color }}>
                         {gap.text}
                       </div>
-                      <div className="font-mono text-[8px] text-muted">{gap.hint}</div>
+                      <div className="font-mono text-[9px] text-muted">{gap.hint}</div>
                     </td>
-                    <td className="px-2 py-2.5 text-right font-mono text-[11px] tabular-nums text-[#22D3EE]">
+                    <td className="px-2 py-2.5 text-right font-mono text-[12px] tabular-nums text-[#22D3EE]">
                       {formatKtcGap(row.ktcRankDelta)}
                     </td>
                   </tr>

@@ -54,7 +54,7 @@ export default function TabNav({ activeTab, onTabChange, offerCount }: TabNavPro
             {/* Offer count badge */}
             {tab.id === 'offers' && (offerCount ?? 0) > 0 && (
               <span
-                className="inline-flex items-center justify-center rounded-full font-mono text-[10px] font-bold"
+                className="inline-flex items-center justify-center rounded-full font-mono text-[11px] font-bold"
                 style={{
                   width:      18,
                   height:     18,

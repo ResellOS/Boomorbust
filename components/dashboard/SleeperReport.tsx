@@ -100,7 +100,7 @@ export default function SleeperReport({
 
       {filtered.length === 0 ? (
         <div className="rounded-[10px] border border-dashed border-white/[0.08] px-3 py-6 text-center">
-          <p className="text-[10px] font-mono uppercase tracking-widest text-[#64748B]">
+          <p className="text-[11px] font-mono uppercase tracking-widest text-[#64748B]">
             No low-roster movers match this filter right now
           </p>
         </div>
@@ -144,10 +144,10 @@ export default function SleeperReport({
                   <PlayerAvatar playerId={id} playerName={name} position={position} size={36} />
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-1">
-                      <span className="text-[11px] font-bold text-white truncate leading-tight">{name}</span>
+                      <span className="text-[12px] font-bold text-white truncate leading-tight">{name}</span>
                       <span
                         className={clsx(
-                          'text-[8px] font-bold uppercase px-1 py-px rounded border shrink-0',
+                          'text-[9px] font-bold uppercase px-1 py-px rounded border shrink-0',
                           POS_BADGE[position] ?? 'bg-white/5 text-slate-300 border-white/10',
                         )}
                       >
@@ -169,7 +169,7 @@ export default function SleeperReport({
                 </div>
 
                 <div className="mb-2">
-                  <span className={clsx('text-[9px] font-black font-mono', trend.className)}>
+                  <span className={clsx('text-[10px] font-black font-mono', trend.className)}>
                     {trend.text}
                   </span>
                 </div>

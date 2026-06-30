@@ -188,13 +188,13 @@ export default function FeedbackPrompt({ open, onClose, compact = false }: Feedb
       {step === 'thanks' ? (
         <div className="px-4 py-5 text-center">
           <div className="mb-2 text-2xl">🏆</div>
-          <p className="text-[14px] font-semibold text-text">
+          <p className="text-[15px] font-semibold text-text">
             Thanks! You&apos;ve earned the Community Contributor badge 🏆
           </p>
           <button
             type="button"
             onClick={onClose}
-            className="mt-4 w-full rounded-lg border-none bg-boom py-2.5 text-[12px] font-bold text-bg"
+            className="mt-4 w-full rounded-lg border-none bg-boom py-2.5 text-[13px] font-bold text-bg"
           >
             Done
           </button>
@@ -202,10 +202,10 @@ export default function FeedbackPrompt({ open, onClose, compact = false }: Feedb
       ) : (
         <>
           <div className="border-b border-white/10 px-4 py-3 pr-10">
-            <p id="feedback-title" className="text-[13px] font-bold text-text">
+            <p id="feedback-title" className="text-[14px] font-bold text-text">
               Help us improve BOB
             </p>
-            <p className="mt-0.5 text-[10px] text-muted">Your input shapes what we build next.</p>
+            <p className="mt-0.5 text-[11px] text-muted">Your input shapes what we build next.</p>
           </div>
           <div className="px-4 py-3">
             {step === 'pick' ? (
@@ -218,7 +218,7 @@ export default function FeedbackPrompt({ open, onClose, compact = false }: Feedb
                   }}
                   className="w-full rounded-lg border border-boom/20 bg-boom/[0.06] p-2.5 text-left transition-colors hover:border-boom/35"
                 >
-                  <p className="text-[11px] font-semibold text-boom">Share a recommendation</p>
+                  <p className="text-[12px] font-semibold text-boom">Share a recommendation</p>
                 </button>
                 <button
                   type="button"
@@ -228,7 +228,7 @@ export default function FeedbackPrompt({ open, onClose, compact = false }: Feedb
                   }}
                   className="w-full rounded-lg border border-[rgba(239,68,68,0.2)] bg-[rgba(239,68,68,0.06)] p-2.5 text-left transition-colors hover:border-[rgba(239,68,68,0.35)]"
                 >
-                  <p className="text-[11px] font-semibold text-[#ef4444]">Report a bug</p>
+                  <p className="text-[12px] font-semibold text-[#ef4444]">Report a bug</p>
                 </button>
               </div>
             ) : (
@@ -236,7 +236,7 @@ export default function FeedbackPrompt({ open, onClose, compact = false }: Feedb
                 <button
                   type="button"
                   onClick={() => setStep('pick')}
-                  className="mb-2 border-none bg-transparent p-0 text-[10px] text-muted hover:text-text"
+                  className="mb-2 border-none bg-transparent p-0 text-[11px] text-muted hover:text-text"
                 >
                   ← Back
                 </button>
@@ -245,14 +245,14 @@ export default function FeedbackPrompt({ open, onClose, compact = false }: Feedb
                   onChange={(e) => setContent(e.target.value)}
                   rows={3}
                   placeholder="What would make BOB more useful?"
-                  className="w-full resize-none rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2 font-figtree text-[12px] text-text outline-none placeholder:text-muted focus:border-boom/40"
+                  className="w-full resize-none rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2 font-figtree text-[13px] text-text outline-none placeholder:text-muted focus:border-boom/40"
                 />
-                {error && <p className="mt-1.5 text-[10px] text-[#ef4444]">{error}</p>}
+                {error && <p className="mt-1.5 text-[11px] text-[#ef4444]">{error}</p>}
                 <button
                   type="button"
                   onClick={handleSubmit}
                   disabled={submitting}
-                  className="mt-3 w-full rounded-lg border-none bg-boom py-2 text-[12px] font-bold text-bg disabled:opacity-60"
+                  className="mt-3 w-full rounded-lg border-none bg-boom py-2 text-[13px] font-bold text-bg disabled:opacity-60"
                 >
                   {submitting ? 'Sending…' : 'Send Feedback'}
                 </button>
@@ -262,7 +262,7 @@ export default function FeedbackPrompt({ open, onClose, compact = false }: Feedb
               <button
                 type="button"
                 onClick={() => void handleSkip()}
-                className="mt-3 w-full border-none bg-transparent py-1 text-center text-[11px] text-muted hover:text-text"
+                className="mt-3 w-full border-none bg-transparent py-1 text-center text-[12px] text-muted hover:text-text"
               >
                 Maybe later
               </button>

@@ -58,7 +58,7 @@ function PlayerThumb({ playerId, name, size = 36 }: { playerId: string; name: st
   if (errored) {
     return (
       <div
-        className="shrink-0 rounded-full flex items-center justify-center text-[10px] font-bold"
+        className="shrink-0 rounded-full flex items-center justify-center text-[11px] font-bold"
         style={{ width: size, height: size, background: 'rgba(255,255,255,0.08)', color: '#94A3B8', ...MONO }}
       >
         {initials}
@@ -312,12 +312,12 @@ function WaiverRadarPanel({ players, gapPositions }: { players: WaiverRadarPlaye
       <div className="flex items-center justify-between gap-2 px-4 py-3 border-b border-white/[0.07]">
         <div className="flex items-center gap-2">
           <Zap size={13} className="text-[#22D3EE]" />
-          <span className="text-[11px] font-bold uppercase tracking-widest text-white/70" style={MONO}>
+          <span className="text-[12px] font-bold uppercase tracking-widest text-white/70" style={MONO}>
             Waiver Radar
           </span>
         </div>
         {gapPositions.length > 0 && (
-          <span className="text-[9px] text-[#22D3EE]/70 uppercase tracking-wide" style={MONO}>
+          <span className="text-[10px] text-[#22D3EE]/70 uppercase tracking-wide" style={MONO}>
             Needs: {gapPositions.join(', ')}
           </span>
         )}
@@ -329,7 +329,7 @@ function WaiverRadarPanel({ players, gapPositions }: { players: WaiverRadarPlaye
           <button
             key={f}
             onClick={() => setFilter(f)}
-            className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide transition-all"
+            className="px-2 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wide transition-all"
             style={{
               ...MONO,
               background: filter === f ? (f === 'ALL' ? 'rgba(34,211,238,0.18)' : `${posColor(f)}22`) : 'rgba(255,255,255,0.05)',
@@ -345,7 +345,7 @@ function WaiverRadarPanel({ players, gapPositions }: { players: WaiverRadarPlaye
       {/* Player list */}
       <div className="flex-1 overflow-y-auto divide-y divide-white/[0.04]" style={{ maxHeight: 440 }}>
         {filtered.length === 0 && (
-          <div className="px-4 py-8 text-center text-[11px] text-white/30" style={MONO}>
+          <div className="px-4 py-8 text-center text-[12px] text-white/30" style={MONO}>
             No waiver targets found
           </div>
         )}
@@ -358,7 +358,7 @@ function WaiverRadarPanel({ players, gapPositions }: { players: WaiverRadarPlaye
               className="flex items-center gap-2.5 px-3 py-2.5 hover:bg-white/[0.03] transition-colors"
             >
               {/* Rank */}
-              <span className="text-[10px] w-4 text-white/25 shrink-0 text-right" style={MONO}>{i + 1}</span>
+              <span className="text-[11px] w-4 text-white/25 shrink-0 text-right" style={MONO}>{i + 1}</span>
 
               {/* Avatar */}
               <PlayerThumb playerId={p.player_id} name={p.name} size={32} />
@@ -366,19 +366,19 @@ function WaiverRadarPanel({ players, gapPositions }: { players: WaiverRadarPlaye
               {/* Info */}
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-1.5">
-                  <span className="text-[12px] font-semibold text-white/90 truncate">{p.name}</span>
+                  <span className="text-[13px] font-semibold text-white/90 truncate">{p.name}</span>
                   {isNeed && (
-                    <span className="text-[8px] px-1 py-0.5 rounded font-bold uppercase"
+                    <span className="text-[9px] px-1 py-0.5 rounded font-bold uppercase"
                       style={{ background: 'rgba(34,211,238,0.15)', color: '#22D3EE', ...MONO }}>
                       NEED
                     </span>
                   )}
                 </div>
                 <div className="flex items-center gap-1.5 mt-0.5">
-                  <span className="text-[10px] font-bold" style={{ color: posColor(p.position), ...MONO }}>
+                  <span className="text-[11px] font-bold" style={{ color: posColor(p.position), ...MONO }}>
                     {p.position}
                   </span>
-                  <span className="text-[10px] text-white/30" style={MONO}>{p.team}</span>
+                  <span className="text-[11px] text-white/30" style={MONO}>{p.team}</span>
                 </div>
               </div>
 
@@ -392,12 +392,12 @@ function WaiverRadarPanel({ players, gapPositions }: { players: WaiverRadarPlaye
               {/* Verdict badge */}
               <div className="shrink-0 flex flex-col items-end gap-0.5">
                 <span
-                  className="text-[9px] font-bold px-1.5 py-0.5 rounded uppercase"
+                  className="text-[10px] font-bold px-1.5 py-0.5 rounded uppercase"
                   style={{ ...MONO, background: `${vm.color}18`, color: vm.color, border: `1px solid ${vm.color}40` }}
                 >
                   {vm.label}
                 </span>
-                <span className="text-[10px] font-bold" style={{ color: '#22D3EE', ...MONO }}>
+                <span className="text-[11px] font-bold" style={{ color: '#22D3EE', ...MONO }}>
                   {p.bbsm_score.toFixed(1)}
                 </span>
               </div>
@@ -408,13 +408,13 @@ function WaiverRadarPanel({ players, gapPositions }: { players: WaiverRadarPlaye
 
       {/* BBSM legend */}
       <div className="px-3 py-2 border-t border-white/[0.05] flex items-center gap-1.5 flex-wrap">
-        <span className="text-[9px] text-white/25 uppercase tracking-wide" style={MONO}>BBSM =</span>
+        <span className="text-[10px] text-white/25 uppercase tracking-wide" style={MONO}>BBSM =</span>
         {[
           { label: 'P3W', weight: '45%' },
           { label: 'Trend', weight: '30%' },
           { label: 'Need', weight: '25%' },
         ].map(({ label, weight }) => (
-          <span key={label} className="text-[9px] text-white/35" style={MONO}>
+          <span key={label} className="text-[10px] text-white/35" style={MONO}>
             {label} <span className="text-white/20">{weight}</span>
           </span>
         ))}
@@ -451,15 +451,15 @@ function ProcessResultsPanel({ players }: { players: ProcessResultsPlayer[] }) {
         <PlayerThumb playerId={p.player_id} name={p.name} size={28} />
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-1.5">
-            <span className="text-[11px] font-semibold text-white/90 truncate">{p.name}</span>
-            <span className="text-[9px] font-bold" style={{ color: posColor(p.position), ...MONO }}>{p.position}</span>
+            <span className="text-[12px] font-semibold text-white/90 truncate">{p.name}</span>
+            <span className="text-[10px] font-bold" style={{ color: posColor(p.position), ...MONO }}>{p.position}</span>
           </div>
           <div className="flex items-center gap-2 mt-0.5">
-            <span className="text-[9px] text-[#A78BFA]" style={MONO}>
+            <span className="text-[10px] text-[#A78BFA]" style={MONO}>
               PROC {p.process_score.toFixed(0)}
             </span>
-            <span className="text-[9px] text-white/20">|</span>
-            <span className="text-[9px] text-[#36E7A1]" style={MONO}>
+            <span className="text-[10px] text-white/20">|</span>
+            <span className="text-[10px] text-[#36E7A1]" style={MONO}>
               RES {p.results_score.toFixed(0)}
             </span>
           </div>
@@ -467,7 +467,7 @@ function ProcessResultsPanel({ players }: { players: ProcessResultsPlayer[] }) {
         <DivergenceChart processHistory={proc} resultsHistory={res} />
         <div className="shrink-0 text-right min-w-[36px]">
           <span
-            className="text-[10px] font-bold"
+            className="text-[11px] font-bold"
             style={{ ...MONO, color: isGem ? '#36E7A1' : isReg ? '#EF4444' : '#94A3B8' }}
           >
             {p.divergence > 0 ? '+' : ''}{p.divergence.toFixed(0)}
@@ -484,17 +484,17 @@ function ProcessResultsPanel({ players }: { players: ProcessResultsPlayer[] }) {
     >
       <div className="flex items-center gap-2 px-4 py-3 border-b border-white/[0.07]">
         <Eye size={13} className="text-[#A78BFA]" />
-        <span className="text-[11px] font-bold uppercase tracking-widest text-white/70" style={MONO}>
+        <span className="text-[12px] font-bold uppercase tracking-widest text-white/70" style={MONO}>
           Process vs Results
         </span>
         <div className="ml-auto flex items-center gap-3">
           <div className="flex items-center gap-1">
             <div className="w-2 h-0.5 rounded" style={{ background: '#A78BFA' }} />
-            <span className="text-[9px] text-white/30" style={MONO}>Process</span>
+            <span className="text-[10px] text-white/30" style={MONO}>Process</span>
           </div>
           <div className="flex items-center gap-1">
             <div className="w-2 h-0.5 rounded" style={{ background: '#36E7A1' }} />
-            <span className="text-[9px] text-white/30" style={MONO}>Results</span>
+            <span className="text-[10px] text-white/30" style={MONO}>Results</span>
           </div>
         </div>
       </div>
@@ -504,7 +504,7 @@ function ProcessResultsPanel({ players }: { players: ProcessResultsPlayer[] }) {
           <div>
             <div className="px-3 pt-2.5 pb-1 flex items-center gap-1.5">
               <div className="h-px flex-1 bg-[#36E7A1]/20" />
-              <span className="text-[9px] font-bold uppercase text-[#36E7A1]/70" style={MONO}>Hidden Gems — Process &gt; Results</span>
+              <span className="text-[10px] font-bold uppercase text-[#36E7A1]/70" style={MONO}>Hidden Gems — Process &gt; Results</span>
               <div className="h-px flex-1 bg-[#36E7A1]/20" />
             </div>
             <div className="divide-y divide-white/[0.04]">
@@ -516,7 +516,7 @@ function ProcessResultsPanel({ players }: { players: ProcessResultsPlayer[] }) {
           <div>
             <div className="px-3 pt-2.5 pb-1 flex items-center gap-1.5">
               <div className="h-px flex-1 bg-[#EF4444]/20" />
-              <span className="text-[9px] font-bold uppercase text-[#EF4444]/70" style={MONO}>Regression Risk — Results &gt; Process</span>
+              <span className="text-[10px] font-bold uppercase text-[#EF4444]/70" style={MONO}>Regression Risk — Results &gt; Process</span>
               <div className="h-px flex-1 bg-[#EF4444]/20" />
             </div>
             <div className="divide-y divide-white/[0.04]">
@@ -528,7 +528,7 @@ function ProcessResultsPanel({ players }: { players: ProcessResultsPlayer[] }) {
           <div>
             <div className="px-3 pt-2.5 pb-1 flex items-center gap-1.5">
               <div className="h-px flex-1 bg-white/[0.06]" />
-              <span className="text-[9px] font-bold uppercase text-white/25" style={MONO}>Aligned</span>
+              <span className="text-[10px] font-bold uppercase text-white/25" style={MONO}>Aligned</span>
               <div className="h-px flex-1 bg-white/[0.06]" />
             </div>
             <div className="divide-y divide-white/[0.04]">
@@ -537,7 +537,7 @@ function ProcessResultsPanel({ players }: { players: ProcessResultsPlayer[] }) {
           </div>
         )}
         {players.length === 0 && (
-          <div className="px-4 py-10 text-center text-[11px] text-white/30" style={MONO}>
+          <div className="px-4 py-10 text-center text-[12px] text-white/30" style={MONO}>
             No data — sync your leagues to populate
           </div>
         )}
@@ -556,15 +556,15 @@ function HiddenGemsPanel({ gems }: { gems: HiddenGem[] }) {
     >
       <div className="flex items-center gap-2 px-4 py-3 border-b border-white/[0.07]">
         <Target size={13} className="text-[#36E7A1]" />
-        <span className="text-[11px] font-bold uppercase tracking-widest text-white/70" style={MONO}>
+        <span className="text-[12px] font-bold uppercase tracking-widest text-white/70" style={MONO}>
           Hidden Gems
         </span>
-        <span className="text-[9px] text-white/30 ml-auto" style={MONO}>BVI &gt; KTC + Process &gt; Results</span>
+        <span className="text-[10px] text-white/30 ml-auto" style={MONO}>BVI &gt; KTC + Process &gt; Results</span>
       </div>
 
       <div className="flex-1 divide-y divide-white/[0.05]" style={{ maxHeight: 460, overflowY: 'auto' }}>
         {gems.length === 0 && (
-          <div className="px-4 py-10 text-center text-[11px] text-white/30" style={MONO}>
+          <div className="px-4 py-10 text-center text-[12px] text-white/30" style={MONO}>
             No hidden gems detected — BVI data populates nightly
           </div>
         )}
@@ -585,17 +585,17 @@ function HiddenGemsPanel({ gems }: { gems: HiddenGem[] }) {
                 <PlayerThumb playerId={gem.player_id} name={gem.name} size={40} />
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-1.5 flex-wrap">
-                    <span className="text-[13px] font-semibold text-white/90">{gem.name}</span>
-                    <span className="text-[9px] font-bold px-1 py-0.5 rounded" style={{ background: `${posC}18`, color: posC, ...MONO }}>
+                    <span className="text-[14px] font-semibold text-white/90">{gem.name}</span>
+                    <span className="text-[10px] font-bold px-1 py-0.5 rounded" style={{ background: `${posC}18`, color: posC, ...MONO }}>
                       {gem.position}
                     </span>
                     {isBoom && (
-                      <span className="text-[8px] font-bold px-1.5 py-0.5 rounded uppercase"
+                      <span className="text-[9px] font-bold px-1.5 py-0.5 rounded uppercase"
                         style={{ background: 'rgba(54,231,161,0.18)', color: '#36E7A1', border: '1px solid rgba(54,231,161,0.40)', ...MONO }}>
                         BOOM
                       </span>
                     )}
-                    <span className="text-[8px] font-bold px-1.5 py-0.5 rounded uppercase ml-auto"
+                    <span className="text-[9px] font-bold px-1.5 py-0.5 rounded uppercase ml-auto"
                       style={{ background: `${vm.color}18`, color: vm.color, border: `1px solid ${vm.color}40`, ...MONO }}>
                       {vm.label}
                     </span>
@@ -603,14 +603,14 @@ function HiddenGemsPanel({ gems }: { gems: HiddenGem[] }) {
 
                   {/* BVI delta badge */}
                   <div className="flex items-center gap-2 mt-1">
-                    <span className="text-[9px]" style={{ color: '#22D3EE', ...MONO }}>
+                    <span className="text-[10px]" style={{ color: '#22D3EE', ...MONO }}>
                       BVI {gem.bvi_score.toLocaleString()} | KTC {gem.ktc_value.toLocaleString()} |{' '}
                       <span style={{ color: '#36E7A1' }}>△+{gem.delta.toLocaleString()} UNDERVALUED</span>
                     </span>
                   </div>
 
                   {/* Reasoning */}
-                  <p className="text-[10px] text-white/45 leading-snug mt-1.5 line-clamp-2"
+                  <p className="text-[11px] text-white/45 leading-snug mt-1.5 line-clamp-2"
                     style={MONO}>
                     {gem.reasoning}
                   </p>
@@ -619,7 +619,7 @@ function HiddenGemsPanel({ gems }: { gems: HiddenGem[] }) {
                 {/* Sparkline */}
                 <div className="shrink-0 flex flex-col items-end gap-1">
                   <Sparkline data={sparkData} color="#36E7A1" width={48} height={20} />
-                  <span className="text-[9px] text-white/25 group-hover:text-[#22D3EE]/60 transition-colors" style={MONO}>
+                  <span className="text-[10px] text-white/25 group-hover:text-[#22D3EE]/60 transition-colors" style={MONO}>
                     View →
                   </span>
                 </div>
@@ -662,11 +662,11 @@ function WREfficiencyMatrix({ players }: { players: WREfficiencyPlayer[] }) {
       <div className="flex items-center gap-2 px-4 py-3 border-b border-white/[0.07]">
         <div className="flex items-center gap-2">
           <div className="w-2 h-2 rounded-full" style={{ background: '#22D3EE', boxShadow: '0 0 6px #22D3EE' }} />
-          <span className="text-[11px] font-bold uppercase tracking-widest text-white/70" style={MONO}>
+          <span className="text-[12px] font-bold uppercase tracking-widest text-white/70" style={MONO}>
             WR Efficiency Matrix
           </span>
         </div>
-        <span className="ml-auto text-[9px] text-white/30" style={MONO}>Compare up to 3 WRs</span>
+        <span className="ml-auto text-[10px] text-white/30" style={MONO}>Compare up to 3 WRs</span>
       </div>
 
       <div className="flex flex-col sm:flex-row gap-0">
@@ -686,7 +686,7 @@ function WREfficiencyMatrix({ players }: { players: WREfficiencyPlayer[] }) {
                 return (
                   <div key={id} className="flex items-center gap-1.5">
                     <div className="w-2 h-2 rounded-full shrink-0" style={{ background: WR_COLORS[i % WR_COLORS.length] }} />
-                    <span className="text-[10px] text-white/70" style={MONO}>{p.name}</span>
+                    <span className="text-[11px] text-white/70" style={MONO}>{p.name}</span>
                   </div>
                 );
               })}
@@ -709,14 +709,14 @@ function WREfficiencyMatrix({ players }: { players: WREfficiencyPlayer[] }) {
               <div className="px-3 py-2 space-y-1 border-b border-white/[0.05]">
                 {axes.map(({ label, val }) => (
                   <div key={label} className="flex items-center gap-2">
-                    <span className="text-[9px] text-white/40 w-28 shrink-0 truncate" style={MONO}>{label}</span>
+                    <span className="text-[10px] text-white/40 w-28 shrink-0 truncate" style={MONO}>{label}</span>
                     <div className="flex-1 h-1 rounded-full bg-white/[0.06] overflow-hidden">
                       <div
                         className="h-full rounded-full transition-all duration-500"
                         style={{ width: `${val}%`, background: '#22D3EE' }}
                       />
                     </div>
-                    <span className="text-[9px] w-6 text-right" style={{ color: '#22D3EE', ...MONO }}>{Math.round(val)}</span>
+                    <span className="text-[10px] w-6 text-right" style={{ color: '#22D3EE', ...MONO }}>{Math.round(val)}</span>
                   </div>
                 ))}
               </div>
@@ -741,10 +741,10 @@ function WREfficiencyMatrix({ players }: { players: WREfficiencyPlayer[] }) {
                       boxShadow: isSelected ? `0 0 6px ${WR_COLORS[selIdx % WR_COLORS.length]}` : 'none',
                     }}
                   />
-                  <span className="text-[10px] font-medium truncate" style={{ color: isSelected ? '#fff' : '#94A3B8' }}>
+                  <span className="text-[11px] font-medium truncate" style={{ color: isSelected ? '#fff' : '#94A3B8' }}>
                     {p.name}
                   </span>
-                  <span className="ml-auto text-[9px] shrink-0" style={{ color: '#22D3EE', ...MONO }}>
+                  <span className="ml-auto text-[10px] shrink-0" style={{ color: '#22D3EE', ...MONO }}>
                     {Math.round(p.depth_chart_priority)}
                   </span>
                 </button>
@@ -821,11 +821,11 @@ export default function ScoutingPage() {
           Dashboard
         </Link>
         <span className="text-white/20 text-xs">/</span>
-        <span className="text-white/60 text-[11px] uppercase tracking-widest" style={MONO}>
+        <span className="text-white/60 text-[12px] uppercase tracking-widest" style={MONO}>
           Scouting Terminal
         </span>
         {data && (
-          <span className="text-white/30 text-[10px] ml-1" style={MONO}>
+          <span className="text-white/30 text-[11px] ml-1" style={MONO}>
             — {data.activeLeagueName}
           </span>
         )}
@@ -835,7 +835,7 @@ export default function ScoutingPage() {
           className="ml-auto flex items-center gap-1.5 text-white/30 hover:text-white/70 transition-colors disabled:opacity-40"
         >
           <RefreshCw size={12} className={refreshing ? 'animate-spin' : ''} />
-          <span className="text-[10px]" style={MONO}>Refresh</span>
+          <span className="text-[11px]" style={MONO}>Refresh</span>
         </button>
       </nav>
 
@@ -844,13 +844,13 @@ export default function ScoutingPage() {
         {/* Page header */}
         <div className="mb-4">
           <h1 className="text-[18px] font-bold tracking-tight text-white/90">Scouting Terminal</h1>
-          <p className="text-[11px] text-white/35 mt-0.5" style={MONO}>
+          <p className="text-[12px] text-white/35 mt-0.5" style={MONO}>
             Waiver radar · Process vs results · Hidden gems · WR efficiency
           </p>
         </div>
 
         {error && (
-          <div className="mb-4 rounded-xl border border-[#EF4444]/30 bg-[#EF4444]/10 px-4 py-3 text-[11px] text-[#EF4444]" style={MONO}>
+          <div className="mb-4 rounded-xl border border-[#EF4444]/30 bg-[#EF4444]/10 px-4 py-3 text-[12px] text-[#EF4444]" style={MONO}>
             {error}
           </div>
         )}
@@ -932,13 +932,13 @@ export default function ScoutingPage() {
             className="mt-6 rounded-2xl px-6 py-8 text-center"
             style={{ ...GLASS, border: '1px solid rgba(255,255,255,0.07)' }}
           >
-            <p className="text-[14px] font-semibold text-white/60 mb-1">No scouting data yet</p>
-            <p className="text-[11px] text-white/35" style={MONO}>
+            <p className="text-[15px] font-semibold text-white/60 mb-1">No scouting data yet</p>
+            <p className="text-[12px] text-white/35" style={MONO}>
               The nightly engine populates tfo_cache at 2 AM. Sync your leagues first.
             </p>
             <Link
               href="/dashboard"
-              className="mt-4 inline-flex items-center gap-1.5 text-[11px] text-[#22D3EE] hover:underline"
+              className="mt-4 inline-flex items-center gap-1.5 text-[12px] text-[#22D3EE] hover:underline"
               style={MONO}
             >
               Go to Dashboard →

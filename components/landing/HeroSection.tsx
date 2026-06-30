@@ -100,7 +100,7 @@ export default function HeroSection() {
                 if (fb) fb.classList.remove("hidden");
               }}
             />
-            <span className="hidden font-black text-white text-[13px] tracking-[0.25em] uppercase italic">
+            <span className="hidden font-black text-white text-[14px] tracking-[0.25em] uppercase italic">
               BOOM OR BUST
             </span>
           </Link>
@@ -111,7 +111,7 @@ export default function HeroSection() {
               <li key={label}>
                 <Link
                   href={href}
-                  className="flex items-center gap-1 text-[12px] font-medium text-slate-400 hover:text-white transition-colors"
+                  className="flex items-center gap-1 text-[13px] font-medium text-slate-400 hover:text-white transition-colors"
                 >
                   {label}
                   {hasArrow && <ChevronDown size={11} className="opacity-50" />}
@@ -125,13 +125,13 @@ export default function HeroSection() {
             <button
               type="button"
               onClick={() => setIsBooting(true)}
-              className="hidden sm:inline-flex items-center justify-center text-[12px] font-semibold border border-white/25 px-5 py-2.5 rounded-lg text-white hover:bg-white hover:text-[#0A0C10] transition-all cursor-pointer"
+              className="hidden sm:inline-flex items-center justify-center text-[13px] font-semibold border border-white/25 px-5 py-2.5 rounded-lg text-white hover:bg-white hover:text-[#0A0C10] transition-all cursor-pointer"
             >
               Sign In
             </button>
             <Link
               href="/onboarding"
-              className="inline-flex items-center gap-2 text-[12px] font-black px-5 py-2.5 rounded-lg text-[#0A0C10] uppercase tracking-wide"
+              className="inline-flex items-center gap-2 text-[13px] font-black px-5 py-2.5 rounded-lg text-[#0A0C10] uppercase tracking-wide"
               style={{
                 background: "linear-gradient(to right, #00F2C3, #6366F1)",
                 boxShadow: "0 0 20px rgba(0,242,195,0.22)",
@@ -152,7 +152,7 @@ export default function HeroSection() {
 
             {/* Eyebrow */}
             <span
-              className="inline-flex w-fit items-center px-4 py-1.5 rounded-full border text-[10px] font-black uppercase tracking-[0.35em]"
+              className="inline-flex w-fit items-center px-4 py-1.5 rounded-full border text-[11px] font-black uppercase tracking-[0.35em]"
               style={{
                 background: "rgba(0,242,195,0.07)",
                 borderColor: "rgba(0,242,195,0.24)",
@@ -177,7 +177,7 @@ export default function HeroSection() {
             </div>
 
             {/* Subtext */}
-            <p className="text-[15px] font-medium text-slate-400 leading-[1.7] max-w-[440px] border-l-2 border-[#00F2C3] pl-5">
+            <p className="text-[16px] font-medium text-slate-400 leading-[1.7] max-w-[440px] border-l-2 border-[#00F2C3] pl-5">
               Stop managing teams&mdash;start managing your assets.{" "}
               <span className="text-white font-semibold">Boom or Bust</span> syncs
               your entire dynasty portfolio into one command center.
@@ -187,7 +187,7 @@ export default function HeroSection() {
             <div className="flex flex-wrap gap-3">
               <Link
                 href="/onboarding"
-                className="inline-flex items-center gap-2.5 px-8 py-3.5 rounded-xl font-black text-[13px] uppercase tracking-wide text-[#0A0C10] transition-transform hover:scale-[1.02] active:scale-[0.98]"
+                className="inline-flex items-center gap-2.5 px-8 py-3.5 rounded-xl font-black text-[14px] uppercase tracking-wide text-[#0A0C10] transition-transform hover:scale-[1.02] active:scale-[0.98]"
                 style={{
                   background: "linear-gradient(to right, #00F2C3, #6366F1)",
                   boxShadow: "0 0 28px rgba(0,242,195,0.28)",
@@ -198,14 +198,14 @@ export default function HeroSection() {
               </Link>
               <Link
                 href="#features"
-                className="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl font-black text-[13px] uppercase tracking-wide border border-white/20 text-white hover:bg-white/5 transition-colors"
+                className="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl font-black text-[14px] uppercase tracking-wide border border-white/20 text-white hover:bg-white/5 transition-colors"
               >
                 See It In Action
               </Link>
             </div>
 
             {/* Trust row */}
-            <div className="flex flex-wrap gap-x-5 gap-y-1.5 text-[11px] font-medium text-slate-500">
+            <div className="flex flex-wrap gap-x-5 gap-y-1.5 text-[12px] font-medium text-slate-500">
               {["100% Free to Start", "No Credit Card", "Secure with Sleeper"].map((t) => (
                 <span key={t} className="flex items-center gap-1.5">
                   <span className="w-1 h-1 rounded-full bg-slate-600 shrink-0" />

@@ -71,24 +71,24 @@ export default function DraftWarRoomRightRail({
     <aside className="flex min-h-0 w-full flex-col overflow-hidden border-l border-border bg-[#0f1420] md:w-[320px] lg:w-[340px]">
       {/* On The Clock */}
       <section className="shrink-0 border-b border-border p-3">
-        <div className="font-mono text-[8px] uppercase tracking-[1.5px] text-boom">On The Clock</div>
-        <div className="mt-1 font-mono text-[12px] uppercase text-text">
+        <div className="font-mono text-[9px] uppercase tracking-[1.5px] text-boom">On The Clock</div>
+        <div className="mt-1 font-mono text-[13px] uppercase text-text">
           {teamOnClockName(config, currentSlot)}
         </div>
         <div className="flex items-end justify-between gap-2">
           <div>
-            <div className="font-mono text-[10px] text-muted">Pick {safePickLabel(currentOverall, teams)}</div>
+            <div className="font-mono text-[11px] text-muted">Pick {safePickLabel(currentOverall, teams)}</div>
             <div className="font-mono text-[26px] tabular-nums leading-none text-boom">
               {fmtClock(clock)}
             </div>
           </div>
           {isUserTurn && (
-            <span className="rounded border border-boom/40 bg-boom/10 px-2 py-0.5 font-mono text-[8px] uppercase text-boom">
+            <span className="rounded border border-boom/40 bg-boom/10 px-2 py-0.5 font-mono text-[9px] uppercase text-boom">
               Your Pick
             </span>
           )}
         </div>
-        <div className="mt-2 font-mono text-[9px] text-muted">
+        <div className="mt-2 font-mono text-[10px] text-muted">
           Needs: <span className="text-text">{needsLabel(needs)}</span>
         </div>
         {bobPick && (
@@ -99,15 +99,15 @@ export default function DraftWarRoomRightRail({
           >
             <PlayerAvatar playerId={bobPick.playerId} name={bobPick.name} size={32} />
             <div className="min-w-0 flex-1">
-              <div className="font-mono text-[8px] uppercase text-muted">Best Available</div>
-              <div className="truncate font-mono text-[10px] text-text">{bobPick.name}</div>
-              <div className="font-mono text-[9px] text-boom">
+              <div className="font-mono text-[9px] uppercase text-muted">Best Available</div>
+              <div className="truncate font-mono text-[11px] text-text">{bobPick.name}</div>
+              <div className="font-mono text-[10px] text-boom">
                 TFO {bobPick.tfoScore.toFixed(1)} · BPA #{bobPick.bobRank}
               </div>
             </div>
           </button>
         )}
-        <div className="mt-2 flex items-center justify-between font-mono text-[9px]">
+        <div className="mt-2 flex items-center justify-between font-mono text-[10px]">
           <span className="text-muted">Pick Confidence</span>
           <span className="text-boom">
             <CountUpNumber value={conf} resetKey={`${currentOverall}-${bobPick?.playerId}`} suffix="%" />
@@ -132,12 +132,12 @@ export default function DraftWarRoomRightRail({
 
       {/* Team Needs */}
       <section className="shrink-0 border-b border-border p-3">
-        <div className="mb-2 font-mono text-[8px] uppercase tracking-[1.5px] text-muted">Team Needs</div>
+        <div className="mb-2 font-mono text-[9px] uppercase tracking-[1.5px] text-muted">Team Needs</div>
         <div className="grid grid-cols-2 gap-1.5">
           {needs.map((n) => (
             <div
               key={n.position}
-              className="rounded border border-border/60 bg-[#141929] px-2 py-1 font-mono text-[9px]"
+              className="rounded border border-border/60 bg-[#141929] px-2 py-1 font-mono text-[10px]"
             >
               <span className="text-text">{n.position}</span>
               <span
@@ -156,13 +156,13 @@ export default function DraftWarRoomRightRail({
 
       {/* Draft Strategy */}
       <section className="shrink-0 border-b border-border p-3">
-        <div className="mb-1 font-mono text-[8px] uppercase tracking-[1.5px] text-muted">Draft Strategy</div>
-        <div className="font-mono text-[10px] text-boom">{strategy.strategy}</div>
-        <div className="mt-1 font-mono text-[9px] text-muted">
+        <div className="mb-1 font-mono text-[9px] uppercase tracking-[1.5px] text-muted">Draft Strategy</div>
+        <div className="font-mono text-[11px] text-boom">{strategy.strategy}</div>
+        <div className="mt-1 font-mono text-[10px] text-muted">
           Round Focus: <span className="text-text">{strategy.roundFocus}</span>
         </div>
-        <div className="mt-1 font-mono text-[9px] text-hold">{strategy.tierBreak}</div>
-        <div className="mt-1 font-mono text-[8px] text-muted">
+        <div className="mt-1 font-mono text-[10px] text-hold">{strategy.tierBreak}</div>
+        <div className="mt-1 font-mono text-[9px] text-muted">
           Approach: {strategy.approach} · Need: {positionalNeed(userRoster, config.superflex)}
         </div>
       </section>
@@ -170,14 +170,14 @@ export default function DraftWarRoomRightRail({
       {/* Position Tiers */}
       {tiers.length > 0 && bobPick && (
         <section className="shrink-0 border-b border-border p-3">
-          <div className="mb-1 font-mono text-[8px] uppercase tracking-[1.5px] text-muted">
+          <div className="mb-1 font-mono text-[9px] uppercase tracking-[1.5px] text-muted">
             Position Tier — {focusPos}
           </div>
           {tiers.map((g) => (
             <div key={g.tier} className="mb-2">
-              <div className="font-mono text-[8px] text-boom">Tier {g.tier}</div>
+              <div className="font-mono text-[9px] text-boom">Tier {g.tier}</div>
               {g.players.map((p, i) => (
-                <div key={p.name} className="flex justify-between font-mono text-[9px] text-muted">
+                <div key={p.name} className="flex justify-between font-mono text-[10px] text-muted">
                   <span>
                     {i + 1}. {p.name.split(' ').pop()}
                   </span>

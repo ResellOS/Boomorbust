@@ -83,7 +83,7 @@ export default function StartSitTopBar({ stats, isOffseason = false }: StartSitT
             key={item.label}
             className="flex min-w-[110px] shrink-0 flex-col justify-center border-r border-border px-3 last:border-r-0 md:min-w-0 md:px-[14px]"
           >
-            <div className="text-[8px] uppercase tracking-wide text-muted whitespace-nowrap">
+            <div className="text-[9px] uppercase tracking-wide text-muted whitespace-nowrap">
               {item.label}
             </div>
             <div
@@ -93,7 +93,7 @@ export default function StartSitTopBar({ stats, isOffseason = false }: StartSitT
             >
               {item.value}
             </div>
-            <div className="mt-px text-[9px] text-muted">{item.sub}</div>
+            <div className="mt-px text-[10px] text-muted">{item.sub}</div>
           </div>
         ))}
       </div>

@@ -430,7 +430,7 @@ function PosBadge({ pos }: { pos: string }) {
   };
   const s = styles[pos] ?? 'bg-white/5 text-[var(--text-muted)] border-[var(--border)]';
   return (
-    <span className={clsx('shrink-0 rounded px-1.5 py-0.5 text-[9px] font-bold uppercase border', s)} style={F_INTER}>
+    <span className={clsx('shrink-0 rounded px-1.5 py-0.5 text-[10px] font-bold uppercase border', s)} style={F_INTER}>
       {pos}
     </span>
   );
@@ -460,7 +460,7 @@ function PlayerAvatar({ pid, name, size = 32 }: { pid: string; name: string; siz
   if (broken) {
     return (
       <div
-        className="shrink-0 rounded flex items-center justify-center text-[10px] font-bold bg-[var(--indigo)]/30 text-[var(--indigo-light)]"
+        className="shrink-0 rounded flex items-center justify-center text-[11px] font-bold bg-[var(--indigo)]/30 text-[var(--indigo-light)]"
         style={{ width: size, height: size, ...F_INTER }}
       >
         {name.slice(0, 2).toUpperCase()}
@@ -485,14 +485,14 @@ function BoomBustTags({ boomLabel, bustLabel }: { boomLabel: string; bustLabel: 
   return (
     <div className="mt-2 flex flex-wrap gap-1.5">
       <span
-        className="flex items-center gap-1 rounded border px-2 py-0.5 text-[9px] font-bold uppercase tracking-wide border-[var(--cyan)]/40 bg-[var(--cyan)]/10 text-[var(--cyan)]"
+        className="flex items-center gap-1 rounded border px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide border-[var(--cyan)]/40 bg-[var(--cyan)]/10 text-[var(--cyan)]"
         style={F_INTER}
       >
         <TrendingUp className="h-2.5 w-2.5" />
         {boomLabel}
       </span>
       <span
-        className="flex items-center gap-1 rounded border px-2 py-0.5 text-[9px] font-bold uppercase tracking-wide border-red-500/40 bg-red-500/10 text-red-400"
+        className="flex items-center gap-1 rounded border px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide border-red-500/40 bg-red-500/10 text-red-400"
         style={F_INTER}
       >
         <TrendingDown className="h-2.5 w-2.5" />
@@ -518,7 +518,7 @@ function ValueHeatmap({ enriched }: { enriched: EnrichedPlayer[] }) {
           return (
             <div key={tier} className="text-center">
               <span className={clsx('text-base', d.text)}>{d.icon}</span>
-              <p className={clsx('text-[9px] font-bold uppercase tracking-wide mt-0.5', d.text)} style={F_INTER}>
+              <p className={clsx('text-[10px] font-bold uppercase tracking-wide mt-0.5', d.text)} style={F_INTER}>
                 {d.label}
               </p>
             </div>
@@ -605,16 +605,16 @@ function RosterPlayerRow({
         <PosBadge pos={player.position} />
         <PlayerAvatar pid={player.id} name={player.name} size={30} />
         <div className="min-w-0 flex-1">
-          <p className="truncate text-[12px] font-semibold text-white" style={F_INTER}>
+          <p className="truncate text-[13px] font-semibold text-white" style={F_INTER}>
             {player.name}
           </p>
-          <p className="text-[9px] text-[var(--text-muted)]" style={F_INTER}>
+          <p className="text-[10px] text-[var(--text-muted)]" style={F_INTER}>
             {player.team}
             {player.age ? ` · Age ${player.age}` : ''}
           </p>
         </div>
         <ValueBar ktcValue={player.ktcValue} trend={player.trend} />
-        <span className="w-12 shrink-0 text-right text-[11px] font-bold tabular-nums text-[var(--text-secondary)]" style={F_INTER}>
+        <span className="w-12 shrink-0 text-right text-[12px] font-bold tabular-nums text-[var(--text-secondary)]" style={F_INTER}>
           {player.ktcValue > 0 ? player.ktcValue.toLocaleString() : '—'}
         </span>
         <TierIcon tier={player.tier} />
@@ -625,7 +625,7 @@ function RosterPlayerRow({
 
       {active && (
         <div className="border-b border-[var(--border)]/60 bg-[var(--bg-secondary)]/50 px-4 py-3">
-          <div className="flex flex-wrap gap-2 text-[10px]">
+          <div className="flex flex-wrap gap-2 text-[11px]">
             <div
               className="flex items-center gap-1.5 rounded border border-[var(--cyan)]/30 bg-[var(--cyan)]/8 px-2 py-1.5"
               style={F_INTER}
@@ -680,10 +680,10 @@ function RosterList({ enriched }: { enriched: EnrichedPlayer[] }) {
   return (
     <div className="rounded-xl border border-[var(--border)] overflow-hidden">
       <div className="flex items-center justify-between border-b border-[var(--border)] bg-[var(--bg-secondary)]/40 px-3 py-2">
-        <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-[var(--text-muted)]" style={F_INTER}>
+        <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-[var(--text-muted)]" style={F_INTER}>
           Roster · {enriched.length} players
         </p>
-        <span className="text-[9px] text-[var(--text-muted)]" style={F_INTER}>tap for actions</span>
+        <span className="text-[10px] text-[var(--text-muted)]" style={F_INTER}>tap for actions</span>
       </div>
       <div className="bg-[var(--bg-card)]">
         {enriched.map((p) => (
@@ -763,7 +763,7 @@ function LeagueDrawer({
                   {league.name}
                 </p>
                 <div
-                  className="mt-1 flex w-fit items-center gap-1.5 rounded border border-[var(--cyan)]/40 bg-[var(--cyan)]/10 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-[var(--cyan)]"
+                  className="mt-1 flex w-fit items-center gap-1.5 rounded border border-[var(--cyan)]/40 bg-[var(--cyan)]/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-[var(--cyan)]"
                   style={F_INTER}
                 >
                   <Zap className="h-2.5 w-2.5" />
@@ -780,7 +780,7 @@ function LeagueDrawer({
                   >
                     {healthScore}
                   </span>
-                  <span className="text-[9px] text-[var(--text-muted)] uppercase tracking-wide" style={F_INTER}>health</span>
+                  <span className="text-[10px] text-[var(--text-muted)] uppercase tracking-wide" style={F_INTER}>health</span>
                 </div>
                 <button
                   type="button"
@@ -807,7 +807,7 @@ function LeagueDrawer({
                   <p className="display text-xs tracking-wide text-[var(--text-muted)] mb-1">
                     BOOMER&apos;S INSULATION PLAY
                   </p>
-                  <p className="text-[11px] leading-relaxed text-[var(--text-secondary)]" style={F_INTER}>
+                  <p className="text-[12px] leading-relaxed text-[var(--text-secondary)]" style={F_INTER}>
                     {boomerPlayer
                       ? `${boomerPlayer.name} anchors your dynasty core with elite KTC positioning. Protect this asset — do not move without significant draft capital return.`
                       : 'Add players to see your insulation play.'}
@@ -815,7 +815,7 @@ function LeagueDrawer({
                   {boomerPlayer && (
                     <div className="mt-2 flex items-center gap-2">
                       <PlayerAvatar pid={boomerPlayer.id} name={boomerPlayer.name} size={22} />
-                      <span className="text-[10px] font-semibold text-[var(--cyan)]" style={F_INTER}>
+                      <span className="text-[11px] font-semibold text-[var(--cyan)]" style={F_INTER}>
                         {boomerPlayer.name} · {boomerPlayer.ktcValue.toLocaleString()} KTC
                       </span>
                     </div>
@@ -832,7 +832,7 @@ function LeagueDrawer({
                   <p className="display text-xs tracking-wide text-[var(--text-muted)] mb-1">
                     BUSTER&apos;S NUKE RISK
                   </p>
-                  <p className="text-[11px] leading-relaxed text-[var(--text-secondary)]" style={F_INTER}>
+                  <p className="text-[12px] leading-relaxed text-[var(--text-secondary)]" style={F_INTER}>
                     {busterPlayer
                       ? `${busterPlayer.name} carries the lowest dynasty outlook in this league. Consider moving before training camp attrition accelerates the decline.`
                       : 'No nuke-tier assets detected.'}
@@ -840,7 +840,7 @@ function LeagueDrawer({
                   {busterPlayer && (
                     <div className="mt-2 flex items-center gap-2">
                       <PlayerAvatar pid={busterPlayer.id} name={busterPlayer.name} size={22} />
-                      <span className="text-[10px] font-semibold text-red-400" style={F_INTER}>
+                      <span className="text-[11px] font-semibold text-red-400" style={F_INTER}>
                         {busterPlayer.name} · sell window open
                       </span>
                     </div>
@@ -887,7 +887,7 @@ function LeagueDrawer({
                     Mock Draft Integration
                   </p>
                   <span
-                    className="rounded border border-amber-500/40 bg-amber-500/15 px-1.5 py-0.5 text-[8px] font-bold uppercase text-amber-300"
+                    className="rounded border border-amber-500/40 bg-amber-500/15 px-1.5 py-0.5 text-[9px] font-bold uppercase text-amber-300"
                     style={F_INTER}
                   >
                     Post-NFL Draft
@@ -899,7 +899,7 @@ function LeagueDrawer({
                     className="flex items-start gap-2 border-b border-[var(--border)]/60 py-2 last:border-b-0"
                   >
                     <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--indigo)]" />
-                    <p className="text-[10px] leading-snug text-[var(--text-secondary)]" style={F_INTER}>{g}</p>
+                    <p className="text-[11px] leading-snug text-[var(--text-secondary)]" style={F_INTER}>{g}</p>
                   </div>
                 ))}
               </div>
@@ -1147,7 +1147,7 @@ export default function OptimizerPage() {
               ROSTER OPTIMIZER
             </h1>
             <div
-              className="mt-2 flex w-fit items-center gap-1.5 rounded border border-[var(--cyan)]/40 bg-[var(--cyan)]/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-[var(--cyan)]"
+              className="mt-2 flex w-fit items-center gap-1.5 rounded border border-[var(--cyan)]/40 bg-[var(--cyan)]/10 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-[var(--cyan)]"
               style={F_INTER}
             >
               <Zap className="h-3 w-3" />
@@ -1242,7 +1242,7 @@ export default function OptimizerPage() {
                   Mock Draft Integration (Post-NFL Draft)
                 </p>
                 <span
-                  className="rounded border border-amber-500/40 bg-amber-500/15 px-2 py-0.5 text-[9px] font-bold uppercase text-amber-300"
+                  className="rounded border border-amber-500/40 bg-amber-500/15 px-2 py-0.5 text-[10px] font-bold uppercase text-amber-300"
                   style={F_INTER}
                 >
                   Beta
@@ -1301,11 +1301,11 @@ export default function OptimizerPage() {
                               style={{ width: `${health}%` }}
                             />
                           </div>
-                          <span className="text-[10px] tabular-nums text-[var(--text-muted)]" style={F_INTER}>
+                          <span className="text-[11px] tabular-nums text-[var(--text-muted)]" style={F_INTER}>
                             {health}%
                           </span>
                         </div>
-                        <div className="flex gap-2 text-[9px]" style={F_INTER}>
+                        <div className="flex gap-2 text-[10px]" style={F_INTER}>
                           <span className="text-amber-300">◆ {dist.diamonds}</span>
                           <span className="text-[var(--indigo-light)]">✦ {dist.gems}</span>
                           <span className="text-emerald-300">— {dist.starters}</span>
@@ -1321,7 +1321,7 @@ export default function OptimizerPage() {
                         >
                           {grade}
                         </span>
-                        <span className="text-[8px] text-[var(--text-muted)] uppercase" style={F_INTER}>
+                        <span className="text-[9px] text-[var(--text-muted)] uppercase" style={F_INTER}>
                           analyze
                         </span>
                       </div>

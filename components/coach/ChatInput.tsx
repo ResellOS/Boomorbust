@@ -65,7 +65,7 @@ export default function ChatInput({ onSend, disabled, initialValue }: Props) {
           placeholder="Ask your dynasty question..."
           rows={1}
           disabled={disabled}
-          className="flex-1 bg-transparent text-[14px] text-white placeholder-slate-600 resize-none outline-none leading-relaxed"
+          className="flex-1 bg-transparent text-[15px] text-white placeholder-slate-600 resize-none outline-none leading-relaxed"
           style={{ minHeight: '24px', maxHeight: '160px' }}
         />
         <button
@@ -82,7 +82,7 @@ export default function ChatInput({ onSend, disabled, initialValue }: Props) {
           </svg>
         </button>
       </div>
-      <p className="text-[10px] text-slate-600 mt-2 text-center">
+      <p className="text-[11px] text-slate-600 mt-2 text-center">
         Coach uses proprietary models, player data, news, and 10+ years of dynasty context.{' '}
         <span className="text-slate-500 underline cursor-pointer">Learn More</span>
       </p>
