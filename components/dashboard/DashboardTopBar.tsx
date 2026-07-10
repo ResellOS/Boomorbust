@@ -1,9 +1,9 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import Image from 'next/image';
 import { Info } from 'lucide-react';
 import { EMPIRE_RATING_TOOLTIP } from '@/lib/dashboard/empireRating';
+import StatBar, { type StatBarCell } from '@/components/common/StatBar';
 
 export interface DashboardTopBarProps {
   leagueCount: number;
@@ -30,38 +30,23 @@ export default function DashboardTopBar({
 }: DashboardTopBarProps) {
   const primaryStrength = strengthDisplay ?? portfolioStrength.toFixed(1);
 
-  return (
-    <header className="col-span-1 md:col-span-2 row-start-1 grid h-[66px] border-b border-border bg-bg grid-cols-1 md:grid-cols-[215px_1fr]">
-      <div className="hidden md:flex items-center justify-center overflow-hidden bg-bg px-1.5 py-1 border-r border-[#1e2640]">
-        <Image
-          src="/logo.png"
-          alt="Boom or Bust"
-          width={203}
-          height={58}
-          unoptimized
-          className="h-full w-full object-contain"
-          style={{
-            mixBlendMode: 'screen',
-            filter: 'brightness(1.2) saturate(1.3) contrast(1.1)',
-            transform: 'scale(1.08)',
-          }}
-        />
-      </div>
+  const cells: StatBarCell[] = [
+    { label: strengthLabel, value: primaryStrength, tone: 'boom', glow: true },
+    { label: "Today's Priorities", value: todaysPriorities },
+    { label: 'Leagues', value: leagueCount, tone: 'boom', glow: true },
+    {
+      label: 'Trade Offers',
+      value: tradeOffers,
+      tone: pendingOffers > 0 ? 'hold' : 'text',
+      sub:
+        pendingOffers > 0 ? (
+          <span className="text-hold">{pendingOffers} pending</span>
+        ) : undefined,
+    },
+    { raw: <PortfolioStrengthStat value={portfolioStrength} delta={portfolioDelta} /> },
+  ];
 
-      <div className="flex min-w-0 items-stretch overflow-x-auto scrollbar-hide">
-        <Stat label={strengthLabel} value={primaryStrength} accent />
-        <Stat label="Today's Priorities" value={String(todaysPriorities)} />
-        <Stat label="Leagues" value={String(leagueCount)} accent />
-        <Stat
-          label="Trade Offers"
-          value={String(tradeOffers)}
-          sub={pendingOffers > 0 ? `${pendingOffers} pending` : undefined}
-          hold={pendingOffers > 0}
-        />
-        <PortfolioStrengthStat value={portfolioStrength} delta={portfolioDelta} />
-      </div>
-    </header>
-  );
+  return <StatBar cells={cells} />;
 }
 
 function PortfolioStrengthStat({ value, delta }: { value: number; delta: number | null }) {
@@ -121,34 +106,6 @@ function PortfolioStrengthStat({ value, delta }: { value: number; delta: number 
           </p>
         ))}
       </div>
-    </div>
-  );
-}
-
-function Stat({
-  label,
-  value,
-  sub,
-  accent,
-  hold,
-}: {
-  label: string;
-  value: string;
-  sub?: string;
-  accent?: boolean;
-  hold?: boolean;
-}) {
-  const color = accent ? 'text-boom' : hold ? 'text-hold' : 'text-text';
-  return (
-    <div className="flex min-w-[100px] shrink-0 flex-col justify-center border-r border-border px-3 py-1.5 last:border-r-0 md:px-[18px]">
-      <div className="mb-[3px] font-figtree text-[11px] uppercase tracking-[1.2px] text-muted">{label}</div>
-      <div
-        className={`font-mono text-[22px] font-semibold leading-none tracking-[-0.5px] ${color}`}
-        style={accent ? GLOW : undefined}
-      >
-        {value}
-      </div>
-      {sub ? <div className="mt-0.5 font-mono text-[9px] text-hold">{sub}</div> : null}
     </div>
   );
 }
