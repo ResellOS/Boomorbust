@@ -10,6 +10,7 @@ import {
   type MissionCardModel,
 } from '@/lib/dashboard/missionTasks';
 import { stagedTradeMissionCards } from '@/lib/dashboard/stagedTradesQueue';
+import AnimatedCard from '@/components/ui/AnimatedCard';
 import { tradeStageHref } from '@/lib/dashboard/dashboardRoutes';
 import type { DailyTask, UrgencyLevel } from '@/lib/dashboard/dailyTasks';
 import type { LineupOpportunity } from '@/lib/dashboard/rotation';
@@ -248,17 +249,18 @@ export default function FrontOfficeTasks({
       {missions.length === 0 ? (
         <p className="px-3 py-3 font-mono text-[11px] text-[#6b7a99]">No tasks queued — you&apos;re caught up.</p>
       ) : (
-        missions.map((card) => (
-          <TaskRow
-            key={card.id}
-            card={card}
-            busy={busyId === card.taskId}
-            exiting={card.taskId ? exitingIds.has(card.taskId) : false}
-            onComplete={(id) => animateThenUpdate(id, 'completed')}
-            onDismiss={(id) => animateThenUpdate(id, 'dismissed')}
-            onStage={handleStage}
-            onOpen={handleOpen}
-          />
+        missions.map((card, index) => (
+          <AnimatedCard key={card.id} delay={index * 80}>
+            <TaskRow
+              card={card}
+              busy={busyId === card.taskId}
+              exiting={card.taskId ? exitingIds.has(card.taskId) : false}
+              onComplete={(id) => animateThenUpdate(id, 'completed')}
+              onDismiss={(id) => animateThenUpdate(id, 'dismissed')}
+              onStage={handleStage}
+              onOpen={handleOpen}
+            />
+          </AnimatedCard>
         ))
       )}
     </section>

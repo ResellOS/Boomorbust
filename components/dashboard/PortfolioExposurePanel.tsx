@@ -10,6 +10,13 @@ const RISK_COLOR: Record<ExposedPlayerRow['riskLevel'], string> = {
   Low: '#36E7A1',
 };
 
+/** Exposure % color by concentration threshold. */
+function exposureColorClass(pct: number): string {
+  if (pct > 50) return 'text-red-400';
+  if (pct >= 30) return 'text-hold';
+  return 'text-muted';
+}
+
 export default function PortfolioExposurePanel({ mostExposed }: { mostExposed: ExposedPlayerRow[] }) {
   const rows = mostExposed.slice(0, 5);
   const hasHighRisk = rows.some((r) => r.riskLevel === 'High');
@@ -37,7 +44,14 @@ export default function PortfolioExposurePanel({ mostExposed }: { mostExposed: E
                 <div className="truncate font-figtree text-[12px] text-[#e8ecf4]">{row.playerName}</div>
                 <div className="font-mono text-[9px] tabular-nums text-[#8b9bb8]">
                   {row.leagueCount} leagues
-                  {row.exposurePct > 0 ? ` · ${row.exposurePct}% exposure` : ''}
+                  {row.exposurePct > 0 ? (
+                    <>
+                      {' · '}
+                      <span className={exposureColorClass(row.exposurePct)}>
+                        {row.exposurePct}% exposure
+                      </span>
+                    </>
+                  ) : null}
                 </div>
               </div>
               <div className="shrink-0 text-right">

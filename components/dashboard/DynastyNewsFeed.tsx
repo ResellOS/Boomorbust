@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
+import PulsingDot from '@/components/ui/PulsingDot';
 import { formatTimeAgo } from '@/lib/dashboard/fetchDashboardNews';
 import { playerHubHref } from '@/lib/dashboard/dashboardRoutes';
 import type { DashboardNewsItem } from '@/lib/dashboard/rotation';
@@ -168,7 +169,10 @@ export default function DynastyNewsFeed({
       <div className="flex shrink-0 flex-col overflow-hidden rounded-[7px] border border-border bg-surface">
         <div className="flex shrink-0 items-center justify-between border-b border-border bg-bg px-3 py-[7px]">
           <span className="font-figtree text-[11px] uppercase tracking-[1.5px] text-text">{title}</span>
-          <span className="font-mono text-[11px] text-boom">● LIVE</span>
+          <span className="flex items-center gap-1 font-mono text-[11px] text-boom">
+            <PulsingDot color="#EF4444" size={6} />
+            LIVE
+          </span>
         </div>
         <div className="grid grid-cols-1 gap-0 md:grid-cols-2 lg:grid-cols-4">
           {visible.map((item) => {
@@ -188,7 +192,7 @@ export default function DynastyNewsFeed({
                   {item.headline}
                 </span>
                 {impact ? (
-                  <span className="mt-1.5 font-mono text-[10px] leading-snug text-[#9aa8c4]">{impact}</span>
+                  <span className="mt-1.5 font-mono text-[10px] italic leading-snug text-boom">{impact}</span>
                 ) : null}
                 {assets.length > 0 ? (
                   <div className="dash-news-hover-reveal">

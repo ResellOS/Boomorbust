@@ -5,6 +5,8 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import PlayerAvatar from '@/components/players/PlayerAvatar';
+import AnimatedCard from '@/components/ui/AnimatedCard';
+import GlowBorder from '@/components/ui/GlowBorder';
 import { buildHeroTargets, impactBadgeStyle } from '@/lib/dashboard/priorityHero';
 import type { DailyTask } from '@/lib/dashboard/dailyTasks';
 import type { LineupOpportunity, TradeTargetItem } from '@/lib/dashboard/rotation';
@@ -95,8 +97,10 @@ export default function TodayTopPriority({
   const openPrimary = () => router.push(target.stageHref);
 
   return (
+    <AnimatedCard>
+    <GlowBorder tone="boom" intensity={0.7} rounded="rounded-[10px]">
     <section
-      className={`dash-clickable-card overflow-hidden rounded-[10px] border border-[#A78BFA]/35 bg-[#0f1420] ${glowClass}`}
+      className={`dash-clickable-card overflow-hidden rounded-[10px] border border-transparent bg-[#0f1420] ${glowClass}`}
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
       onClick={openPrimary}
@@ -151,9 +155,14 @@ export default function TodayTopPriority({
         <div className="flex flex-col gap-2 lg:flex-row lg:items-center">
           <div className="flex min-w-0 flex-1 items-start gap-2.5">
             {target.playerId ? (
-              <PlayerAvatar playerId={target.playerId} name={target.playerName ?? target.title} size={52} />
+              <PlayerAvatar
+                playerId={target.playerId}
+                name={target.playerName ?? target.title}
+                size={48}
+                borderClass="ring-2 ring-boom/40"
+              />
             ) : (
-              <div className="h-[52px] w-[52px] shrink-0 rounded-full bg-[#141929]" />
+              <div className="h-[48px] w-[48px] shrink-0 rounded-full bg-[#141929] ring-2 ring-boom/40" />
             )}
             <div className="min-w-0 flex-1">
               <h3 className="font-figtree text-[17px] font-semibold leading-tight text-[#e8ecf4]">
@@ -175,14 +184,13 @@ export default function TodayTopPriority({
             <MiniMetric label="Accept" value={target.acceptanceChance} />
             <MiniMetric label="Impact" value={target.portfolioImpact} accent />
             <MiniMetric label="Conf." value={target.confidence} />
-            <MiniMetric label="Window" value={target.tradeWindow} />
           </div>
 
           <div className="flex shrink-0 gap-1.5 lg:flex-col" onClick={(e) => e.stopPropagation()}>
             <Link
               href={target.stageHref}
               className={`dash-action-btn inline-flex items-center justify-center rounded-md px-3 py-1.5 font-figtree text-[11px] font-semibold no-underline ${
-                target.isSell ? 'dash-action-btn-bust bg-[#EF4444] text-white' : 'bg-bust text-white'
+                target.isSell ? 'bg-bust text-white' : 'bg-boom text-[#0a0d14]'
               }`}
             >
               {target.isSell ? 'View Trade' : 'Stage Offer'}
@@ -197,6 +205,8 @@ export default function TodayTopPriority({
         </div>
       </div>
     </section>
+    </GlowBorder>
+    </AnimatedCard>
   );
 }
 

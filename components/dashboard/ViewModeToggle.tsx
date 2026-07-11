@@ -1,5 +1,7 @@
 'use client';
 
+import PulsingDot from '@/components/ui/PulsingDot';
+
 export type DashboardViewMode = 'global' | 'league';
 
 interface ViewModeToggleProps {
@@ -19,8 +21,8 @@ export default function ViewModeToggle({ mode, onChange, leagueName }: ViewModeT
           onClick={() => onChange('global')}
           className={`rounded-[5px] px-3 py-1.5 font-figtree text-[12px] font-semibold transition-all ${
             isGlobal
-              ? 'bg-boom/20 text-boom ring-1 ring-boom/40'
-              : 'text-[#6b7a99] hover:text-[#e8ecf4]'
+              ? 'bg-boom text-[#0a0d14] shadow-[0_0_12px_rgba(54,231,161,0.45)]'
+              : 'bg-surface text-muted hover:text-[#e8ecf4]'
           }`}
         >
           Global View
@@ -30,19 +32,20 @@ export default function ViewModeToggle({ mode, onChange, leagueName }: ViewModeT
           onClick={() => onChange('league')}
           className={`rounded-[5px] px-3 py-1.5 font-figtree text-[12px] font-semibold transition-all ${
             !isGlobal
-              ? 'bg-boom/20 text-boom ring-1 ring-boom/40'
-              : 'text-[#6b7a99] hover:text-[#e8ecf4]'
+              ? 'bg-boom text-[#0a0d14] shadow-[0_0_12px_rgba(54,231,161,0.45)]'
+              : 'bg-surface text-muted hover:text-[#e8ecf4]'
           }`}
         >
           League View
         </button>
       </div>
       <p
-        className={`font-mono text-[10px] ${isGlobal ? 'text-boom/80' : 'text-[#A78BFA]'}`}
+        className={`flex items-center gap-1.5 font-mono text-[10px] ${isGlobal ? 'text-boom/80' : 'text-[#A78BFA]'}`}
       >
+        <PulsingDot color={isGlobal ? '#36E7A1' : '#A78BFA'} size={6} />
         {isGlobal
-          ? '● Portfolio command center — cross-league priorities'
-          : `● League war room${leagueName ? ` · ${leagueName}` : ''}`}
+          ? 'Portfolio command center — cross-league priorities'
+          : `League war room${leagueName ? ` · ${leagueName}` : ''}`}
         <span className="ml-2 text-[#6b7a99]">G · L · /</span>
       </p>
     </div>

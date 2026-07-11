@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import PulsingDot from '@/components/ui/PulsingDot';
 
 interface FooterProps {
   leagueCount: number;
@@ -31,7 +32,7 @@ export default function Footer({
 
   return (
     <footer
-      className="col-span-1 md:col-span-2 row-start-3 hidden md:grid border-t border-border/50 bg-bg/[0.98]"
+      className="col-span-1 md:col-span-2 row-start-3 grid border-t border-border/50 bg-bg/[0.98]"
       style={{ gridTemplateColumns: 'repeat(4, 1fr)', height: 28 }}
     >
       <div className="flex h-full items-center gap-2 border-r border-border/40 px-[18px]">
@@ -84,7 +85,7 @@ export default function Footer({
           </div>
         </div>
         <div className="ml-1.5 flex items-center gap-[5px]">
-          <span className="inline-block h-1.5 w-1.5 rounded-full bg-boom" />
+          <PulsingDot color="#36E7A1" size={6} />
           <span className="font-mono text-[8.5px] text-muted">All Connected</span>
         </div>
       </div>

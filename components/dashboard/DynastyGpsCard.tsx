@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { ChevronRight } from 'lucide-react';
 import { blueprintHref } from '@/lib/dashboard/dashboardRoutes';
+import AnimatedCard from '@/components/ui/AnimatedCard';
 import type { DynastyGpsData } from '@/lib/dashboard/dynastyGps';
 
 function StrengthGauge({ value, label }: { value: number; label: string }) {
@@ -49,6 +50,7 @@ export default function DynastyGpsCard({
   const href = blueprintHref(leagueId);
 
   return (
+    <AnimatedCard className="h-full">
     <Link
       href={href}
       className="dash-clickable-card flex h-full flex-col overflow-hidden rounded-[10px] border border-[#1e2640] bg-[#0f1420] no-underline"
@@ -92,7 +94,7 @@ export default function DynastyGpsCard({
           <div className="font-mono text-[8px] uppercase tracking-wide text-[#6b7a99]">
             Recommended Focus
           </div>
-          <p className="mt-1 font-figtree text-[12px] leading-relaxed text-[#e8ecf4]">
+          <p className="mt-1 font-figtree text-[12px] leading-relaxed text-boom">
             {data.recommendedFocus}
           </p>
           <span className="mt-2 inline-flex items-center gap-0.5 font-mono text-[10px] text-boom">
@@ -102,6 +104,7 @@ export default function DynastyGpsCard({
         </div>
       </div>
     </Link>
+    </AnimatedCard>
   );
 }
 

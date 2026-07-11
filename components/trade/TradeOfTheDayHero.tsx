@@ -4,6 +4,8 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import CountUpDelta from '@/components/dashboard/CountUpDelta';
 import TradePlayerHeadshot from '@/components/trade/TradePlayerHeadshot';
+import AnimatedCard from '@/components/ui/AnimatedCard';
+import GlowBorder from '@/components/ui/GlowBorder';
 import type { TradeOpportunity } from '@/lib/trade/types';
 import {
   acceptanceColor,
@@ -84,8 +86,10 @@ export default function TradeOfTheDayHero({
   const confNum = confidenceScore(o.tradeConfidence);
 
   return (
+    <AnimatedCard>
+    <GlowBorder tone="boom" intensity={0.7} rounded="rounded-[10px]">
     <section
-      className={`dash-clickable-card overflow-hidden rounded-[10px] border border-[#1e2640] bg-[#0f1420] ${glowClass}`}
+      className={`dash-clickable-card overflow-hidden rounded-[10px] border border-transparent bg-[#0f1420] ${glowClass}`}
       style={{ borderLeft: '4px solid #36E7A1' }}
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
@@ -132,30 +136,31 @@ export default function TradeOfTheDayHero({
           </div>
         </div>
 
-        <div
-          key={o.id}
-          className="mx-4 mb-3 flex flex-wrap items-stretch gap-1 rounded-lg border border-[#1e2640]/70 bg-[#141929]/60 px-2 py-1.5"
-        >
-          <ScoreChip label="Acceptance" color={acceptanceColor(o.acceptanceProbability)}>
-            <CountUpDelta key={`${o.id}-acc`} value={o.acceptanceProbability} />
-            <span className="text-[11px]">%</span>
-          </ScoreChip>
-          <ScoreChip label="Impact" color={impactColor(o.championshipImpact)}>
-            +<CountUpDelta key={`${o.id}-imp`} value={Math.round(o.championshipImpact * 10) / 10} />%
-          </ScoreChip>
-          <ScoreChip label="Rank Δ" color={rankDisplay != null ? valueGapColor(Math.abs(rankDisplay), o.type) : '#8b9bb8'}>
-            {rankDisplay != null ? (
-              <CountUpDelta key={`${o.id}-rd`} value={rankDisplay} />
-            ) : (
-              '—'
-            )}
-          </ScoreChip>
-          <ScoreChip label="Confidence" color={confNum >= 80 ? '#36E7A1' : confNum >= 60 ? '#FBBF24' : '#A78BFA'}>
-            <CountUpDelta key={`${o.id}-conf`} value={confNum} />
-          </ScoreChip>
-          <ScoreChip label="Fairness" color={fairnessColor(o.mutualBenefitScore)}>
-            {o.mutualBenefitScore}/100
-          </ScoreChip>
+        <div key={o.id} className="mx-4 mb-3">
+          <div className="grid grid-cols-2 gap-2">
+            <ScoreChip label="Acceptance" color={acceptanceColor(o.acceptanceProbability)}>
+              <CountUpDelta key={`${o.id}-acc`} value={o.acceptanceProbability} />
+              <span className="text-[12px]">%</span>
+            </ScoreChip>
+            <ScoreChip label="Impact" color={impactColor(o.championshipImpact)}>
+              +<CountUpDelta key={`${o.id}-imp`} value={Math.round(o.championshipImpact * 10) / 10} />%
+            </ScoreChip>
+            <ScoreChip label="Rank Δ" color={rankDisplay != null ? valueGapColor(Math.abs(rankDisplay), o.type) : '#8b9bb8'}>
+              {rankDisplay != null ? (
+                <CountUpDelta key={`${o.id}-rd`} value={rankDisplay} />
+              ) : (
+                '—'
+              )}
+            </ScoreChip>
+            <ScoreChip label="Confidence" color={confNum >= 80 ? '#36E7A1' : confNum >= 60 ? '#FBBF24' : '#A78BFA'}>
+              <CountUpDelta key={`${o.id}-conf`} value={confNum} />
+            </ScoreChip>
+          </div>
+          <div className="mt-2">
+            <ScoreChip label="Fairness" color={fairnessColor(o.mutualBenefitScore)}>
+              {o.mutualBenefitScore}/100
+            </ScoreChip>
+          </div>
         </div>
 
         <div className="grid gap-3 px-4 pb-3 lg:grid-cols-2">
@@ -186,7 +191,9 @@ export default function TradeOfTheDayHero({
         <button
           type="button"
           onClick={() => onStageOffer(o)}
-          className="dash-action-btn rounded-md bg-bust px-4 py-2 font-mono text-[11px] font-semibold uppercase text-white"
+          className={`dash-action-btn rounded-md px-4 py-2 font-mono text-[11px] font-semibold uppercase ${
+            o.type === 'sell_high' ? 'bg-boom text-[#0a0d14]' : 'bg-bust text-white'
+          }`}
         >
           Stage Offer
         </button>
@@ -206,6 +213,8 @@ export default function TradeOfTheDayHero({
         </button>
       </div>
     </section>
+    </GlowBorder>
+    </AnimatedCard>
   );
 }
 
@@ -219,9 +228,9 @@ function ScoreChip({
   color?: string;
 }) {
   return (
-    <div className="flex min-w-[72px] flex-1 flex-col items-center rounded border border-[#1e2640]/50 bg-[#0a0d14]/50 px-2 py-1">
-      <div className="font-mono text-[7px] uppercase tracking-wide text-[#6b7a99]">{label}</div>
-      <div className="font-mono text-sm font-semibold tabular-nums" style={{ color }}>
+    <div className="flex w-full flex-col items-center rounded border border-[#1e2640]/50 bg-[#0a0d14]/50 px-2 py-1.5">
+      <div className="font-mono text-[10px] uppercase tracking-wide text-muted">{label}</div>
+      <div className="font-mono text-[18px] font-semibold tabular-nums" style={{ color }}>
         {children}
       </div>
     </div>

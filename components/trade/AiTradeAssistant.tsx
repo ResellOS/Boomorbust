@@ -39,11 +39,11 @@ export default function AiTradeAssistant({
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder='Ask: "Who should I sell high?" or "Find me an RB upgrade."'
-          className="min-w-0 flex-1 rounded-md border border-[#1e2640] bg-[#141929] px-2.5 py-1.5 font-figtree text-[12px] text-[#e8ecf4] outline-none placeholder:text-[#6b7a99] focus:border-boom/40"
+          className="min-w-0 flex-1 rounded-none border-0 border-b border-[#1e2640] bg-transparent px-1 py-1.5 font-figtree text-[12px] text-[#e8ecf4] outline-none transition-colors placeholder:text-[#6b7a99] focus:border-boom"
         />
         <Link
           href={query.trim() ? `/dashboard/coach?q=${encodeURIComponent(query.trim())}` : '/dashboard/coach'}
-          className="dash-action-btn flex shrink-0 items-center gap-1 rounded-md border border-boom/30 bg-boom/10 px-3 py-1.5 font-mono text-[10px] text-boom no-underline"
+          className="dash-action-btn flex shrink-0 items-center gap-1 rounded-md bg-boom px-3 py-1.5 font-mono text-[10px] text-[#0a0d14] no-underline"
         >
           <Send className="h-3 w-3" />
           Send

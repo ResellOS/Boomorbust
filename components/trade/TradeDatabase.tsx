@@ -40,7 +40,7 @@ const DEFAULT_VISIBLE = 12;
 
 const QUICK_CHIPS: { id: QuickChip; label: string }[] = [
 
-  { id: 'smash', label: 'Smash Accepts' },
+  { id: 'smash', label: 'Smart Accepts' },
 
   { id: 'high', label: 'High Confidence' },
 
