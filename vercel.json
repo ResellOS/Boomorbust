@@ -1,7 +1,8 @@
 {
   "crons": [
     { "path": "/api/cron/collect-drafts", "schedule": "0 3 * * *" },
-    { "path": "/api/cron/sync-sleeper", "schedule": "0 4 * * *" },
+    { "path": "/api/cron/sync-sleeper", "schedule": "0 15 * * *" },
+    { "path": "/api/cron/sync-sleeper", "schedule": "0 3 * * *" },
     { "path": "/api/cron/sync-ktc", "schedule": "0 5 * * *" },
     { "path": "/api/cron/sync-injuries", "schedule": "0 6 * * *" },
     { "path": "/api/cron/sync-projections", "schedule": "0 7 * * *" },

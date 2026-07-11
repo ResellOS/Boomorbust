@@ -17,6 +17,7 @@ import { buildMissionCards } from '@/lib/dashboard/missionTasks';
 import { LEAGUE_ROTATE_SECONDS } from '@/lib/dashboard/constants';
 import DashboardKeyboardShortcuts from './DashboardKeyboardShortcuts';
 import DashboardTopBar from './DashboardTopBar';
+import { SyncButton } from './SyncButton';
 import ModeToggleBar, { type DashboardMode } from './ModeToggleBar';
 import ViewModeToggle, { type DashboardViewMode } from './ViewModeToggle';
 import LeagueRotationHeader from './LeagueRotationHeader';
@@ -244,7 +245,12 @@ export default function DashboardClient({
 
           <ViewModeToggle mode={viewMode} onChange={handleViewMode} leagueName={currentLeague?.name} />
 
-          <ModeToggleBar leagues={leagues} mode={effectiveMode} onSelect={setMode} />
+          <div className="flex items-center gap-2">
+            <div className="min-w-0 flex-1">
+              <ModeToggleBar leagues={leagues} mode={effectiveMode} onSelect={setMode} />
+            </div>
+            <SyncButton />
+          </div>
 
           <LeagueRotationHeader
             league={currentLeague}

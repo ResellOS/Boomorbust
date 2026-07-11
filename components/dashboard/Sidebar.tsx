@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import ConfidenceRing from '@/components/startsit/ConfidenceRing';
 import AdSlot from '@/components/ads/AdSlot';
+import { SyncButton } from '@/components/dashboard/SyncButton';
 import type { SignalCounts } from '@/lib/dashboard/rotation';
 import { formatSignalBucketLabel } from '@/lib/ui/labels';
 import { useSidebarCollapse } from '@/components/dashboard/SidebarCollapseContext';
@@ -173,6 +174,9 @@ export default function Sidebar({
         <>
       <div className="shrink-0 px-[15px] pb-[3px] pt-[11px] font-figtree text-[12px] font-extrabold uppercase tracking-[1.5px] text-muted">
         My Leagues
+      </div>
+      <div className="shrink-0 px-[15px] pb-2 pt-0.5">
+        <SyncButton />
       </div>
       <div className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {leagues.map((league, i) => {
