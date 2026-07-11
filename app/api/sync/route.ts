@@ -5,6 +5,10 @@ import { fetchUserLeagues, fetchLeagueFull, fetchLeagueRosters, fetchNflState, t
 import { mergeSleeperRosterSettings } from '@/lib/sleeper/leagueCardLogo';
 import { persistLastEmpireRatingAfterSync } from '@/lib/dashboard/empireRating';
 
+// Rosters + full engine (TFO, GM profiles, BBV, trade opps) run inline on a
+// user's Sync click, so allow up to 5 minutes (requires Vercel Pro).
+export const maxDuration = 300;
+
 export async function POST(req: Request) {
   // Auth check via cookie-based client (anon key)
   const supabase = createClient();
@@ -130,10 +134,74 @@ export async function POST(req: Request) {
     await persistLastEmpireRatingAfterSync(userId, profile.sleeper_user_id);
   }
 
+  // ── Run the engine INLINE so the dashboard is fresh immediately, instead of
+  // waiting up to a day for the nightly crons. Each call is best-effort and
+  // non-fatal; a partial engine run still returns success. Mirrors the auth
+  // patterns the cron routes expect (CRON_SECRET) + the per-user TFO route.
+  const engines: Record<string, boolean> = {
+    tfo: false,
+    managerProfiles: false,
+    bbv: false,
+    tradeOpps: false,
+  };
+
+  if (rostersSynced > 0 || leaguesSynced > 0) {
+    const origin = new URL(req.url).origin;
+    const cookie = req.headers.get('cookie') ?? '';
+    const cronAuth = `Bearer ${process.env.CRON_SECRET ?? ''}`;
+
+    // 1. TFO pre-warm for this user's rostered players (session/cookie auth).
+    try {
+      const r = await fetch(`${origin}/api/onboarding/calculate-tfo`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Cookie: cookie },
+        body: JSON.stringify({}),
+      });
+      engines.tfo = r.ok;
+    } catch (err) {
+      console.error('[sync] calculate-tfo failed:', err);
+    }
+
+    // 2. GM / manager profiles (CRON_SECRET, POST).
+    try {
+      const r = await fetch(`${origin}/api/cron/sync-manager-profiles`, {
+        method: 'POST',
+        headers: { Authorization: cronAuth },
+      });
+      engines.managerProfiles = r.ok;
+    } catch (err) {
+      console.error('[sync] sync-manager-profiles failed:', err);
+    }
+
+    // 3. BBV / BVI value engine (CRON_SECRET, GET).
+    try {
+      const r = await fetch(`${origin}/api/cron/calculate-bbv`, {
+        headers: { Authorization: cronAuth },
+      });
+      engines.bbv = r.ok;
+    } catch (err) {
+      console.error('[sync] calculate-bbv failed:', err);
+    }
+
+    // 4. Proactive trade opportunities (CRON_SECRET, GET).
+    try {
+      const r = await fetch(`${origin}/api/cron/proactive-trades`, {
+        headers: { Authorization: cronAuth },
+      });
+      engines.tradeOpps = r.ok;
+    } catch (err) {
+      console.error('[sync] proactive-trades failed:', err);
+    }
+
+    console.log('[sync] engines:', JSON.stringify(engines));
+  }
+
   return NextResponse.json({
     success: true,
     leagues_synced: leaguesSynced,
     rosters_synced: rostersSynced,
+    engines,
     errors: syncErrors.length > 0 ? syncErrors : undefined,
+    message: 'Sync complete. Dashboard data is now updated.',
   });
 }
