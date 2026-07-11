@@ -43,11 +43,48 @@ function StrengthGauge({ value, label }: { value: number; label: string }) {
 export default function DynastyGpsCard({
   data,
   leagueId,
+  summary = false,
 }: {
   data: DynastyGpsData;
   leagueId?: string;
+  /** Collapsed summary — status + strength only; full GPS via the card link. */
+  summary?: boolean;
 }) {
   const href = blueprintHref(leagueId);
+
+  if (summary) {
+    return (
+      <AnimatedCard className="h-full">
+        <Link
+          href={href}
+          className="dash-clickable-card flex h-full flex-col overflow-hidden rounded-[10px] border border-[#1e2640] bg-[#0f1420] no-underline"
+        >
+          <div className="border-b border-[#1e2640]/80 px-3.5 py-2.5">
+            <h3 className="font-figtree text-[11px] uppercase tracking-[1.5px] text-[#e8ecf4]">Dynasty GPS</h3>
+            <p className="font-mono text-[9px] text-[#6b7a99]">Strategic summary · tap for blueprint</p>
+          </div>
+          <div className="flex flex-1 items-center justify-between gap-3 p-3.5">
+            <div>
+              <div className="font-mono text-[8px] uppercase tracking-wide text-[#6b7a99]">
+                {data.isLeagueContext ? 'League Status' : 'Portfolio Status'}
+              </div>
+              <div
+                className="mt-0.5 font-figtree text-[20px] font-semibold uppercase tracking-wide"
+                style={{ color: data.portfolioStatusColor }}
+              >
+                {data.portfolioStatus}
+              </div>
+              <span className="mt-2 inline-flex items-center gap-0.5 font-mono text-[10px] text-boom">
+                View Full GPS
+                <ChevronRight className="h-3 w-3" />
+              </span>
+            </div>
+            <StrengthGauge value={data.strengthNumeric} label={data.strengthLabel} />
+          </div>
+        </Link>
+      </AnimatedCard>
+    );
+  }
 
   return (
     <AnimatedCard className="h-full">

@@ -264,9 +264,15 @@ export default function DashboardClient({
 
             <FrontOfficeTasks initialTasks={scopedTasks} lineupOpportunity={scopedLineup} />
 
-            <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3 lg:min-h-[280px]">
-              <DynastyGpsCard data={gps} leagueId={contextLeagueId} />
-              <RosterConstruction grades={rosterGrades} compact leagueId={contextLeagueId} />
+            {/* Opportunity Feed promoted above the context cards */}
+            <OpportunityFeed
+              lineupOpportunity={scopedLineup}
+              players={players}
+              tradeTargets={scopedTradeTargets}
+            />
+
+            <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3">
+              {/* Mispriced Assets — capped at 3 */}
               <MarketSignalsCompact
                 players={players}
                 leagueCounts={leagueCounts}
@@ -275,14 +281,12 @@ export default function DashboardClient({
                 ownedInLeagueIds={ownedInLeagueIds}
                 tradeTargets={scopedTradeTargets}
               />
+              {/* Dynasty GPS — collapsed to summary; full GPS via card link */}
+              <DynastyGpsCard data={gps} leagueId={contextLeagueId} summary />
+              <RosterConstruction grades={rosterGrades} compact leagueId={contextLeagueId} />
             </div>
 
-            <OpportunityFeed
-              lineupOpportunity={scopedLineup}
-              players={players}
-              tradeTargets={scopedTradeTargets}
-            />
-
+            {/* News moved to the bottom of the feed */}
             <DynastyNewsFeed
               items={filteredNews.length > 0 ? filteredNews : newsItems.slice(0, 4)}
               rosterPlayerIds={newsRosterIds}

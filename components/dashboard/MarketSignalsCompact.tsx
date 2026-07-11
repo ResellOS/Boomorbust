@@ -125,7 +125,7 @@ export default function MarketSignalsCompact({
 
   const sorted = sortByMarketSignal(players)
     .filter((p) => p.marketVerdict && !p.marketVerdict.noMarketData)
-    .slice(0, 5);
+    .slice(0, 3);
 
   return (
     <section className="flex h-full flex-col overflow-hidden rounded-[10px] border border-[#1e2640] bg-[#0f1420]">
