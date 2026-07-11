@@ -1,11 +1,11 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import Link from 'next/link';
 import PlayerAvatar from '@/components/players/PlayerAvatar';
 import CountUpDelta from '@/components/dashboard/CountUpDelta';
+import MispricedAssetModal from './MispricedAssetModal';
 import { formatStartSitConfidence } from '@/lib/ui/labels';
-import { playerHubHref } from '@/lib/dashboard/dashboardRoutes';
 import type { LeagueBundle, RotationPlayer, TradeTargetItem } from '@/lib/dashboard/rotation';
 import { sortByMarketSignal } from '@/lib/dashboard/sortPlayers';
 import { computeAssetActionability } from '@/lib/dashboard/assetActionability';
@@ -32,12 +32,14 @@ function SignalRow({
   currentLeague,
   ownedInLeagueIds,
   tradeTargetIds,
+  onSelect,
 }: {
   player: RotationPlayer;
   isAll: boolean;
   currentLeague: LeagueBundle | null;
   ownedInLeagueIds: Set<string>;
   tradeTargetIds: Set<string>;
+  onSelect: (player: RotationPlayer) => void;
 }) {
   const mv = player.marketVerdict;
   if (!mv || mv.noMarketData) return null;
@@ -55,12 +57,12 @@ function SignalRow({
     ownedInLeagueIds,
     tradeTargetIds,
   });
-  const href = playerHubHref(player.playerId);
 
   return (
-    <Link
-      href={href}
-      className={`dash-clickable-row block border-b border-[#1e2640]/50 px-3 py-2 no-underline last:border-b-0 ${glowClass}`}
+    <button
+      type="button"
+      onClick={() => onSelect(player)}
+      className={`dash-clickable-row block w-full cursor-pointer border-b border-[#1e2640]/50 px-3 py-2 text-left transition-transform last:border-b-0 hover:scale-[1.01] ${glowClass}`}
     >
       <div className="flex items-center gap-2">
         <PlayerAvatar playerId={player.playerId} name={player.name} size={32} />
@@ -100,7 +102,7 @@ function SignalRow({
         <span style={{ color: action.dotColor }}>{action.key}</span>
         <span className="normal-case text-[#8b9bb8]">· {action.hint}</span>
       </div>
-    </Link>
+    </button>
   );
 }
 
@@ -118,6 +120,9 @@ export default function MarketSignalsCompact({
   ownedInLeagueIds: Set<string>;
   tradeTargets: TradeTargetItem[];
 }) {
+  const [selectedAsset, setSelectedAsset] = useState<RotationPlayer | null>(null);
+  const [modalOpen, setModalOpen] = useState(false);
+
   const tradeTargetIds = useMemo(
     () => new Set(tradeTargets.map((t) => t.playerId)),
     [tradeTargets],
@@ -154,10 +159,22 @@ export default function MarketSignalsCompact({
               currentLeague={currentLeague}
               ownedInLeagueIds={ownedInLeagueIds}
               tradeTargetIds={tradeTargetIds}
+              onSelect={(asset) => {
+                setSelectedAsset(asset);
+                setModalOpen(true);
+              }}
             />
           ))
         )}
       </div>
+      <MispricedAssetModal
+        player={selectedAsset}
+        isOpen={modalOpen}
+        onClose={() => {
+          setModalOpen(false);
+          setSelectedAsset(null);
+        }}
+      />
     </section>
   );
 }
