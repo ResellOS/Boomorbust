@@ -51,8 +51,17 @@ import {
   TrendSparkline,
 } from './PlayerHubCharts';
 import PlayerAvatar from './PlayerAvatar';
+import AnimatedCard from '@/components/ui/AnimatedCard';
 
 const WATCHLIST_KEY = 'bb_watchlist';
+
+/** Photo-ring color driven by the BOB verdict. */
+function verdictRingColor(label: string, fallback: string): string {
+  if (label === 'BUY' || label === 'STRONG BUY') return '#36E7A1';
+  if (label === 'SELL' || label === 'STRONG SELL') return '#A78BFA';
+  if (label === 'HOLD') return '#FBBF24';
+  return fallback;
+}
 
 interface PlayerDetailPanelProps {
   player: HubPlayer;
@@ -203,6 +212,7 @@ export default function PlayerDetailPanel({
   const archetypeLabel = comparableArchetype(player);
   const frontOfficeTitle = playerFrontOfficeTitle(player, rankGap);
   const posBorder = positionBorderColor(player.position);
+  const ringHex = verdictRingColor(verdict.label, posBorder);
   const firstName = player.fullName.split(' ')[0] ?? player.fullName;
   const hasHistory = player.scoreHistory.length >= 2;
 
@@ -260,6 +270,7 @@ export default function PlayerDetailPanel({
   const isSellVerdict = verdict.label === 'SELL' || verdict.label === 'STRONG SELL';
 
   return (
+    <AnimatedCard key={pid} variant="slideInRight" duration={300} className="min-h-full">
     <DossierTransition playerId={pid}>
     <div className="flex min-h-full flex-col bg-[#0a0d14] pb-4">
       {/* Hero header — selected player dominates */}
@@ -270,7 +281,7 @@ export default function PlayerDetailPanel({
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center">
           <div
             className="relative mx-auto flex h-[160px] w-[120px] shrink-0 items-center justify-center overflow-hidden rounded-full border-[3px] bg-[#0f1420] lg:mx-0"
-            style={{ borderColor: posBorder, boxShadow: `0 0 24px ${posBorder}44` }}
+            style={{ borderColor: ringHex, boxShadow: `0 0 24px ${ringHex}44` }}
           >
             {!imgFailed ? (
               // eslint-disable-next-line @next/next/no-img-element
@@ -286,14 +297,14 @@ export default function PlayerDetailPanel({
           </div>
 
           <div className="min-w-0 flex-1">
-            <div className="font-figtree text-2xl font-bold tracking-[0.5px] text-text md:text-[28px]">
-              {player.fullName}
-            </div>
             <div
-              className="mt-0.5 font-mono text-[11px] uppercase tracking-[1.2px] text-boom"
+              className="font-mono text-[11px] uppercase tracking-[1.2px] text-boom"
               style={{ textShadow: '0 0 12px rgba(54,231,161,0.25)' }}
             >
               {frontOfficeTitle}
+            </div>
+            <div className="font-figtree text-2xl font-bold tracking-[0.5px] text-text md:text-[28px]">
+              {player.fullName}
             </div>
             <div className="font-mono text-[11px] text-muted">
               {player.position} · {player.team}
@@ -309,9 +320,12 @@ export default function PlayerDetailPanel({
               <QuickActionBtn onClick={handleWatch} accent={watching}>
                 {watching ? 'On Watchlist' : 'Add to Watchlist'}
               </QuickActionBtn>
-              <QuickActionBtn href={`/trade?target=${pid}`} accent>
+              <Link
+                href={`/trade?target=${pid}`}
+                className="rounded-md bg-boom px-2.5 py-1.5 font-mono text-[9px] uppercase tracking-wide text-[#0a0d14] no-underline transition-colors hover:bg-boom/90"
+              >
                 Stage Trade
-              </QuickActionBtn>
+              </Link>
               <QuickActionBtn href={`/players?position=${player.position}&sort=rating`}>
                 View Rankings
               </QuickActionBtn>
@@ -639,8 +653,8 @@ export default function PlayerDetailPanel({
       <div className="shrink-0 border-b border-border px-4 py-3">
         <CollapsibleDossierSection
           title="Rating History"
-          defaultOpen={hasHistory}
-          compact={!hasHistory}
+          defaultOpen={false}
+          compact
         >
           {hasHistory ? (
             <RatingHistoryChart values={player.scoreHistory} dates={player.scoreHistoryDates} />
@@ -719,6 +733,7 @@ export default function PlayerDetailPanel({
       </div>
     </div>
     </DossierTransition>
+    </AnimatedCard>
   );
 }
 

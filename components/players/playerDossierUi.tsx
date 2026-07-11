@@ -145,7 +145,7 @@ export function StaggerBullets({ playerId, items }: { playerId: string; items: s
       {items.map((b, idx) => (
         <li
           key={b}
-          className="flex gap-2 font-figtree text-[12px] leading-snug text-muted transition-opacity duration-200"
+          className="flex gap-2 font-mono text-[12px] leading-snug text-muted transition-opacity duration-200"
           style={{ opacity: idx < visibleCount ? 1 : 0 }}
         >
           <span className="shrink-0 text-boom">✓</span>

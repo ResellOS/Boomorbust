@@ -27,7 +27,24 @@ const PAGE_SIZE = 25;
 type FilterKey = 'ALL' | 'BOOM' | 'HOLD' | 'BUST' | 'QB' | 'RB' | 'WR' | 'TE';
 type SortKey = 'rating' | 'name' | 'position';
 
-const FILTERS: FilterKey[] = ['ALL', 'BOOM', 'HOLD', 'BUST', 'QB', 'RB', 'WR', 'TE'];
+const VERDICT_FILTERS: FilterKey[] = ['ALL', 'BOOM', 'HOLD', 'BUST'];
+const POSITION_FILTERS: FilterKey[] = ['QB', 'RB', 'WR', 'TE'];
+
+/** Rating (TFO score) color tiers. */
+function ratingColor(score: number): string {
+  if (score >= 90) return '#36E7A1';
+  if (score >= 75) return '#FBBF24';
+  if (score >= 60) return '#e8ecf4';
+  return '#6b7a99';
+}
+
+/** Outlined grade-pill color by dynasty asset tier label. */
+function gradePillClass(label: string): string {
+  if (label === 'ELITE ASSET') return 'border-boom text-boom';
+  if (label === 'STRONG ASSET') return 'border-hold text-hold';
+  if (label === 'STABLE ASSET') return 'border-muted text-muted';
+  return 'border-bust text-bust';
+}
 
 interface PlayerHubClientProps {
   players: HubPlayer[];
@@ -111,16 +128,25 @@ export default function PlayerHubClient({
 
   const similar = selected ? findSimilarPlayers(players, selected, 3) : [];
 
-  const filterBtnClass = (key: FilterKey): string => {
-    if (filter !== key) {
-      return 'border border-border bg-surface text-muted hover:border-muted hover:text-text';
-    }
-    if (key === 'ALL') return 'border-border bg-border text-text';
-    if (key === 'BOOM') return 'border-boom/35 bg-boom/[0.08] text-boom';
-    if (key === 'HOLD') return 'border-hold/35 bg-hold/[0.08] text-hold';
-    if (key === 'BUST') return 'border-bust/35 bg-bust/[0.08] text-bust';
-    return 'border-border bg-border text-text';
-  };
+  // Any active pill is uniformly filled boom with glow (not per-verdict colors).
+  const filterBtnClass = (key: FilterKey): string =>
+    filter === key
+      ? 'border border-boom bg-boom text-[#0a0d14] shadow-[0_0_12px_rgba(54,231,161,0.45)]'
+      : 'border border-border bg-surface text-muted hover:border-muted hover:text-text';
+
+  const renderFilterPill = (key: FilterKey) => (
+    <button
+      key={key}
+      type="button"
+      onClick={() => {
+        setFilter(key);
+        setPage(1);
+      }}
+      className={`cursor-pointer rounded-[5px] px-[11px] py-[7px] font-figtree text-[11px] font-medium transition-all min-h-[44px] md:min-h-0 md:py-[5px] ${filterBtnClass(key)}`}
+    >
+      {FILTER_VERDICT_LABELS[key] ?? key}
+    </button>
+  );
 
   return (
     <div
@@ -136,42 +162,40 @@ export default function PlayerHubClient({
           </div>
         </div>
 
-        <div className="flex flex-wrap items-center gap-1.5">
-          <div className="flex min-w-[180px] flex-1 items-center gap-2 rounded-md border border-border bg-surface px-3 py-[7px]">
-            <Search className="h-3.5 w-3.5 shrink-0 text-muted" strokeWidth={2} />
-            <input
-              type="search"
-              value={search}
-              onChange={(e) => {
-                setSearch(e.target.value);
-                setPage(1);
-              }}
-              placeholder="Search players..."
-              className="w-full border-none bg-transparent font-figtree text-[12px] text-text outline-none placeholder:text-muted"
-            />
-          </div>
-          {FILTERS.map((key) => (
-            <button
-              key={key}
-              type="button"
-              onClick={() => {
-                setFilter(key);
-                setPage(1);
-              }}
-              className={`cursor-pointer rounded-[5px] px-[11px] py-[7px] font-figtree text-[11px] font-medium transition-colors min-h-[44px] md:min-h-0 md:py-[5px] ${filterBtnClass(key)}`}
+        <div className="flex flex-col gap-1.5">
+          <div className="flex items-center gap-2">
+            {/* Ghost search — underline only */}
+            <div className="flex min-w-[180px] flex-1 items-center gap-2 rounded-none border-0 border-b border-[#1e2640] bg-transparent px-1 py-[7px] transition-colors focus-within:border-boom">
+              <Search className="h-3.5 w-3.5 shrink-0 text-muted" strokeWidth={2} />
+              <input
+                type="search"
+                value={search}
+                onChange={(e) => {
+                  setSearch(e.target.value);
+                  setPage(1);
+                }}
+                placeholder="Search players..."
+                className="w-full border-none bg-transparent font-figtree text-[12px] text-text outline-none placeholder:text-muted"
+              />
+            </div>
+            <select
+              value={sort}
+              onChange={(e) => setSort(e.target.value as SortKey)}
+              className="ml-auto cursor-pointer rounded-[5px] border border-border bg-surface px-2.5 py-[5px] font-figtree text-[11px] text-text outline-none"
             >
-              {FILTER_VERDICT_LABELS[key] ?? key}
-            </button>
-          ))}
-          <select
-            value={sort}
-            onChange={(e) => setSort(e.target.value as SortKey)}
-            className="ml-auto cursor-pointer rounded-[5px] border border-border bg-surface px-2.5 py-[5px] font-figtree text-[11px] text-text outline-none"
-          >
-            <option value="rating">Dynasty Rating</option>
-            <option value="name">Name</option>
-            <option value="position">Position</option>
-          </select>
+              <option value="rating">Dynasty Rating</option>
+              <option value="name">Name</option>
+              <option value="position">Position</option>
+            </select>
+          </div>
+          {/* Row 1 — verdict filters */}
+          <div className="flex flex-wrap items-center gap-1.5">
+            {VERDICT_FILTERS.map(renderFilterPill)}
+          </div>
+          {/* Row 2 — position filters */}
+          <div className="flex flex-wrap items-center gap-1.5">
+            {POSITION_FILTERS.map(renderFilterPill)}
+          </div>
         </div>
 
         <div className="overflow-hidden rounded-[7px] border border-border bg-surface">
@@ -222,12 +246,12 @@ export default function PlayerHubClient({
                       </div>
                     </div>
                   </div>
-                  <div className="font-mono text-[14px]" style={{ color: mvColor(p) }}>
+                  <div className="font-mono text-[14px]" style={{ color: ratingColor(p.tfoScore) }}>
                     {p.tfoScore.toFixed(1)}
                   </div>
                   <div>
                     <span
-                      className="inline-block whitespace-nowrap rounded border border-border bg-white/[0.03] px-[7px] py-[3px] text-center font-figtree text-[10px] font-medium text-text"
+                      className={`inline-block whitespace-nowrap rounded border bg-transparent px-[7px] py-[3px] text-center font-figtree text-[10px] font-medium ${gradePillClass(getGradeLabel(p.tfoScore))}`}
                     >
                       {getGradeLabel(p.tfoScore)}
                     </span>

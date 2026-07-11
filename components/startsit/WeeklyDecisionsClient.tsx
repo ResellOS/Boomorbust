@@ -4,6 +4,7 @@ import { useCallback, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import OffseasonContextBanner from '@/components/startsit/OffseasonContextBanner';
+import AnimatedCard from '@/components/ui/AnimatedCard';
 import CountUpNumber from './weekly/CountUpNumber';
 import type {
   DecisionsSummary,
@@ -262,11 +263,11 @@ export default function WeeklyDecisionsClient({
             </div>
             <button
               type="button"
-              className="hidden rounded border border-[#7c3aed]/50 bg-[#7c3aed]/15 px-3 py-1.5 font-mono text-[10px] uppercase text-[#A78BFA] sm:inline-block"
+              className="inline-block rounded bg-boom px-3 py-1.5 font-mono text-[10px] uppercase text-[#0a0d14]"
             >
               Sync Lineup
               {notSyncedCount > 0 && (
-                <span className="ml-1 text-hold">({notSyncedCount} not synced)</span>
+                <span className="ml-1 text-[#0a0d14]/70">({notSyncedCount} not synced)</span>
               )}
             </button>
           </div>
@@ -279,7 +280,7 @@ export default function WeeklyDecisionsClient({
             onClick={() => handleLeagueChange('all')}
             className={`shrink-0 rounded-[6px] border px-3 py-1.5 font-figtree text-[12px] transition-colors ${
               isPortfolio
-                ? 'border-boom bg-boom/15 text-boom'
+                ? 'border-boom bg-transparent text-white'
                 : 'border-border bg-surface text-muted hover:text-text'
             }`}
           >
@@ -292,7 +293,7 @@ export default function WeeklyDecisionsClient({
               onClick={() => handleLeagueChange(lg.id)}
               className={`shrink-0 rounded-[6px] border px-3 py-1.5 font-figtree text-[12px] transition-colors ${
                 leagueId === lg.id
-                  ? 'border-boom bg-boom/15 font-semibold text-boom'
+                  ? 'border-boom bg-transparent font-semibold text-white'
                   : 'border-border bg-surface text-muted hover:text-text'
               }`}
             >
@@ -305,8 +306,9 @@ export default function WeeklyDecisionsClient({
         <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6">
           {isPortfolio ? (
             <>
-              <StatCell label="Projected Wins" value="—" sub="Week 1 tracking" />
+              <StatCell index={0} label="Projected Wins" value="—" sub="Week 1 tracking" />
               <StatCell
+                index={1}
                 label="Total Projected"
                 value={
                   portfolioSummary ? (
@@ -322,25 +324,29 @@ export default function WeeklyDecisionsClient({
                 sub="Across active leagues"
               />
               <StatCell
+                index={2}
                 label="Expected Gain"
                 value={`+${decisionsSummary.expectedGain.toFixed(1)}`}
                 sub="If all calls followed"
               />
               <StatCell
+                index={3}
                 label="High Impact"
                 value={String(decisionsSummary.high)}
                 sub="Decisions flagged"
               />
               <StatCell
+                index={4}
                 label="Portfolio Confidence"
                 value={preseason ? 'Preseason' : `${topbar.avgConfidence}%`}
                 sub="Model consensus"
               />
-              <StatCell label="Decisions Remaining" value={String(pendingCount)} sub="To approve" />
+              <StatCell index={5} label="Decisions Remaining" value={String(pendingCount)} sub="To approve" />
             </>
           ) : (
             <>
               <StatCell
+                index={0}
                 label="Record"
                 value={
                   seasonRecord.totalDecisions > 0
@@ -350,6 +356,7 @@ export default function WeeklyDecisionsClient({
                 sub={preseason ? 'Tracking Week 1' : 'Season record'}
               />
               <StatCell
+                index={1}
                 label="Projected Score"
                 value={
                   matchup ? (
@@ -364,14 +371,16 @@ export default function WeeklyDecisionsClient({
                 }
                 sub="Your lineup"
               />
-              <StatCell label="Win Probability" value="—" sub="Opponent syncing" />
+              <StatCell index={2} label="Win Probability" value="—" sub="Opponent syncing" />
               <StatCell
+                index={3}
                 label="Confidence"
                 value={preseason ? 'Preseason' : `${topbar.avgConfidence}%`}
                 sub="Lineup confidence"
               />
-              <StatCell label="Decisions Remaining" value={String(pendingCount)} sub="High impact" />
+              <StatCell index={4} label="Decisions Remaining" value={String(pendingCount)} sub="High impact" />
               <StatCell
+                index={5}
                 label="Last Updated"
                 value={topbar.lastUpdatedMinutes <= 0 ? 'Now' : `${topbar.lastUpdatedMinutes}m`}
                 sub="Data sync"
@@ -458,16 +467,21 @@ function StatCell({
   label,
   value,
   sub,
+  index = 0,
 }: {
   label: string;
   value: React.ReactNode;
   sub: string;
+  index?: number;
 }) {
   return (
-    <div className="rounded border border-border/60 bg-surface2/30 px-2 py-1.5">
+    <AnimatedCard
+      delay={index * 70}
+      className="rounded border border-border/60 bg-surface2/30 px-2 py-1.5"
+    >
       <div className="font-mono text-[8px] uppercase tracking-wide text-muted">{label}</div>
       <div className="font-mono text-[15px] text-text">{value}</div>
       <div className="font-mono text-[9px] text-muted">{sub}</div>
-    </div>
+    </AnimatedCard>
   );
 }

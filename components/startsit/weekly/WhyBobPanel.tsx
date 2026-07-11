@@ -51,7 +51,7 @@ export default function WhyBobPanel({ card }: WhyBobPanelProps) {
       )}
       <ul className="mt-3 space-y-1">
         {card.whyBullets.slice(0, 6).map((b) => (
-          <li key={b} className="flex gap-1.5 font-mono text-[11px] leading-relaxed text-text">
+          <li key={b} className="flex gap-1.5 font-mono text-[11px] leading-relaxed text-muted">
             <span className="shrink-0 text-boom">✓</span>
             <span>{b}</span>
           </li>
@@ -60,6 +60,13 @@ export default function WhyBobPanel({ card }: WhyBobPanelProps) {
       <div className="mt-2 flex flex-wrap gap-3 font-mono text-[10px] text-muted">
         <span>{card.confidence}% confidence</span>
         {card.impact && <span>{card.impact} impact</span>}
+      </div>
+      {/* Confidence progress bar */}
+      <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-surface">
+        <div
+          className="h-full rounded-full bg-boom transition-all duration-500"
+          style={{ width: `${Math.max(0, Math.min(100, card.confidence))}%` }}
+        />
       </div>
       {card.playerId && (
         <Link

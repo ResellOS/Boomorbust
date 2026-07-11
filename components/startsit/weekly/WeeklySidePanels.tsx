@@ -1,7 +1,9 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import PlayerAvatar from '@/components/players/PlayerAvatar';
+import PulsingDot from '@/components/ui/PulsingDot';
 import type { StartSitRecommendation } from '@/lib/startsit/types';
 
 interface WeeklySidePanelsProps {
@@ -14,10 +16,19 @@ interface WeeklySidePanelsProps {
   onSelectPlayer: (playerId: string) => void;
 }
 
-function PanelShell({ title, children }: { title: string; children: React.ReactNode }) {
+function PanelShell({
+  title,
+  dotColor,
+  children,
+}: {
+  title: string;
+  dotColor?: string;
+  children: React.ReactNode;
+}) {
   return (
     <div className="rounded-md border border-border bg-surface p-2.5">
-      <div className="mb-1.5 font-mono text-[9px] uppercase tracking-[1.5px] text-muted">
+      <div className="mb-1.5 flex items-center gap-1.5 font-mono text-[9px] uppercase tracking-[1.5px] text-muted">
+        {dotColor ? <PulsingDot color={dotColor} size={6} /> : null}
         {title}
       </div>
       {children}
@@ -25,13 +36,43 @@ function PanelShell({ title, children }: { title: string; children: React.ReactN
   );
 }
 
-const TIMELINE = [
-  { time: 'Now', label: 'Review lineup' },
-  { time: '11:30', label: 'Inactives' },
-  { time: '12:15', label: 'Weather update' },
-  { time: '12:45', label: 'Final BOB recalc' },
-  { time: '1:00', label: 'Kickoff' },
+// Sunday game-day timeline: 9 AM → 4 PM window.
+const TIMELINE_START = 9;
+const TIMELINE_END = 16;
+const timelinePct = (hour: number): number =>
+  Math.max(0, Math.min(100, ((hour - TIMELINE_START) / (TIMELINE_END - TIMELINE_START)) * 100));
+
+const TIME_MARKERS = [
+  { hour: 9, label: '9:00 AM' },
+  { hour: 11, label: '11:00 AM' },
+  { hour: 12, label: '12:00 PM' },
+  { hour: 13, label: '1:00 PM' },
+  { hour: 14, label: '2:00 PM' },
+  { hour: 16, label: '4:00 PM' },
 ];
+
+const TIMELINE_EVENTS = [
+  { hour: 9, label: 'Active Lineup' },
+  { hour: 11, label: 'Decisions' },
+  { hour: 12, label: 'Waiver Sub' },
+  { hour: 12.75, label: 'Final Edit' },
+  { hour: 13, label: 'Kickoff' },
+];
+
+/** Green marker at the viewer's current local time (client-only to avoid SSR mismatch). */
+function useCurrentTimePct(): number | null {
+  const [pct, setPct] = useState<number | null>(null);
+  useEffect(() => {
+    const compute = () => {
+      const now = new Date();
+      setPct(timelinePct(now.getHours() + now.getMinutes() / 60));
+    };
+    compute();
+    const iv = window.setInterval(compute, 60_000);
+    return () => window.clearInterval(iv);
+  }, []);
+  return pct;
+}
 
 export default function WeeklySidePanels({
   boom,
@@ -42,9 +83,10 @@ export default function WeeklySidePanels({
   weatherImpact,
   onSelectPlayer,
 }: WeeklySidePanelsProps) {
+  const currentTimePct = useCurrentTimePct();
   return (
     <div className="space-y-2">
-      <PanelShell title="Boom Candidates">
+      <PanelShell title="Boom Candidates" dotColor="#36E7A1">
         {boom.length === 0 ? (
           <p className="font-mono text-[10px] text-muted">No boom signals yet</p>
         ) : (
@@ -72,7 +114,7 @@ export default function WeeklySidePanels({
         )}
       </PanelShell>
 
-      <PanelShell title="Bust Risks">
+      <PanelShell title="Bust Risks" dotColor="#EF4444">
         {bust.length === 0 ? (
           <p className="font-mono text-[10px] text-muted">No bust flags</p>
         ) : (
@@ -161,20 +203,49 @@ export default function WeeklySidePanels({
       </PanelShell>
 
       <PanelShell title="Sunday Timeline">
-        <div className="flex gap-0.5">
-          {TIMELINE.map((t, i) => (
-            <div key={t.time} className="flex-1 text-center">
+        <div className="overflow-x-auto scrollbar-hide">
+          <div className="relative min-w-[440px] px-2 pb-1 pt-4">
+            {/* Event labels above the axis */}
+            {TIMELINE_EVENTS.map((ev) => (
               <div
-                className="mx-auto h-1 rounded-full"
-                style={{
-                  background: i === 0 ? '#36E7A1' : '#1e2640',
-                  boxShadow: i === 0 ? '0 0 6px rgba(54,231,161,0.5)' : undefined,
-                }}
-              />
-              <div className="mt-1 font-mono text-[8px] text-muted">{t.time}</div>
-              <div className="font-mono text-[7px] leading-tight text-muted">{t.label}</div>
+                key={ev.label}
+                className="absolute top-0 -translate-x-1/2 whitespace-nowrap font-mono text-[7px] uppercase leading-none text-muted"
+                style={{ left: `${timelinePct(ev.hour)}%` }}
+              >
+                {ev.label}
+              </div>
+            ))}
+
+            {/* Axis with time markers + current-time indicator */}
+            <div className="relative h-[2px] w-full rounded-full bg-[#1e2640]">
+              {TIME_MARKERS.map((m) => (
+                <div
+                  key={m.label}
+                  className="absolute top-1/2 h-1.5 w-1.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#1e2640]"
+                  style={{ left: `${timelinePct(m.hour)}%` }}
+                />
+              ))}
+              {currentTimePct != null ? (
+                <div
+                  className="absolute top-1/2 h-3.5 w-[2px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-boom transition-all duration-500"
+                  style={{ left: `${currentTimePct}%`, boxShadow: '0 0 6px rgba(54,231,161,0.6)' }}
+                />
+              ) : null}
             </div>
-          ))}
+
+            {/* Time marker labels below the axis */}
+            <div className="relative mt-1.5 h-3">
+              {TIME_MARKERS.map((m) => (
+                <div
+                  key={m.label}
+                  className="absolute -translate-x-1/2 whitespace-nowrap font-mono text-[7px] leading-none text-muted"
+                  style={{ left: `${timelinePct(m.hour)}%` }}
+                >
+                  {m.label}
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </PanelShell>
     </div>
