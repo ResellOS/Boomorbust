@@ -315,9 +315,9 @@ export default function PlayerHubClient({
             onClick={() => setMobileDetailOpen(false)}
             className="shrink-0 border-b border-border px-4 py-3 text-left font-mono text-[11px] text-boom"
           >
-            ← Back to list
+            ← Players
           </button>
-          <div className="min-h-0 flex-1 overflow-y-auto">
+          <div className="min-h-0 flex-1 overflow-y-auto pb-20">
             <PlayerDetailPanel
               player={selected}
               leagueNames={leaguePresence[selected.playerId] ?? []}

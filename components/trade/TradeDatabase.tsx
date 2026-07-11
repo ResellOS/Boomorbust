@@ -340,7 +340,7 @@ export default function TradeDatabase({
 
             <tr className="border-b border-[#1e2640] font-mono text-[8px] uppercase tracking-wide text-[#6b7a99]">
 
-              <th className="px-2 py-2">Target</th>
+              <th className="sticky left-0 z-10 bg-[#0f1420] px-2 py-2">Target</th>
 
               <th className="px-2 py-2">You Send</th>
 
@@ -392,7 +392,7 @@ export default function TradeDatabase({
 
                 >
 
-                  <td className="px-2 py-2">
+                  <td className="sticky left-0 z-10 bg-[#0f1420] px-2 py-2">
 
                     <div className="flex items-center gap-1.5">
 
