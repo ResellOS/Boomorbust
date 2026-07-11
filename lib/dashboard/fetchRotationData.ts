@@ -9,13 +9,9 @@ import {
   type SleeperUser,
 } from '@/lib/sleeper';
 import { fetchAllPlayers } from '@/lib/sleeper/players';
-import {
-  acquireCostForScore,
-  generateTradeReason,
-  getVerdict,
-  getTradeVerdictLabel,
-} from '@/lib/verdict';
+import { getVerdict } from '@/lib/verdict';
 import { fetchDashboardNews } from './fetchDashboardNews';
+import { buildLeagueTradeTargets } from './leagueTradeTargets';
 import { sortByMarketSignal } from './sortPlayers';
 import {
   computeRosterBreakdown,
@@ -375,13 +371,18 @@ export async function fetchRotationData(
   }
 
   const sleeperByLeague = new Map<string, SleeperRoster[]>();
+  const usersByLeague = new Map<string, SleeperUser[]>();
   await Promise.all(
     leaguesRaw.map(async (l) => {
       try {
-        const rosters = await fetchLeagueRosters(l.id);
+        const [rosters, users] = await Promise.all([
+          fetchLeagueRosters(l.id),
+          fetchLeagueUsers(l.id),
+        ]);
         if (rosters) sleeperByLeague.set(l.id, rosters);
+        if (users) usersByLeague.set(l.id, users);
       } catch (err) {
-        console.error(`[dashboard] sleeper rosters failed for ${l.id}:`, err);
+        console.error(`[dashboard] sleeper rosters/users failed for ${l.id}:`, err);
       }
     }),
   );
@@ -499,46 +500,76 @@ export async function fetchRotationData(
     breakdown: computeRosterBreakdown(portfolioPlayers, null, portfolioStatus),
   };
 
-  const tradeTargets: TradeTargetItem[] = [];
-  try {
-    let q = supabase
-      .from('formula_scores')
-      .select('player_id, tfo_score')
-      .eq('scoring_context', scoringContext)
-      .order('tfo_score', { ascending: false })
-      .limit(12);
-    if (idList.length > 0) q = q.not('player_id', 'in', `(${idList.join(',')})`);
-    const { data } = await q;
-    const targetIds = (data ?? []).slice(0, 4).map((r) => String(r.player_id));
-    if (targetIds.length > 0) {
-      const { data: meta } = await supabase
-        .from('players')
-        .select('id, full_name, position, team')
-        .in('id', targetIds);
-      const m = new Map(
-        (meta ?? []).map((p) => [String(p.id), p as { full_name: string; position: string; team: string }]),
-      );
-      (data ?? []).slice(0, 4).forEach((r, i) => {
-        const p = m.get(String(r.player_id));
-        const score = safeScore(r.tfo_score) || 50;
-        const verdictLabel = getTradeVerdictLabel(score);
-        const lg = leagues[i % Math.max(leagues.length, 1)];
-        tradeTargets.push({
-          playerId: String(r.player_id),
-          playerName: p?.full_name ?? 'Unknown Player',
-          position: (p?.position ?? '—').toUpperCase(),
-          team: p?.team ?? '—',
-          leagueName: lg?.name ?? 'League',
-          leagueId: lg?.id ?? '',
-          tfoScore: score,
-          reason: generateTradeReason(score, verdictLabel),
-          acquireCost: acquireCostForScore(score),
-        });
-      });
-    }
-  } catch (err) {
-    console.error('[dashboard] trade targets fetch failed:', err);
+  // Load TFO + metadata for every player rostered by ANY team in the user's
+  // leagues (not only the user's own players) so per-league trade targets can
+  // evaluate opponents' surplus and the user's real positional needs.
+  const leaguePlayerIdSet = new Set<string>();
+  for (const ids of Object.values(leagueRosteredIds)) {
+    for (const id of ids) leaguePlayerIdSet.add(id);
   }
+  const opponentIds = Array.from(leaguePlayerIdSet).filter(
+    (id) => !tfoMap.has(id) || !metaByPlayer.has(id),
+  );
+  if (opponentIds.length > 0) {
+    const tfoBatch = 150;
+    for (let i = 0; i < opponentIds.length; i += tfoBatch) {
+      const slice = opponentIds.slice(i, i + tfoBatch);
+      try {
+        const { data, error } = await supabase
+          .from('formula_scores')
+          .select('player_id, tfo_score, calculated_at')
+          .eq('scoring_context', scoringContext)
+          .in('player_id', slice)
+          .order('calculated_at', { ascending: false });
+        if (error) throw error;
+        for (const row of (data ?? []) as { player_id: string | number; tfo_score: number | null }[]) {
+          const pid = String(row.player_id);
+          if (tfoMap.has(pid)) continue;
+          const s = safeScore(row.tfo_score);
+          if (s > 0) tfoMap.set(pid, s);
+        }
+      } catch (err) {
+        console.error('[dashboard] opponent scores fetch failed:', err);
+      }
+    }
+
+    const metaMissing = opponentIds.filter((id) => !metaByPlayer.has(id));
+    const metaBatch = 200;
+    for (let i = 0; i < metaMissing.length; i += metaBatch) {
+      const slice = metaMissing.slice(i, i + metaBatch);
+      try {
+        const { data, error } = await supabase
+          .from('players')
+          .select('id, full_name, position, team')
+          .in('id', slice);
+        if (error) throw error;
+        for (const p of data ?? []) {
+          const pid = String(p.id);
+          metaByPlayer.set(pid, {
+            name: cleanName(p.full_name),
+            position: (p.position ?? '—').toUpperCase(),
+            team: p.team ?? '—',
+            tfoScore: tfoMap.get(pid) ?? 0,
+          });
+        }
+      } catch (err) {
+        console.error('[dashboard] opponent meta fetch failed:', err);
+      }
+    }
+  }
+
+  // Per-league trade targets — each league's own roster needs + a realistic
+  // available surplus player from a specific manager in that league.
+  // (Replaces the old global top-TFO round-robin that showed the same players
+  // in every league.) See lib/dashboard/leagueTradeTargets.ts.
+  const tradeTargets: TradeTargetItem[] = buildLeagueTradeTargets({
+    leagues,
+    rosterByLeague,
+    sleeperByLeague,
+    usersByLeague,
+    tfoOf: (pid) => tfoMap.get(pid) ?? 0,
+    metaOf: (pid) => metaByPlayer.get(pid) ?? null,
+  });
 
   // Overvalued: hide unless we have meaningful market comparison data.
   const overvalued: OvervaluedItem[] = [];
@@ -556,14 +587,8 @@ export async function fetchRotationData(
       const roster = rosterByLeague.get(lg.id);
       if (!roster?.rosterId) return;
 
-      let users: SleeperUser[] = [];
-      let rosters: SleeperRoster[] = [];
-      try {
-        users = (await fetchLeagueUsers(lg.id)) ?? [];
-        rosters = (await fetchLeagueRosters(lg.id)) ?? [];
-      } catch {
-        return;
-      }
+      const users = usersByLeague.get(lg.id) ?? [];
+      const rosters = sleeperByLeague.get(lg.id) ?? [];
 
       try {
         const pending = (await fetchLeagueTrades(lg.id)) ?? [];
