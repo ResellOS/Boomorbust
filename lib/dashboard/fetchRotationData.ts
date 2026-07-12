@@ -3,6 +3,7 @@ import {
   fetchLeagueRosters,
   fetchLeagueUsers,
   fetchLeagueTrades,
+  fetchTransactions,
   fetchNflState,
   type SleeperRoster,
   type SleeperTransaction,
@@ -387,6 +388,30 @@ export async function fetchRotationData(
     }),
   );
 
+  // Recent completed trades per league → the "actively trading at position"
+  // signal for on-the-block detection. Sleeper's /trades path is dead, so read
+  // /transactions/{week} for a small recent window (offseason trades land under
+  // week 1; in-season, the current week and the two prior).
+  const tradesByLeague = new Map<string, SleeperTransaction[]>();
+  {
+    const wk = nflSeason.week > 0 ? nflSeason.week : 1;
+    const weeks = Array.from(new Set([wk, Math.max(1, wk - 1), 1]));
+    await Promise.all(
+      leaguesRaw.map(async (l) => {
+        const trades: SleeperTransaction[] = [];
+        for (const w of weeks) {
+          const txs = await fetchTransactions(l.id, w).catch(() => null);
+          for (const tx of txs ?? []) {
+            if (tx.type === 'trade' && (tx.status === 'complete' || tx.status === 'completed')) {
+              trades.push(tx);
+            }
+          }
+        }
+        if (trades.length > 0) tradesByLeague.set(l.id, trades);
+      }),
+    );
+  }
+
   // Every player rostered by ANY team in each league (for league-scoped news).
   const leagueRosteredIds: Record<string, string[]> = {};
   for (const [leagueId, rosters] of Array.from(sleeperByLeague.entries())) {
@@ -567,6 +592,7 @@ export async function fetchRotationData(
     rosterByLeague,
     sleeperByLeague,
     usersByLeague,
+    tradesByLeague,
     tfoOf: (pid) => tfoMap.get(pid) ?? 0,
     metaOf: (pid) => metaByPlayer.get(pid) ?? null,
   });
