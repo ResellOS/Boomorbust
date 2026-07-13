@@ -1,10 +1,12 @@
 import { initialAssetsFromSuggestion } from '@/lib/trade/calculatorAssets';
 import type { BobSuggestion, ManagerTradeCard, TradeOpportunity } from '@/lib/trade/types';
 import type { CalculatorAsset } from '@/components/trade/TradeCalculator';
+import { PICK_TFO, pickMarketValue, parsePickYear, pickRoundFromLabel } from '@/lib/trade/pickValues';
 
 export interface TradeValueTotals {
-  giveTfo: number;
-  getTfo: number;
+  /** Dynasty MARKET value (KTC) of the give / get sides — the fairness currency. */
+  giveValue: number;
+  getValue: number;
   delta: number;
   diffPct: number;
 }
@@ -35,7 +37,7 @@ export function interpretTradePackage(
   totals: TradeValueTotals | null,
   opp: TradeOpportunity | null,
 ): { label: string; detail: string; color: string } {
-  if (!totals || (totals.giveTfo === 0 && totals.getTfo === 0)) {
+  if (!totals || (totals.giveValue === 0 && totals.getValue === 0)) {
     if (opp) {
       if (opp.type === 'buy_low' || opp.type === 'buy_window') {
         return {
@@ -59,7 +61,7 @@ export function interpretTradePackage(
   if (diffPct > 10) {
     return {
       label: 'Strong Value',
-      detail: `You gain +${delta.toFixed(1)} TFO — market would call this a win.`,
+      detail: `You gain +${Math.round(delta).toLocaleString()} in market value — the market would call this a win.`,
       color: '#36E7A1',
     };
   }
@@ -150,6 +152,7 @@ export function opportunityToSuggestion(opp: TradeOpportunity): BobSuggestion {
     position: opp.position,
     team: opp.team,
     tfoScore: null,
+    ktcValue: opp.playerKtc,
     ktcRank: opp.marketRank,
     rankDelta: opp.valueGap,
     verdict: opp.marketVerdict,
@@ -171,12 +174,14 @@ export function calculatorAssetsFromOpportunity(opp: TradeOpportunity): {
   const { give, get } = initialAssetsFromSuggestion(s);
 
   if (opp.type !== 'sell_high' && opp.suggestedPrice) {
+    const round = pickRoundFromLabel(opp.suggestedPrice);
     give.push({
       key: `pick-${opp.suggestedPrice}`,
       label: opp.suggestedPrice,
       isPick: true,
-      tfoScore: opp.suggestedPrice.includes('1st') ? 70 : opp.suggestedPrice.includes('2nd') ? 55 : 40,
-      ktcValue: null,
+      tfoScore: PICK_TFO[round] ?? 40,
+      // Real dynasty market value so the calculator can judge the package.
+      ktcValue: pickMarketValue(round, parsePickYear(opp.suggestedPrice)),
     });
   }
   if (opp.suggestedAddOn) {

@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { CalculatorSearchHit } from '@/app/api/trade/calculator-search/route';
 import type { OwnedPick } from '@/lib/trade/types';
+import { PICK_TFO, pickMarketValue, parsePickYear } from '@/lib/trade/pickValues';
 
 export interface CalculatorAsset {
   key: string;
@@ -26,9 +27,11 @@ export interface TradeCalculatorProps {
   onTotalsChange?: (totals: import('@/lib/trade/tradeHubUi').TradeValueTotals) => void;
 }
 
-// Nominal TFO / KTC weight of a rookie pick by round (no per-pick value source).
-const PICK_TFO: Record<number, number> = { 1: 70, 2: 55, 3: 40, 4: 25 };
-const PICK_KTC: Record<number, number> = { 1: 4000, 2: 2500, 3: 1200, 4: 500 };
+// The single source of trade value for any asset is its dynasty MARKET value
+// (KTC). TFO is a talent grade and is NOT tradeable value — see lib/trade/pickValues.
+function assetMarketValue(a: CalculatorAsset): number {
+  return a.ktcValue ?? 0;
+}
 
 function SideColumn({
   title,
@@ -72,8 +75,8 @@ function SideColumn({
     };
   }, [query]);
 
+  const valueSum = assets.reduce((s, a) => s + (a.ktcValue ?? 0), 0);
   const tfoSum = assets.reduce((s, a) => s + (a.tfoScore ?? 0), 0);
-  const ktcSum = assets.reduce((s, a) => s + (a.ktcValue ?? 0), 0);
 
   return (
     <div className="flex min-w-0 flex-col rounded-[8px] border border-border bg-surface">
@@ -147,7 +150,7 @@ function SideColumn({
               label: opt.label,
               isPick: true,
               tfoScore: PICK_TFO[opt.round] ?? 20,
-              ktcValue: PICK_KTC[opt.round] ?? 300,
+              ktcValue: pickMarketValue(opt.round, parsePickYear(opt.label)),
             });
             setPickIdx('');
           }}
@@ -185,15 +188,15 @@ function SideColumn({
         )}
       </div>
 
-      {/* Side totals */}
+      {/* Side totals — Market Value drives fairness; TFO is a talent readout only. */}
       <div className="mt-1 border-t border-border px-2.5 py-2">
         <div className="flex items-center justify-between font-mono text-[11px]">
-          <span className="text-muted">Value total</span>
-          <span className="text-text">{tfoSum.toFixed(1)}</span>
+          <span className="text-muted">Market Value</span>
+          <span className="text-text">{valueSum.toLocaleString()}</span>
         </div>
         <div className="flex items-center justify-between font-mono text-[11px]">
-          <span className="text-muted">KTC total</span>
-          <span className="text-text">{ktcSum.toLocaleString()}</span>
+          <span className="text-muted">Talent (TFO)</span>
+          <span className="text-text">{tfoSum.toFixed(1)}</span>
         </div>
       </div>
     </div>
@@ -227,13 +230,14 @@ export default function TradeCalculator({
     return out;
   }, []);
 
-  const giveTfo = give.reduce((s, a) => s + (a.tfoScore ?? 0), 0);
-  const getTfo = get.reduce((s, a) => s + (a.tfoScore ?? 0), 0);
+  // Fairness is judged on dynasty MARKET value (KTC), not TFO talent grades.
+  const giveValue = give.reduce((s, a) => s + assetMarketValue(a), 0);
+  const getValue = get.reduce((s, a) => s + assetMarketValue(a), 0);
 
   // Fairness verdict — green when gaining, gray when even, amber when giving up
   // value (no red/purple — "uneven", not "bad").
   const active = give.length > 0 && get.length > 0;
-  const diffPct = active ? ((getTfo - giveTfo) / Math.max(giveTfo, getTfo, 1)) * 100 : 0;
+  const diffPct = active ? ((getValue - giveValue) / Math.max(giveValue, getValue, 1)) * 100 : 0;
   let verdict: { label: string; color: string } = { label: 'Add players to compare', color: '#6b7a99' };
   if (active) {
     if (Math.abs(diffPct) <= 10) verdict = { label: 'Fair Trade', color: '#6b7a99' };
@@ -241,13 +245,16 @@ export default function TradeCalculator({
     else verdict = { label: "You're Losing", color: '#f59e0b' };
   }
 
-  const delta = Math.round((getTfo - giveTfo) * 10) / 10;
+  const delta = Math.round(getValue - giveValue);
+  // Any asset with no market value yet (unscored rookie / obscure pick) — flag it
+  // so a 0-value side isn't silently read as a lopsided trade.
+  const missingValue = active && [...give, ...get].some((a) => a.ktcValue == null);
   // Diverging meter: segment grows from center toward the favored side.
   const meterMag = Math.min(Math.abs(diffPct), 100) / 2; // 0–50 (% of track)
 
   useEffect(() => {
-    onTotalsChange?.({ giveTfo, getTfo, delta, diffPct });
-  }, [giveTfo, getTfo, delta, diffPct, onTotalsChange]);
+    onTotalsChange?.({ giveValue, getValue, delta, diffPct });
+  }, [giveValue, getValue, delta, diffPct, onTotalsChange]);
 
   const inner = (
     <>
@@ -289,9 +296,9 @@ export default function TradeCalculator({
             {verdict.label}
           </div>
           <div className="text-right">
-            <div className="font-mono text-[10px] uppercase tracking-wide text-muted">Trade Value Delta</div>
+            <div className="font-mono text-[10px] uppercase tracking-wide text-muted">Market Value Delta</div>
             <div className="font-mono text-[16px] font-bold" style={{ color: verdict.color }}>
-              {delta >= 0 ? '+' : ''}{delta.toFixed(1)}
+              {delta >= 0 ? '+' : ''}{delta.toLocaleString()}
             </div>
           </div>
         </div>
@@ -314,6 +321,11 @@ export default function TradeCalculator({
           <span>You Give</span>
           <span>You Get</span>
         </div>
+        {missingValue && (
+          <div className="mt-1.5 font-figtree text-[9.5px] text-muted">
+            Some assets have no market value yet — verdict may be incomplete.
+          </div>
+        )}
       </div>
     </>
   );

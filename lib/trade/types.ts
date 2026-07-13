@@ -86,6 +86,8 @@ export interface TradeOpportunity {
   type: 'buy_low' | 'sell_high' | 'buy_window' | 'neutral';
   bobRank: number | null;
   marketRank: number | null;
+  /** Player's dynasty market value (KTC) — the fairness currency for the calculator. */
+  playerKtc: number | null;
   valueGap: number | null;
   suggestedPrice: string;
   givePlayerName: string;

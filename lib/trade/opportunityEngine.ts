@@ -25,12 +25,27 @@ function actionVerb(s: BobSuggestion): string {
   return 'Add';
 }
 
-function suggestedPrice(gap: number | null, type: BobSuggestion['type']): string {
+function suggestedPrice(
+  gap: number | null,
+  type: BobSuggestion['type'],
+  playerKtc: number | null,
+): string {
   const g = gap != null ? Math.abs(Math.round(gap)) : 0;
   if (type === 'sell') {
     if (g >= 200) return '2027 2nd Round Pick';
     if (g >= 100) return '2027 3rd Round Pick';
     return 'Future pick or depth';
+  }
+  // Size the acquisition price to the player's actual dynasty MARKET value (KTC),
+  // not the rank gap — otherwise low-value players (e.g. Tua ~860, Zaccheaus ~74)
+  // get absurd first-round asks. Fall back to gap only when value is unknown.
+  const v = playerKtc ?? 0;
+  if (v > 0) {
+    if (v >= 6500) return '2027 1st Round Pick + young starter';
+    if (v >= 4000) return '2027 1st Round Pick';
+    if (v >= 2000) return '2027 2nd Round Pick';
+    if (v >= 800) return '2027 3rd Round Pick';
+    return 'Depth piece or late pick';
   }
   if (g >= 150) return '2027 1st Round Pick';
   if (g >= 80) return '2027 2nd Round Pick';
@@ -245,7 +260,9 @@ export function suggestionToOpportunity(
   }
 
   const giveName =
-    s.type === 'sell' ? s.playerName : suggestedPrice(gap, s.type).split(' ').slice(0, 3).join(' ');
+    s.type === 'sell'
+      ? s.playerName
+      : suggestedPrice(gap, s.type, s.ktcValue ?? null).split(' ').slice(0, 3).join(' ');
   const getName = s.type === 'sell' ? 'Future pick value' : s.playerName;
 
   return {
@@ -260,8 +277,9 @@ export function suggestionToOpportunity(
     type: typeBadge(s),
     bobRank: bobRankFromMarket(s.ktcRank ?? null, s.rankDelta ?? null),
     marketRank: s.ktcRank ?? null,
+    playerKtc: s.ktcValue ?? null,
     valueGap: gap != null ? Math.abs(gap) : null,
-    suggestedPrice: suggestedPrice(gap, s.type),
+    suggestedPrice: suggestedPrice(gap, s.type, s.ktcValue ?? null),
     givePlayerName: giveName,
     getPlayerName: getName,
     suggestedAddOn: s.type === 'buy' ? 'RB depth piece (any)' : undefined,
