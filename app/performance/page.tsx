@@ -7,6 +7,7 @@ import PerformanceTopBar from '@/components/performance/PerformanceTopBar';
 import PerformanceClient from '@/components/performance/PerformanceClient';
 import WhyBobPanel from '@/components/performance/WhyBobPanel';
 import PerformanceFooter from '@/components/performance/PerformanceFooter';
+import { getUserTier } from '@/lib/access/gates';
 
 export const dynamic = 'force-dynamic';
 
@@ -46,13 +47,14 @@ export default async function PerformancePage() {
   if (needsOnboarding) redirect('/onboarding');
 
   const data = await fetchPerformanceData(userId);
+  const tier = await getUserTier(userId);
 
   return (
     <div className="performance-page-grid h-full overflow-hidden bg-bg">
       <div className="col-span-full">
         <PerformanceTopBar stats={data.stats} />
       </div>
-      <Sidebar leagues={data.leagues} />
+      <Sidebar leagues={data.leagues} subscriptionTier={tier} />
       <div className="col-start-1 md:col-start-2 row-start-2 min-h-0 overflow-hidden">
         <PerformanceClient data={data} />
       </div>

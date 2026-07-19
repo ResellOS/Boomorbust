@@ -1,6 +1,7 @@
 'use client';
 
 import type { ReactNode } from 'react';
+import BetaBanner from '@/components/BetaBanner';
 import { SidebarCollapseProvider, useSidebarCollapse } from './SidebarCollapseContext';
 
 type GridVariant = 'default' | 'startsit';
@@ -30,7 +31,12 @@ interface TerminalPageGridProps {
 export default function TerminalPageGrid({ children, variant = 'default' }: TerminalPageGridProps) {
   return (
     <SidebarCollapseProvider>
-      <GridInner variant={variant}>{children}</GridInner>
+      <div className="flex h-full flex-col">
+        <BetaBanner />
+        <div className="min-h-0 flex-1">
+          <GridInner variant={variant}>{children}</GridInner>
+        </div>
+      </div>
     </SidebarCollapseProvider>
   );
 }

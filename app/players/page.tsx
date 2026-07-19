@@ -66,7 +66,7 @@ export default async function PlayersPage() {
     <TerminalPageGrid>
       <PlayerHubTopBar stats={hubData.stats} />
 
-      <Sidebar leagues={hubData.leagues} rosterSnapshot={hubData.rosterSnapshot} />
+      <Sidebar leagues={hubData.leagues} rosterSnapshot={hubData.rosterSnapshot} subscriptionTier={tier} />
 
       <Suspense
         fallback={

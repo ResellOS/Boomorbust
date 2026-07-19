@@ -7,6 +7,7 @@ import ExposureTopBar from '@/components/exposure/ExposureTopBar';
 import ExposureClient from '@/components/exposure/ExposureClient';
 import ExposureFooter from '@/components/exposure/ExposureFooter';
 import TerminalPageGrid from '@/components/dashboard/TerminalPageGrid';
+import { getUserTier } from '@/lib/access/gates';
 
 export const dynamic = 'force-dynamic';
 
@@ -52,11 +53,12 @@ export default async function ExposurePage() {
   if (!sleeperUserId) redirect('/login');
 
   const data = await fetchExposureData(userId, sleeperUserId);
+  const tier = await getUserTier(userId);
 
   return (
     <TerminalPageGrid>
       <ExposureTopBar stats={data.topbar} />
-      <Sidebar leagues={data.leagues} />
+      <Sidebar leagues={data.leagues} subscriptionTier={tier} />
       <div className="col-start-1 md:col-start-2 row-start-2 min-h-0 overflow-hidden">
         <ExposureClient data={data} />
       </div>

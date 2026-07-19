@@ -7,6 +7,7 @@ import StartSitTopBar from '@/components/startsit/StartSitTopBar';
 import WeeklyDecisionsClient from '@/components/startsit/WeeklyDecisionsClient';
 import StartSitFooter from '@/components/startsit/StartSitFooter';
 import TerminalPageGrid from '@/components/dashboard/TerminalPageGrid';
+import { getUserTier } from '@/lib/access/gates';
 
 export const dynamic = 'force-dynamic';
 
@@ -65,6 +66,7 @@ export default async function StartSitPage({ searchParams }: PageProps) {
     selectedWeek,
     selectedLeague,
   );
+  const tier = await getUserTier(userId);
 
   return (
     <TerminalPageGrid variant="startsit">
@@ -72,6 +74,7 @@ export default async function StartSitPage({ searchParams }: PageProps) {
 
       <Sidebar
         leagues={data.leagues}
+        subscriptionTier={tier}
         weekContext={{
           nflWeek: data.weekContext.nflWeek,
           windowOpen: data.weekContext.windowOpen,

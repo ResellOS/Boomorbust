@@ -36,7 +36,7 @@ export default async function TradePage({
   return (
     <TerminalPageGrid>
       <TradeTopBar stats={data.stats} />
-      <Sidebar leagues={data.leagues} />
+      <Sidebar leagues={data.leagues} subscriptionTier={tier} />
       <TradeHubClient
         data={data}
         showAds={showAds}

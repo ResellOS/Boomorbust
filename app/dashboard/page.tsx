@@ -104,6 +104,7 @@ export default async function DashboardPage() {
         leagues={sidebarLeagues}
         signalCounts={data.portfolio.signalCounts}
         showAds={showAds}
+        subscriptionTier={tier}
       />
       <DashboardClient data={data} dailyTasks={dailyTasks} lastEmpireRating={lastEmpireRating} />
     </TerminalPageGrid>

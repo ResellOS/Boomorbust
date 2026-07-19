@@ -70,7 +70,16 @@ interface SidebarProps {
   signalCounts?: SignalCounts;
   /** True when subscription_tier === 'free' — enables sidebar AdSense. */
   showAds?: boolean;
+  /** Canonical internal tier (getUserTier). Drives the upgrade CTA vs member badge. */
+  subscriptionTier?: string | null;
 }
+
+// Internal tier (getUserTier) → display name for the member badge.
+const PLAN_LABELS: Record<string, string> = {
+  pro: 'Pro',
+  elite: 'Elite',
+  all_pro_terminal: 'All-Pro Terminal',
+};
 
 const NAV_ITEMS: { label: string; href: string; icon: LucideIcon }[] = [
   { label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
@@ -124,9 +133,12 @@ export default function Sidebar({
   bobConfidence,
   signalCounts,
   showAds = false,
+  subscriptionTier,
 }: SidebarProps) {
   const pathname = usePathname() ?? '';
   const { collapsed, toggle } = useSidebarCollapse();
+  const isPaid = !!subscriptionTier && subscriptionTier !== 'free';
+  const planName = (subscriptionTier && PLAN_LABELS[subscriptionTier]) || 'Pro';
 
   return (
     <aside
@@ -406,7 +418,13 @@ export default function Sidebar({
           <AdSlot placement="dashboard-sidebar" showAds={showAds} />
         </div>
       )}
-      {!exposureOverview && !weekContext && (
+      {isPaid ? (
+        <div className="mx-2.5 mb-2.5 shrink-0">
+          <span className="inline-flex items-center gap-1.5 rounded-md border border-boom/30 bg-boom/10 px-2.5 py-1.5 font-mono text-[10px] text-boom">
+            <span aria-hidden>✓</span> {planName} Member
+          </span>
+        </div>
+      ) : !exposureOverview && !weekContext ? (
         <div className="mx-2.5 mb-2.5 shrink-0 rounded-lg border border-bust/25 bg-gradient-to-br from-bust/[0.08] to-boom/[0.04] p-3">
           <div className="mb-2 font-figtree text-xs font-extrabold uppercase tracking-wide text-text">
             Unlock Full Power
@@ -435,7 +453,7 @@ export default function Sidebar({
             Upgrade Now
           </Link>
         </div>
-      )}
+      ) : null}
         </>
       ) : null}
     </aside>
