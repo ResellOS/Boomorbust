@@ -199,6 +199,8 @@ export interface TradePageData {
   footer: TradePageFooter;
   /** Picks the user currently owns, keyed by leagueId (give-side dropdown). */
   ownedPicksByLeague: Record<string, OwnedPick[]>;
+  /** The user's rostered players (with KTC), keyed by leagueId — package pool. */
+  myTradeAssetsByLeague: Record<string, import('@/lib/trade/buildPackage').PackageAsset[]>;
   selectedOfferDefaults: {
     offeredPlayerIds: string[];
     yourPlayerIds: string[];

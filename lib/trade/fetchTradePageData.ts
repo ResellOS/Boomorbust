@@ -14,6 +14,7 @@ import { tradeVerdictFromDelta } from '@/lib/trade/verdict';
 import { fetchMarketVerdicts } from '@/lib/verdict/fetchMarketVerdicts';
 import { buildSuggestionWhyReasons, type SuggestionComponents } from '@/lib/trade/suggestionReasons';
 import { dedupeSuggestionsByPlayer } from '@/lib/trade/dedupeSuggestions';
+import type { PackageAsset } from '@/lib/trade/buildPackage';
 import { normalizeDirection60d } from '@/lib/dashboard/tickerSignal';
 import {
   buildOwnedPicksFromTradedData,
@@ -112,6 +113,7 @@ export async function fetchTradePageData(userId: string): Promise<TradePageData>
     history: [],
     footer: emptyFooter(),
     ownedPicksByLeague: {},
+    myTradeAssetsByLeague: {},
     selectedOfferDefaults: null,
   };
 
@@ -439,6 +441,9 @@ export async function fetchTradePageData(userId: string): Promise<TradePageData>
   const suggestions: BobSuggestion[] = [];
   // Draft picks the user currently owns, per league (give-side dropdown).
   const ownedPicksByLeague: Record<string, OwnedPick[]> = {};
+  // The user's own rostered players (with KTC market value), per league — the
+  // pool the package builder draws from to auto-fill the "You Give" side.
+  const myTradeAssetsByLeague: Record<string, PackageAsset[]> = {};
   const targetSeasons = defaultTargetSeasons();
   try {
     const marketVerdicts = await fetchMarketVerdicts(supabase, 'dynasty');
@@ -491,6 +496,7 @@ export async function fetchTradePageData(userId: string): Promise<TradePageData>
             team: playerDb[pid]?.team ?? 'FA',
             tfoScore: tfoMap.get(String(pid)) ?? null,
             ktcRank: mv.ktcRank,
+            ktcValue: mv.ktcValue,
             edgeScore: Math.round(Math.abs(mv.rankDelta ?? 0) / 10 * 10) / 10,
             rankDelta: mv.rankDelta,
             verdict: mv.verdict,
@@ -529,6 +535,25 @@ export async function fetchTradePageData(userId: string): Promise<TradePageData>
 
       // Sell-high: user's own roster players flagged SELL/BUST in this league.
       const myRoster = rosters?.find((r) => r.owner_id === sleeperUserId);
+
+      // Build the give-side asset pool: every player the user rosters that has a
+      // real market value. The package builder combines these (+ owned picks) to
+      // hit a target's KTC when previewing a buy.
+      const myAssets: PackageAsset[] = [];
+      for (const pid of myRoster?.players ?? []) {
+        const ktc = marketVerdicts.get(String(pid))?.ktcValue ?? 0;
+        if (ktc <= 0) continue;
+        const p = playerDb[pid];
+        myAssets.push({
+          key: String(pid),
+          label: `${p?.full_name ?? 'Player'}${p?.position ? ` (${p.position})` : ''}`,
+          isPick: false,
+          ktcValue: ktc,
+          tfoScore: tfoMap.get(String(pid)) ?? null,
+        });
+      }
+      myTradeAssetsByLeague[lg.id] = myAssets;
+
       for (const pid of myRoster?.players ?? []) {
         if (!myRosterIdSet.has(String(pid))) continue;
         const mv = marketVerdicts.get(String(pid));
@@ -545,6 +570,7 @@ export async function fetchTradePageData(userId: string): Promise<TradePageData>
           team: playerDb[pid]?.team ?? 'FA',
           tfoScore: tfoMap.get(String(pid)) ?? null,
           ktcRank: mv.ktcRank,
+          ktcValue: mv.ktcValue,
           edgeScore: Math.round(Math.abs(mv.rankDelta ?? 0) / 10 * 10) / 10,
           rankDelta: mv.rankDelta,
           verdict: mv.verdict,
@@ -766,6 +792,7 @@ export async function fetchTradePageData(userId: string): Promise<TradePageData>
       tradeVolumeThisMonth: tradeVolumeThisMonth || completedOffers.length,
     },
     ownedPicksByLeague,
+    myTradeAssetsByLeague,
     selectedOfferDefaults: topOffer
       ? {
           offeredPlayerIds: topOffer.offeredPlayerIds,

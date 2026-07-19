@@ -3,18 +3,24 @@
 import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import type { BobSuggestion, OwnedPick } from '@/lib/trade/types';
+import type { PackageAsset } from '@/lib/trade/buildPackage';
 import { initialAssetsFromSuggestion } from '@/lib/trade/calculatorAssets';
 import TradeCalculator from '@/components/trade/TradeCalculator';
 
 interface TradePreviewModalProps {
   suggestion: BobSuggestion;
   givePicks: OwnedPick[];
+  /** The user's rostered players (with KTC) in this league — package pool. */
+  myAssets?: PackageAsset[];
   onClose: () => void;
 }
 
-export default function TradePreviewModal({ suggestion, givePicks, onClose }: TradePreviewModalProps) {
+export default function TradePreviewModal({ suggestion, givePicks, myAssets, onClose }: TradePreviewModalProps) {
   const [mounted, setMounted] = useState(false);
-  const { give, get } = initialAssetsFromSuggestion(suggestion);
+  const { give, get } = initialAssetsFromSuggestion(suggestion, {
+    players: myAssets,
+    picks: givePicks,
+  });
 
   useEffect(() => setMounted(true), []);
 

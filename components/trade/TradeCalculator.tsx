@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import type { CalculatorSearchHit } from '@/app/api/trade/calculator-search/route';
 import type { OwnedPick } from '@/lib/trade/types';
 import { PICK_TFO, pickMarketValue, parsePickYear } from '@/lib/trade/pickValues';
+import { packageFairness } from '@/lib/trade/buildPackage';
 
 export interface CalculatorAsset {
   key: string;
@@ -172,7 +173,7 @@ function SideColumn({
               </span>
               <div className="flex shrink-0 items-center gap-2">
                 <span className="font-mono text-[11px] text-boom">
-                  {a.tfoScore != null ? a.tfoScore.toFixed(1) : '—'}
+                  {a.ktcValue != null ? `${a.ktcValue.toLocaleString()} KTC` : '—'}
                 </span>
                 <button
                   type="button"
@@ -295,13 +296,31 @@ export default function TradeCalculator({
           <div className="font-figtree text-[14px] font-bold" style={{ color: verdict.color }}>
             {verdict.label}
           </div>
-          <div className="text-right">
-            <div className="font-mono text-[10px] uppercase tracking-wide text-muted">Market Value Delta</div>
-            <div className="font-mono text-[16px] font-bold" style={{ color: verdict.color }}>
-              {delta >= 0 ? '+' : ''}{delta.toLocaleString()}
+          <div className="flex items-center gap-4">
+            {active && (
+              <div className="text-right">
+                <div className="font-mono text-[10px] uppercase tracking-wide text-muted">Fairness</div>
+                <div className="font-mono text-[16px] font-bold" style={{ color: verdict.color }}>
+                  {packageFairness(giveValue, getValue)}/100
+                </div>
+              </div>
+            )}
+            <div className="text-right">
+              <div className="font-mono text-[10px] uppercase tracking-wide text-muted">Market Value Delta</div>
+              <div className="font-mono text-[16px] font-bold" style={{ color: verdict.color }}>
+                {delta >= 0 ? '+' : ''}{delta.toLocaleString()}
+              </div>
             </div>
           </div>
         </div>
+
+        {/* Total / Target readout — package total (give) vs target value (get). */}
+        {active && (
+          <div className="mt-1.5 flex items-center justify-between font-mono text-[10px] text-muted">
+            <span>Total: <span className="text-text">{giveValue.toLocaleString()} KTC</span></span>
+            <span>Target: <span className="text-text">{getValue.toLocaleString()} KTC</span></span>
+          </div>
+        )}
 
         {/* Value-balance meter — fills from center toward the favored side */}
         <div className="relative mt-2 h-1.5 w-full rounded-full bg-border/70">

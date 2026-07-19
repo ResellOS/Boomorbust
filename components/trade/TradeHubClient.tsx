@@ -291,7 +291,8 @@ export default function TradeHubClient({
       {previewSuggestion ? (
         <TradePreviewModal
           suggestion={previewSuggestion}
-          givePicks={givePicks}
+          givePicks={data.ownedPicksByLeague?.[previewSuggestion.leagueId] ?? givePicks}
+          myAssets={data.myTradeAssetsByLeague?.[previewSuggestion.leagueId] ?? []}
           onClose={() => setPreviewSuggestion(null)}
         />
       ) : null}
