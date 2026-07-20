@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import PulsingDot from '@/components/ui/PulsingDot';
+import { formatMinutesAgo } from '@/lib/utils/format';
 
 interface FooterProps {
   leagueCount: number;
@@ -44,7 +45,7 @@ export default function Footer({
           <div className="font-figtree text-sm font-bold text-boom">Optimal</div>
         </div>
         <span className="ml-1.5 font-mono text-[8.5px] text-muted">
-          Last run: {lastRunMinutes} min ago
+          Last run: {formatMinutesAgo(lastRunMinutes)}
         </span>
       </div>
       <div className="flex h-full items-center gap-2 border-r border-border/40 px-[18px]">

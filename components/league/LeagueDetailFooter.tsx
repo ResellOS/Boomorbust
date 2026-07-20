@@ -1,3 +1,5 @@
+import { formatMinutesAgo } from '@/lib/utils/format';
+
 interface LeagueDetailFooterProps {
   playersTracked: number;
   boomPlayers: number;
@@ -96,7 +98,7 @@ export default function LeagueDetailFooter({
         icon="🕐"
         iconBg="rgba(107,122,153,0.1)"
         iconBorder="rgba(107,122,153,0.2)"
-        value={`${lastUpdatedMinutes} min ago`}
+        value={formatMinutesAgo(lastUpdatedMinutes)}
         valueClass="text-text"
         label="Last Updated"
         sub="BOB Engine sync"

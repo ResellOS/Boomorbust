@@ -1,6 +1,7 @@
 'use client';
 
 import { LEAGUE_STATUS, type RosterBreakdown as RosterBreakdownData } from '@/lib/dashboard/rotation';
+import { formatTFO } from '@/lib/utils/format';
 
 // Grade colors — green/yellow/amber (no red/purple; "needs work", not "bad").
 const GRADE_COLOR: Record<string, string> = {
@@ -45,7 +46,7 @@ export default function RosterBreakdown({ breakdown }: { breakdown: RosterBreakd
                 {g.grade}
               </div>
               <div className="font-mono text-[9px] text-muted">
-                {g.avgTfo > 0 ? g.avgTfo.toFixed(0) : '—'}
+                {g.avgTfo > 0 ? formatTFO(g.avgTfo) : '—'}
               </div>
             </div>
           ))}

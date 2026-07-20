@@ -3,17 +3,13 @@
 import PlayerAvatar from '@/components/PlayerAvatar';
 import PlayerBhsActions from '@/components/dashboard/PlayerBhsActions';
 import type { OvervaluedPlayer } from '@/app/api/dashboard/snapshot/route';
+import { formatKTC } from '@/lib/utils/format';
 
 interface Props {
   players: OvervaluedPlayer[];
   /** League context for trade finder links. */
   contextLeagueId?: string | null;
   className?: string;
-}
-
-function formatKtc(n: number): string {
-  if (n >= 1000) return `${(n / 1000).toFixed(1)}K`;
-  return String(Math.round(n));
 }
 
 export default function OvervaluedAssets({ players, contextLeagueId = null, className = '' }: Props) {
@@ -69,7 +65,7 @@ export default function OvervaluedAssets({ players, contextLeagueId = null, clas
               </div>
               <div className="text-right shrink-0">
                 <div className="text-[11px] font-mono font-black text-[#36E7A1]">
-                  {formatKtc(p.ktcValue)}
+                  {formatKTC(p.ktcValue)}
                 </div>
                 <div className="text-[9px] text-[#EF4444] font-mono font-bold">
                   MO {p.moPts >= 0 ? '+' : ''}

@@ -1,14 +1,9 @@
 import Image from 'next/image';
 import type { PlayerHubStats } from '@/lib/players/types';
+import { formatMinutesAgo } from '@/lib/utils/format';
 
 interface PlayerHubTopBarProps {
   stats: PlayerHubStats;
-}
-
-function formatLastUpdated(minutes: number): string {
-  if (minutes <= 0) return 'Just now';
-  if (minutes === 1) return '1 min ago';
-  return `${minutes} min ago`;
 }
 
 export default function PlayerHubTopBar({ stats }: PlayerHubTopBarProps) {
@@ -52,7 +47,7 @@ export default function PlayerHubTopBar({ stats }: PlayerHubTopBarProps) {
     },
     {
       label: 'Last Updated',
-      value: formatLastUpdated(stats.lastUpdatedMinutes),
+      value: formatMinutesAgo(stats.lastUpdatedMinutes),
       desc: 'Next update in 22:41',
       color: 'text-text',
       small: true,

@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { RefreshCw, RotateCw } from 'lucide-react';
 import { markSyncComplete, msSinceLastSync } from '@/lib/sync/autoSync';
+import { formatTimeAgo } from '@/lib/utils/format';
 import type { SyncStatusResponse } from '@/app/api/sync/status/route';
 
 type SyncState = 'idle' | 'stale' | 'syncing' | 'success' | 'error' | 'reload';
@@ -13,10 +14,7 @@ const SUCCESS_DURATION_MS = 3000; // show "complete" before prompting reload
 const ENGINE_PHASE_MS = 30_000; // after 30s of syncing, we're in the engine pass
 
 function formatAge(ms: number): string {
-  const mins = Math.floor(ms / 60_000);
-  if (mins < 60) return `${mins}m ago`;
-  const hrs = Math.floor(mins / 60);
-  return `${hrs}h ago`;
+  return formatTimeAgo(Date.now() - ms);
 }
 
 export function SyncButton() {

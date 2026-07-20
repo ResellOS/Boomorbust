@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import type { ExposureTopbarStats } from '@/lib/exposure/types';
+import { formatMinutesAgo } from '@/lib/utils/format';
 
 interface ExposureTopBarProps {
   stats: ExposureTopbarStats;
@@ -16,11 +17,6 @@ function gradeColor(grade: string): string {
   if (grade.startsWith('B')) return '#FBBF24';
   if (grade === '—') return '#64748B';
   return '#EF4444';
-}
-
-function formatUpdated(minutes: number): string {
-  if (minutes <= 0) return 'Just now';
-  return `${minutes} min ago`;
 }
 
 export default function ExposureTopBar({ stats }: ExposureTopBarProps) {
@@ -65,7 +61,7 @@ export default function ExposureTopBar({ stats }: ExposureTopBarProps) {
     },
     {
       label: 'Last Updated',
-      value: formatUpdated(stats.lastUpdatedMinutes),
+      value: formatMinutesAgo(stats.lastUpdatedMinutes),
       sub: 'Live sync',
       color: 'text-text',
       small: true,
