@@ -39,7 +39,8 @@ export function buildPlayerTradeHints(
         likelihood: o.acceptanceProbability,
       }));
 
-    const giveParts = [top.givePlayerName, top.suggestedAddOn, top.suggestedPrice].filter(Boolean);
+    // givePlayerName already IS the full package; suggestedPrice duplicates it.
+    const giveParts = [top.givePlayerName, top.suggestedAddOn].filter(Boolean);
     return {
       leagues,
       managers,

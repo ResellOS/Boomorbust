@@ -25,6 +25,12 @@ function actionVerb(s: BobSuggestion): string {
   return 'Add';
 }
 
+// Size the acquisition price to the player's actual dynasty MARKET value (KTC),
+// NOT the rank gap. Rank-gap sizing was the bug: a low-value player with a big
+// engine-vs-market gap (e.g. Tua ~860, Zaccheaus ~74) got a first-round ask.
+// Pick KTC benchmarks (see lib/trade/pickValues): 1st≈5,200 · 2nd≈2,800 ·
+// 3rd≈1,400 · 4th≈650. Each tier asks a pick whose value ≈ the player's value,
+// so the package never grossly overpays.
 function suggestedPrice(
   gap: number | null,
   type: BobSuggestion['type'],
@@ -32,25 +38,27 @@ function suggestedPrice(
 ): string {
   const g = gap != null ? Math.abs(Math.round(gap)) : 0;
   if (type === 'sell') {
+    // What you'd receive for selling — modest, gap-scaled, never a 1st.
     if (g >= 200) return '2027 2nd Round Pick';
     if (g >= 100) return '2027 3rd Round Pick';
     return 'Future pick or depth';
   }
-  // Size the acquisition price to the player's actual dynasty MARKET value (KTC),
-  // not the rank gap — otherwise low-value players (e.g. Tua ~860, Zaccheaus ~74)
-  // get absurd first-round asks. Fall back to gap only when value is unknown.
+
   const v = playerKtc ?? 0;
   if (v > 0) {
-    if (v >= 6500) return '2027 1st Round Pick + young starter';
-    if (v >= 4000) return '2027 1st Round Pick';
-    if (v >= 2000) return '2027 2nd Round Pick';
-    if (v >= 800) return '2027 3rd Round Pick';
+    if (v >= 7500) return '2027 1st Round Pick + young starter';
+    if (v >= 4500) return '2027 1st Round Pick';
+    if (v >= 2400) return '2027 2nd Round Pick';
+    if (v >= 1100) return '2027 3rd Round Pick';
+    if (v >= 450) return '2027 4th Round Pick';
     return 'Depth piece or late pick';
   }
-  if (g >= 150) return '2027 1st Round Pick';
-  if (g >= 80) return '2027 2nd Round Pick';
-  if (g >= 40) return '2027 3rd Round Pick';
-  return 'RB depth piece (any)';
+
+  // Value unknown — stay conservative. Never fabricate a first-round ask from a
+  // rank gap alone; cap at a mid-round pick.
+  if (g >= 120) return '2027 2nd Round Pick';
+  if (g >= 60) return '2027 3rd Round Pick';
+  return 'Mid-to-late round pick';
 }
 
 function acceptanceFromManager(
@@ -259,10 +267,13 @@ export function suggestionToOpportunity(
     why.push(`Market ${dir} ${s.playerName} by ${Math.abs(gap)} spots.`);
   }
 
-  const giveName =
-    s.type === 'sell'
-      ? s.playerName
-      : suggestedPrice(gap, s.type, s.ktcValue ?? null).split(' ').slice(0, 3).join(' ');
+  // One canonical package string. Previously `givePlayerName` was the first three
+  // words of `suggestedPrice` AND `suggestedPrice` was rendered again alongside a
+  // hardcoded "RB depth piece" add-on — so a single 2027 1st showed up as
+  // "2027 1st Round Pick + RB depth piece + 2027 1st Round Pick". givePlayerName
+  // now IS the full package; add-on is folded in; consumers render it once.
+  const price = suggestedPrice(gap, s.type, s.ktcValue ?? null);
+  const giveName = s.type === 'sell' ? s.playerName : price;
   const getName = s.type === 'sell' ? 'Future pick value' : s.playerName;
 
   return {
@@ -279,10 +290,12 @@ export function suggestionToOpportunity(
     marketRank: s.ktcRank ?? null,
     playerKtc: s.ktcValue ?? null,
     valueGap: gap != null ? Math.abs(gap) : null,
-    suggestedPrice: suggestedPrice(gap, s.type, s.ktcValue ?? null),
+    suggestedPrice: price,
     givePlayerName: giveName,
     getPlayerName: getName,
-    suggestedAddOn: s.type === 'buy' ? 'RB depth piece (any)' : undefined,
+    // Add-on folded into the single package string above — no separate hardcoded
+    // sweetener (it was double-counting the price).
+    suggestedAddOn: undefined,
     acceptanceProbability: acceptance,
     mutualBenefitScore: mutual,
     championshipImpact: champ,

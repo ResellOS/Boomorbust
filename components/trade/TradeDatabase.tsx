@@ -418,8 +418,6 @@ export default function TradeDatabase({
 
                     {o.givePlayerName}
 
-                    {o.suggestedPrice ? ` + ${o.suggestedPrice}` : ''}
-
                   </td>
 
                   <td className="px-2 py-2 font-figtree text-[10px] text-boom">{o.getPlayerName}</td>

@@ -180,7 +180,6 @@ export default function TradeOfTheDayHero({
             <div className="mt-1 font-figtree text-[12px] text-[#e8ecf4]">
               You give: {o.givePlayerName}
               {o.suggestedAddOn ? ` + ${o.suggestedAddOn}` : ''}
-              {o.suggestedPrice ? ` + ${o.suggestedPrice}` : ''}
             </div>
             <div className="font-figtree text-[12px] font-semibold text-boom">You get: {o.getPlayerName}</div>
           </div>

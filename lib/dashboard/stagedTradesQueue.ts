@@ -40,7 +40,9 @@ export function readStagedTrades(): StagedTradeItem[] {
 }
 
 export function pushStagedTrade(opp: TradeOpportunity): StagedTradeItem {
-  const giveParts = [opp.givePlayerName, opp.suggestedAddOn, opp.suggestedPrice].filter(Boolean);
+  // givePlayerName already IS the full package for buys; suggestedPrice is the
+  // same string — don't concatenate them or the price double-counts.
+  const giveParts = [opp.givePlayerName, opp.suggestedAddOn].filter(Boolean);
   const item: StagedTradeItem = {
     id: `staged-${opp.id}-${Date.now()}`,
     playerId: opp.playerId,
