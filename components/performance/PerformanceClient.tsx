@@ -15,6 +15,7 @@ import RecentCallsFeed from '@/components/performance/RecentCallsFeed';
 import HallOfFame from '@/components/performance/HallOfFame';
 import HallOfAccountability from '@/components/performance/HallOfAccountability';
 import ModelTimeline from '@/components/performance/ModelTimeline';
+import MethodologyPanel from '@/components/performance/MethodologyPanel';
 
 export default function PerformanceClient({ data }: { data: PerformancePageData }) {
   const { stats, consensus, weeklyChart, categoryAccuracy, confidenceCalibration, calls, hallOfFame, hallOfShame, modelTimeline, trackRecordConsensus } = data;
@@ -94,6 +95,9 @@ export default function PerformanceClient({ data }: { data: PerformancePageData 
 
       {/* Section 7 — How BOB Learns */}
       <ModelTimeline entries={modelTimeline} />
+
+      {/* Section 8 — Methodology: TFO formula + forward-validation countdown */}
+      <MethodologyPanel />
     </div>
   );
 }
