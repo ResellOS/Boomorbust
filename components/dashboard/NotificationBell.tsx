@@ -184,6 +184,22 @@ export default function NotificationBell() {
     [],
   );
 
+  const markAll = useCallback(async () => {
+    const supabase = createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) return;
+    // Optimistic: clear immediately, then persist.
+    setRows([]);
+    setUnreadCount(0);
+    await supabase
+      .from('notifications')
+      .update({ read: true })
+      .eq('user_id', user.id)
+      .eq('read', false);
+  }, []);
+
   const onOpenItem = useCallback(
     async (row: NotificationRow, href: string) => {
       await markRead(row.id);
@@ -245,13 +261,29 @@ export default function NotificationBell() {
         >
           <div className="flex items-center justify-between border-b border-white/[0.06] px-3 py-2">
             <span className="font-mono text-[11px] font-black uppercase tracking-[0.2em] text-[#64748B]">
-              Inbox
+              Notifications
             </span>
-            {loading ? <Loader2 className="h-3.5 w-3.5 animate-spin text-[#64748B]" /> : null}
+            <div className="flex items-center gap-2">
+              {loading ? <Loader2 className="h-3.5 w-3.5 animate-spin text-[#64748B]" /> : null}
+              {!loading && items.length > 0 ? (
+                <button
+                  type="button"
+                  onClick={() => void markAll()}
+                  className="font-mono text-[10px] font-bold uppercase tracking-wide text-[#22D3EE] hover:text-white"
+                >
+                  Mark all read
+                </button>
+              ) : null}
+            </div>
           </div>
           <ul className="slim-scroll max-h-[min(64vh,360px)] overflow-y-auto p-2">
             {!loading && items.length === 0 ? (
-              <li className="px-2 py-6 text-center font-mono text-[12px] text-[#64748B]">No unread alerts.</li>
+              <li className="px-3 py-6 text-center">
+                <p className="font-mono text-[12px] text-[#94A3B8]">No notifications yet.</p>
+                <p className="mt-1 font-mono text-[11px] text-[#64748B]">
+                  BOB will alert you when something important happens.
+                </p>
+              </li>
             ) : null}
             {items.map(({ row, displayName, reason, href }) => (
               <li key={row.id} className="mb-2 last:mb-0">

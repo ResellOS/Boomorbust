@@ -35,6 +35,17 @@ export async function PATCH(req: Request) {
   let body: unknown;
   try { body = await req.json(); } catch { return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 }); }
 
+  // Mark-all: { mark_all_read: true } clears every unread alert for the user.
+  if ((body as { mark_all_read?: unknown }).mark_all_read === true) {
+    const { error } = await supabase
+      .from('notifications')
+      .update({ read: true })
+      .eq('user_id', user.id)
+      .eq('read', false);
+    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ ok: true });
+  }
+
   const id = (body as { id?: unknown }).id;
   if (typeof id !== 'string') return NextResponse.json({ error: 'id required' }, { status: 400 });
 

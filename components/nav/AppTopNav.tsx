@@ -4,6 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { clsx } from 'clsx';
+import NotificationBell from '@/components/dashboard/NotificationBell';
 
 const NAV_LINKS = [
   { href: '/dashboard', label: 'Dashboard' },
@@ -80,6 +81,7 @@ export default function AppTopNav({ username, avatarUrl }: AppTopNavProps) {
         >
           Settings
         </Link>
+        <NotificationBell />
         <div className="flex items-center gap-2">
           {avatarUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
