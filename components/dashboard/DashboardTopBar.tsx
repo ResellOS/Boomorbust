@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Info } from 'lucide-react';
 import { EMPIRE_RATING_TOOLTIP } from '@/lib/dashboard/empireRating';
+import { formatScore } from '@/lib/utils/format';
 import StatBar, { type StatBarCell } from '@/components/common/StatBar';
 
 export interface DashboardTopBarProps {
@@ -28,7 +29,7 @@ export default function DashboardTopBar({
   strengthLabel = 'Portfolio Strength',
   strengthDisplay,
 }: DashboardTopBarProps) {
-  const primaryStrength = strengthDisplay ?? portfolioStrength.toFixed(1);
+  const primaryStrength = strengthDisplay ?? formatScore(portfolioStrength);
 
   const cells: StatBarCell[] = [
     { label: strengthLabel, value: primaryStrength, tone: 'boom', glow: true },
@@ -63,7 +64,8 @@ function PortfolioStrengthStat({ value, delta }: { value: number; delta: number 
   }, [open]);
 
   const deltaColor = delta != null && delta > 0 ? '#36E7A1' : '#A78BFA';
-  const deltaLabel = delta != null ? `${delta > 0 ? '+' : ''}${delta.toFixed(1)}` : null;
+  const deltaLabel =
+    delta != null && Number.isFinite(delta) ? `${delta > 0 ? '+' : ''}${delta.toFixed(1)}` : null;
 
   return (
     <div
@@ -82,7 +84,7 @@ function PortfolioStrengthStat({ value, delta }: { value: number; delta: number 
       </button>
       <div className="flex items-baseline gap-2">
         <div className="font-mono text-[22px] font-semibold leading-none tracking-[-0.5px] text-boom" style={GLOW}>
-          {value.toFixed(1)}
+          {formatScore(value)}
         </div>
         {deltaLabel != null && (
           <div className="flex flex-col leading-none">

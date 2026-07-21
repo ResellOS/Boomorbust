@@ -230,6 +230,9 @@ export interface DashboardRotationData {
 
 // Empire rating shares the dashboard's existing curve: clamp(teamTfo + 8, 40..99).
 export function empireRatingFromTfo(teamTfo: number): number {
+  // Guard non-finite input (empty roster / unscored team) so the rating never
+  // propagates NaN to the topbar, gauge, or delta.
+  if (!Number.isFinite(teamTfo)) return 40;
   return Math.round(Math.min(99, Math.max(40, teamTfo + 8)) * 10) / 10;
 }
 

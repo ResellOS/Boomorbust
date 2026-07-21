@@ -1,4 +1,5 @@
 import { LEAGUE_STATUS, type LeagueBundle, type PortfolioBundle, type PositionKey, type RotationPlayer } from './rotation';
+import { formatScore } from '@/lib/utils/format';
 
 export interface DynastyGpsData {
   portfolioStatus: string;
@@ -154,7 +155,9 @@ export function computeDynastyGps(
   const strengthNumeric = useChampionshipLabel && playoffOdds
     ? parseInt(playoffOdds, 10)
     : empireRating;
-  const strengthValue = useChampionshipLabel && playoffOdds ? playoffOdds : empireRating.toFixed(1);
+  // Portfolio Strength is a 0–100 score — show a whole number (formatScore is
+  // NaN/undefined-safe, so a missing teamTfo renders "—" not "NaN" or "0.4").
+  const strengthValue = useChampionshipLabel && playoffOdds ? playoffOdds : formatScore(empireRating);
 
   return {
     portfolioStatus: isLeague ? LEAGUE_STATUS[currentLeague!.status].label.toUpperCase() : statusMeta.label,
