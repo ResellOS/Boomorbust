@@ -52,8 +52,7 @@ import {
 } from './PlayerHubCharts';
 import PlayerAvatar from './PlayerAvatar';
 import AnimatedCard from '@/components/ui/AnimatedCard';
-
-const WATCHLIST_KEY = 'bb_watchlist';
+import { isWatched, addToWatchlist, removeFromWatchlist } from '@/lib/watchlist/store';
 
 /** Photo-ring color driven by the BOB verdict. */
 function verdictRingColor(label: string, fallback: string): string {
@@ -150,13 +149,7 @@ export default function PlayerDetailPanel({
   }, [player.playerId]);
 
   useEffect(() => {
-    try {
-      const raw = localStorage.getItem(WATCHLIST_KEY);
-      const list: string[] = raw ? JSON.parse(raw) : [];
-      setWatching(list.includes(player.playerId));
-    } catch {
-      setWatching(false);
-    }
+    setWatching(isWatched(player.playerId));
   }, [player.playerId]);
 
   const bio = player.bio;
@@ -237,18 +230,23 @@ export default function PlayerDetailPanel({
   }, [bio?.injuryStatus, hasMarket, mv, direction, firstName]);
 
   const handleWatch = useCallback(() => {
-    try {
-      const raw = localStorage.getItem(WATCHLIST_KEY);
-      const list: string[] = raw ? JSON.parse(raw) : [];
-      const next = list.includes(player.playerId)
-        ? list.filter((id) => id !== player.playerId)
-        : [...list, player.playerId];
-      localStorage.setItem(WATCHLIST_KEY, JSON.stringify(next));
-      setWatching(next.includes(player.playerId));
-    } catch {
-      setWatching((w) => !w);
+    // Optimistic toggle; the store handles localStorage + best-effort DB sync.
+    if (isWatched(player.playerId)) {
+      removeFromWatchlist(player.playerId);
+      setWatching(false);
+    } else {
+      addToWatchlist({
+        playerId: player.playerId,
+        playerName: player.fullName,
+        position: player.position,
+        team: player.team,
+        ktcAtAdd: mv && !mv.noMarketData ? mv.ktcValue : null,
+        tfoAtAdd: player.tfoScore,
+        addedAt: new Date().toISOString(),
+      });
+      setWatching(true);
     }
-  }, [player.playerId]);
+  }, [player.playerId, player.fullName, player.position, player.team, player.tfoScore, mv]);
 
   const metricCards = (['opportunity', 'situation', 'production', 'durability'] as const).map((k) =>
     metricCardLabel(k, player, c),
@@ -318,7 +316,7 @@ export default function PlayerDetailPanel({
             </div>
             <div className="mt-3 flex flex-wrap gap-1.5">
               <QuickActionBtn onClick={handleWatch} accent={watching}>
-                {watching ? 'On Watchlist' : 'Add to Watchlist'}
+                {watching ? '✓ Watching' : 'Add to Watchlist'}
               </QuickActionBtn>
               <Link
                 href={`/trade?target=${pid}`}
