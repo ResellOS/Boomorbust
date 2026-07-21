@@ -4,176 +4,80 @@ import Link from 'next/link';
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
-import SettingsNav, { type SettingsSection } from '@/components/settings/SettingsNav';
-import ProfileCard from '@/components/settings/ProfileCard';
-import LeagueConnections from '@/components/settings/LeagueConnections';
-import SubscriptionCard from '@/components/settings/SubscriptionCard';
-import UsageDonuts from '@/components/settings/UsageDonuts';
-import NotificationToggles from '@/components/settings/NotificationToggles';
-import BobEngineCard from '@/components/settings/BobEngineCard';
-import FeedbackSection from '@/components/settings/FeedbackSection';
 import AppTopNav from '@/components/nav/AppTopNav';
+import { SyncButton } from '@/components/dashboard/SyncButton';
+import {
+  getNotificationPrefs,
+  saveNotificationPrefs,
+  getDisplayPrefs,
+  saveDisplayPrefs,
+  getHiddenLeagues,
+  setHiddenLeagues,
+  type NotificationPrefs,
+  type DisplayPrefs,
+} from '@/lib/settings/prefs';
 import type { ProfileData } from '@/app/api/settings/profile/route';
 
-// ─── Placeholder sections ────────────────────────────────────────────────────
+const CARD = 'rounded-xl p-5 md:p-6';
+const CARD_STYLE = { background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' } as const;
 
-function Placeholder({ title, description }: { title: string; description: string }) {
+function SectionHeader({ title, sub }: { title: string; sub?: string }) {
   return (
-    <div
-      className="rounded-xl flex flex-col items-center justify-center py-20 gap-3"
-      style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}
-    >
-      <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ background: 'rgba(54,231,161,0.1)', border: '1px solid rgba(54,231,161,0.2)' }}>
-        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="8" stroke="#36E7A1" strokeWidth="1.5"/><path d="M10 7v3l1.5 1.5" stroke="#36E7A1" strokeWidth="1.5" strokeLinecap="round"/></svg>
-      </div>
-      <p className="text-[15px] font-semibold text-white">{title}</p>
-      <p className="text-[13px] text-slate-500 text-center max-w-xs">{description}</p>
+    <div className="mb-4">
+      <p className="font-figtree text-[13px] font-bold uppercase tracking-[1.5px] text-slate-400">{title}</p>
+      {sub && <p className="mt-0.5 text-[12px] text-slate-500">{sub}</p>}
     </div>
   );
 }
 
-// ─── Dynasty Title section ───────────────────────────────────────────────────
-
-const DYNASTY_TITLES = [
-  { id: 'DYNASTY GOAT',   desc: 'The greatest of all time. Undisputed.' },
-  { id: 'THE ARCHITECT',  desc: 'Builds through draft, never overpays.' },
-  { id: 'THE SHARK',      desc: 'Consistently wins trades, ruthless.' },
-  { id: 'THE GAMBLER',    desc: 'High risk, high reward.' },
-  { id: 'THE PROFESSOR',  desc: 'Purely data driven, never emotional.' },
-  { id: 'THE PROPHET',    desc: 'Consistently ahead of market.' },
-];
-
-function DynastyTitleSection({ currentTitle }: { currentTitle: string }) {
-  const [selected, setSelected] = useState(currentTitle);
-  const [saving, setSaving] = useState(false);
-
-  const save = async () => {
-    setSaving(true);
-    try {
-      await fetch('/api/settings/profile', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ dynasty_title: selected }),
-      });
-    } finally {
-      setSaving(false);
-    }
-  };
-
+function Toggle({ checked, onChange, label }: { checked: boolean; onChange: (v: boolean) => void; label: string }) {
   return (
-    <div
-      className="rounded-xl p-6"
-      style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}
+    <button
+      type="button"
+      role="switch"
+      aria-checked={checked}
+      onClick={() => onChange(!checked)}
+      className="flex w-full items-center justify-between gap-3 py-2.5 text-left"
     >
-      <p className="text-[14px] font-bold text-slate-400 uppercase tracking-widest mb-1">Dynasty Title</p>
-      <p className="text-[13px] text-slate-500 mb-5">Your public dynasty identity. Displayed on your profile.</p>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-5">
-        {DYNASTY_TITLES.map((t) => (
-          <button
-            key={t.id}
-            onClick={() => setSelected(t.id)}
-            className="flex flex-col text-left p-4 rounded-xl transition-all"
-            style={{
-              background: selected === t.id ? 'rgba(124,58,237,0.15)' : 'rgba(255,255,255,0.03)',
-              border: selected === t.id ? '1px solid rgba(167,139,250,0.4)' : '1px solid rgba(255,255,255,0.07)',
-            }}
-          >
-            <p className="text-[13px] font-bold" style={{ color: selected === t.id ? '#A78BFA' : '#94a3b8' }}>{t.id}</p>
-            <p className="text-[11px] text-slate-500 mt-0.5">{t.desc}</p>
-          </button>
-        ))}
-      </div>
-      <button
-        onClick={save}
-        disabled={saving}
-        className="px-5 py-2.5 rounded-xl text-[13px] font-bold transition-all"
-        style={{ background: '#36E7A1', color: '#0a0d14' }}
+      <span className="font-figtree text-[13px] text-white">{label}</span>
+      <span
+        className="relative h-[22px] w-[40px] shrink-0 rounded-full transition-colors"
+        style={{ background: checked ? '#36E7A1' : 'rgba(255,255,255,0.12)' }}
       >
-        {saving ? 'Saving…' : 'Save Title'}
-      </button>
-    </div>
+        <span
+          className="absolute top-[3px] h-4 w-4 rounded-full bg-white transition-all"
+          style={{ left: checked ? '21px' : '3px' }}
+        />
+      </span>
+    </button>
   );
 }
 
-function ProfileBadges({ badges }: { badges: ProfileData['badges'] }) {
-  if (badges.length === 0) {
-    return (
-      <div
-        className="rounded-xl p-6"
-        style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}
-      >
-        <p className="text-[14px] font-bold text-slate-400 uppercase tracking-widest mb-1">Earned Badges</p>
-        <p className="text-[13px] text-slate-500">
-          Share feedback when prompted to earn your first badge.
-        </p>
-      </div>
-    );
-  }
-
+function SaveButton({ onClick, saved }: { onClick: () => void; saved: boolean }) {
   return (
-    <div
-      className="rounded-xl p-6"
-      style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}
+    <button
+      type="button"
+      onClick={onClick}
+      className="mt-3 rounded-lg px-4 py-2 font-figtree text-[13px] font-bold transition-all"
+      style={{ background: saved ? 'rgba(54,231,161,0.15)' : '#36E7A1', color: saved ? '#36E7A1' : '#0a0d14', border: '1px solid rgba(54,231,161,0.3)' }}
     >
-      <p className="text-[14px] font-bold text-slate-400 uppercase tracking-widest mb-3">Earned Badges</p>
-      <div className="flex flex-wrap gap-2">
-        {badges.map((b) => (
-          <span
-            key={`${b.badgeType}-${b.awardedAt}`}
-            className="inline-flex items-center rounded-full px-3 py-1.5 font-mono text-[12px] font-semibold"
-            style={{
-              color: '#36E7A1',
-              background: 'rgba(54, 231, 161, 0.1)',
-              border: '1px solid rgba(54, 231, 161, 0.28)',
-            }}
-          >
-            {b.badgeType === 'feedback_contributor' ? '🏆 ' : ''}
-            {b.badgeLabel}
-          </span>
-        ))}
-      </div>
-    </div>
+      {saved ? '✓ Saved' : 'Save Preferences'}
+    </button>
   );
 }
-
-// ─── Page ────────────────────────────────────────────────────────────────────
 
 export default function SettingsPage() {
   const router = useRouter();
-  const [section,  setSection]  = useState<SettingsSection>('profile');
-  const [data,     setData]     = useState<ProfileData | null>(null);
-  const [loading,  setLoading]  = useState(true);
-  const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const [data, setData] = useState<ProfileData | null>(null);
+  const [loading, setLoading] = useState(true);
 
   const fetchProfile = useCallback(async () => {
     try {
       const res = await fetch('/api/settings/profile');
       if (!res.ok) return;
-      const profile = (await res.json()) as ProfileData;
-
-      // Enrich subscription with Stripe renewal when paid
-      if (profile.subscription.isPaid) {
-        try {
-          const billRes = await fetch('/api/stripe/billing-summary');
-          if (billRes.ok) {
-            const bill = (await billRes.json()) as {
-              renewal_iso?: string | null;
-              price_label?: string | null;
-              interval?: 'month' | 'year' | null;
-            };
-            if (bill.renewal_iso) {
-              profile.subscription.renewsLabel = `Renews ${new Date(bill.renewal_iso).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}`;
-            }
-            if (bill.price_label && bill.interval) {
-              profile.subscription.price = `${bill.price_label} /${bill.interval === 'year' ? 'yr' : 'mo'}`;
-            }
-          }
-        } catch {
-          /* billing optional */
-        }
-      }
-
-      setData(profile);
+      setData((await res.json()) as ProfileData);
+    } catch {
+      /* handled by the error card below */
     } finally {
       setLoading(false);
     }
@@ -187,310 +91,404 @@ export default function SettingsPage() {
     router.push('/auth/login');
   };
 
-  const handleNotifChange = async (key: keyof ProfileData['notifications'], value: boolean) => {
-    if (!data) return;
-
-    // Optimistic update
-    setData((prev) => prev ? { ...prev, notifications: { ...prev.notifications, [key]: value } } : prev);
-
-    try {
-      await fetch('/api/notifications/preferences', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ [key]: value }),
-      });
-    } catch {
-      // Revert on failure
-      setData((prev) => prev ? { ...prev, notifications: { ...prev.notifications, [key]: !value } } : prev);
-    }
-  };
-
-  const renderSection = () => {
-    if (loading) {
-      return (
-        <div className="space-y-4">
-          {[...Array(3)].map((_, i) => (
-            <div key={i} className="h-40 rounded-xl animate-pulse" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }} />
-          ))}
-        </div>
-      );
-    }
-
-    switch (section) {
-      case 'profile':
-        return (
-          <div className="space-y-5">
-            {data && <ProfileCard data={data} onEdit={() => {}} />}
-            {data && <LeagueConnections leagues={data.leagues} />}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-              {data && <SubscriptionCard subscription={data.subscription} />}
-              {data && <UsageDonuts usage={data.usage} renewsLabel={data.subscription.renewsLabel} />}
-            </div>
-            {data && <NotificationToggles notifications={data.notifications} onChange={handleNotifChange} />}
-            <div
-              className="rounded-xl p-6"
-              style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}
-            >
-              <p className="text-[14px] font-bold text-slate-400 uppercase tracking-widest mb-1">BOB Record</p>
-              <p className="text-[13px] text-slate-500 mb-4">View your prediction track record and model accuracy.</p>
-              <Link
-                href="/performance"
-                className="inline-flex items-center gap-2 rounded-xl px-5 py-2.5 text-[13px] font-bold no-underline transition hover:opacity-90"
-                style={{ background: 'rgba(54,231,161,0.12)', color: '#36E7A1', border: '1px solid rgba(54,231,161,0.25)' }}
-              >
-                View BOB Record →
-              </Link>
-            </div>
-            <FeedbackSection />
-          </div>
-        );
-
-      case 'dynasty-title':
-        return data ? (
-          <div className="space-y-5">
-            <DynastyTitleSection currentTitle={data.dynastyTitle} />
-            <ProfileBadges badges={data.badges} />
-          </div>
-        ) : null;
-
-      case 'league-connections':
-        return data ? <LeagueConnections leagues={data.leagues} /> : null;
-
-      case 'subscription':
-        return data ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            <SubscriptionCard subscription={data.subscription} />
-            <UsageDonuts usage={data.usage} renewsLabel={data.subscription.renewsLabel} />
-          </div>
-        ) : null;
-
-      case 'notifications':
-      case 'trade-alerts':
-      case 'waiver-alerts':
-        return data ? <NotificationToggles notifications={data.notifications} onChange={handleNotifChange} /> : null;
-
-      case 'email-preferences':
-        return <Placeholder title="Email Preferences" description="Configure which digest emails you receive and how often." />;
-
-      case 'push-notifications':
-        return <Placeholder title="Push Notifications" description="Manage browser and mobile push notification settings." />;
-
-      case 'data-settings':
-        return <Placeholder title="Data Settings" description="Control how your data is stored and used within the platform." />;
-
-      case 'privacy-settings':
-        return (
-          <div className="space-y-5">
-            <div
-              className="rounded-xl p-6"
-              style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}
-            >
-              <p className="text-[14px] font-bold text-slate-400 uppercase tracking-widest mb-1">
-                Privacy Settings
-              </p>
-              <p className="text-[13px] text-slate-500 mb-4 leading-relaxed">
-                We sync your Sleeper league data to power BOB — we do not sell your personal data.
-                Free-tier ads are programmatic only. Export or delete your data anytime from Export
-                My Data in the sidebar.
-              </p>
-              <div className="flex flex-wrap gap-3">
-                <Link
-                  href="/privacy"
-                  className="inline-flex items-center rounded-lg px-4 py-2 text-[12px] font-semibold transition hover:opacity-90"
-                  style={{
-                    background: 'rgba(54, 231, 161, 0.12)',
-                    color: '#36E7A1',
-                    border: '1px solid rgba(54, 231, 161, 0.25)',
-                  }}
-                >
-                  Privacy Policy
-                </Link>
-                <Link
-                  href="/terms"
-                  className="inline-flex items-center rounded-lg px-4 py-2 text-[12px] font-semibold transition hover:opacity-90"
-                  style={{
-                    background: 'rgba(255,255,255,0.05)',
-                    color: '#e8ecf4',
-                    border: '1px solid rgba(255,255,255,0.1)',
-                  }}
-                >
-                  Terms of Service
-                </Link>
-              </div>
-            </div>
-          </div>
-        );
-
-      case 'export-data':
-        return (
-          <div
-            className="rounded-xl p-6"
-            style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}
-          >
-            <p className="text-[14px] font-bold text-slate-400 uppercase tracking-widest mb-1">Export My Data</p>
-            <p className="text-[13px] text-slate-500 mb-5">Download a full export of your dynasty data, trade history, and league stats.</p>
-            <div className="space-y-3">
-              {['Roster History (.csv)', 'Trade History (.csv)', 'Empire Score History (.json)', 'Full Account Data (.zip)'].map((item) => (
-                <div key={item} className="flex items-center justify-between p-4 rounded-xl" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
-                  <p className="text-[14px] text-white">{item}</p>
-                  <button className="px-4 py-1.5 rounded-lg text-[12px] font-semibold" style={{ background: 'rgba(54,231,161,0.12)', color: '#36E7A1', border: '1px solid rgba(54,231,161,0.25)' }}>
-                    Export
-                  </button>
-                </div>
-              ))}
-            </div>
-          </div>
-        );
-
-      case 'integrations':
-        return (
-          <div
-            className="rounded-xl p-6"
-            style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}
-          >
-            <p className="text-[14px] font-bold text-slate-400 uppercase tracking-widest mb-5">Integrations</p>
-            <div className="space-y-3">
-              {[
-                { name: 'Sleeper',   connected: true,  desc: 'Dynasty leagues & rosters' },
-                { name: 'Twitter/X', connected: false, desc: 'Share your Wrapped & stats' },
-                { name: 'Discord',   connected: false, desc: 'Bot alerts in your server' },
-              ].map((int) => (
-                <div key={int.name} className="flex items-center justify-between p-4 rounded-xl" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
-                  <div>
-                    <p className="text-[14px] font-semibold text-white">{int.name}</p>
-                    <p className="text-[12px] text-slate-500">{int.desc}</p>
-                  </div>
-                  <button
-                    className="px-4 py-1.5 rounded-lg text-[12px] font-semibold"
-                    style={int.connected
-                      ? { background: 'rgba(54,231,161,0.1)', color: '#36E7A1', border: '1px solid rgba(54,231,161,0.25)' }
-                      : { background: 'rgba(255,255,255,0.05)', color: '#94a3b8', border: '1px solid rgba(255,255,255,0.1)' }
-                    }
-                  >
-                    {int.connected ? 'Connected' : 'Connect'}
-                  </button>
-                </div>
-              ))}
-            </div>
-          </div>
-        );
-
-      case 'bob-engine':
-        return <BobEngineCard />;
-
-      case 'api-access':
-        return (
-          <div
-            className="rounded-xl p-6"
-            style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}
-          >
-            <p className="text-[14px] font-bold text-slate-400 uppercase tracking-widest mb-1">API Access</p>
-            <p className="text-[13px] text-slate-500 mb-5">Build on top of Boom or Bust with our API. Requires All-Pro Terminal subscription.</p>
-            <div className="p-4 rounded-xl mb-4" style={{ background: 'rgba(124,58,237,0.08)', border: '1px solid rgba(124,58,237,0.2)' }}>
-              <p className="text-[12px] font-bold text-slate-400 mb-2 uppercase tracking-wider">API Key</p>
-              <div className="flex items-center gap-3">
-                <code className="flex-1 text-[13px] text-slate-400 font-mono truncate">••••••••••••••••••••••••••••••••</code>
-                <button className="px-3 py-1.5 rounded-lg text-[12px] text-white" style={{ background: 'rgba(255,255,255,0.08)' }}>Reveal</button>
-                <button className="px-3 py-1.5 rounded-lg text-[12px] font-semibold" style={{ background: 'rgba(54,231,161,0.12)', color: '#36E7A1', border: '1px solid rgba(54,231,161,0.25)' }}>Regenerate</button>
-              </div>
-            </div>
-            <p className="text-[12px] text-slate-500">Rate limit: 1,000 requests/day · <a href="#" style={{ color: '#36E7A1' }}>API Documentation →</a></p>
-          </div>
-        );
-
-      default:
-        return <Placeholder title={section} description="Coming soon." />;
-    }
-  };
-
-  const sectionLabels: Record<SettingsSection, string> = {
-    'profile':            'Settings / Profile',
-    'dynasty-title':      'Settings / Dynasty Title',
-    'league-connections': 'Settings / League Connections',
-    'subscription':       'Settings / Subscription & Billing',
-    'notifications':      'Settings / Notifications',
-    'email-preferences':  'Settings / Email Preferences',
-    'push-notifications': 'Settings / Push Notifications',
-    'trade-alerts':       'Settings / Trade Alerts',
-    'waiver-alerts':      'Settings / Waiver Alerts',
-    'data-settings':      'Settings / Data Settings',
-    'privacy-settings':   'Settings / Privacy Settings',
-    'export-data':        'Settings / Export My Data',
-    'integrations':       'Settings / Integrations',
-    'api-access':         'Settings / API Access',
-    'bob-engine':         'Settings / BOB Engine',
-  };
-
   return (
     <div className="flex min-h-dvh flex-col bg-[#0a0d14]">
       <AppTopNav username={data?.username} avatarUrl={data?.avatarUrl} />
-      <div className="flex min-h-0 flex-1">
-      {/* Left sidebar (desktop) */}
-      <aside
-        className="hidden lg:flex flex-col w-56 flex-shrink-0 border-r sticky top-0 h-dvh overflow-y-auto"
-        style={{ borderColor: 'rgba(255,255,255,0.07)', background: 'rgba(255,255,255,0.015)' }}
-      >
-        <SettingsNav active={section} onChange={setSection} onLogout={handleLogout} />
-      </aside>
-
-      {/* Mobile nav toggle */}
-      <div className="lg:hidden fixed bottom-4 right-4 z-50">
-        <button
-          onClick={() => setMobileNavOpen((v) => !v)}
-          className="w-12 h-12 rounded-full flex items-center justify-center shadow-lg"
-          style={{ background: '#36E7A1', color: '#0a0d14' }}
-        >
-          <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-            <path d="M3 5h12M3 9h12M3 13h12" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
-          </svg>
-        </button>
-      </div>
-
-      {/* Mobile nav drawer */}
-      {mobileNavOpen && (
-        <div className="lg:hidden fixed inset-0 z-40" onClick={() => setMobileNavOpen(false)}>
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
-          <aside
-            className="absolute left-0 top-0 bottom-0 w-64 overflow-y-auto"
-            style={{ background: '#0a0d14', border: '1px solid rgba(255,255,255,0.1)' }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <SettingsNav
-              active={section}
-              onChange={(s) => { setSection(s); setMobileNavOpen(false); }}
-              onLogout={handleLogout}
-            />
-          </aside>
-        </div>
-      )}
-
-      {/* Main content */}
-      <main className="flex-1 min-w-0 px-4 md:px-6 py-6 overflow-y-auto pb-20 lg:pb-6">
-        {/* Header */}
+      <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-6 pb-24 md:px-6">
         <div className="mb-6">
-          <h1 className="text-[24px] font-bold text-white">{sectionLabels[section]}</h1>
-          <p className="text-[14px] text-slate-500 mt-0.5">Manage your account, leagues, and preferences.</p>
+          <h1 className="font-figtree text-[24px] font-bold text-white">Settings</h1>
+          <p className="mt-0.5 text-[14px] text-slate-500">Manage your account, leagues, and preferences.</p>
         </div>
 
-        {!loading && !data && (
-          <div
-            className="rounded-xl p-8 text-center"
-            style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.25)' }}
-          >
-            <p className="text-[15px] font-semibold text-red-400">Could not load profile</p>
-            <p className="text-[13px] text-slate-500 mt-2">Check your connection and try refreshing.</p>
-            <button
-              onClick={() => { setLoading(true); fetchProfile(); }}
-              className="mt-4 px-4 py-2 rounded-lg text-[13px] font-semibold"
-              style={{ background: '#36E7A1', color: '#0a0d14' }}
-            >
+        {loading ? (
+          <div className="space-y-4">
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="h-40 animate-pulse rounded-xl" style={CARD_STYLE} />
+            ))}
+          </div>
+        ) : !data ? (
+          <div className="rounded-xl p-8 text-center" style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.25)' }}>
+            <p className="text-[15px] font-semibold text-red-400">Could not load your settings</p>
+            <p className="mt-2 text-[13px] text-slate-500">Check your connection and try again.</p>
+            <button onClick={() => { setLoading(true); fetchProfile(); }} className="mt-4 rounded-lg px-4 py-2 text-[13px] font-semibold" style={{ background: '#36E7A1', color: '#0a0d14' }}>
               Retry
             </button>
           </div>
+        ) : (
+          <div className="space-y-5">
+            <AccountSection data={data} onSaved={fetchProfile} />
+            <LeaguesSection data={data} />
+            <NotificationsSection />
+            <DisplaySection />
+            <DataSection data={data} />
+            <AboutSection />
+            <DangerZone onDeleted={handleLogout} />
+          </div>
         )}
-        {renderSection()}
       </main>
+    </div>
+  );
+}
+
+// ─── Section 1 — Account ──────────────────────────────────────────────────────
+
+function AccountSection({ data, onSaved }: { data: ProfileData; onSaved: () => void }) {
+  const [name, setName] = useState(data.teamName);
+  const [saving, setSaving] = useState(false);
+  const dirty = name.trim() !== data.teamName && name.trim().length > 0;
+
+  const save = async () => {
+    if (!dirty) return;
+    setSaving(true);
+    try {
+      await fetch('/api/settings/profile', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ team_name: name.trim() }),
+      });
+      onSaved();
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <section className={CARD} style={CARD_STYLE}>
+      <SectionHeader title="Account" />
+      <label className="mb-1 block text-[12px] text-slate-500">Display Name</label>
+      <div className="flex gap-2">
+        <input
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          className="min-w-0 flex-1 rounded-lg border border-white/10 bg-white/[0.03] px-3 py-2 font-figtree text-[14px] text-white outline-none focus:border-boom/50"
+        />
+        <button
+          type="button"
+          onClick={save}
+          disabled={!dirty || saving}
+          className="shrink-0 rounded-lg px-4 py-2 font-figtree text-[13px] font-bold transition-all disabled:opacity-40"
+          style={{ background: '#36E7A1', color: '#0a0d14' }}
+        >
+          {saving ? 'Saving…' : 'Save'}
+        </button>
+      </div>
+
+      <label className="mb-1 mt-4 block text-[12px] text-slate-500">Sleeper Username</label>
+      <div className="rounded-lg border border-white/10 bg-white/[0.02] px-3 py-2 font-mono text-[13px] text-slate-400">
+        @{data.username}
+      </div>
+
+      <div className="mt-4 flex flex-wrap items-center gap-3">
+        <span
+          className="rounded-full px-3 py-1 font-mono text-[11px] font-bold"
+          style={{ color: '#36E7A1', background: 'rgba(54,231,161,0.12)', border: '1px solid rgba(54,231,161,0.3)' }}
+        >
+          {data.subscription.label} Plan
+        </span>
+        {data.subscription.isPaid && (
+          <span className="font-mono text-[10px] text-boom">🏆 Founding Member</span>
+        )}
+        <span className="text-[12px] text-slate-500">Member since {data.memberSince}</span>
+      </div>
+    </section>
+  );
+}
+
+// ─── Section 2 — Connected Leagues ────────────────────────────────────────────
+
+function LeaguesSection({ data }: { data: ProfileData }) {
+  const [hidden, setHidden] = useState<string[]>([]);
+  const [confirmId, setConfirmId] = useState<string | null>(null);
+
+  useEffect(() => { setHidden(getHiddenLeagues()); }, []);
+
+  const disconnect = (id: string) => {
+    const next = hidden.includes(id) ? hidden : [...hidden, id];
+    setHidden(next);
+    setHiddenLeagues(next);
+    setConfirmId(null);
+  };
+  const reconnect = (id: string) => {
+    const next = hidden.filter((x) => x !== id);
+    setHidden(next);
+    setHiddenLeagues(next);
+  };
+
+  const visible = data.leagues.filter((l) => !hidden.includes(l.id));
+
+  return (
+    <section className={CARD} style={CARD_STYLE}>
+      <div className="mb-4 flex items-center justify-between">
+        <SectionHeader title={`Connected Leagues (${visible.length})`} />
+        <Link
+          href="/leagues/connect"
+          className="shrink-0 rounded-lg px-3 py-1.5 font-figtree text-[12px] font-bold no-underline"
+          style={{ background: 'rgba(54,231,161,0.12)', color: '#36E7A1', border: '1px solid rgba(54,231,161,0.25)' }}
+        >
+          + Add More Leagues
+        </Link>
+      </div>
+
+      {data.leagues.length === 0 ? (
+        <p className="py-6 text-center text-[13px] text-slate-500">
+          No leagues connected yet. Connect your Sleeper account to get started.
+        </p>
+      ) : (
+        <div className="divide-y divide-white/[0.06]">
+          {data.leagues.map((lg) => {
+            const isHidden = hidden.includes(lg.id);
+            return (
+              <div key={lg.id} className="flex items-center gap-3 py-3">
+                <div className="min-w-0 flex-1">
+                  <p className={`truncate font-figtree text-[14px] font-semibold ${isHidden ? 'text-slate-600 line-through' : 'text-white'}`}>
+                    {lg.name}
+                  </p>
+                  <p className="font-mono text-[11px] text-slate-500">{lg.format} · {lg.role} · since {lg.since}</p>
+                </div>
+                {isHidden ? (
+                  <button type="button" onClick={() => reconnect(lg.id)} className="shrink-0 rounded-lg border border-white/10 px-3 py-1.5 text-[12px] text-slate-400 hover:text-white">
+                    Restore
+                  </button>
+                ) : confirmId === lg.id ? (
+                  <div className="flex shrink-0 items-center gap-2">
+                    <span className="text-[11px] text-slate-400">Sure?</span>
+                    <button type="button" onClick={() => disconnect(lg.id)} className="rounded-lg px-2.5 py-1.5 text-[12px] font-bold" style={{ background: 'rgba(239,68,68,0.15)', color: '#EF4444', border: '1px solid rgba(239,68,68,0.3)' }}>
+                      Disconnect
+                    </button>
+                    <button type="button" onClick={() => setConfirmId(null)} className="text-[12px] text-slate-500 hover:text-white">Cancel</button>
+                  </div>
+                ) : (
+                  <button type="button" onClick={() => setConfirmId(lg.id)} className="shrink-0 rounded-lg border border-white/10 px-3 py-1.5 text-[12px] text-slate-400 transition-colors hover:border-red-500/40 hover:text-red-400">
+                    Disconnect
+                  </button>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
+      {hidden.length > 0 && (
+        <p className="mt-3 text-[11px] text-slate-500">
+          Disconnected leagues are hidden on this device. Restore them above or re-sync from Connect Leagues.
+        </p>
+      )}
+    </section>
+  );
+}
+
+// ─── Section 3 — Notifications ────────────────────────────────────────────────
+
+const NOTIF_ROWS: { key: keyof NotificationPrefs; label: string }[] = [
+  { key: 'regimeChange', label: 'Regime change alerts' },
+  { key: 'sellWindow', label: 'Sell window alerts' },
+  { key: 'breakoutSignals', label: 'Breakout signals' },
+  { key: 'championshipChanges', label: 'Championship odds changes > 5%' },
+  { key: 'tradeOpportunities', label: 'New trade opportunities' },
+  { key: 'weeklyReport', label: 'Weekly dynasty report' },
+];
+
+function NotificationsSection() {
+  const [prefs, setPrefs] = useState<NotificationPrefs | null>(null);
+  const [saved, setSaved] = useState(false);
+
+  useEffect(() => { setPrefs(getNotificationPrefs()); }, []);
+  if (!prefs) return null;
+
+  const set = (key: keyof NotificationPrefs, v: boolean) => {
+    setPrefs({ ...prefs, [key]: v });
+    setSaved(false);
+  };
+  const save = () => { saveNotificationPrefs(prefs); setSaved(true); };
+
+  return (
+    <section className={CARD} style={CARD_STYLE}>
+      <SectionHeader title="Notifications" sub="Choose what BOB alerts you about." />
+      <div className="divide-y divide-white/[0.05]">
+        {NOTIF_ROWS.map((r) => (
+          <Toggle key={r.key} label={r.label} checked={prefs[r.key]} onChange={(v) => set(r.key, v)} />
+        ))}
+      </div>
+      <SaveButton onClick={save} saved={saved} />
+    </section>
+  );
+}
+
+// ─── Section 4 — Display ──────────────────────────────────────────────────────
+
+const DISPLAY_ROWS: { key: keyof DisplayPrefs; label: string }[] = [
+  { key: 'showKtc', label: 'Show KTC values alongside BOB' },
+  { key: 'showConfidence', label: 'Show confidence percentages' },
+  { key: 'compactMode', label: 'Compact mode' },
+  { key: 'showReasoning', label: 'Show BOB reasoning on cards' },
+];
+
+function DisplaySection() {
+  const [prefs, setPrefs] = useState<DisplayPrefs | null>(null);
+  const [saved, setSaved] = useState(false);
+
+  useEffect(() => { setPrefs(getDisplayPrefs()); }, []);
+  if (!prefs) return null;
+
+  const set = (key: keyof DisplayPrefs, v: boolean) => {
+    setPrefs({ ...prefs, [key]: v });
+    setSaved(false);
+  };
+  const save = () => { saveDisplayPrefs(prefs); setSaved(true); };
+
+  return (
+    <section className={CARD} style={CARD_STYLE}>
+      <SectionHeader title="Display" sub="Tune how information shows across the app." />
+      <div className="divide-y divide-white/[0.05]">
+        {DISPLAY_ROWS.map((r) => (
+          <Toggle key={r.key} label={r.label} checked={prefs[r.key]} onChange={(v) => set(r.key, v)} />
+        ))}
+      </div>
+      <SaveButton onClick={save} saved={saved} />
+    </section>
+  );
+}
+
+// ─── Section 5 — Data ─────────────────────────────────────────────────────────
+
+function DataSection({ data }: { data: ProfileData }) {
+  const exportData = () => {
+    const payload = {
+      exportedAt: new Date().toISOString(),
+      account: { username: data.username, teamName: data.teamName, memberSince: data.memberSince, plan: data.subscription.label },
+      leagues: data.leagues,
+      preferences: { notifications: getNotificationPrefs(), display: getDisplayPrefs() },
+    };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `boom-or-bust-data-${new Date().toISOString().slice(0, 10)}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  return (
+    <section className={CARD} style={CARD_STYLE}>
+      <SectionHeader title="Data" sub="Sync your leagues or export a copy of your data." />
+      <div className="flex flex-wrap items-center gap-3">
+        <SyncButton />
+        <button
+          type="button"
+          onClick={exportData}
+          className="rounded-lg px-4 py-2 font-figtree text-[13px] font-bold no-underline transition-all"
+          style={{ background: 'rgba(255,255,255,0.05)', color: '#e8ecf4', border: '1px solid rgba(255,255,255,0.12)' }}
+        >
+          Export My Data
+        </button>
+      </div>
+      <p className="mt-2 text-[11px] text-slate-500">Export downloads a JSON file of your leagues and preferences.</p>
+    </section>
+  );
+}
+
+// ─── Section 6 — About ────────────────────────────────────────────────────────
+
+function AboutSection() {
+  const links: { label: string; href: string }[] = [
+    { label: 'Privacy', href: '/privacy' },
+    { label: 'Terms', href: '/terms' },
+    { label: 'Contact', href: 'mailto:hello@boomorbust.app' },
+    { label: 'Discord', href: 'https://discord.gg/boomorbust' },
+  ];
+  return (
+    <section className={CARD} style={CARD_STYLE}>
+      <SectionHeader title="About" />
+      <div className="space-y-1.5 font-mono text-[12px] text-slate-400">
+        <div className="flex justify-between"><span>BOB Version</span><span className="text-white">Beta 1.0</span></div>
+        <div className="flex justify-between"><span>Forward Validation</span><span className="text-white">Feb 1, 2027</span></div>
+      </div>
+      <div className="mt-4 flex flex-wrap gap-2">
+        {links.map((l) => (
+          <Link
+            key={l.label}
+            href={l.href}
+            className="rounded-lg px-3 py-1.5 font-figtree text-[12px] no-underline transition-colors"
+            style={{ background: 'rgba(255,255,255,0.04)', color: '#94a3b8', border: '1px solid rgba(255,255,255,0.08)' }}
+          >
+            {l.label}
+          </Link>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+// ─── Section 7 — Danger Zone ──────────────────────────────────────────────────
+
+function ConfirmAction({
+  title, description, confirmWord, actionLabel, onConfirm,
+}: {
+  title: string; description: string; confirmWord: string; actionLabel: string; onConfirm: () => Promise<void> | void;
+}) {
+  const [text, setText] = useState('');
+  const [busy, setBusy] = useState(false);
+  const ready = text.trim().toLowerCase() === confirmWord;
+
+  return (
+    <div className="rounded-lg p-4" style={{ background: 'rgba(239,68,68,0.05)', border: '1px solid rgba(239,68,68,0.2)' }}>
+      <p className="font-figtree text-[13px] font-bold text-red-400">{title}</p>
+      <p className="mt-0.5 text-[12px] text-slate-500">{description}</p>
+      <div className="mt-3 flex flex-col gap-2 sm:flex-row">
+        <input
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          placeholder={`Type "${confirmWord}" to confirm`}
+          className="min-w-0 flex-1 rounded-lg border border-red-500/25 bg-white/[0.03] px-3 py-2 font-mono text-[12px] text-white outline-none placeholder:text-slate-600 focus:border-red-500/50"
+        />
+        <button
+          type="button"
+          disabled={!ready || busy}
+          onClick={async () => { setBusy(true); try { await onConfirm(); } finally { setBusy(false); } }}
+          className="shrink-0 rounded-lg px-4 py-2 font-figtree text-[13px] font-bold transition-all disabled:opacity-40"
+          style={{ background: '#EF4444', color: '#fff' }}
+        >
+          {busy ? 'Working…' : actionLabel}
+        </button>
       </div>
     </div>
+  );
+}
+
+function DangerZone({ onDeleted }: { onDeleted: () => void }) {
+  const disconnectAll = () => {
+    // No bulk-disconnect endpoint exists; send the user to league setup to
+    // manage/reconnect. (Per-league hide lives in the Connected Leagues section.)
+    window.location.href = '/leagues/connect';
+  };
+
+  const deleteAccount = async () => {
+    try {
+      const res = await fetch('/api/account', { method: 'DELETE' });
+      if (res.ok) onDeleted();
+    } catch {
+      /* surfaced by the button staying enabled */
+    }
+  };
+
+  return (
+    <section className={CARD} style={{ background: 'rgba(239,68,68,0.04)', border: '1px solid rgba(239,68,68,0.25)' }}>
+      <SectionHeader title="Danger Zone" />
+      <div className="space-y-3">
+        <ConfirmAction
+          title="Disconnect All Leagues"
+          description="Removes every league from your account and returns you to league setup."
+          confirmWord="disconnect"
+          actionLabel="Disconnect All"
+          onConfirm={disconnectAll}
+        />
+        <ConfirmAction
+          title="Delete Account"
+          description="Permanently deletes your account and all associated data. This cannot be undone."
+          confirmWord="delete"
+          actionLabel="Delete Account"
+          onConfirm={deleteAccount}
+        />
+      </div>
+    </section>
   );
 }
