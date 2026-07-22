@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { clsx } from 'clsx';
 import NotificationBell from '@/components/dashboard/NotificationBell';
+import GlobalSearch from '@/components/nav/GlobalSearch';
 
 const NAV_LINKS = [
   { href: '/dashboard', label: 'Dashboard' },
@@ -81,6 +82,7 @@ export default function AppTopNav({ username, avatarUrl }: AppTopNavProps) {
         >
           Settings
         </Link>
+        <GlobalSearch />
         <NotificationBell />
         <div className="flex items-center gap-2">
           {avatarUrl ? (

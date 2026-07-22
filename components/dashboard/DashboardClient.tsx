@@ -29,6 +29,7 @@ import DynastyGpsCard from './DynastyGpsCard';
 import OpportunityFeed from './OpportunityFeed';
 import MarketSignalsCompact from './MarketSignalsCompact';
 import DashboardIntelPanels from './DashboardIntelPanels';
+import StaleDataWarning from './StaleDataWarning';
 import RosterConstruction from './RosterConstruction';
 import DynastyNewsFeed from './DynastyNewsFeed';
 import RightPanel from './RightPanel';
@@ -241,6 +242,8 @@ export default function DashboardClient({
       <div className="col-start-1 row-start-2 flex min-h-0 min-w-0 flex-col overflow-hidden lg:col-start-2 lg:grid lg:grid-cols-[1fr_280px]">
         <div className="flex min-w-0 flex-col gap-3 overflow-y-auto overflow-x-hidden p-[11px_13px] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           <LiveScoreTicker inSeason={nflSeason.inSeason} />
+
+          <StaleDataWarning />
 
           <PageBriefingHeader contextLabel={contextLabel} isAll={isAll} viewSubtitle={viewSubtitle} />
 
