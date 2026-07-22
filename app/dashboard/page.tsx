@@ -95,6 +95,7 @@ export default async function DashboardPage() {
       id: l.id,
       name: l.name,
       rotationStatus: { key: meta.key, label: meta.label, color: meta.color },
+      syncedAt: l.syncedAt,
     };
   });
 

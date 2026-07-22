@@ -21,6 +21,7 @@ import AdSlot from '@/components/ads/AdSlot';
 import { SyncButton } from '@/components/dashboard/SyncButton';
 import type { SignalCounts } from '@/lib/dashboard/rotation';
 import { formatSignalBucketLabel } from '@/lib/ui/labels';
+import { formatTimeAgo } from '@/lib/utils/format';
 import { useSidebarCollapse } from '@/components/dashboard/SidebarCollapseContext';
 
 export interface League {
@@ -30,6 +31,8 @@ export interface League {
   status?: string | null;
   // When present (dashboard rotation mode), drives the 5-category dot + badge.
   rotationStatus?: { key: string; label: string; color: string };
+  /** Last Sleeper sync time (ISO) for this league — drives the freshness dot. */
+  syncedAt?: string | null;
 }
 
 export interface RosterSnapshotItem {
@@ -100,6 +103,16 @@ function isActive(pathname: string, href: string): boolean {
 }
 
 const LEAGUE_DOTS = ['#36E7A1', '#A78BFA'] as const;
+
+// Per-league sync freshness: green < 6h, yellow 6–24h, red > 24h.
+function syncDotColor(syncedAt: string): string {
+  const t = new Date(syncedAt).getTime();
+  if (!Number.isFinite(t)) return '#6b7a99';
+  const hours = (Date.now() - t) / 3_600_000;
+  if (hours < 6) return '#36E7A1';
+  if (hours < 24) return '#FBBF24';
+  return '#EF4444';
+}
 
 function cleanLeagueName(name: string): string {
   return name.replace(/\s*(Contender|Rebuild|Redraft)\s*$/i, '').trim();
@@ -216,6 +229,14 @@ export default function Sidebar({
               />
               <span className="flex min-w-0 items-center gap-1 font-figtree text-[13.5px] font-medium">
                 <span className="truncate">{displayName}</span>
+                {league.syncedAt ? (
+                  <span
+                    className="h-1.5 w-1.5 shrink-0 rounded-full"
+                    style={{ background: syncDotColor(league.syncedAt) }}
+                    title={`Synced ${formatTimeAgo(league.syncedAt)}`}
+                    aria-label={`Synced ${formatTimeAgo(league.syncedAt)}`}
+                  />
+                ) : null}
                 <span className="shrink-0 text-boom opacity-0 transition-opacity group-hover:opacity-100">
                   →
                 </span>

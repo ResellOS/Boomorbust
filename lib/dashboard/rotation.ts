@@ -126,6 +126,8 @@ export interface LeagueBundle {
   players: RotationPlayer[];
   signalCounts: SignalCounts;
   breakdown: RosterBreakdown;
+  /** Last Sleeper sync timestamp for this league (ISO), for freshness dots. */
+  syncedAt: string | null;
 }
 
 export interface PortfolioBundle {

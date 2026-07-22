@@ -213,11 +213,12 @@ export async function fetchRotationData(
     status: string | null;
     total_rosters: number | null;
     roster_positions: string[] | null;
+    synced_at: string | null;
   }[] = [];
   try {
     const { data, error } = await supabase
       .from('leagues')
-      .select('id, name, status, total_rosters, roster_positions')
+      .select('id, name, status, total_rosters, roster_positions, synced_at')
       .eq('user_id', userId);
     if (error) throw error;
     leaguesRaw = data ?? [];
@@ -502,6 +503,7 @@ export async function fetchRotationData(
       players,
       signalCounts,
       breakdown: computeRosterBreakdown(players, rosterPositions, status),
+      syncedAt: l.synced_at ?? null,
     };
   });
 
