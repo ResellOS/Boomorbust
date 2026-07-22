@@ -28,6 +28,7 @@ import FrontOfficeTasks from './FrontOfficeTasks';
 import DynastyGpsCard from './DynastyGpsCard';
 import OpportunityFeed from './OpportunityFeed';
 import MarketSignalsCompact from './MarketSignalsCompact';
+import DashboardIntelPanels from './DashboardIntelPanels';
 import RosterConstruction from './RosterConstruction';
 import DynastyNewsFeed from './DynastyNewsFeed';
 import RightPanel from './RightPanel';
@@ -291,6 +292,9 @@ export default function DashboardClient({
               <DynastyGpsCard data={gps} leagueId={contextLeagueId} summary />
               <RosterConstruction grades={rosterGrades} compact leagueId={contextLeagueId} />
             </div>
+
+            {/* Engine intelligence panels — each self-hides when its table is empty */}
+            <DashboardIntelPanels leagueId={contextLeagueId} />
 
             {/* News moved to the bottom of the feed */}
             <DynastyNewsFeed
