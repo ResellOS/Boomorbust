@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import FreshnessBadge from '@/components/common/FreshnessBadge';
 
 // Intelligence panels backed by the shared engine tables via the app API routes:
 //   /api/sell-windows  /api/regime-alerts  /api/breakout
@@ -38,6 +39,7 @@ interface GmProfile {
   archetype?: string;
   trade_frequency?: string | number;
   transaction_count?: number;
+  calculated_at?: string | null;
 }
 
 const card = 'rounded-lg border border-border bg-surface p-3';
@@ -124,7 +126,15 @@ export default function DashboardIntelPanels({ leagueId }: { leagueId?: string }
 
       {gm.length > 0 && (
         <div className={card}>
-          <div className={`${head} text-bust`}>GM Profiles</div>
+          <div className={`${head} text-bust`}>
+            GM Profiles
+            <FreshnessBadge
+              timestamp={gm.reduce<string | null>(
+                (max, p) => (p.calculated_at && (!max || p.calculated_at > max) ? p.calculated_at : max),
+                null,
+              )}
+            />
+          </div>
           <div className="flex flex-col gap-1.5">
             {gm.slice(0, 4).map((p, i) => (
               <div key={i} className="flex items-center justify-between text-[12px]">
