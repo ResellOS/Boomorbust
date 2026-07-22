@@ -221,7 +221,7 @@ function LeaguesSection({ data }: { data: ProfileData }) {
       <div className="mb-4 flex items-center justify-between">
         <SectionHeader title={`Connected Leagues (${visible.length})`} />
         <Link
-          href="/leagues/connect"
+          href="/onboarding"
           className="shrink-0 rounded-lg px-3 py-1.5 font-figtree text-[12px] font-bold no-underline"
           style={{ background: 'rgba(54,231,161,0.12)', color: '#36E7A1', border: '1px solid rgba(54,231,161,0.25)' }}
         >
@@ -456,9 +456,9 @@ function ConfirmAction({
 
 function DangerZone({ onDeleted }: { onDeleted: () => void }) {
   const disconnectAll = () => {
-    // No bulk-disconnect endpoint exists; send the user to league setup to
+    // No bulk-disconnect endpoint exists; send the user to onboarding to
     // manage/reconnect. (Per-league hide lives in the Connected Leagues section.)
-    window.location.href = '/leagues/connect';
+    window.location.href = '/onboarding';
   };
 
   const deleteAccount = async () => {
