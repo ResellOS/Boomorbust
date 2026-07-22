@@ -16,6 +16,7 @@ import TradeDatabase, { type TradeTypeFilter } from '@/components/trade/TradeDat
 import TradeHubRightSidebar from '@/components/trade/TradeHubRightSidebar';
 import AiTradeAssistant, { type TradeQuickAction } from '@/components/trade/AiTradeAssistant';
 import TradePreviewModal from '@/components/trade/TradePreviewModal';
+import TradeHistory from '@/components/trade/TradeHistory';
 import AdSlot from '@/components/ads/AdSlot';
 
 const ALL = 'all';
@@ -46,6 +47,7 @@ export default function TradeHubClient({
   const [previewSuggestion, setPreviewSuggestion] = useState<ReturnType<
     typeof opportunityToSuggestion
   > | null>(null);
+  const [mainTab, setMainTab] = useState<'hub' | 'history'>('hub');
 
   const effectiveLeagueId = viewMode === 'global' ? ALL : leagueId;
 
@@ -235,6 +237,25 @@ export default function TradeHubClient({
           onLeagueChange={setLeagueId}
         />
 
+        <div className="flex items-center gap-1 border-b border-border">
+          {(['hub', 'history'] as const).map((tab) => (
+            <button
+              key={tab}
+              type="button"
+              onClick={() => setMainTab(tab)}
+              className={`-mb-px border-b-2 px-3 py-2 font-figtree text-[12px] font-bold transition-colors ${
+                mainTab === tab ? 'border-boom text-boom' : 'border-transparent text-muted hover:text-text'
+              }`}
+            >
+              {tab === 'hub' ? 'Hub' : 'History'}
+            </button>
+          ))}
+        </div>
+
+        {mainTab === 'history' ? (
+          <TradeHistory leagues={data.leagues} />
+        ) : (
+        <>
         <div className="grid grid-cols-1 gap-3 xl:grid-cols-[1.2fr_1fr_300px]">
           <TradeOfTheDayHero
             opportunities={filteredOpportunities}
@@ -279,6 +300,8 @@ export default function TradeHubClient({
         <AiTradeAssistant onQuickAction={handleQuickAction} />
 
         {showAds ? <AdSlot placement="trade-history" showAds={showAds} /> : null}
+        </>
+        )}
       </div>
 
       <TradeHubRightSidebar
