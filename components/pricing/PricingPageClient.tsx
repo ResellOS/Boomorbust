@@ -625,6 +625,9 @@ export default function PricingPageClient({
             Import My Leagues
           </Link>
           <div className="text-center text-[10px] text-muted">No credit card required.</div>
+          <div className="text-center text-[10px] text-boom">
+            Payments activate September 1, 2026. Beta users get full access until then.
+          </div>
         </div>
       </div>
 

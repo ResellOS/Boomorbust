@@ -273,7 +273,7 @@ export default function Sidebar({
               <span className="text-boom">{weekContext.weatherImpact}</span>
             </div>
             <Link
-              href="/matchups"
+              href="/startsit"
               className="flex items-center gap-1 px-3 py-2 text-[11px] text-boom no-underline hover:underline"
             >
               View Matchup Matrix →
@@ -425,6 +425,18 @@ export default function Sidebar({
           <span className="inline-flex items-center gap-1.5 rounded-md border border-boom/30 bg-boom/10 px-2.5 py-1.5 font-mono text-[10px] text-boom">
             <span aria-hidden>✓</span> {planName} Member
           </span>
+        </div>
+      ) : leagues.length === 0 ? (
+        <div className="mx-2.5 mb-2.5 shrink-0 rounded-lg border border-boom/25 bg-boom/[0.06] p-3">
+          <div className="mb-2 font-figtree text-xs font-extrabold uppercase tracking-wide text-text">
+            Connect your leagues to start
+          </div>
+          <Link
+            href="/onboarding"
+            className="mt-1 block w-full rounded-md bg-boom py-[9px] text-center font-figtree text-xs font-extrabold uppercase tracking-wide text-[#0a0d14] no-underline"
+          >
+            Connect Leagues
+          </Link>
         </div>
       ) : !exposureOverview && !weekContext ? (
         <div className="mx-2.5 mb-2.5 shrink-0 rounded-lg border border-bust/25 bg-gradient-to-br from-bust/[0.08] to-boom/[0.04] p-3">
