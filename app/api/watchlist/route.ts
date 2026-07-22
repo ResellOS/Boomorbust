@@ -9,6 +9,29 @@ export const dynamic = 'force-dynamic';
 // the watchlist page can show current value vs value-at-add. The watch list
 // itself lives in localStorage; this endpoint only enriches it with live values.
 export async function GET(req: NextRequest) {
+  // list mode: return the signed-in user's persisted watchlist rows so the page
+  // can hydrate cross-device from player_watchlist (in addition to localStorage).
+  if (req.nextUrl.searchParams.get('list')) {
+    const supabase = createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return NextResponse.json({ watchlist: [] });
+    const { data } = await supabase
+      .from('player_watchlist')
+      .select('player_id, player_name, position, team, ktc_value_at_add, tfo_at_add, created_at')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false });
+    const watchlist = (data ?? []).map((r) => ({
+      playerId: String(r.player_id),
+      playerName: (r.player_name as string) ?? String(r.player_id),
+      position: (r.position as string) ?? '',
+      team: (r.team as string) ?? '',
+      ktcAtAdd: typeof r.ktc_value_at_add === 'number' ? r.ktc_value_at_add : null,
+      tfoAtAdd: typeof r.tfo_at_add === 'number' ? r.tfo_at_add : null,
+      addedAt: (r.created_at as string) ?? new Date().toISOString(),
+    }));
+    return NextResponse.json({ watchlist });
+  }
+
   const ids = (req.nextUrl.searchParams.get('ids') ?? '')
     .split(',')
     .map((s) => s.trim())

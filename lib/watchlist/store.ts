@@ -62,3 +62,17 @@ export function removeFromWatchlist(playerId: string): WatchEntry[] {
   }).catch(() => {});
   return next;
 }
+
+/**
+ * Merge server-persisted watchlist rows (from player_watchlist) into the local
+ * list, so the watchlist shows up cross-device. Local entries win on conflict;
+ * server-only entries are added. The merged list is written back to localStorage.
+ */
+export function mergeIntoWatchlist(serverEntries: WatchEntry[]): WatchEntry[] {
+  const byId = new Map<string, WatchEntry>();
+  for (const e of getWatchlist()) byId.set(e.playerId, e);
+  for (const s of serverEntries) if (!byId.has(s.playerId)) byId.set(s.playerId, s);
+  const merged = Array.from(byId.values());
+  write(merged);
+  return merged;
+}

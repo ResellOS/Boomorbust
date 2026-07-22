@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import AppTopNav from '@/components/nav/AppTopNav';
-import { getWatchlist, removeFromWatchlist, type WatchEntry } from '@/lib/watchlist/store';
+import { getWatchlist, mergeIntoWatchlist, removeFromWatchlist, type WatchEntry } from '@/lib/watchlist/store';
 import { formatKTC, formatDelta, formatTFO, formatTimeAgo } from '@/lib/utils/format';
 
 interface MarketRow { playerId: string; ktcValue: number | null; verdict: string | null }
@@ -20,19 +20,40 @@ export default function WatchlistPage() {
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    const list = getWatchlist();
-    setEntries(list);
-    setReady(true);
-    if (list.length === 0) return;
-    const ids = list.map((e) => e.playerId).join(',');
-    fetch(`/api/watchlist?ids=${encodeURIComponent(ids)}`)
-      .then((r) => (r.ok ? r.json() : { players: [] }))
-      .then((d: { players: MarketRow[] }) => {
+    let cancelled = false;
+    (async () => {
+      let list = getWatchlist();
+      // Cross-device hydrate: merge server-persisted rows (player_watchlist) in.
+      try {
+        const r = await fetch('/api/watchlist?list=1');
+        if (r.ok) {
+          const d = (await r.json()) as { watchlist?: WatchEntry[] };
+          if (d.watchlist && d.watchlist.length > 0) list = mergeIntoWatchlist(d.watchlist);
+        }
+      } catch {
+        /* offline / unauthenticated — localStorage list stands */
+      }
+      if (cancelled) return;
+      setEntries(list);
+      setReady(true);
+      if (list.length === 0) return;
+
+      // Enrich with current market value / verdict.
+      const ids = list.map((e) => e.playerId).join(',');
+      try {
+        const r = await fetch(`/api/watchlist?ids=${encodeURIComponent(ids)}`);
+        const d = (r.ok ? await r.json() : { players: [] }) as { players: MarketRow[] };
+        if (cancelled) return;
         const map: Record<string, MarketRow> = {};
         for (const p of d.players ?? []) map[p.playerId] = p;
         setMarket(map);
-      })
-      .catch(() => {});
+      } catch {
+        /* market enrichment is best-effort */
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const remove = (playerId: string) => setEntries(removeFromWatchlist(playerId));
