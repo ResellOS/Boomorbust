@@ -181,13 +181,15 @@ export interface StatBarProps {
   cells: StatBarCell[];
   /** Tailwind md grid columns for the cell row. Defaults to `md:grid-cols-5`. */
   columnsClassName?: string;
+  /** Optional element pinned to the far right of the bar (e.g. a notification bell). */
+  trailing?: ReactNode;
 }
 
 /**
  * Shared terminal-style top stat bar: logo box + a scrollable row of stat cells.
  * Numeric cells count up from zero on mount. Used across dashboard pages.
  */
-export default function StatBar({ cells, columnsClassName = 'md:grid-cols-5' }: StatBarProps) {
+export default function StatBar({ cells, columnsClassName = 'md:grid-cols-5', trailing }: StatBarProps) {
   return (
     <header className="col-span-1 row-start-1 grid h-[66px] border-b border-border bg-bg grid-cols-1 md:col-span-2 md:grid-cols-[215px_1fr]">
       <div className="hidden items-center justify-center overflow-hidden border-r border-border bg-bg px-1.5 py-1 md:flex">
@@ -207,14 +209,19 @@ export default function StatBar({ cells, columnsClassName = 'md:grid-cols-5' }: 
         />
       </div>
 
-      <div className={`flex overflow-x-auto scrollbar-hide md:grid ${columnsClassName}`}>
-        {cells.map((cell, i) =>
-          isRaw(cell) ? (
-            <Fragment key={i}>{cell.raw}</Fragment>
-          ) : (
-            <Cell key={cell.label} item={cell} />
-          ),
-        )}
+      <div className="flex min-w-0 items-stretch">
+        <div className={`flex min-w-0 flex-1 overflow-x-auto scrollbar-hide md:grid ${columnsClassName}`}>
+          {cells.map((cell, i) =>
+            isRaw(cell) ? (
+              <Fragment key={i}>{cell.raw}</Fragment>
+            ) : (
+              <Cell key={cell.label} item={cell} />
+            ),
+          )}
+        </div>
+        {trailing != null ? (
+          <div className="flex shrink-0 items-center border-l border-border px-3">{trailing}</div>
+        ) : null}
       </div>
     </header>
   );

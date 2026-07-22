@@ -5,6 +5,7 @@ import { Info } from 'lucide-react';
 import { EMPIRE_RATING_TOOLTIP } from '@/lib/dashboard/empireRating';
 import { formatScore } from '@/lib/utils/format';
 import StatBar, { type StatBarCell } from '@/components/common/StatBar';
+import NotificationBell from '@/components/dashboard/NotificationBell';
 
 export interface DashboardTopBarProps {
   leagueCount: number;
@@ -47,7 +48,7 @@ export default function DashboardTopBar({
     { raw: <PortfolioStrengthStat value={portfolioStrength} delta={portfolioDelta} /> },
   ];
 
-  return <StatBar cells={cells} />;
+  return <StatBar cells={cells} trailing={<NotificationBell />} />;
 }
 
 function PortfolioStrengthStat({ value, delta }: { value: number; delta: number | null }) {
