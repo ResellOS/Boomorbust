@@ -25,7 +25,7 @@ import AdSlot from '@/components/ads/AdSlot';
 const PAGE_SIZE = 25;
 
 type FilterKey = 'ALL' | 'BOOM' | 'HOLD' | 'BUST' | 'QB' | 'RB' | 'WR' | 'TE';
-type SortKey = 'rating' | 'name' | 'position';
+type SortKey = 'rating' | 'name' | 'position' | 'momentum';
 
 const VERDICT_FILTERS: FilterKey[] = ['ALL', 'BOOM', 'HOLD', 'BUST'];
 const POSITION_FILTERS: FilterKey[] = ['QB', 'RB', 'WR', 'TE'];
@@ -87,7 +87,10 @@ export default function PlayerHubClient({
   });
   const [search, setSearch] = useState('');
   const [sort, setSort] = useState<SortKey>(
-    deepLinkSort === 'name' || deepLinkSort === 'position' || deepLinkSort === 'rating'
+    deepLinkSort === 'name' ||
+      deepLinkSort === 'position' ||
+      deepLinkSort === 'rating' ||
+      deepLinkSort === 'momentum'
       ? deepLinkSort
       : 'rating',
   );
@@ -112,6 +115,10 @@ export default function PlayerHubClient({
       list.sort((a, b) => a.fullName.localeCompare(b.fullName));
     } else if (sort === 'position') {
       list.sort((a, b) => a.position.localeCompare(b.position) || b.tfoScore - a.tfoScore);
+    } else if (sort === 'momentum') {
+      // No momentum_score field/table exists; trendDelta (recent score change) is the
+      // real momentum signal on HubPlayer, so sort by it descending (biggest risers first).
+      list.sort((a, b) => (b.trendDelta ?? 0) - (a.trendDelta ?? 0));
     } else {
       list.sort((a, b) => b.tfoScore - a.tfoScore);
     }
@@ -184,6 +191,7 @@ export default function PlayerHubClient({
               className="ml-auto cursor-pointer rounded-[5px] border border-border bg-surface px-2.5 py-[5px] font-figtree text-[11px] text-text outline-none"
             >
               <option value="rating">Dynasty Rating</option>
+              <option value="momentum">Momentum ↑</option>
               <option value="name">Name</option>
               <option value="position">Position</option>
             </select>
