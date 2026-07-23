@@ -5,24 +5,37 @@ import { createAdminClient } from '@/lib/supabase/admin';
 export const dynamic = 'force-dynamic';
 
 // GET /api/trade-history?league_id=&period=&type=&page=&limit=
-// Completed trades from league_transactions (type = 'trade' only — not waivers or
-// free-agent adds), scoped to the signed-in user's leagues, newest first, paginated.
-// league_transactions is engine-populated; when empty this returns an empty page so
-// the UI shows its "no trade history yet" state. Defensive: never 500s.
+// The signed-in user's completed trades from the `trades` table (real data — 253
+// rows across leagues), newest first, paginated. assets_sent/assets_received are
+// arrays of Sleeper player ids; we resolve them to names. Defensive: never 500s.
+//
+// NOTE: every `trades` row is one of the user's own trades (keyed by user_id), so
+// type=all/mine/league all return the same set here — the param is accepted and
+// reserved for when league-wide (non-user) trades become available.
 
 function periodCutoffIso(period: string): string | null {
   const now = Date.now();
   if (period === 'week') return new Date(now - 7 * 86_400_000).toISOString();
   if (period === 'month') return new Date(now - 30 * 86_400_000).toISOString();
   if (period === 'season') return new Date(now - 365 * 86_400_000).toISOString();
-  return null; // 'all' or unknown → no time filter
+  return null;
+}
+
+interface TradeRowRaw {
+  id: string;
+  league_id: string | null;
+  league_scoring_type: string | null;
+  assets_sent: string[] | null;
+  assets_received: string[] | null;
+  status: string | null;
+  created_at: string | null;
 }
 
 export async function GET(req: NextRequest) {
   const sp = req.nextUrl.searchParams;
   const leagueId = sp.get('league_id') ?? 'all';
   const period = sp.get('period') ?? 'season';
-  const type = sp.get('type') ?? 'all'; // all | mine | league
+  const type = sp.get('type') ?? 'all';
   const page = Math.max(1, Number(sp.get('page') ?? '1') || 1);
   const limit = Math.min(100, Math.max(1, Number(sp.get('limit') ?? '20') || 20));
 
@@ -35,26 +48,22 @@ export async function GET(req: NextRequest) {
 
     const db = createAdminClient();
 
-    // The user's leagues (scope + name lookup).
     const { data: leagueRows } = await db.from('leagues').select('id, name').eq('user_id', user.id);
-    const leagues = (leagueRows ?? []) as { id: string; name: string }[];
-    if (leagues.length === 0) {
-      return NextResponse.json({ trades: [], page, limit, hasMore: false, total: 0 });
-    }
-    const leagueName = new Map(leagues.map((l) => [String(l.id), l.name]));
-    const scopeIds = leagueId !== 'all' ? [leagueId] : leagues.map((l) => String(l.id));
+    const leagueName = new Map(((leagueRows ?? []) as { id: string; name: string }[]).map((l) => [String(l.id), l.name]));
 
     const from = (page - 1) * limit;
     const to = from + limit - 1;
 
     let q = db
-      .from('league_transactions')
-      .select('*', { count: 'exact' })
-      .eq('type', 'trade')
-      .in('league_id', scopeIds)
+      .from('trades')
+      .select('id, league_id, league_scoring_type, assets_sent, assets_received, status, created_at', {
+        count: 'exact',
+      })
+      .eq('user_id', user.id)
       .order('created_at', { ascending: false })
       .range(from, to);
 
+    if (leagueId !== 'all') q = q.eq('league_id', leagueId);
     const cutoff = periodCutoffIso(period);
     if (cutoff) q = q.gte('created_at', cutoff);
 
@@ -62,23 +71,44 @@ export async function GET(req: NextRequest) {
     if (error) {
       return NextResponse.json({ trades: [], page, limit, hasMore: false, total: 0, note: error.message });
     }
+    const raw = (data ?? []) as TradeRowRaw[];
 
-    const trades = (data ?? []).map((t: Record<string, unknown>) => ({
-      id: String(t.id ?? t.transaction_id ?? ''),
+    // Resolve player ids -> names for every asset on the page.
+    const ids = new Set<string>();
+    for (const t of raw) {
+      for (const a of t.assets_sent ?? []) ids.add(String(a));
+      for (const a of t.assets_received ?? []) ids.add(String(a));
+    }
+    const nameMap = new Map<string, { name: string; position: string | null }>();
+    if (ids.size > 0) {
+      const { data: players } = await db
+        .from('players')
+        .select('id, full_name, position')
+        .in('id', Array.from(ids));
+      for (const p of (players ?? []) as { id: string; full_name: string | null; position: string | null }[]) {
+        nameMap.set(String(p.id), { name: p.full_name ?? `#${p.id}`, position: p.position ?? null });
+      }
+    }
+    const toAssets = (arr: string[] | null) =>
+      (arr ?? []).map((id) => ({
+        id: String(id),
+        name: nameMap.get(String(id))?.name ?? `#${id}`,
+        position: nameMap.get(String(id))?.position ?? null,
+      }));
+
+    const trades = raw.map((t) => ({
+      id: String(t.id),
       leagueId: String(t.league_id ?? ''),
       leagueName: leagueName.get(String(t.league_id ?? '')) ?? '—',
-      createdAt: (t.created_at as string | null) ?? null,
-      adds: (t.adds as unknown) ?? null,
-      drops: (t.drops as unknown) ?? null,
-      payload: (t.payload as unknown) ?? null,
+      createdAt: t.created_at ?? null,
+      status: t.status ?? null,
+      scoringType: t.league_scoring_type ?? null,
+      assetsSent: toAssets(t.assets_sent),
+      assetsReceived: toAssets(t.assets_received),
     }));
 
     const total = count ?? trades.length;
     const hasMore = from + trades.length < total;
-
-    // NOTE: type=mine/league requires per-league roster mapping to attribute a
-    // transaction to the user; not resolved here (table is engine-populated and
-    // currently empty). The param is accepted and reserved.
     return NextResponse.json({ trades, page, limit, hasMore, total, typeFilter: type });
   } catch (e) {
     return NextResponse.json({

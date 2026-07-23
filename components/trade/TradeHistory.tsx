@@ -7,13 +7,20 @@ import { formatTimeAgo } from '@/lib/utils/format';
 // league / period / type filters and Load More pagination. Shows an empty state
 // when there's no history (league_transactions is engine-populated).
 
+interface Asset {
+  id: string;
+  name: string;
+  position: string | null;
+}
 interface TradeRow {
   id: string;
   leagueId: string;
   leagueName: string;
   createdAt: string | null;
-  adds: Record<string, unknown> | null;
-  drops: Record<string, unknown> | null;
+  status: string | null;
+  scoringType: string | null;
+  assetsSent: Asset[];
+  assetsReceived: Asset[];
 }
 
 type Period = 'week' | 'month' | 'season';
@@ -128,21 +135,30 @@ export default function TradeHistory({ leagues }: { leagues: { id: string; name:
         <>
           <div className="overflow-hidden rounded-xl border border-border">
             {rows.map((t) => {
-              const moved =
-                Object.keys(t.adds ?? {}).length + Object.keys(t.drops ?? {}).length;
+              const sent = t.assetsSent.map((a) => a.name).join(', ') || '—';
+              const received = t.assetsReceived.map((a) => a.name).join(', ') || '—';
               return (
                 <div
                   key={t.id}
-                  className="flex items-center justify-between gap-3 border-b border-border/60 bg-surface px-3 py-2.5 last:border-b-0"
+                  className="border-b border-border/60 border-l-2 border-l-boom/40 bg-surface px-3 py-2.5 last:border-b-0"
                 >
-                  <div className="min-w-0">
-                    <div className="truncate font-figtree text-[13px] text-text">{t.leagueName}</div>
-                    <div className="font-mono text-[10px] text-muted">
-                      {moved} asset{moved === 1 ? '' : 's'} moved
+                  <div className="mb-1 flex items-center justify-between gap-3">
+                    <div className="flex min-w-0 items-center gap-2">
+                      <span className="truncate font-figtree text-[13px] text-text">{t.leagueName}</span>
+                      {t.status ? (
+                        <span className="shrink-0 rounded bg-boom/10 px-1.5 py-0.5 font-mono text-[9px] font-bold uppercase text-boom">
+                          {t.status}
+                        </span>
+                      ) : null}
                     </div>
+                    <span className="shrink-0 font-mono text-[11px] text-muted">{formatTimeAgo(t.createdAt)}</span>
                   </div>
-                  <div className="shrink-0 font-mono text-[11px] text-muted">
-                    {formatTimeAgo(t.createdAt)}
+                  <div className="font-figtree text-[12px] leading-snug">
+                    <span className="font-mono text-[10px] uppercase text-muted">Gave</span>{' '}
+                    <span className="text-text">{sent}</span>
+                    <span className="mx-1.5 text-boom">→</span>
+                    <span className="font-mono text-[10px] uppercase text-muted">Got</span>{' '}
+                    <span className="text-text">{received}</span>
                   </div>
                 </div>
               );
