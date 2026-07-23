@@ -21,7 +21,11 @@ export async function GET(req: Request) {
       .order('match_score', { ascending: false })
       .limit(30);
     if (error) return NextResponse.json({ count: 0, candidates: [], note: error.message });
-    return NextResponse.json({ count: data?.length ?? 0, candidates: data ?? [] });
+    // Breakout candidates are not user-specific and change slowly — cache 1h.
+    return NextResponse.json(
+      { count: data?.length ?? 0, candidates: data ?? [] },
+      { headers: { 'Cache-Control': 'public, max-age=3600, s-maxage=3600' } },
+    );
   } catch (e) {
     return NextResponse.json({ count: 0, candidates: [], note: e instanceof Error ? e.message : 'error' });
   }

@@ -4,6 +4,8 @@ import { Redis } from '@upstash/redis';
 import { getPlayersByIds } from '@/lib/sleeper/players';
 
 const CACHE_TTL = 86400; // 24 hours
+// ADP is public + slow-changing — cache 1h at the edge too.
+const CACHE_HEADERS = { 'Cache-Control': 'public, max-age=3600, s-maxage=3600' };
 
 function getRedis(): Redis | null {
   if (!process.env.UPSTASH_REDIS_REST_URL || !process.env.UPSTASH_REDIS_REST_TOKEN) return null;
@@ -25,7 +27,7 @@ export async function GET(request: NextRequest) {
   if (redis) {
     try {
       const cached = await redis.get(cacheKey);
-      if (cached) return NextResponse.json(cached);
+      if (cached) return NextResponse.json(cached, { headers: CACHE_HEADERS });
     } catch {}
   }
 
@@ -37,7 +39,7 @@ export async function GET(request: NextRequest) {
     .eq('draft_type', type)
     .eq('scoring_format', format);
 
-  if (error || !data?.length) return NextResponse.json([]);
+  if (error || !data?.length) return NextResponse.json([], { headers: CACHE_HEADERS });
 
   // Aggregate pick_numbers per player
   const agg: Record<string, number[]> = {};
@@ -70,5 +72,5 @@ export async function GET(request: NextRequest) {
     try { await redis.set(cacheKey, results, { ex: CACHE_TTL }); } catch {}
   }
 
-  return NextResponse.json(results);
+  return NextResponse.json(results, { headers: CACHE_HEADERS });
 }
