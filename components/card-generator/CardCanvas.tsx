@@ -593,7 +593,7 @@ const CardCanvas = forwardRef<HTMLDivElement, CardCanvasProps>(({ data, classNam
             letterSpacing: '0.08em',
           }}
         >
-          · boomorbust.app
+          · @boomorbust · boomorbust.app
         </span>
       </div>
     </div>
