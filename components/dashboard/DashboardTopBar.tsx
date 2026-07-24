@@ -36,7 +36,7 @@ export default function DashboardTopBar({
   const cells: StatBarCell[] = [
     { label: strengthLabel, value: primaryStrength, tone: 'boom', glow: true },
     { label: "Today's Priorities", value: todaysPriorities },
-    { label: 'Leagues', value: leagueCount, tone: 'boom', glow: true },
+    { label: 'Leagues', value: leagueCount, tone: 'boom', glow: true, animate: false },
     {
       label: 'Trade Offers',
       value: tradeOffers,

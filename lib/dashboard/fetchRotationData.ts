@@ -30,6 +30,7 @@ import { fetchMarketVerdicts } from '@/lib/verdict/fetchMarketVerdicts';
 import { normalizeDirection60d } from '@/lib/dashboard/tickerSignal';
 import { computeFrontOfficePriority } from './priorityAction';
 import { tallyMarketSignals, emptySignalCounts as emptySignals } from './marketSignals';
+import { reconcileLeaguesWithRosters } from '@/lib/league/reconcileLeagues';
 
 function buildEmptyDashboardData(nflSeason: DashboardRotationData['nflSeason']): DashboardRotationData {
   return {
@@ -244,6 +245,32 @@ export async function fetchRotationData(
     }
   } catch (err) {
     console.error('[dashboard] rosters fetch failed:', err);
+  }
+
+  // Reconcile leagues with roster membership. The leagues table is auth-uid keyed
+  // and can be under-synced; rosters (Sleeper-id keyed) are the definitive set, so
+  // the header/sidebar count matches the roster-derived content below. No-op when
+  // the table already covers every rostered league.
+  try {
+    const reconciled = await reconcileLeaguesWithRosters(
+      supabase,
+      leaguesRaw.map((l) => ({ id: l.id, name: l.name, status: l.status })),
+      Array.from(rosterByLeague.keys()),
+    );
+    const byId = new Map(leaguesRaw.map((l) => [String(l.id), l]));
+    leaguesRaw = reconciled.map(
+      (r) =>
+        byId.get(String(r.id)) ?? {
+          id: r.id,
+          name: r.name,
+          status: r.status,
+          total_rosters: null,
+          roster_positions: null,
+          synced_at: null,
+        },
+    );
+  } catch (err) {
+    console.error('[dashboard] league reconciliation failed:', err);
   }
 
   const idList = Array.from(allPlayerIds);

@@ -21,7 +21,7 @@ export default function TradeTopBar({ stats }: TradeTopBarProps) {
       tone: 'hold',
       sub: 'Available',
     },
-    { label: 'Leagues Active', value: stats.leaguesActive, tone: 'text', sub: 'All Connected' },
+    { label: 'Leagues Active', value: stats.leaguesActive, tone: 'text', sub: 'All Connected', animate: false },
   ];
 
   return <StatBar cells={cells} />;

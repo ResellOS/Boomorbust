@@ -16,6 +16,7 @@ import { buildSuggestionWhyReasons, type SuggestionComponents } from '@/lib/trad
 import { dedupeSuggestionsByPlayer } from '@/lib/trade/dedupeSuggestions';
 import type { PackageAsset } from '@/lib/trade/buildPackage';
 import { normalizeDirection60d } from '@/lib/dashboard/tickerSignal';
+import { reconcileLeaguesWithRosters } from '@/lib/league/reconcileLeagues';
 import {
   buildOwnedPicksFromTradedData,
   defaultTargetSeasons,
@@ -161,6 +162,26 @@ export async function fetchTradePageData(userId: string): Promise<TradePageData>
   } catch (err) {
     console.error('[trade] leagues fetch failed:', err);
     leaguesRaw = [];
+  }
+
+  // Reconcile with roster membership: the leagues table is auth-uid keyed and can
+  // be under-synced; the user's rosters (Sleeper-id keyed) are the definitive set,
+  // so header + sidebar read the same reconciled count as the content below.
+  try {
+    const { data: rosterLeagues } = await supabase
+      .from('rosters')
+      .select('league_id')
+      .eq('owner_id', sleeperUserId);
+    const rosterLeagueIds = (rosterLeagues ?? []).map((r) => String(r.league_id));
+    const reconciled = await reconcileLeaguesWithRosters(
+      supabase,
+      leaguesRaw.map((l) => ({ id: l.id, name: l.name, status: l.status ?? null })),
+      rosterLeagueIds,
+    );
+    const byId = new Map(leaguesRaw.map((l) => [String(l.id), l]));
+    leaguesRaw = reconciled.map((r) => byId.get(String(r.id)) ?? { id: r.id, name: r.name, status: r.status });
+  } catch (err) {
+    console.error('[trade] league reconciliation failed:', err);
   }
 
   const leagues: TradeLeague[] = leaguesRaw.map((lg, i) => {
