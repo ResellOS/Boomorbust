@@ -1,19 +1,37 @@
 import { getTrackRecordConsensus } from '@/lib/engine/client';
 import type { TrackRecordConsensusData, TrackRecordConsensusRow } from './types';
 
+// Derive the BOB Verdict from the BOB-vs-expert rank gap, using the app's standard
+// STRONG BUY/BUY/HOLD/SELL/STRONG SELL taxonomy. consensus_rank_delta = bob_rank −
+// consensus_rank, so a NEGATIVE gap means BOB ranks the player better than experts
+// (bullish → BUY side) and a POSITIVE gap means BOB ranks them worse (bearish → SELL
+// side) — matching the gapLabel hints in BobVsConsensusTrackRecord. The engine's own
+// `verdict` field is ignored here because it returns HOLD for every row.
+export function verdictFromConsensusDelta(delta: number): string {
+  if (!Number.isFinite(delta)) return 'HOLD';
+  if (delta <= -40) return 'STRONG BUY';
+  if (delta <= -15) return 'BUY';
+  if (delta >= 40) return 'STRONG SELL';
+  if (delta >= 15) return 'SELL';
+  return 'HOLD';
+}
+
 function mapRow(raw: Record<string, unknown>): TrackRecordConsensusRow | null {
   const playerId = String(raw.player_id ?? '');
   const playerName = String(raw.player_name ?? '—');
   if (!playerId && playerName === '—') return null;
 
+  const consensusRankDelta = Number(raw.consensus_rank_delta) || 0;
+
   return {
     playerId,
     playerName,
     position: String(raw.position ?? '—'),
-    verdict: String(raw.verdict ?? '—'),
+    // Wired to the gap direction/magnitude (not the engine's all-HOLD passthrough).
+    verdict: verdictFromConsensusDelta(consensusRankDelta),
     bobRank: Number(raw.bob_rank) || 0,
     consensusRank: Number(raw.consensus_rank) || 0,
-    consensusRankDelta: Number(raw.consensus_rank_delta) || 0,
+    consensusRankDelta,
     ktcRankDelta: Number(raw.ktc_rank_delta) || 0,
   };
 }

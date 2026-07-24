@@ -37,6 +37,14 @@ function formatKtcGap(delta: number): string {
   return String(delta);
 }
 
+// BUY-side green, SELL-side purple, HOLD muted — matches the app verdict palette.
+function verdictColor(v: string): string {
+  const u = v.toUpperCase();
+  if (u.includes('BUY')) return '#36E7A1';
+  if (u.includes('SELL')) return '#A78BFA';
+  return '#94A3B8';
+}
+
 function PositionBars({ byPosition }: { byPosition: TrackRecordConsensusData['byPosition'] }) {
   const entries = [
     { key: 'QB', label: 'QB', count: byPosition.QB, color: '#A78BFA' },
@@ -172,7 +180,12 @@ export default function BobVsConsensusTrackRecord({ data }: BobVsConsensusTrackR
                       </div>
                     </td>
                     <td className="px-2 py-2.5 font-mono text-[11px] text-muted">{row.position}</td>
-                    <td className="px-2 py-2.5 font-mono text-[11px] text-text">{row.verdict}</td>
+                    <td
+                      className="px-2 py-2.5 font-mono text-[11px] font-bold"
+                      style={{ color: verdictColor(row.verdict) }}
+                    >
+                      {row.verdict}
+                    </td>
                     <td className="px-2 py-2.5 text-right font-mono text-[12px] tabular-nums text-text">
                       {row.bobRank || '—'}
                     </td>
