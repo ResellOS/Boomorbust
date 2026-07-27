@@ -63,6 +63,12 @@ export interface TradeDimension {
 
 export interface TradeAnalysis {
   verdict: TradeVerdict;
+  /** Composite 0–100 (50 = perfectly even). */
+  trade_score: number;
+  /** Action string, e.g. "MAKE THIS TRADE". */
+  recommendation: string;
+  /** Fairness label, e.g. "Very Fair", "Favors You". */
+  fairness_label: string;
   value_delta: number;
   explanation: string;
   dimensions: {
@@ -72,6 +78,32 @@ export interface TradeAnalysis {
     age_curve: TradeDimension;
   };
   why_bullets: string[];
+  /** Upside bullets (favorable dimensions / rising assets). */
+  positive_reasons: string[];
+  /** Downside factors — only present when a real signal fires (never fabricated). */
+  risks: string[];
+}
+
+function lastName(name: string): string {
+  const parts = name.trim().split(/\s+/);
+  return parts[parts.length - 1] || name;
+}
+
+function recommendationFor(score: number): string {
+  if (score >= 62) return 'MAKE THIS TRADE';
+  if (score >= 55) return 'SLIGHT WIN — WORTH IT';
+  if (score >= 45) return 'FAIR — YOUR CALL';
+  if (score >= 38) return 'LEAN DECLINE';
+  return 'DECLINE';
+}
+
+function fairnessLabelFor(score: number): string {
+  const d = score - 50;
+  const a = Math.abs(d);
+  if (a <= 8) return 'Very Fair';
+  if (a <= 18) return 'Fair';
+  if (a <= 32) return d > 0 ? 'Favors You' : 'Favors Them';
+  return d > 0 ? 'Strongly Favors You' : 'Strongly Favors Them';
 }
 
 export interface TradeSide {
@@ -175,8 +207,44 @@ export function analyzeTradeOffer(
     `Age curve (${acScore > 0 ? '+' : ''}${acScore}): ${acNote}`,
   ];
 
+  // Composite (−100..+100) → 0–100 trade score (50 = perfectly even).
+  const trade_score = Math.round(Math.max(0, Math.min(100, (composite + 100) / 2)));
+  const recommendation = recommendationFor(trade_score);
+  const fairness_label = fairnessLabelFor(trade_score);
+
+  // Positive reasons — favorable dimensions (score notably in your favor).
+  const positive_reasons: string[] = [];
+  if (cvScore > 8) positive_reasons.push(cvNote);
+  if (fvScore > 8) positive_reasons.push(fvNote);
+  if (pnScore > 8) positive_reasons.push(pnNote);
+  if (acScore > 8) positive_reasons.push(acNote);
+
+  // Risks — only pushed when a real per-asset signal fires. No generic fabrication.
+  const risks: string[] = [];
+  for (const p of receiving.players) {
+    const pos = p.position.toUpperCase();
+    if (p.age == null) continue;
+    if (getTrend(p.position, p.age) === 'declining') {
+      risks.push(`${lastName(p.name)} is on the declining side of the ${pos} age curve (age ${p.age})`);
+    }
+    if (pos === 'RB' && p.age > 28) {
+      risks.push(`${lastName(p.name)} is past the typical RB cliff (age ${p.age}) — bell-cow risk`);
+    } else if ((pos === 'WR' || pos === 'QB') && p.age > 32) {
+      risks.push(`${lastName(p.name)} is on the wrong side of 32 for a ${pos}`);
+    }
+    if ((myRoster.positions[p.position] ?? 0) >= 3) {
+      risks.push(`Adds ${lastName(p.name)} to an already-deep ${pos} room`);
+    }
+  }
+  if (value_delta < -400) risks.push(`You give up ~${Math.abs(value_delta)} KTC on raw face value`);
+  if (fvScore < -10) risks.push('Assets you receive have limited upside based on age');
+  const risksDeduped = Array.from(new Set(risks)).slice(0, 6);
+
   return {
     verdict,
+    trade_score,
+    recommendation,
+    fairness_label,
     value_delta,
     explanation,
     dimensions: {
@@ -186,5 +254,7 @@ export function analyzeTradeOffer(
       age_curve: { score: acScore, note: acNote },
     },
     why_bullets,
+    positive_reasons,
+    risks: risksDeduped,
   };
 }
