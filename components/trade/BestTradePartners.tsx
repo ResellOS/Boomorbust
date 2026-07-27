@@ -55,7 +55,9 @@ function PartnerCard({
           </div>
         </div>
         <div className="shrink-0 text-right">
-          <div className="font-mono text-[14px] font-semibold tabular-nums text-boom">{m.tradeLikelihood}%</div>
+          <div className="font-mono text-[12px] font-semibold uppercase text-boom">
+            {m.tradeLikelihood >= 80 ? 'High' : m.tradeLikelihood >= 55 ? 'Moderate' : 'Low'}
+          </div>
           <div className="font-mono text-[7px] uppercase text-[#6b7a99]">Likelihood</div>
         </div>
       </div>

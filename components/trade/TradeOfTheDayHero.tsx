@@ -9,6 +9,7 @@ import GlowBorder from '@/components/ui/GlowBorder';
 import type { TradeOpportunity } from '@/lib/trade/types';
 import {
   acceptanceColor,
+  acceptanceBandShort,
   confidenceScore,
   valueGapColor,
   whyThisMattersBullets,
@@ -139,8 +140,7 @@ export default function TradeOfTheDayHero({
         <div key={o.id} className="mx-4 mb-3">
           <div className="grid grid-cols-2 gap-2">
             <ScoreChip label="Acceptance" color={acceptanceColor(o.acceptanceProbability)}>
-              <CountUpDelta key={`${o.id}-acc`} value={o.acceptanceProbability} />
-              <span className="text-[12px]">%</span>
+              <span className="text-[13px] font-bold uppercase">{acceptanceBandShort(o.acceptanceProbability)}</span>
             </ScoreChip>
             <ScoreChip label="Impact" color={impactColor(o.championshipImpact)}>
               +<CountUpDelta key={`${o.id}-imp`} value={Math.round(o.championshipImpact * 10) / 10} />%

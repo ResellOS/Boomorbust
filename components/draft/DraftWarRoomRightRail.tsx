@@ -109,8 +109,8 @@ export default function DraftWarRoomRightRail({
         )}
         <div className="mt-2 flex items-center justify-between font-mono text-[10px]">
           <span className="text-muted">Pick Confidence</span>
-          <span className="text-boom">
-            <CountUpNumber value={conf} resetKey={`${currentOverall}-${bobPick?.playerId}`} suffix="%" />
+          <span className="text-boom uppercase">
+            {conf >= 70 ? 'High' : conf >= 45 ? 'Moderate' : 'Low'}
           </span>
         </div>
       </section>

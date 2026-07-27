@@ -8,6 +8,7 @@ import { opportunityToSuggestion } from '@/lib/trade/tradeHubUi';
 import {
   acceptanceColor,
   acceptanceGlow,
+  acceptanceBandShort,
   mutualBenefitColor,
   typeBadgeStyle,
   valueGapColor,
@@ -209,7 +210,7 @@ export default function SuggestedTradesTable({
                       textShadow: acceptanceGlow(o.acceptanceProbability),
                     }}
                   >
-                    {o.acceptanceProbability}%
+                    {acceptanceBandShort(o.acceptanceProbability)}
                   </td>
                   <td className="px-3 py-2">
                     <MutualBadge score={o.mutualBenefitScore} />

@@ -143,7 +143,7 @@ export default function DraftAssistantPanel({
               </button>
               <div className="mt-2 flex items-center justify-between font-mono text-[10px]">
                 <span className="text-muted">Confidence</span>
-                <span className="text-boom">{conf}%</span>
+                <span className="text-boom uppercase">{conf >= 70 ? 'High' : conf >= 45 ? 'Moderate' : 'Low'}</span>
               </div>
               {onViewAnalysis && (
                 <button

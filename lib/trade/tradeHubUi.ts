@@ -209,6 +209,24 @@ export function acceptanceGlow(pct: number): string | undefined {
   return undefined;
 }
 
+// Acceptance is an uncalibrated heuristic (no accept/reject outcome data exists to
+// fit against), so surface it as a qualitative band rather than a false-precision
+// percentage. Thresholds mirror the rejection predictor's verdict cutoffs.
+export type AcceptanceBand = 'LIKELY ACCEPTED' | 'COIN FLIP' | 'LIKELY REJECTED';
+
+export function acceptanceBand(pct: number): AcceptanceBand {
+  if (pct >= 60) return 'LIKELY ACCEPTED';
+  if (pct >= 40) return 'COIN FLIP';
+  return 'LIKELY REJECTED';
+}
+
+/** Compact band label for tight chips. */
+export function acceptanceBandShort(pct: number): string {
+  if (pct >= 60) return 'Likely';
+  if (pct >= 40) return 'Coin Flip';
+  return 'Unlikely';
+}
+
 export function mutualBenefitColor(score: number): string {
   if (score >= 80) return '#36E7A1';
   if (score >= 60) return '#22c55e';

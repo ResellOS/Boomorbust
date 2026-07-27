@@ -13,6 +13,7 @@ import TradeCalculator, { type CalculatorAsset } from '@/components/trade/TradeC
 import {
 
   acceptanceColor,
+  acceptanceBandShort,
 
   calculatorAssetsFromOpportunity,
 
@@ -204,7 +205,7 @@ export default function TradeStagingArea({
 
               <Row label="Acceptance">
 
-                <CountUpDelta key={`${activeOpportunity.id}-acc`} value={acceptPct} style={{ color: acceptanceColor(acceptPct) }} />%
+                <span style={{ color: acceptanceColor(acceptPct) }}>{acceptanceBandShort(acceptPct)}</span>
 
               </Row>
 
@@ -222,7 +223,7 @@ export default function TradeStagingArea({
 
               <Row label="Mgr Interest">
 
-                <span className="text-boom">{mgrInterest}%</span>
+                <span className="text-boom">{mgrInterest >= 80 ? 'High' : mgrInterest >= 55 ? 'Moderate' : 'Low'}</span>
 
               </Row>
 

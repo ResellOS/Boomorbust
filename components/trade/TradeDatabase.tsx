@@ -17,6 +17,7 @@ import { opportunityToSuggestion } from '@/lib/trade/tradeHubUi';
 import {
 
   acceptanceColor,
+  acceptanceBandShort,
 
   typeBadgeStyle,
 
@@ -470,7 +471,7 @@ export default function TradeDatabase({
 
                   >
 
-                    {o.acceptanceProbability}%
+                    {acceptanceBandShort(o.acceptanceProbability)}
 
                   </td>
 

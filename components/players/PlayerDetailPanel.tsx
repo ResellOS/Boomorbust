@@ -501,8 +501,12 @@ export default function PlayerDetailPanel({
             <div className="font-mono text-[9px] uppercase text-muted">Suggested Opening Offer</div>
             <div className="font-figtree text-[12px] text-text">{tradeHints.openingOffer}</div>
             <div className="mt-1 font-mono text-[10px] text-boom">
-              <CountUpNumber value={tradeHints.acceptanceProbability} resetKey={pid} suffix="%" />
-              {' '}acceptance probability
+              {tradeHints.acceptanceProbability >= 60
+                ? 'Likely'
+                : tradeHints.acceptanceProbability >= 40
+                  ? 'Coin flip'
+                  : 'Unlikely'}
+              {' '}to be accepted
             </div>
           </div>
           {tradeExpanded ? (

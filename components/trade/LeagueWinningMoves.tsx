@@ -6,7 +6,7 @@ import TradePlayerHeadshot from '@/components/trade/TradePlayerHeadshot';
 import AnimatedCard from '@/components/ui/AnimatedCard';
 import GlowBorder from '@/components/ui/GlowBorder';
 import type { TradeOpportunity } from '@/lib/trade/types';
-import { acceptanceColor } from '@/lib/trade/tradeHubUi';
+import { acceptanceColor, acceptanceBandShort } from '@/lib/trade/tradeHubUi';
 
 type MoveKind = 'Best Buy Low' | 'Best Sell High' | 'Most Likely Accepted' | 'Highest Impact';
 
@@ -137,7 +137,7 @@ export default function LeagueWinningMoves({
                       <CountUpDelta key={`${o.id}-imp`} value={Math.round(o.championshipImpact * 10) / 10} />% impact
                     </span>
                     <span style={{ color: acceptanceColor(o.acceptanceProbability) }}>
-                      <CountUpDelta key={`${o.id}-acc`} value={o.acceptanceProbability} />% accept
+                      {acceptanceBandShort(o.acceptanceProbability)} to accept
                     </span>
                   </div>
                   <p className="mt-1 line-clamp-2 font-figtree text-[10px] leading-snug text-[#9aa8c4]">{reason}</p>

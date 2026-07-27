@@ -11,6 +11,7 @@ import type { TradeOpportunity } from '@/lib/trade/types';
 import {
 
   acceptanceColor,
+  acceptanceBand,
 
   acceptanceGlow,
 
@@ -252,17 +253,17 @@ export default function BestTradeHero({
 
                 <div>
 
-                  <div className="font-mono text-[8px] uppercase text-[#6b7a99]">Acceptance Probability</div>
+                  <div className="font-mono text-[8px] uppercase text-[#6b7a99]">Acceptance</div>
 
                   <div
 
-                    className="font-mono text-2xl tabular-nums"
+                    className="font-mono text-lg font-bold uppercase tracking-wide"
 
                     style={{ color: acceptColor, textShadow: acceptanceGlow(o.acceptanceProbability) }}
 
                   >
 
-                    {o.acceptanceProbability}%
+                    {acceptanceBand(o.acceptanceProbability)}
 
                   </div>
 
