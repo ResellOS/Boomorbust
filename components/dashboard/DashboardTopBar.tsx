@@ -17,6 +17,8 @@ export interface DashboardTopBarProps {
   portfolioDelta: number | null;
   strengthLabel?: string;
   strengthDisplay?: string;
+  /** Current-league (or most-urgent) focus score for the header. */
+  leagueFocus?: { score: number; level: 'HIGH' | 'MEDIUM' | 'LOW'; sub?: string } | null;
 }
 
 const GLOW = { textShadow: '0 0 9px rgba(54,231,161,0.45)' } as const;
@@ -30,13 +32,26 @@ export default function DashboardTopBar({
   portfolioDelta,
   strengthLabel = 'Portfolio Strength',
   strengthDisplay,
+  leagueFocus,
 }: DashboardTopBarProps) {
   const primaryStrength = strengthDisplay ?? formatScore(portfolioStrength);
+  const focusTone = leagueFocus?.level === 'HIGH' ? 'hold' : leagueFocus?.level === 'LOW' ? 'muted' : 'text';
 
   const cells: StatBarCell[] = [
     { label: strengthLabel, value: primaryStrength, tone: 'boom', glow: true },
     { label: "Today's Priorities", value: todaysPriorities },
     { label: 'Leagues', value: leagueCount, tone: 'boom', glow: true, animate: false },
+    ...(leagueFocus
+      ? [
+          {
+            label: 'League Focus',
+            value: leagueFocus.score,
+            tone: focusTone as 'hold' | 'muted' | 'text',
+            animate: false,
+            sub: leagueFocus.sub ? <span className="text-muted">{leagueFocus.sub}</span> : undefined,
+          } satisfies StatBarCell,
+        ]
+      : []),
     {
       label: 'Trade Offers',
       value: tradeOffers,
@@ -52,6 +67,7 @@ export default function DashboardTopBar({
   return (
     <StatBar
       cells={cells}
+      columnsClassName={cells.length >= 6 ? 'md:grid-cols-6' : 'md:grid-cols-5'}
       trailing={
         <div className="flex items-center gap-2">
           <GlobalSearch />

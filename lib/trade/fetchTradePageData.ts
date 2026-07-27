@@ -17,6 +17,8 @@ import { dedupeSuggestionsByPlayer } from '@/lib/trade/dedupeSuggestions';
 import type { PackageAsset } from '@/lib/trade/buildPackage';
 import { normalizeDirection60d } from '@/lib/dashboard/tickerSignal';
 import { reconcileLeaguesWithRosters } from '@/lib/league/reconcileLeagues';
+import { computeLeagueFocusScore } from '@/lib/dashboard/leagueFocus';
+import { mapDailyTaskRow } from '@/lib/dashboard/dailyTasks';
 import {
   buildOwnedPicksFromTradedData,
   defaultTargetSeasons,
@@ -791,6 +793,46 @@ export async function fetchTradePageData(userId: string): Promise<TradePageData>
   }
 
   stats.tradeOpportunities = opportunities.length;
+
+  // ── League Focus Score (0–100 urgency), live-computed per league ──────────
+  // Signals available here: incoming pending offers + the user's active daily
+  // tasks (by league) + lineup-window state. sell_window_alerts is empty today.
+  try {
+    const inSeason =
+      nflState != null && nflState.season_type === 'regular' && currentWeek >= 1 && currentWeek <= 18;
+    const tasksByLeague = new Map<string, { urgencyScore: number; impactScore?: number; expiresInHours?: number | null }[]>();
+    const { data: taskRows } = await supabase
+      .from('daily_tasks')
+      .select('*')
+      .eq('user_id', userId)
+      .in('status', ['pending', 'PENDING'])
+      .gt('expires_at', new Date().toISOString())
+      .limit(50);
+    for (const raw of taskRows ?? []) {
+      const t = mapDailyTaskRow(raw as Record<string, unknown>);
+      const lid = (t.taskData as { league_id?: string }).league_id;
+      if (!lid) continue;
+      if (!tasksByLeague.has(lid)) tasksByLeague.set(lid, []);
+      const h = t.expiresAt ? (new Date(t.expiresAt).getTime() - Date.now()) / 3_600_000 : null;
+      tasksByLeague.get(lid)!.push({ urgencyScore: t.urgencyScore, impactScore: t.impactScore, expiresInHours: Number.isFinite(h) ? h : null });
+    }
+
+    let topFocus: { score: number; level: 'HIGH' | 'MEDIUM' | 'LOW'; leagueName: string } | null = null;
+    for (const l of leagues) {
+      const offers = allOffers.filter((o) => o.leagueId === l.id && o.direction === 'incoming').map(() => ({ expiresInHours: null as number | null }));
+      const f = computeLeagueFocusScore({
+        pendingOffers: offers,
+        dailyTasks: tasksByLeague.get(l.id) ?? [],
+        lineup: { windowOpen: inSeason, hoursToLock: null },
+        sellWindowAlerts: 0,
+      });
+      l.focusScore = f;
+      if (!topFocus || f.score > topFocus.score) topFocus = { score: f.score, level: f.level, leagueName: l.name };
+    }
+    stats.topLeagueFocus = topFocus;
+  } catch (err) {
+    console.error('[trade] league focus failed:', err);
+  }
 
   return {
     stats,

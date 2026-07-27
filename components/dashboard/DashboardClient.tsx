@@ -216,6 +216,22 @@ export default function DashboardClient({
     [scopedLineup, players, scopedTradeTargets],
   );
 
+  // League Focus for the header: the current league in league view, else the
+  // most-urgent league across the portfolio (with its name as the sub-label).
+  const headerFocus = useMemo(() => {
+    if (currentLeague?.focusScore) {
+      const f = currentLeague.focusScore;
+      return { score: f.score, level: f.level, sub: f.reasons[0]?.label };
+    }
+    let top: { league: typeof leagues[number]; score: number } | null = null;
+    for (const l of leagues) {
+      const s = l.focusScore?.score ?? 0;
+      if (!top || s > top.score) top = { league: l, score: s };
+    }
+    if (!top || !top.league.focusScore) return null;
+    return { score: top.league.focusScore.score, level: top.league.focusScore.level, sub: top.league.name };
+  }, [currentLeague, leagues]);
+
   const fallbackFeedItem = opportunityItems[0] ?? null;
   const pendingOffers = incomingTrades.filter((t) => t.status === 'PENDING' || t.status === 'NEW').length;
   const todaysPriorities = buildMissionCards(scopedTasks, scopedLineup, 3).length;
@@ -237,6 +253,7 @@ export default function DashboardClient({
         portfolioDelta={empireDelta}
         strengthLabel={gps.strengthLabel}
         strengthDisplay={gps.strengthValue}
+        leagueFocus={headerFocus}
       />
 
       <div className="col-start-1 row-start-2 flex min-h-0 min-w-0 flex-col overflow-hidden lg:col-start-2 lg:grid lg:grid-cols-[1fr_280px]">

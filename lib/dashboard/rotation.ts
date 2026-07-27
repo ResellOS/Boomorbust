@@ -128,6 +128,8 @@ export interface LeagueBundle {
   breakdown: RosterBreakdown;
   /** Last Sleeper sync timestamp for this league (ISO), for freshness dots. */
   syncedAt: string | null;
+  /** 0–100 urgency (how much this league needs attention now) + why. Live-computed. */
+  focusScore: import('./leagueFocus').LeagueFocusScore | null;
 }
 
 export interface PortfolioBundle {

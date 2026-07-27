@@ -31,6 +31,15 @@ import { normalizeDirection60d } from '@/lib/dashboard/tickerSignal';
 import { computeFrontOfficePriority } from './priorityAction';
 import { tallyMarketSignals, emptySignalCounts as emptySignals } from './marketSignals';
 import { reconcileLeaguesWithRosters } from '@/lib/league/reconcileLeagues';
+import { computeLeagueFocusScore, type LeagueFocusScore } from '@/lib/dashboard/leagueFocus';
+import { mapDailyTaskRow } from '@/lib/dashboard/dailyTasks';
+
+function hoursUntil(iso: string | null | undefined): number | null {
+  if (!iso) return null;
+  const t = new Date(iso).getTime();
+  if (!Number.isFinite(t)) return null;
+  return (t - Date.now()) / 3_600_000;
+}
 
 function buildEmptyDashboardData(nflSeason: DashboardRotationData['nflSeason']): DashboardRotationData {
   return {
@@ -531,6 +540,7 @@ export async function fetchRotationData(
       signalCounts,
       breakdown: computeRosterBreakdown(players, rosterPositions, status),
       syncedAt: l.synced_at ?? null,
+      focusScore: null, // set below once incoming trades + tasks are loaded
     };
   });
 
@@ -757,8 +767,54 @@ export async function fetchRotationData(
     }
   }
 
+  // ── League Focus Score (0–100 urgency) — live-computed per league ─────────
+  // Composed from signals already loaded here: pending incoming trade offers,
+  // the user's active daily tasks bucketed by league, and lineup-window state.
+  // (sell_window_alerts is engine-populated and empty today → contributes 0.)
+  const focusByLeague = new Map<string, LeagueFocusScore>();
+  {
+    const tasksByLeague = new Map<string, { urgencyScore: number; impactScore?: number; expiresInHours?: number | null }[]>();
+    try {
+      const { data: taskRows } = await supabase
+        .from('daily_tasks')
+        .select('*')
+        .eq('user_id', userId)
+        .in('status', ['pending', 'PENDING'])
+        .gt('expires_at', new Date().toISOString())
+        .limit(50);
+      for (const raw of taskRows ?? []) {
+        const t = mapDailyTaskRow(raw as Record<string, unknown>);
+        const lid = (t.taskData as { league_id?: string }).league_id;
+        if (!lid) continue;
+        if (!tasksByLeague.has(lid)) tasksByLeague.set(lid, []);
+        tasksByLeague.get(lid)!.push({
+          urgencyScore: t.urgencyScore,
+          impactScore: t.impactScore,
+          expiresInHours: hoursUntil(t.expiresAt),
+        });
+      }
+    } catch (err) {
+      console.error('[dashboard] focus daily_tasks fetch failed:', err);
+    }
+
+    for (const l of leagues) {
+      const offers = incomingTrades
+        .filter((t) => t.leagueId === l.id)
+        .map(() => ({ expiresInHours: null as number | null })); // Sleeper trades have no hard expiry
+      focusByLeague.set(
+        l.id,
+        computeLeagueFocusScore({
+          pendingOffers: offers,
+          dailyTasks: tasksByLeague.get(l.id) ?? [],
+          lineup: { windowOpen: nflSeason.inSeason, hoursToLock: null },
+          sellWindowAlerts: 0,
+        }),
+      );
+    }
+  }
+
   return {
-    leagues,
+    leagues: leagues.map((l) => ({ ...l, focusScore: focusByLeague.get(l.id) ?? null })),
     portfolio,
     tradeTargets,
     overvalued,

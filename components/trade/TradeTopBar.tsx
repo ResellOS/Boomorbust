@@ -22,7 +22,18 @@ export default function TradeTopBar({ stats }: TradeTopBarProps) {
       sub: 'Available',
     },
     { label: 'Leagues Active', value: stats.leaguesActive, tone: 'text', sub: 'All Connected', animate: false },
+    ...(stats.topLeagueFocus
+      ? [
+          {
+            label: 'League Focus',
+            value: stats.topLeagueFocus.score,
+            tone: (stats.topLeagueFocus.level === 'HIGH' ? 'hold' : stats.topLeagueFocus.level === 'LOW' ? 'muted' : 'text') as 'hold' | 'muted' | 'text',
+            animate: false,
+            sub: <span className="text-muted">{stats.topLeagueFocus.leagueName}</span>,
+          } satisfies StatBarCell,
+        ]
+      : []),
   ];
 
-  return <StatBar cells={cells} />;
+  return <StatBar cells={cells} columnsClassName={cells.length >= 6 ? 'md:grid-cols-6' : 'md:grid-cols-5'} />;
 }

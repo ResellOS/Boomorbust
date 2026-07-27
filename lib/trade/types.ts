@@ -43,6 +43,8 @@ export interface TradeLeague {
   status?: string | null;
   tag: 'Contender' | 'Rebuild';
   dotColor: string;
+  /** 0–100 urgency + why (live-computed). */
+  focusScore?: import('@/lib/dashboard/leagueFocus').LeagueFocusScore | null;
 }
 
 export interface BobSuggestion {
@@ -158,6 +160,8 @@ export interface TradePageStats {
   championshipOdds: number;
   /** Count of ranked trade opportunities. */
   tradeOpportunities: number;
+  /** Most-urgent connected league's focus score, for the header. */
+  topLeagueFocus?: { score: number; level: 'HIGH' | 'MEDIUM' | 'LOW'; leagueName: string } | null;
 }
 
 export interface TradePageFooter {
